@@ -44,7 +44,7 @@ public class GameController
 	 */
 	public static PlayerJoinReturnValue addPlayer(MessageChannel channelID, User playerID)
 	{
-		if(!(playerID.equals(playerA.user)||playerID.equals(playerB.user)))
+		if(!((playerA != null && playerID.equals(playerA.user))||(playerB != null && playerID.equals(playerB.user))))
 		{
 			switch(playersJoined)
 			{
@@ -76,7 +76,7 @@ public class GameController
 	{
 		if(gameStatus != 0)
 			return PlayerQuitReturnValue.GAMEINPROGRESS;
-		if(playerID == playerA.user)
+		if(playerA != null && playerID == playerA.user)
 		{
 			playerA = null;
 			playersJoined--;
@@ -94,7 +94,7 @@ public class GameController
 			}
 			return PlayerQuitReturnValue.SUCCESS;
 		}
-		else if(playerID == playerB.user)
+		else if(playerB != null && playerID == playerB.user)
 		{
 			playerB = null;
 			playersJoined--;
@@ -175,9 +175,9 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		displayBoardAndStatus();
 		channel.sendMessage(currentPlayer.user.getName() + ", your turn. Choose a space on the board.")
 			.completeAfter(3,TimeUnit.SECONDS);
+		displayBoardAndStatus();
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -226,9 +226,9 @@ public class GameController
 					}
 					if(gameStatus == 4)
 					{
-						displayBoardAndStatus();
 						channel.sendMessage("Game Over. " + currentPlayer.user.getName() + " Wins!")
-							.completeAfter(5,TimeUnit.SECONDS);
+							.completeAfter(3,TimeUnit.SECONDS);
+						displayBoardAndStatus();
 						reset();
 					}
 					else
@@ -253,6 +253,7 @@ public class GameController
 	{
 		//Build up board display
 		StringBuilder board = new StringBuilder().append("```\n");
+		board.append("     RtaB     \n");
 		for(int i=0; i<boardSize; i++)
 		{
 			if(pickedNumbers[i])
@@ -279,12 +280,14 @@ public class GameController
 		int nameLength = Math.max(nameA.length(),nameB.length())+1;
 		//And ignore the negative sign if there is one
 		int moneyLength = Math.max(String.valueOf(Math.abs(moneyA)).length(),String.valueOf(Math.abs(moneyB)).length());
+		//Make a little extra room for the commas
+		moneyLength += (moneyLength-1)/3;
 		//Then start printing, Player A first - including pointer if currently their turn
 		if(currentPlayer.equals(playerA))
-			board.append(">");
+			board.append("> ");
 		else
-			board.append(" ");
-		board.append(String.format("|%-"+nameLength+"s|",nameA));
+			board.append("  ");
+		board.append(String.format("%-"+nameLength+"s",nameA));
 		//Now figure out if we need a negative sign, a space, or neither
 		if(moneyA<0)
 			board.append("-");
@@ -292,14 +295,14 @@ public class GameController
 			board.append(" ");
 		//Then print the money itself
 		board.append("$");
-		board.append(String.format("|%,"+moneyLength+"d|",moneyA));
+		board.append(String.format("%,"+moneyLength+"d",Math.abs(moneyA)));
 		board.append("\n");
 		//Do the whole thing again for Player B!
 		if(currentPlayer.equals(playerB))
-			board.append(">");
+			board.append("> ");
 		else
-			board.append(" ");
-		board.append(String.format("|%-"+nameLength+"s|",nameB));
+			board.append("  ");
+		board.append(String.format("%-"+nameLength+"s",nameB));
 		//Now figure out if we need a negative sign, a space, or neither
 		if(moneyB<0)
 			board.append("-");
@@ -307,7 +310,7 @@ public class GameController
 			board.append(" ");
 		//Then print the money itself
 		board.append("$");
-		board.append(String.format("|%,"+moneyLength+"d|",moneyB));
+		board.append(String.format("%,"+moneyLength+"d",Math.abs(moneyB)));
 		board.append("\n");
 		//Close it off and print it out
 		board.append("```");
