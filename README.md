@@ -6,6 +6,14 @@ Minor Versions are standard updates including new features
 Both alpha and beta replace patch numbering
 Patch Versions are bugfixes found after release of minor version
 
+1.0.0 (planned)
+ - Added bots! Bots will play the game if no one else joins within 2 minutes.
+ - First public release, heralding the start of Season 1.
+ 
+0.4.0 (planned)
+ - Cash amounts now vary from $10,000 to $1,000,000, along with -$10,000 to -$50,000.
+ - The winner now gets a bonus for every space left on the board.
+
 0.3.0
  - Bot now refers to players by their nicknames rather than their usernames, and uses mentions to alert players during the game.
  - Improved suspense mode to not trigger all the time
