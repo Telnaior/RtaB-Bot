@@ -367,7 +367,9 @@ public class GameController
 				list.add(playerA.uID+":"+playerA.name+":"+playerA.money);
 			if(!bFound)
 				list.add(playerB.uID+":"+playerB.name+":"+playerB.money);
-			//Then rewrite it
+			//Then sort and rewrite it
+			DescendingScoreSorter sorter = new DescendingScoreSorter();
+			list.sort(sorter);
 			Path file = Paths.get("scores.csv");
 			Path fileOld = Paths.get("scoresOld.csv");
 			Files.delete(fileOld);
