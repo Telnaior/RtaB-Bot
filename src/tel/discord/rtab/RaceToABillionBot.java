@@ -13,8 +13,10 @@ import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
 import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.QuitCommand;
+import tel.discord.rtab.commands.RankCommand;
 import tel.discord.rtab.commands.ResetCommand;
 import tel.discord.rtab.commands.ShutdownBotCommand;
+import tel.discord.rtab.commands.TopCommand;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -35,6 +37,8 @@ public class RaceToABillionBot
 		utilities.addCommand(new HelpCommand());
 		utilities.addCommand(new JoinCommand());
 		utilities.addCommand(new QuitCommand());
+		utilities.addCommand(new RankCommand());
+		utilities.addCommand(new TopCommand());
 		utilities.addCommand(new PingBotCommand());
 		utilities.addCommand(new ResetCommand());
 		utilities.addCommand(new ShutdownBotCommand());

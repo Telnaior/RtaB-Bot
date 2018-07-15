@@ -13,7 +13,7 @@ Patch Versions are bugfixes found after release of minor version
 0.4.0 (planned)
  - Cash amounts now vary from $10,000 to $1,000,000, along with -$10,000 to -$50,000.
  - The winner now gets a bonus for every space left on the board.
- - Score file is now sorted, allowing for !rank and !top.
+ - Score file is now sorted, and !rank and !top have been created to take advantage of this.
 
 0.3.0
  - Bot now refers to players by their nicknames rather than their usernames, and uses mentions to alert players during the game.

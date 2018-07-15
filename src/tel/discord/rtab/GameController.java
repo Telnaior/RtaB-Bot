@@ -335,38 +335,18 @@ public class GameController
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
-			String[] record;
-			boolean aFound = false;
-			boolean bFound = false;
+			int aLocation,bLocation;
 			//Replace the records of the players if they're there, otherwise add them
-			for(int i=0; i<list.size(); i++)
-			{
-				/*
-				 * record format:
-				 * record[0] = uID
-				 * record[1] = name
-				 * record[2] = money
-				 */
-				record = list.get(i).split(":");
-				if(record[0].equals(playerA.uID))
-				{
-					list.set(i,playerA.uID+":"+playerA.name+":"+playerA.money);
-					aFound = true;
-				}
-				else if(record[0].equals(playerB.uID))
-				{
-					list.set(i,playerB.uID+":"+playerB.name+":"+playerB.money);
-					bFound = true;
-				}
-				//No need to continue if we've already found them both
-				if(aFound && bFound)
-					break;
-			}
-			//Add them to the end if they haven't been found
-			if(!aFound)
+			aLocation = findUserInList(list,playerA.uID,false);
+			bLocation = findUserInList(list,playerB.uID,false);
+			if(aLocation == -1)
 				list.add(playerA.uID+":"+playerA.name+":"+playerA.money);
-			if(!bFound)
+			else
+				list.set(aLocation,playerA.uID+":"+playerA.name+":"+playerA.money);
+			if(bLocation == -1)
 				list.add(playerB.uID+":"+playerB.name+":"+playerB.money);
+			else
+				list.set(bLocation,playerB.uID+":"+playerB.name+":"+playerB.money);
 			//Then sort and rewrite it
 			DescendingScoreSorter sorter = new DescendingScoreSorter();
 			list.sort(sorter);
@@ -381,5 +361,27 @@ public class GameController
 		{
 			e.printStackTrace();
 		}
+	}
+	public static int findUserInList(List<String> list, String userID, boolean isName)
+	{
+		int field;
+		if(isName)
+			field = 1;
+		else
+			field = 0;
+		/*
+		 * record format:
+		 * record[0] = uID
+		 * record[1] = name
+		 * record[2] = money
+		 */
+		String[] record;
+		for(int i=0; i<list.size(); i++)
+		{
+			record = list.get(i).split(":");
+			if(record[field].equals(userID))
+				return i;
+		}
+		return -1;
 	}
 }
