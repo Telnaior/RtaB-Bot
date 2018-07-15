@@ -20,7 +20,8 @@ public class GameController
 	static Player currentPlayer = null;
 	public static int playersJoined = 0;
 	public static int gameStatus = 0;
-	static boolean[] pickedNumbers = new boolean[boardSize];
+	static boolean[] pickedSpaces = new boolean[boardSize];
+	static int spacesLeft = boardSize;
 	static boolean[] bombs = new boolean[boardSize];
 	public static EventWaiter waiter;
 	/*
@@ -34,7 +35,8 @@ public class GameController
 		currentPlayer = null;
 		playersJoined = 0;
 		gameStatus = 0;
-		pickedNumbers = new boolean[15];
+		pickedSpaces = new boolean[15];
+		spacesLeft = boardSize;
 		bombs = new boolean[15];
 	}
 	/*
@@ -187,7 +189,7 @@ public class GameController
 							&& checkValidNumber(e.getMessage().getContentRaw()))
 					{
 							int location = Integer.parseInt(e.getMessage().getContentRaw());
-							if(pickedNumbers[location-1])
+							if(pickedSpaces[location-1])
 							{
 								channel.sendMessage("That space has already been picked.").queue();
 								return false;
@@ -201,17 +203,20 @@ public class GameController
 				e -> 
 				{
 					int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
-					pickedNumbers[location] = true;
+					pickedSpaces[location] = true;
 					channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
-					channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 					if(bombs[location])
 					{
+						if(Math.random()<0.5)
+							channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 						channel.sendMessage("**BOOM**").completeAfter(3,TimeUnit.SECONDS);
 						currentPlayer.money -= 250000;
 						gameStatus = 4;
 					}
 					else
 					{
+						if((Math.random()*spacesLeft)<spacesLeft)
+							channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 						channel.sendMessage("**$100,000**").completeAfter(3,TimeUnit.SECONDS);
 						currentPlayer.money += 100000;
 					}
@@ -257,7 +262,7 @@ public class GameController
 		board.append("     RtaB     \n");
 		for(int i=0; i<boardSize; i++)
 		{
-			if(pickedNumbers[i])
+			if(pickedSpaces[i])
 			{
 				board.append("  ");
 			}
