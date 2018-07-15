@@ -1,5 +1,10 @@
 package tel.discord.rtab;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
@@ -236,6 +241,7 @@ public class GameController
 						channel.sendMessage("Game Over. " + currentPlayer.user.getAsMention() + " Wins!")
 							.completeAfter(3,TimeUnit.SECONDS);
 						displayBoardAndStatus();
+						saveData();
 						reset();
 					}
 					else
@@ -322,5 +328,54 @@ public class GameController
 		//Close it off and print it out
 		board.append("```");
 		channel.sendMessage(board.toString()).queue();
+	}
+	static void saveData()
+	{
+		try
+		{
+			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			String[] record;
+			boolean aFound = false;
+			boolean bFound = false;
+			//Replace the records of the players if they're there, otherwise add them
+			for(int i=0; i<list.size(); i++)
+			{
+				/*
+				 * record format:
+				 * record[0] = uID
+				 * record[1] = name
+				 * record[2] = money
+				 */
+				record = list.get(i).split(":");
+				if(record[0].equals(playerA.uID))
+				{
+					list.set(i,playerA.uID+":"+playerA.name+":"+playerA.money);
+					aFound = true;
+				}
+				else if(record[0].equals(playerB.uID))
+				{
+					list.set(i,playerB.uID+":"+playerB.name+":"+playerB.money);
+					bFound = true;
+				}
+				//No need to continue if we've already found them both
+				if(aFound && bFound)
+					break;
+			}
+			//Add them to the end if they haven't been found
+			if(!aFound)
+				list.add(playerA.uID+":"+playerA.name+":"+playerA.money);
+			if(!bFound)
+				list.add(playerB.uID+":"+playerB.name+":"+playerB.money);
+			//Then rewrite it
+			Path file = Paths.get("scores.csv");
+			Path fileOld = Paths.get("scoresOld.csv");
+			Files.copy(file,fileOld);
+			Files.delete(file);
+			Files.write(file, list);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

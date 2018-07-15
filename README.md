@@ -7,7 +7,7 @@ Both alpha and beta replace patch numbering
 Patch Versions are bugfixes found after release of minor version
 
 0.3.0
- - Bot now refers to players by their nicknames rather than their usernames.
+ - Bot now refers to players by their nicknames rather than their usernames, and uses mentions to alert players during the game.
  - Improved suspense mode to not trigger all the time
  - Improved player tracking, and added persistence! Money now carries over from game to game.
 
