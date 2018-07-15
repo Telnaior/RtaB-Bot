@@ -178,7 +178,7 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		channel.sendMessage(currentPlayer.name + ", your turn. Choose a space on the board.")
+		channel.sendMessage(currentPlayer.user.getAsMention() + ", your turn. Choose a space on the board.")
 			.completeAfter(3,TimeUnit.SECONDS);
 		displayBoardAndStatus();
 		waiter.waitForEvent(MessageReceivedEvent.class,
@@ -210,6 +210,7 @@ public class GameController
 						if(Math.random()<0.5)
 							channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 						channel.sendMessage("**BOOM**").completeAfter(3,TimeUnit.SECONDS);
+						channel.sendMessage(currentPlayer.user.getAsMention() + " loses $250,000 as penalty for blowing up.");
 						currentPlayer.money -= 250000;
 						gameStatus = 4;
 					}
@@ -232,7 +233,7 @@ public class GameController
 					}
 					if(gameStatus == 4)
 					{
-						channel.sendMessage("Game Over. " + currentPlayer.name + " Wins!")
+						channel.sendMessage("Game Over. " + currentPlayer.user.getAsMention() + " Wins!")
 							.completeAfter(3,TimeUnit.SECONDS);
 						displayBoardAndStatus();
 						reset();
