@@ -14,9 +14,9 @@ public class GameController
 {
 	static final int boardSize = 15;
 	static MessageChannel channel = null;
-	static User playerA = null;
-	static User playerB = null;
-	static User currentPlayer = null;
+	static Player playerA = null;
+	static Player playerB = null;
+	static Player currentPlayer = null;
 	public static int playersJoined = 0;
 	public static int gameStatus = 0;
 	static boolean[] pickedNumbers = new boolean[boardSize];
@@ -44,20 +44,20 @@ public class GameController
 	 */
 	public static PlayerJoinReturnValue addPlayer(MessageChannel channelID, User playerID)
 	{
-		if(!(playerID.equals(playerA)||playerID.equals(playerB)))
+		if(!(playerID.equals(playerA.user)||playerID.equals(playerB.user)))
 		{
 			switch(playersJoined)
 			{
 			case 0:
 				channel = channelID;
-				playerA = playerID;
+				playerA = new Player(playerID);
 				playersJoined++;
-				channel.sendMessage(playerA.getName() + " joined the game. One more player is required.").queue();
+				channel.sendMessage(playerA.user.getName() + " joined the game. One more player is required.").queue();
 				return PlayerJoinReturnValue.JOINED1;
 			case 1:
-				playerB = playerID;
+				playerB = new Player(playerID);
 				playersJoined++;
-				channel.sendMessage(playerB.getName() + " joined the game. The game is now starting. Please PM bombs within the next 60 seconds.").queue();
+				channel.sendMessage(playerB.user.getName() + " joined the game. The game is now starting. Please PM bombs within the next 60 seconds.").queue();
 				getBombs();
 				return PlayerJoinReturnValue.JOINED2;
 			default:
@@ -76,7 +76,7 @@ public class GameController
 	{
 		if(gameStatus != 0)
 			return PlayerQuitReturnValue.GAMEINPROGRESS;
-		if(playerID == playerA)
+		if(playerID == playerA.user)
 		{
 			playerA = null;
 			playersJoined--;
@@ -94,7 +94,7 @@ public class GameController
 			}
 			return PlayerQuitReturnValue.SUCCESS;
 		}
-		else if(playerID == playerB)
+		else if(playerID == playerB.user)
 		{
 			playerB = null;
 			playersJoined--;
@@ -114,19 +114,19 @@ public class GameController
 		//Declare game in progress
 		gameStatus = 1;
 		//Request players send in bombs
-		playerA.openPrivateChannel().queue(
+		playerA.user.openPrivateChannel().queue(
 				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
-		playerB.openPrivateChannel().queue(
+		playerB.user.openPrivateChannel().queue(
 				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
 		//Wait for bombs to return
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Check if right player, and valid bomb pick
-				e -> (e.getAuthor().equals(playerA) && checkValidNumber(e.getMessage().getContentRaw())),
+				e -> (e.getAuthor().equals(playerA.user) && checkValidNumber(e.getMessage().getContentRaw())),
 				//Parse it and update the bomb board
 				e -> 
 				{
 					bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-					playerA.openPrivateChannel().queue(
+					playerA.user.openPrivateChannel().queue(
 							(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
 					checkReady();
 				},
@@ -138,12 +138,12 @@ public class GameController
 				});
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Check if right player, and valid bomb pick
-				e -> (e.getAuthor().equals(playerB) && checkValidNumber(e.getMessage().getContentRaw())),
+				e -> (e.getAuthor().equals(playerB.user) && checkValidNumber(e.getMessage().getContentRaw())),
 				//Parse it and update the bomb board
 				e -> 
 				{
 					bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-					playerB.openPrivateChannel().queue(
+					playerB.user.openPrivateChannel().queue(
 							(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
 					checkReady();
 				},
@@ -175,33 +175,14 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		channel.sendMessage(currentPlayer.getName() + ", your turn. Choose a space on the board.")
-			.completeAfter(5,TimeUnit.SECONDS);
-		//Build up board display
-		String board = "```\n";
-		for(int i=0; i<boardSize; i++)
-		{
-			if(pickedNumbers[i])
-			{
-				board = board.concat("  ");
-			}
-			else
-			{
-				board = board.concat(String.format("%02d",(i+1)));
-			}
-			if(i%5==4)
-				board = board.concat("\n");
-			else
-				board = board.concat(" ");
-		}
-		board = board.concat("```");
-		System.out.println(board);
-		channel.sendMessage(board).queue();
+		displayBoardAndStatus();
+		channel.sendMessage(currentPlayer.user.getName() + ", your turn. Choose a space on the board.")
+			.completeAfter(3,TimeUnit.SECONDS);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
 				{
-					if(e.getAuthor().equals(currentPlayer) && e.getChannel().equals(channel)
+					if(e.getAuthor().equals(currentPlayer.user) && e.getChannel().equals(channel)
 							&& checkValidNumber(e.getMessage().getContentRaw()))
 					{
 							int location = Integer.parseInt(e.getMessage().getContentRaw());
@@ -225,19 +206,29 @@ public class GameController
 					if(bombs[location])
 					{
 						channel.sendMessage("**BOOM**").completeAfter(3,TimeUnit.SECONDS);
+						currentPlayer.money -= 250000;
 						gameStatus = 4;
 					}
 					else
 					{
-						channel.sendMessage("SAFE").completeAfter(3,TimeUnit.SECONDS);
+						channel.sendMessage("**$100,000**").completeAfter(3,TimeUnit.SECONDS);
+						currentPlayer.money += 100000;
 					}
-					if(currentPlayer.equals(playerA))
+					if(currentPlayer.user.equals(playerA.user))
+					{
+						playerA.money = currentPlayer.money;
 						currentPlayer = playerB;
+					}
 					else
+					{
+						playerB.money = currentPlayer.money;
 						currentPlayer = playerA;
+					}
 					if(gameStatus == 4)
 					{
-						channel.sendMessage("Game Over. " + currentPlayer.getName() + " Wins!").completeAfter(5,TimeUnit.SECONDS);
+						displayBoardAndStatus();
+						channel.sendMessage("Game Over. " + currentPlayer.user.getName() + " Wins!")
+							.completeAfter(5,TimeUnit.SECONDS);
 						reset();
 					}
 					else
@@ -257,5 +248,69 @@ public class GameController
 		{
 			return false;
 		}
+	}
+	static void displayBoardAndStatus()
+	{
+		//Build up board display
+		StringBuilder board = new StringBuilder().append("```\n");
+		for(int i=0; i<boardSize; i++)
+		{
+			if(pickedNumbers[i])
+			{
+				board.append("  ");
+			}
+			else
+			{
+				board.append(String.format("%02d",(i+1)));
+			}
+			if(i%5==4)
+				board.append("\n");
+			else
+				board.append(" ");
+		}
+		board.append("\n");
+		//Next the status line
+		//Start by getting the lengths so we can pad the status bars appropriately
+		String nameA = playerA.user.getName();
+		String nameB = playerB.user.getName();
+		int moneyA = playerA.money;
+		int moneyB = playerB.money;
+		//Add one extra to name length because we want one extra space between name and cash
+		int nameLength = Math.max(nameA.length(),nameB.length())+1;
+		//And ignore the negative sign if there is one
+		int moneyLength = Math.max(String.valueOf(Math.abs(moneyA)).length(),String.valueOf(Math.abs(moneyB)).length());
+		//Then start printing, Player A first - including pointer if currently their turn
+		if(currentPlayer.equals(playerA))
+			board.append(">");
+		else
+			board.append(" ");
+		board.append(String.format("|%-"+nameLength+"s|",nameA));
+		//Now figure out if we need a negative sign, a space, or neither
+		if(moneyA<0)
+			board.append("-");
+		else if(moneyB<0)
+			board.append(" ");
+		//Then print the money itself
+		board.append("$");
+		board.append(String.format("|%,"+moneyLength+"d|",moneyA));
+		board.append("\n");
+		//Do the whole thing again for Player B!
+		if(currentPlayer.equals(playerB))
+			board.append(">");
+		else
+			board.append(" ");
+		board.append(String.format("|%-"+nameLength+"s|",nameB));
+		//Now figure out if we need a negative sign, a space, or neither
+		if(moneyB<0)
+			board.append("-");
+		else if(moneyA<0)
+			board.append(" ");
+		//Then print the money itself
+		board.append("$");
+		board.append(String.format("|%,"+moneyLength+"d|",moneyB));
+		board.append("\n");
+		//Close it off and print it out
+		board.append("```");
+		channel.sendMessage(board.toString()).queue();
 	}
 }
