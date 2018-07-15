@@ -15,7 +15,7 @@ public class JoinCommand extends Command
 	@Override
 	protected void execute(CommandEvent event)
 	{
-		switch(GameController.addPlayer(event.getChannel(),event.getAuthor()))
+		switch(GameController.addPlayer(event.getChannel(),event.getMember()))
 		{
 		case JOINED1:
 		case JOINED2:

@@ -6,10 +6,12 @@ import net.dv8tion.jda.core.entities.User;
 class Player
 {
 	User user;
+	String name;
 	int money;
-	Player(User playerName)
+	Player(User playerName, String nickname)
 	{
 		user = playerName;
+		name = nickname;
 		money = 0;
 	}
 }

@@ -2,6 +2,7 @@ package tel.discord.rtab;
 
 import java.util.concurrent.TimeUnit;
 
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -42,22 +43,22 @@ public class GameController
 	 * String playerID - ID of player to be added.
 	 * Returns an enum which gives the result of the join attempt.
 	 */
-	public static PlayerJoinReturnValue addPlayer(MessageChannel channelID, User playerID)
+	public static PlayerJoinReturnValue addPlayer(MessageChannel channelID, Member playerID)
 	{
-		if(!((playerA != null && playerID.equals(playerA.user))||(playerB != null && playerID.equals(playerB.user))))
+		if(!((playerA != null && playerID.getUser().equals(playerA.user))||(playerB != null && playerID.getUser().equals(playerB.user))))
 		{
 			switch(playersJoined)
 			{
 			case 0:
 				channel = channelID;
-				playerA = new Player(playerID);
+				playerA = new Player(playerID.getUser(),playerID.getNickname());
 				playersJoined++;
-				channel.sendMessage(playerA.user.getName() + " joined the game. One more player is required.").queue();
+				channel.sendMessage(playerA.name + " joined the game. One more player is required.").queue();
 				return PlayerJoinReturnValue.JOINED1;
 			case 1:
-				playerB = new Player(playerID);
+				playerB = new Player(playerID.getUser(),playerID.getNickname());
 				playersJoined++;
-				channel.sendMessage(playerB.user.getName() + " joined the game. The game is now starting. Please PM bombs within the next 60 seconds.").queue();
+				channel.sendMessage(playerB.name + " joined the game. The game is now starting. Please PM bombs within the next 60 seconds.").queue();
 				getBombs();
 				return PlayerJoinReturnValue.JOINED2;
 			default:
@@ -175,7 +176,7 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		channel.sendMessage(currentPlayer.user.getName() + ", your turn. Choose a space on the board.")
+		channel.sendMessage(currentPlayer.name + ", your turn. Choose a space on the board.")
 			.completeAfter(3,TimeUnit.SECONDS);
 		displayBoardAndStatus();
 		waiter.waitForEvent(MessageReceivedEvent.class,
@@ -226,7 +227,7 @@ public class GameController
 					}
 					if(gameStatus == 4)
 					{
-						channel.sendMessage("Game Over. " + currentPlayer.user.getName() + " Wins!")
+						channel.sendMessage("Game Over. " + currentPlayer.name + " Wins!")
 							.completeAfter(3,TimeUnit.SECONDS);
 						displayBoardAndStatus();
 						reset();
@@ -272,8 +273,8 @@ public class GameController
 		board.append("\n");
 		//Next the status line
 		//Start by getting the lengths so we can pad the status bars appropriately
-		String nameA = playerA.user.getName();
-		String nameB = playerB.user.getName();
+		String nameA = playerA.name;
+		String nameB = playerB.name;
 		int moneyA = playerA.money;
 		int moneyB = playerB.money;
 		//Add one extra to name length because we want one extra space between name and cash
