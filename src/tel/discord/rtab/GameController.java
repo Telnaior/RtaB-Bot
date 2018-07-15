@@ -115,35 +115,13 @@ public class GameController
 		gameStatus = 1;
 		//Request players send in bombs
 		playerA.openPrivateChannel().queue(
-				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-15").queue());
+				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
 		playerB.openPrivateChannel().queue(
-				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-15").queue());
+				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
 		//Wait for bombs to return
 		waiter.waitForEvent(MessageReceivedEvent.class,
-				//Right player
-				e ->
-				{
-					if(e.getAuthor().equals(playerA))
-					{
-						try
-						{
-							int location = Integer.parseInt(e.getMessage().getContentRaw());
-							if(location > 0 && location <= boardSize)
-								return true;
-							else
-							{
-								playerA.openPrivateChannel().queue(
-										(channel) -> channel.sendMessage("Number out of range, 1-15 expected.").queue());
-								return false;
-							}
-						}
-						catch(NumberFormatException e1)
-						{
-							return false;
-						}
-					}
-					return false;
-				},
+				//Check if right player, and valid bomb pick
+				e -> (e.getAuthor().equals(playerA) && checkValidNumber(e.getMessage().getContentRaw())),
 				//Parse it and update the bomb board
 				e -> 
 				{
@@ -159,31 +137,8 @@ public class GameController
 					checkReady();
 				});
 		waiter.waitForEvent(MessageReceivedEvent.class,
-				//Right player
-				e ->
-				{
-					if(e.getAuthor().equals(playerB))
-					{
-						//Make sure it's actually a number and in range
-						try
-						{
-							int location = Integer.parseInt(e.getMessage().getContentRaw());
-							if(location > 0 && location <= boardSize)
-								return true;
-							else
-							{
-								playerB.openPrivateChannel().queue(
-										(channel) -> channel.sendMessage("Number out of range, 1-15 expected.").queue());
-								return false;
-							}
-						}
-						catch(NumberFormatException e1)
-						{
-							return false;
-						}
-					}
-					return false;
-				},
+				//Check if right player, and valid bomb pick
+				e -> (e.getAuthor().equals(playerB) && checkValidNumber(e.getMessage().getContentRaw())),
 				//Parse it and update the bomb board
 				e -> 
 				{
@@ -246,29 +201,17 @@ public class GameController
 				//Right player and channel
 				e ->
 				{
-					if(e.getAuthor().equals(currentPlayer) && e.getChannel().equals(channel))
+					if(e.getAuthor().equals(currentPlayer) && e.getChannel().equals(channel)
+							&& checkValidNumber(e.getMessage().getContentRaw()))
 					{
-						try
-						{
 							int location = Integer.parseInt(e.getMessage().getContentRaw());
-							if(location > 0 && location <= boardSize)
-								if(pickedNumbers[location-1])
-								{
-									channel.sendMessage("That space has already been picked.").queue();
-									return false;
-								}
-								else
-									return true;
-							else
+							if(pickedNumbers[location-1])
 							{
-								channel.sendMessage("Number out of range, 1-15 expected.").queue();
+								channel.sendMessage("That space has already been picked.").queue();
 								return false;
 							}
-						}
-						catch(NumberFormatException e1)
-						{
-							return false;
-						}
+							else
+								return true;
 					}
 					return false;
 				},
@@ -302,5 +245,17 @@ public class GameController
 						runTurn();
 					}
 				});
+	}
+	static boolean checkValidNumber(String message)
+	{
+		try
+		{
+			int location = Integer.parseInt(message);
+			return (location > 0 && location <= boardSize);
+		}
+		catch(NumberFormatException e1)
+		{
+			return false;
+		}
 	}
 }
