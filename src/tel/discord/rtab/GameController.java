@@ -215,13 +215,14 @@ public class GameController
 						if(Math.random()<0.5)
 							channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 						channel.sendMessage("**BOOM**").completeAfter(3,TimeUnit.SECONDS);
-						channel.sendMessage(currentPlayer.user.getAsMention() + " loses $250,000 as penalty for blowing up.");
+						channel.sendMessage(currentPlayer.user.getAsMention() +
+								" loses $250,000 as penalty for blowing up.").queue();
 						currentPlayer.money -= 250000;
 						gameStatus = 4;
 					}
 					else
 					{
-						if((Math.random()*spacesLeft)<spacesLeft)
+						if((Math.random()*spacesLeft)<1)
 							channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 						channel.sendMessage("**$100,000**").completeAfter(3,TimeUnit.SECONDS);
 						currentPlayer.money += 100000;
@@ -369,6 +370,7 @@ public class GameController
 			//Then rewrite it
 			Path file = Paths.get("scores.csv");
 			Path fileOld = Paths.get("scoresOld.csv");
+			Files.delete(fileOld);
 			Files.copy(file,fileOld);
 			Files.delete(file);
 			Files.write(file, list);

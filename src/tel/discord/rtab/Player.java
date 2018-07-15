@@ -19,6 +19,8 @@ class Player
 	{
 		user = playerName.getUser();
 		name = playerName.getNickname();
+		if(name == null)
+			name = user.getName();
 		uID = user.getId();
 		money = 0;
 		try

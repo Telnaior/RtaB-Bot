@@ -1,6 +1,6 @@
 # Private Bot Data
 config.txt
-scores.csv
+*.csv
 
 # Eclipse Files
 .classpath
