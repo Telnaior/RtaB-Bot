@@ -53,12 +53,12 @@ public class GameController
 			{
 			case 0:
 				channel = channelID;
-				playerA = new Player(playerID.getUser(),playerID.getNickname());
+				playerA = new Player(playerID);
 				playersJoined++;
 				channel.sendMessage(playerA.name + " joined the game. One more player is required.").queue();
 				return PlayerJoinReturnValue.JOINED1;
 			case 1:
-				playerB = new Player(playerID.getUser(),playerID.getNickname());
+				playerB = new Player(playerID);
 				playersJoined++;
 				channel.sendMessage(playerB.name + " joined the game. The game is now starting. Please PM bombs within the next 60 seconds.").queue();
 				getBombs();

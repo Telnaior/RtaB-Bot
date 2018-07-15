@@ -1,5 +1,6 @@
 package tel.discord.rtab;
 
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
 
@@ -7,11 +8,13 @@ class Player
 {
 	User user;
 	String name;
+	String uID;
 	int money;
-	Player(User playerName, String nickname)
+	Player(Member playerName)
 	{
-		user = playerName;
-		name = nickname;
+		user = playerName.getUser();
+		name = playerName.getNickname();
+		uID = user.getId();
 		money = 0;
 	}
 }
