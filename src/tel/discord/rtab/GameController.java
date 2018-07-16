@@ -28,6 +28,7 @@ public class GameController
 	static boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	static int spacesLeft = BOARD_SIZE;
 	static boolean[] bombs = new boolean[BOARD_SIZE];
+	static Board gameboard;
 	public static EventWaiter waiter;
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -43,6 +44,7 @@ public class GameController
 		pickedSpaces = new boolean[15];
 		spacesLeft = BOARD_SIZE;
 		bombs = new boolean[15];
+		gameboard = null;
 	}
 	/*
 	 * addPlayer - adds a player to the game.
@@ -177,8 +179,8 @@ public class GameController
 				currentPlayer = playerA;
 			else
 				currentPlayer = playerB;
+			gameboard = new Board(BOARD_SIZE);
 			channel.sendMessage("Let's go!").queue();
-			generateBoard();
 			runTurn();
 		}
 	}
@@ -225,8 +227,26 @@ public class GameController
 					{
 						if((Math.random()*spacesLeft)<1)
 							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-						channel.sendMessage("**$100,000**").completeAfter(5,TimeUnit.SECONDS);
-						currentPlayer.money += 100000;
+						//Figure out what space we got
+						switch(gameboard.typeBoard[location])
+						{
+						case CASH:
+							//On cash, update the player's score and tell them how much they won
+							int cashWon = gameboard.cashBoard[location];
+							StringBuilder resultString = new StringBuilder().append("**");
+							if(cashWon<0)
+								resultString.append("-");
+							resultString.append("$");
+							resultString.append(String.format("$,d",Math.abs(cashWon)));
+							resultString.append("**");
+							channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
+							currentPlayer.money += cashWon;
+							break;
+						default:
+							//This will never happen
+							channel.sendMessage("**An error!** @Atia#2084 fix pls").completeAfter(5,TimeUnit.SECONDS);
+							break;
+						}
 					}
 					if(currentPlayer.user.equals(playerA.user))
 					{
@@ -384,9 +404,5 @@ public class GameController
 				return i;
 		}
 		return -1;
-	}
-	static void generateBoard()
-	{
-		
 	}
 }

@@ -11,7 +11,7 @@ Patch Versions are bugfixes found after release of minor version
  - First public release, heralding the start of Season 1.
  
 0.4.0 (planned)
- - Cash amounts now vary from $10,000 to $1,000,000, along with -$10,000 to -$50,000.
+ - Cash amounts now vary from -$25,000 to $1,000,000.
  - The winner now gets a bonus for every space left on the board.
  - Score file is now sorted, and !rank and !top have been created to take advantage of this.
 
