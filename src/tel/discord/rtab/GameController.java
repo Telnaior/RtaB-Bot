@@ -213,8 +213,8 @@ public class GameController
 					if(bombs[location])
 					{
 						if(Math.random()<0.5)
-							channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
-						channel.sendMessage("**BOOM**").completeAfter(3,TimeUnit.SECONDS);
+							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
+						channel.sendMessage("**BOOM**").completeAfter(5,TimeUnit.SECONDS);
 						channel.sendMessage(currentPlayer.user.getAsMention() +
 								" loses $250,000 as penalty for blowing up.").queue();
 						currentPlayer.money -= 250000;
@@ -223,8 +223,8 @@ public class GameController
 					else
 					{
 						if((Math.random()*spacesLeft)<1)
-							channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
-						channel.sendMessage("**$100,000**").completeAfter(3,TimeUnit.SECONDS);
+							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
+						channel.sendMessage("**$100,000**").completeAfter(5,TimeUnit.SECONDS);
 						currentPlayer.money += 100000;
 					}
 					if(currentPlayer.user.equals(playerA.user))
