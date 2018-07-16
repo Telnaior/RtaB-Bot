@@ -18,16 +18,16 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class GameController
 {
-	static final int boardSize = 15;
+	static final int BOARD_SIZE = 15;
 	static MessageChannel channel = null;
 	static Player playerA = null;
 	static Player playerB = null;
 	static Player currentPlayer = null;
 	public static int playersJoined = 0;
 	public static int gameStatus = 0;
-	static boolean[] pickedSpaces = new boolean[boardSize];
-	static int spacesLeft = boardSize;
-	static boolean[] bombs = new boolean[boardSize];
+	static boolean[] pickedSpaces = new boolean[BOARD_SIZE];
+	static int spacesLeft = BOARD_SIZE;
+	static boolean[] bombs = new boolean[BOARD_SIZE];
 	public static EventWaiter waiter;
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -41,7 +41,7 @@ public class GameController
 		playersJoined = 0;
 		gameStatus = 0;
 		pickedSpaces = new boolean[15];
-		spacesLeft = boardSize;
+		spacesLeft = BOARD_SIZE;
 		bombs = new boolean[15];
 	}
 	/*
@@ -123,9 +123,9 @@ public class GameController
 		gameStatus = 1;
 		//Request players send in bombs
 		playerA.user.openPrivateChannel().queue(
-				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
+				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + BOARD_SIZE).queue());
 		playerB.user.openPrivateChannel().queue(
-				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
+				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + BOARD_SIZE).queue());
 		//Wait for bombs to return
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Check if right player, and valid bomb pick
@@ -178,6 +178,7 @@ public class GameController
 			else
 				currentPlayer = playerB;
 			channel.sendMessage("Let's go!").queue();
+			generateBoard();
 			runTurn();
 		}
 	}
@@ -256,7 +257,7 @@ public class GameController
 		try
 		{
 			int location = Integer.parseInt(message);
-			return (location > 0 && location <= boardSize);
+			return (location > 0 && location <= BOARD_SIZE);
 		}
 		catch(NumberFormatException e1)
 		{
@@ -268,7 +269,7 @@ public class GameController
 		//Build up board display
 		StringBuilder board = new StringBuilder().append("```\n");
 		board.append("     RtaB     \n");
-		for(int i=0; i<boardSize; i++)
+		for(int i=0; i<BOARD_SIZE; i++)
 		{
 			if(pickedSpaces[i])
 			{
@@ -383,5 +384,9 @@ public class GameController
 				return i;
 		}
 		return -1;
+	}
+	static void generateBoard()
+	{
+		
 	}
 }
