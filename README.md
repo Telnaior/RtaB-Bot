@@ -10,9 +10,13 @@ Patch Versions are bugfixes found after release of minor version
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
-0.4.0 (planned)
- - Cash amounts now vary from -$25,000 to $1,000,000.
+0.5.0 (planned)
+ - Added boosters, which multiply all cash earned.
+ - Added a winstreak counter to the savefile format to serve as a bonus multiplier.
  - The winner now gets a bonus for every space left on the board.
+ 
+0.4.0
+ - Cash amounts now vary from -$25,000 to $1,000,000.
  - Score file is now sorted, and !rank and !top have been created to take advantage of this.
 
 0.3.0

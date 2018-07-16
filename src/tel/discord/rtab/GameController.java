@@ -237,7 +237,7 @@ public class GameController
 							if(cashWon<0)
 								resultString.append("-");
 							resultString.append("$");
-							resultString.append(String.format("$,d",Math.abs(cashWon)));
+							resultString.append(String.format("%,d",Math.abs(cashWon)));
 							resultString.append("**");
 							channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 							currentPlayer.money += cashWon;
