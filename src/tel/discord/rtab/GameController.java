@@ -208,6 +208,7 @@ public class GameController
 				{
 					int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
 					pickedSpaces[location] = true;
+					spacesLeft--;
 					channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 					if(bombs[location])
 					{
