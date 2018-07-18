@@ -238,7 +238,6 @@ public class GameController
 							resultString.append("$");
 							resultString.append(String.format("%,d",Math.abs(cashWon)));
 							resultString.append("**");
-							channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 							players[currentTurn].addMoney(cashWon,false);
 							break;
 						case BOOSTER:
@@ -249,9 +248,10 @@ public class GameController
 							break;
 						default:
 							//This will never happen
-							channel.sendMessage("**An error!** @Atia#2084 fix pls").completeAfter(5,TimeUnit.SECONDS);
+							resultString.append("**An error!** @Atia#2084 fix pls");
 							break;
 						}
+						channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 					}
 					//Advance turn to next player
 					currentTurn++;
@@ -267,7 +267,7 @@ public class GameController
 						if(spacesLeft == 0)
 							winBonus *= 2;
 						channel.sendMessage(players[currentTurn].name + " receives a win bonus of $"
-								+ String.format("%,d",winBonus + "."));
+								+ String.format("%,d",winBonus) + ".").queue();
 						players[currentTurn].addMoney(winBonus,true);
 						displayBoardAndStatus();
 						saveData();
