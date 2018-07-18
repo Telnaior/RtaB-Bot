@@ -18,9 +18,10 @@ Patch Versions are bugfixes found after release of minor version
  	
 0.5.1 (planned)
  - Money messages now mention the final amount earned, not just the pre-booster amount.
+ - Reworked booster amounts and chances.
  
 0.5.0 (planned)
- - Added boosters, which multiply all cash earned.
+ - Added boosters, capped at 20% and 500%, which multiply all cash earned.
  - Added a winstreak counter to the savefile format to serve as a bonus multiplier.
  - Win bonus added - $20k for each space picked during the game, doubled if the board was wiped clean.
  - Fixed the player objects to be in an array like they should have been the whole time, making everything *much* easier.

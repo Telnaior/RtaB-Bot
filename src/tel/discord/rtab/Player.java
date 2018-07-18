@@ -11,6 +11,8 @@ import net.dv8tion.jda.core.entities.User;
 
 class Player
 {
+	final int MAX_BOOSTER = 500;
+	final int MIN_BOOSTER = 020;
 	User user;
 	String name;
 	String uID;
@@ -67,5 +69,13 @@ class Player
 		if(bonus)
 			adjustedPrize *= winstreak;
 		money += adjustedPrize;
+	}
+	void addBooster(int amount)
+	{
+		booster += amount;
+		if(booster > MAX_BOOSTER)
+			booster = MAX_BOOSTER;
+		if(booster < MIN_BOOSTER)
+			booster = MIN_BOOSTER;
 	}
 }

@@ -6,11 +6,12 @@ class Board
 {
 	SpaceType[] typeBoard;
 	Integer[] cashBoard;
+	Integer[] boostBoard;
 	Board(int size)
 	{
 		//Initialise types
-		final SpaceType[] TYPE_VALUES = {SpaceType.CASH};
-		final int[] TYPE_WEIGHTS =      {             1};
+		final SpaceType[] TYPE_VALUES = {SpaceType.CASH,SpaceType.BOOSTER};
+		final int[] TYPE_WEIGHTS =      {            10,                2};
 		typeBoard = new SpaceType[size];
 		typeBoard = initBoard(size,typeBoard,TYPE_VALUES,TYPE_WEIGHTS);
 		//Initialise cash - uses Integer because generic methods don't like int
@@ -22,6 +23,12 @@ class Board
 				1,1,1,1,1,1,1,1,1,1}; //Big
 		cashBoard = new Integer[size];
 		cashBoard = initBoard(size,cashBoard,CASH_VALUES,CASH_WEIGHTS);
+		final Integer[] BOOST_VALUES = {-50,-40,-30,-20,-10, //Negative
+				10,20,30,40,50,75,100,150,200}; //Positive
+		final int[] BOOST_WEIGHTS = {1,2,2,3,3, //Negative
+				10,9,7,5,3,2,2,1,1}; //Positive
+		boostBoard = new Integer[size];
+		boostBoard = initBoard(size,boostBoard,BOOST_VALUES,BOOST_WEIGHTS);
 	}
 	private <T> T[] initBoard(int size, T[] board, T[] values, int[] weights)
 	{

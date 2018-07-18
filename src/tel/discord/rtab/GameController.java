@@ -226,12 +226,13 @@ public class GameController
 						if((Math.random()*spacesLeft)<1)
 							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 						//Figure out what space we got
+						StringBuilder resultString = new StringBuilder();
 						switch(gameboard.typeBoard[location])
 						{
 						case CASH:
 							//On cash, update the player's score and tell them how much they won
 							int cashWon = gameboard.cashBoard[location];
-							StringBuilder resultString = new StringBuilder().append("**");
+							resultString.append("**");
 							if(cashWon<0)
 								resultString.append("-");
 							resultString.append("$");
@@ -239,6 +240,12 @@ public class GameController
 							resultString.append("**");
 							channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 							players[currentTurn].addMoney(cashWon,false);
+							break;
+						case BOOSTER:
+							//On cash, update the player's booster and tell them what they found
+							int boostFound = gameboard.boostBoard[location];
+							resultString.append("A **" + boostFound + "%** Booster!");
+							players[currentTurn].addBooster(boostFound);
 							break;
 						default:
 							//This will never happen
