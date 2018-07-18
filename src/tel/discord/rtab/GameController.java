@@ -19,10 +19,10 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 public class GameController
 {
 	static final int BOARD_SIZE = 15;
+	static final int PLAYER_COUNT = 2;
 	static MessageChannel channel = null;
-	static Player playerA = null;
-	static Player playerB = null;
-	static Player currentPlayer = null;
+	static Player[] players = null;
+	static int currentTurn = -1;
 	public static int playersJoined = 0;
 	public static int gameStatus = 0;
 	static boolean[] pickedSpaces = new boolean[BOARD_SIZE];
@@ -36,9 +36,8 @@ public class GameController
 	public static void reset()
 	{
 		channel = null;
-		playerA = null;
-		playerB = null;
-		currentPlayer = null;
+		players = new Player[PLAYER_COUNT];
+		currentTurn = -1;
 		playersJoined = 0;
 		gameStatus = 0;
 		pickedSpaces = new boolean[15];
@@ -54,20 +53,20 @@ public class GameController
 	 */
 	public static PlayerJoinReturnValue addPlayer(MessageChannel channelID, Member playerID)
 	{
-		if(!((playerA != null && playerID.getUser().equals(playerA.user))||(playerB != null && playerID.getUser().equals(playerB.user))))
+		if(!((players[0] != null && playerID.getUser().equals(players[0].user))||(players[1] != null && playerID.getUser().equals(players[1].user))))
 		{
 			switch(playersJoined)
 			{
 			case 0:
 				channel = channelID;
-				playerA = new Player(playerID);
+				players[0] = new Player(playerID);
 				playersJoined++;
-				channel.sendMessage(playerA.name + " joined the game. One more player is required.").queue();
+				channel.sendMessage(players[0].name + " joined the game. One more player is required.").queue();
 				return PlayerJoinReturnValue.JOINED1;
 			case 1:
-				playerB = new Player(playerID);
+				players[1] = new Player(playerID);
 				playersJoined++;
-				channel.sendMessage(playerB.name + " joined the game. The game is now starting. Please PM bombs within the next 60 seconds.").queue();
+				channel.sendMessage(players[1].name + " joined the game. The game is now starting. Please PM bombs within the next 60 seconds.").queue();
 				getBombs();
 				return PlayerJoinReturnValue.JOINED2;
 			default:
@@ -86,9 +85,9 @@ public class GameController
 	{
 		if(gameStatus != 0)
 			return PlayerQuitReturnValue.GAMEINPROGRESS;
-		if(playerA != null && playerID == playerA.user)
+		if(players[0] != null && playerID == players[0].user)
 		{
-			playerA = null;
+			players[0] = null;
 			playersJoined--;
 			switch(playersJoined)
 			{
@@ -96,17 +95,17 @@ public class GameController
 				reset();
 				break;
 			case 1:
-				playerA = playerB;
-				playerB = null;
+				players[0] = players[1];
+				players[1] = null;
 				break;
 			default:
 				return PlayerQuitReturnValue.UNEXPECTEDPLAYERCOUNT;
 			}
 			return PlayerQuitReturnValue.SUCCESS;
 		}
-		else if(playerB != null && playerID == playerB.user)
+		else if(players[1] != null && playerID == players[1].user)
 		{
-			playerB = null;
+			players[1] = null;
 			playersJoined--;
 			if(playersJoined != 1)
 				return PlayerQuitReturnValue.UNEXPECTEDPLAYERCOUNT;
@@ -124,19 +123,19 @@ public class GameController
 		//Declare game in progress
 		gameStatus = 1;
 		//Request players send in bombs
-		playerA.user.openPrivateChannel().queue(
+		players[0].user.openPrivateChannel().queue(
 				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + BOARD_SIZE).queue());
-		playerB.user.openPrivateChannel().queue(
+		players[1].user.openPrivateChannel().queue(
 				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + BOARD_SIZE).queue());
 		//Wait for bombs to return
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Check if right player, and valid bomb pick
-				e -> (e.getAuthor().equals(playerA.user) && checkValidNumber(e.getMessage().getContentRaw())),
+				e -> (e.getAuthor().equals(players[0].user) && checkValidNumber(e.getMessage().getContentRaw())),
 				//Parse it and update the bomb board
 				e -> 
 				{
 					bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-					playerA.user.openPrivateChannel().queue(
+					players[0].user.openPrivateChannel().queue(
 							(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
 					checkReady();
 				},
@@ -148,12 +147,12 @@ public class GameController
 				});
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Check if right player, and valid bomb pick
-				e -> (e.getAuthor().equals(playerB.user) && checkValidNumber(e.getMessage().getContentRaw())),
+				e -> (e.getAuthor().equals(players[1].user) && checkValidNumber(e.getMessage().getContentRaw())),
 				//Parse it and update the bomb board
 				e -> 
 				{
 					bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-					playerB.user.openPrivateChannel().queue(
+					players[1].user.openPrivateChannel().queue(
 							(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
 					checkReady();
 				},
@@ -175,10 +174,7 @@ public class GameController
 		if(gameStatus > 2)
 		{
 			//Determine first player
-			if(Math.random() < 0.5)
-				currentPlayer = playerA;
-			else
-				currentPlayer = playerB;
+			currentTurn = (int)(Math.random()*PLAYER_COUNT);
 			gameboard = new Board(BOARD_SIZE);
 			channel.sendMessage("Let's go!").queue();
 			runTurn();
@@ -186,14 +182,14 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		channel.sendMessage(currentPlayer.user.getAsMention() + ", your turn. Choose a space on the board.")
+		channel.sendMessage(players[currentTurn].user.getAsMention() + ", your turn. Choose a space on the board.")
 			.completeAfter(3,TimeUnit.SECONDS);
 		displayBoardAndStatus();
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
 				{
-					if(e.getAuthor().equals(currentPlayer.user) && e.getChannel().equals(channel)
+					if(e.getAuthor().equals(players[currentTurn].user) && e.getChannel().equals(channel)
 							&& checkValidNumber(e.getMessage().getContentRaw()))
 					{
 							int location = Integer.parseInt(e.getMessage().getContentRaw());
@@ -218,9 +214,11 @@ public class GameController
 						if(Math.random()<0.5)
 							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 						channel.sendMessage("**BOOM**").completeAfter(5,TimeUnit.SECONDS);
-						channel.sendMessage(currentPlayer.user.getAsMention() +
+						channel.sendMessage(players[currentTurn].user.getAsMention() +
 								" loses $250,000 as penalty for blowing up.").queue();
-						currentPlayer.addMoney(-250000,false);
+						players[currentTurn].addMoney(-250000,false);
+						players[currentTurn].booster = 100;
+						players[currentTurn].winstreak = 0;
 						gameStatus = 4;
 					}
 					else
@@ -240,7 +238,7 @@ public class GameController
 							resultString.append(String.format("%,d",Math.abs(cashWon)));
 							resultString.append("**");
 							channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
-							currentPlayer.addMoney(cashWon,false);
+							players[currentTurn].addMoney(cashWon,false);
 							break;
 						default:
 							//This will never happen
@@ -248,22 +246,15 @@ public class GameController
 							break;
 						}
 					}
-					if(currentPlayer.user.equals(playerA.user))
-					{
-						playerA.money = currentPlayer.money;
-						playerA.booster = currentPlayer.booster;
-						currentPlayer = playerB;
-					}
-					else
-					{
-						playerB.money = currentPlayer.money;
-						playerB.booster = currentPlayer.booster;
-						currentPlayer = playerA;
-					}
+					//Advance turn to next player
+					currentTurn++;
+					currentTurn = currentTurn % PLAYER_COUNT;
+					
 					if(gameStatus == 4)
 					{
-						channel.sendMessage("Game Over. " + currentPlayer.user.getAsMention() + " Wins!")
+						channel.sendMessage("Game Over. " + players[currentTurn].user.getAsMention() + " Wins!")
 							.completeAfter(3,TimeUnit.SECONDS);
+						players[currentTurn].winstreak ++;
 						displayBoardAndStatus();
 						saveData();
 						reset();
@@ -309,54 +300,46 @@ public class GameController
 		board.append("\n");
 		//Next the status line
 		//Start by getting the lengths so we can pad the status bars appropriately
-		String nameA = playerA.name;
-		String nameB = playerB.name;
-		int moneyA = playerA.money;
-		int moneyB = playerB.money;
-		int boostA = playerA.booster;
-		int boostB = playerB.booster;
 		//Add one extra to name length because we want one extra space between name and cash
-		int nameLength = Math.max(nameA.length(),nameB.length())+1;
+		int nameLength = players[0].name.length();
+		for(int i=1; i<PLAYER_COUNT; i++)
+			nameLength = Math.max(nameLength,players[i].name.length());
+		nameLength ++;
 		//And ignore the negative sign if there is one
-		int moneyLength = Math.max(String.valueOf(Math.abs(moneyA)).length(),String.valueOf(Math.abs(moneyB)).length());
+		int moneyLength = String.valueOf(Math.abs(players[0].money)).length();
+		for(int i=1; i<PLAYER_COUNT; i++)
+			moneyLength = Math.max(moneyLength, String.valueOf(Math.abs(players[i].money)).length());
+		//Do we need to worry about negatives?
+		boolean negativeExists = false;
+		for(int i=0; i<PLAYER_COUNT;i++)
+			if(players[i].money<0)
+			{
+				negativeExists = true;
+				break;
+			}
 		//Make a little extra room for the commas
 		moneyLength += (moneyLength-1)/3;
-		//Then start printing, Player A first - including pointer if currently their turn
-		if(currentPlayer.equals(playerA))
-			board.append("> ");
-		else
-			board.append("  ");
-		board.append(String.format("%-"+nameLength+"s",nameA));
-		//Now figure out if we need a negative sign, a space, or neither
-		if(moneyA<0)
-			board.append("-");
-		else if(moneyB<0)
-			board.append(" ");
-		//Then print the money itself
-		board.append("$");
-		board.append(String.format("%,"+moneyLength+"d",Math.abs(moneyA)));
-		//Now the booster display
-		board.append(" [");
-		board.append(String.format("%03d",boostA));
-		board.append("%]\n");
-		//Do the whole thing again for Player B!
-		if(currentPlayer.equals(playerB))
-			board.append("> ");
-		else
-			board.append("  ");
-		board.append(String.format("%-"+nameLength+"s",nameB));
-		//Now figure out if we need a negative sign, a space, or neither
-		if(moneyB<0)
-			board.append("-");
-		else if(moneyA<0)
-			board.append(" ");
-		//Then print the money itself
-		board.append("$");
-		board.append(String.format("%,"+moneyLength+"d",Math.abs(moneyB)));
-		//Now the booster display
-		board.append(" [");
-		board.append(String.format("%03d",boostB));
-		board.append("%]\n");
+		//Then start printing - including pointer if currently their turn
+		for(int i=0; i<PLAYER_COUNT; i++)
+		{
+			if(currentTurn == i)
+				board.append("> ");
+			else
+				board.append("  ");
+			board.append(String.format("%-"+nameLength+"s",players[i].name));
+			//Now figure out if we need a negative sign, a space, or neither
+			if(players[i].money<0)
+				board.append("-");
+			else if(negativeExists)
+				board.append(" ");
+			//Then print the money itself
+			board.append("$");
+			board.append(String.format("%,"+moneyLength+"d",Math.abs(players[i].money)));
+			//Now the booster display
+			board.append(" [");
+			board.append(String.format("%03d",players[i].booster));
+			board.append("%]\n");
+		}
 		//Close it off and print it out
 		board.append("```");
 		channel.sendMessage(board.toString()).queue();
@@ -366,18 +349,17 @@ public class GameController
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
-			int aLocation,bLocation;
 			//Replace the records of the players if they're there, otherwise add them
-			aLocation = findUserInList(list,playerA.uID,false);
-			bLocation = findUserInList(list,playerB.uID,false);
-			if(aLocation == -1)
-				list.add(playerA.uID+":"+playerA.name+":"+playerA.money+":"+playerA.booster+":"+playerA.winstreak);
-			else
-				list.set(aLocation,playerA.uID+":"+playerA.name+":"+playerA.money+":"+playerA.booster+":"+playerA.winstreak);
-			if(bLocation == -1)
-				list.add(playerB.uID+":"+playerB.name+":"+playerB.money+":"+playerB.booster+":"+playerB.winstreak);
-			else
-				list.set(bLocation,playerB.uID+":"+playerB.name+":"+playerB.money+":"+playerB.booster+":"+playerB.winstreak);
+			for(int i=0; i<PLAYER_COUNT; i++)
+			{
+				int location = findUserInList(list,players[i].uID,false);
+				String toPrint = players[i].uID+":"+players[i].name+":"+players[i].money
+						+":"+players[0].booster+":"+players[0].winstreak;
+				if(location == -1)
+					list.add(toPrint);
+				else
+					list.set(location,toPrint);
+			}
 			//Then sort and rewrite it
 			DescendingScoreSorter sorter = new DescendingScoreSorter();
 			list.sort(sorter);

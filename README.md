@@ -10,10 +10,18 @@ Patch Versions are bugfixes found after release of minor version
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
+0.6.0 (planned)
+ - Created more enums (game status, player alive/dead)
+ - Cleaned up join/quit code
+ - Added multiple-player games! The board size is 5 plus another five for each player in the game, 
+ 	and the winstreak and win bonuses are multiplied based on how many players lose.
+ 
 0.5.0 (planned)
  - Added boosters, which multiply all cash earned.
  - Added a winstreak counter to the savefile format to serve as a bonus multiplier.
  - The winner now gets a bonus for every space left on the board.
+ - Fixed the player objects to be in an array like they should have been the whole time, making everything *much* easier.
+ - Cleaned up ugly code in board generation and saving scores.
  
 0.4.0
  - Cash amounts now vary from -$25,000 to $1,000,000.
