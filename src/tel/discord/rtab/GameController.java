@@ -12,8 +12,10 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import tel.discord.rtab.enums.GameStatus;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
+import tel.discord.rtab.enums.PlayerStatus;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -24,7 +26,8 @@ public class GameController
 	static List<Player> players = new ArrayList<>();
 	static int currentTurn = -1;
 	public static int playersJoined = 0;
-	public static int gameStatus = 0;
+	static int playersAlive = 0;
+	public static GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
 	static boolean[] pickedSpaces;
 	static int spacesLeft;
 	static boolean[] bombs;
@@ -39,7 +42,8 @@ public class GameController
 		players.clear();
 		currentTurn = -1;
 		playersJoined = 0;
-		gameStatus = 0;
+		playersAlive = 0;
+		gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
 	}
 	/*
@@ -51,7 +55,7 @@ public class GameController
 	public static PlayerJoinReturnValue addPlayer(MessageChannel channelID, Member playerID)
 	{
 		//Make sure game isn't already running
-		if(gameStatus != 0)
+		if(gameStatus != GameStatus.SIGNUPS_OPEN)
 			return PlayerJoinReturnValue.INPROGRESS;
 		//Are they in the right channel?
 		if(playersJoined == 0)
@@ -88,7 +92,7 @@ public class GameController
 	public static PlayerQuitReturnValue removePlayer(MessageChannel channelID, User playerID)
 	{
 		//Make sure game isn't running, too late to quit now
-		if(gameStatus != 0)
+		if(gameStatus != GameStatus.SIGNUPS_OPEN)
 			return PlayerQuitReturnValue.GAMEINPROGRESS;
 		//Search for player
 		for(int i=0; i<playersJoined; i++)
@@ -109,67 +113,56 @@ public class GameController
 	public static void startTheGameAlready()
 	{
 		//Declare game in progress so we don't get latecomers
-		gameStatus = 1;
+		gameStatus = GameStatus.IN_PROGRESS;
 		//Initialise stuff that needs initialising
 		boardSize = 5 + (5*playersJoined);
 		pickedSpaces = new boolean[boardSize];
 		bombs = new boolean[boardSize];
-		//Request players send in bombs
-		players.get(0).user.openPrivateChannel().queue(
-				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
-		players.get(1).user.openPrivateChannel().queue(
-				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
-		//Wait for bombs to return
-		waiter.waitForEvent(MessageReceivedEvent.class,
-				//Check if right player, and valid bomb pick
-				e -> (e.getAuthor().equals(players.get(0).user) && checkValidNumber(e.getMessage().getContentRaw())),
-				//Parse it and update the bomb board
-				e -> 
-				{
-					bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-					players.get(0).user.openPrivateChannel().queue(
-							(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
-					checkReady();
-				},
-				//Or timeout after a minute
-				1, TimeUnit.MINUTES, () ->
-				{
-					gameStatus = 0;
-					checkReady();
-				});
-		waiter.waitForEvent(MessageReceivedEvent.class,
-				//Check if right player, and valid bomb pick
-				e -> (e.getAuthor().equals(players.get(1).user) && checkValidNumber(e.getMessage().getContentRaw())),
-				//Parse it and update the bomb board
-				e -> 
-				{
-					bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-					players.get(1).user.openPrivateChannel().queue(
-							(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
-					checkReady();
-				},
-				//Or timeout after a minute
-				1, TimeUnit.MINUTES, () ->
-				{
-					gameStatus = 0;
-					checkReady();
-				});
+		//Request players send in bombs, and set up waiter for them to return
+		for(int i=0; i<playersJoined; i++)
+		{
+			final int iInner = i;
+			players.get(iInner).user.openPrivateChannel().queue(
+					(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
+			waiter.waitForEvent(MessageReceivedEvent.class,
+					//Check if right player, and valid bomb pick
+					e -> (e.getAuthor().equals(players.get(iInner).user) && checkValidNumber(e.getMessage().getContentRaw())),
+					//Parse it and update the bomb board
+					e -> 
+					{
+						bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
+						players.get(iInner).user.openPrivateChannel().queue(
+								(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
+						players.get(iInner).status = PlayerStatus.ALIVE;
+						playersAlive ++;
+						checkReady();
+					},
+					//Or timeout after a minute
+					1, TimeUnit.MINUTES, () ->
+					{
+						gameStatus = GameStatus.SIGNUPS_OPEN;
+						checkReady();
+					});
+		}
+
 	}
 	static void checkReady()
 	{
-		if(gameStatus == 0)
+		if(gameStatus == GameStatus.SIGNUPS_OPEN)
 		{
-			channel.sendMessage("Bomb placement timed out.").queue();
+			channel.sendMessage("Bomb placement timed out. Game aborted.").queue();
 		}
 		else
-			gameStatus++;
-		if(gameStatus > 2)
 		{
-			//Determine first player
-			currentTurn = (int)(Math.random()*playersJoined);
-			gameboard = new Board(boardSize);
-			channel.sendMessage("Let's go!").queue();
-			runTurn();
+			//If everyone has sent in, what are we waiting for?
+			if(playersAlive == playersJoined)
+			{
+				//Determine first player
+				currentTurn = (int)(Math.random()*playersJoined);
+				gameboard = new Board(boardSize);
+				channel.sendMessage("Let's go!").queue();
+				runTurn();
+			}
 		}
 	}
 	static void runTurn()
@@ -210,9 +203,10 @@ public class GameController
 						channel.sendMessage(players.get(currentTurn).user.getAsMention() +
 								" loses $250,000 as penalty for blowing up.").queue();
 						players.get(currentTurn).addMoney(-250000,false);
+						players.get(currentTurn).status = PlayerStatus.OUT;
 						players.get(currentTurn).booster = 100;
 						players.get(currentTurn).winstreak = 0;
-						gameStatus = 4;
+						playersAlive --;
 					}
 					else
 					{
@@ -247,21 +241,31 @@ public class GameController
 						channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 					}
 					//Advance turn to next player
-					currentTurn++;
-					currentTurn = currentTurn % playersJoined;
-					
-					if(gameStatus == 4)
+					advanceTurn();
+					//Test if game over
+					if(spacesLeft == 0 || playersAlive == 1)
 					{
-						channel.sendMessage("Game Over. " + players.get(currentTurn).user.getAsMention() + " Wins!")
-							.completeAfter(3,TimeUnit.SECONDS);
-						players.get(currentTurn).winstreak ++;
-						//Award $20k for each space picked, and double it if every space was picked
-						int winBonus = 20000*(boardSize-spacesLeft);
-						if(spacesLeft == 0)
-							winBonus *= 2;
-						channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
-								+ String.format("%,d",winBonus) + "**.").queue();
-						players.get(currentTurn).addMoney(winBonus,true);
+						gameStatus = GameStatus.END_GAME;
+						channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
+						for(int i=0; i<playersAlive; i++)
+						{
+							channel.sendMessage(players.get(currentTurn).user.getAsMention() + " Wins!")
+								.completeAfter(1,TimeUnit.SECONDS);
+							//Boost winstreak by number of opponents defeated
+							players.get(currentTurn).winstreak += (playersJoined - playersAlive);
+							//But it always gets to be at least 1
+							if(players.get(currentTurn).winstreak == 0)
+								players.get(currentTurn).winstreak = 1;
+							//Award $20k for each space picked, double it if every space was picked, then share with everyone in
+							int winBonus = 20000*(boardSize-spacesLeft);
+							if(spacesLeft == 0)
+								winBonus *= 2;
+							winBonus /= playersAlive;
+							channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
+									+ String.format("%,d",winBonus) + "**.").queue();
+							players.get(currentTurn).addMoney(winBonus,true);
+							advanceTurn();
+						}
 						displayBoardAndStatus();
 						saveData();
 						reset();
@@ -271,6 +275,16 @@ public class GameController
 						runTurn();
 					}
 				});
+	}
+	static void advanceTurn()
+	{
+		//Keep spinning through until we've got someone who's still in the game
+		do
+		{
+			currentTurn++;
+			currentTurn = currentTurn % playersJoined;
+		}
+		while(players.get(currentTurn).status == PlayerStatus.OUT);
 	}
 	static boolean checkValidNumber(String message)
 	{
@@ -343,9 +357,14 @@ public class GameController
 			board.append("$");
 			board.append(String.format("%,"+moneyLength+"d",Math.abs(players.get(i).money)));
 			//Now the booster display
-			board.append(" [");
-			board.append(String.format("%03d",players.get(i).booster));
-			board.append("%]\n");
+			if(players.get(i).status == PlayerStatus.ALIVE)
+			{
+				board.append(" [");
+				board.append(String.format("%03d",players.get(i).booster));
+				board.append("%]\n");
+			}
+			else
+				board.append(" [OUT ]\n");
 		}
 		//Close it off and print it out
 		board.append("```");

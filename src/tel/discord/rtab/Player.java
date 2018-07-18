@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import tel.discord.rtab.enums.PlayerStatus;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 
@@ -19,6 +20,7 @@ class Player
 	int money;
 	int booster;
 	int winstreak;
+	PlayerStatus status;
 	Player(Member playerName)
 	{
 		user = playerName.getUser();
@@ -29,6 +31,7 @@ class Player
 		money = 0;
 		booster = 100;
 		winstreak = 0;
+		status = PlayerStatus.OUT;
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
