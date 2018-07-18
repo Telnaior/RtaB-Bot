@@ -244,7 +244,7 @@ public class GameController
 						case BOOSTER:
 							//On cash, update the player's booster and tell them what they found
 							int boostFound = gameboard.boostBoard[location];
-							resultString.append("A **" + boostFound + "%** Booster!");
+							resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster!");
 							players[currentTurn].addBooster(boostFound);
 							break;
 						default:
@@ -369,7 +369,7 @@ public class GameController
 			{
 				int location = findUserInList(list,players[i].uID,false);
 				String toPrint = players[i].uID+":"+players[i].name+":"+players[i].money
-						+":"+players[0].booster+":"+players[0].winstreak;
+						+":"+players[i].booster+":"+players[i].winstreak;
 				if(location == -1)
 					list.add(toPrint);
 				else
