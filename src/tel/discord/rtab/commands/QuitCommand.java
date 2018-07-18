@@ -25,10 +25,6 @@ public class QuitCommand extends Command {
 		case GAMEINPROGRESS:
 			event.reply("The game cannot be left after it has started.");
 			break;
-		case UNEXPECTEDPLAYERCOUNT:
-			event.reply("Something weird happened. Resetting the game.");
-			GameController.reset();
-			break;
 		default:
 			event.reply("Unknown error occurred.");
 			break;

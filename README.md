@@ -10,9 +10,21 @@ Patch Versions are bugfixes found after release of minor version
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
+0.9.0 (planned)
+ - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
+ - Set up join cooldowns (once you bomb, you're out for a day)
+ 
+0.8.0 (planned)
+ - Events! Chaos for players, and chaos to code in!
+ 
+0.7.0 (planned)
+ - Minigames! Pick one up during the game and survive the round to play it.
+ - Also added bonus games, earned by winning three, six, and nine games in a row.
+ 
 0.6.0 (planned)
  - Created more enums (game status, player alive/dead)
  - Cleaned up join/quit code
+ - Made the player list into a list, because seriously that's just so much more convenient.
  - Added multiple-player games! The board size is 5 plus another five for each player in the game, 
  	and the winstreak and win bonuses are multiplied based on how many players lose.
  	

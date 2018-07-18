@@ -17,15 +17,20 @@ public class JoinCommand extends Command
 	{
 		switch(GameController.addPlayer(event.getChannel(),event.getMember()))
 		{
-		case JOINED1:
-		case JOINED2:
+		case JOINED:
+			event.reply("Successfully joined game.");
 			break;
-		case GAMEFULL:
-			event.reply("Cannot join game: Game already full.");
+		case UPDATED:
+			event.reply("Updated in-game name.");
+			break;
+		case INPROGRESS:
+			event.reply("Cannot join game: Game already running.");
 			break;
 		case ALREADYIN:
 			event.reply("Cannot join game: Already joined game.");
 			break;
+		case WRONGCHANNEL:
+			event.reply("Cannot join game: Game running in channel " + GameController.channel.getName());
 		default:
 			event.reply("Unknown error occurred.");
 			break;
