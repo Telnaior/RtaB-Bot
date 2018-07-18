@@ -61,7 +61,7 @@ class Player
 			e.printStackTrace();
 		}
 	}
-	void addMoney(int amount, boolean bonus)
+	StringBuilder addMoney(int amount, boolean bonus)
 	{
 		//Start with the base amount
 		int adjustedPrize = amount;
@@ -79,13 +79,14 @@ class Player
 			if(adjustedPrize<0)
 				resultString.append("-");
 			resultString.append("$");
-			resultString.append(String.format("%,d**",adjustedPrize));
+			resultString.append(String.format("%,d**",Math.abs(adjustedPrize)));
 			if(adjustedPrize<amount)
 				resultString.append(".");
 			else
 				resultString.append("!");
-			GameController.channel.sendMessage(resultString).queue();
+			return resultString;
 		}
+		return null;
 	}
 	void addBooster(int amount)
 	{

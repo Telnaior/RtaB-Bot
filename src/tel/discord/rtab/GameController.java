@@ -67,7 +67,7 @@ public class GameController
 		//Look for match already in player list
 		for(int i=0; i<playersJoined; i++)
 		{
-			if(players.get(i).uID == newPlayer.uID)
+			if(players.get(i).uID.equals(newPlayer.uID))
 			{
 				//Found them, check if we should update their name or just laugh at them
 				if(players.get(i).name == newPlayer.name)
@@ -97,7 +97,7 @@ public class GameController
 		//Search for player
 		for(int i=0; i<playersJoined; i++)
 		{
-			if(players.get(i).uID == playerID.getId())
+			if(players.get(i).uID.equals(playerID.getId()))
 			{
 				//Found them, get rid of them and call it a success
 				players.remove(i);
@@ -116,6 +116,7 @@ public class GameController
 		gameStatus = GameStatus.IN_PROGRESS;
 		//Initialise stuff that needs initialising
 		boardSize = 5 + (5*playersJoined);
+		spacesLeft = boardSize;
 		pickedSpaces = new boolean[boardSize];
 		bombs = new boolean[boardSize];
 		//Request players send in bombs, and set up waiter for them to return
@@ -202,7 +203,10 @@ public class GameController
 						channel.sendMessage("**BOOM**").completeAfter(5,TimeUnit.SECONDS);
 						channel.sendMessage(players.get(currentTurn).user.getAsMention() +
 								" loses $250,000 as penalty for blowing up.").queue();
-						players.get(currentTurn).addMoney(-250000,false);
+						StringBuilder extraResult = null;
+						extraResult = players.get(currentTurn).addMoney(-250000,false);
+						if(extraResult != null)
+							channel.sendMessage(extraResult).queue();
 						players.get(currentTurn).status = PlayerStatus.OUT;
 						players.get(currentTurn).booster = 100;
 						players.get(currentTurn).winstreak = 0;
@@ -214,6 +218,7 @@ public class GameController
 							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 						//Figure out what space we got
 						StringBuilder resultString = new StringBuilder();
+						StringBuilder extraResult = null;
 						switch(gameboard.typeBoard[location])
 						{
 						case CASH:
@@ -225,7 +230,7 @@ public class GameController
 							resultString.append("$");
 							resultString.append(String.format("%,d",Math.abs(cashWon)));
 							resultString.append("**");
-							players.get(currentTurn).addMoney(cashWon,false);
+							extraResult = players.get(currentTurn).addMoney(cashWon,false);
 							break;
 						case BOOSTER:
 							//On cash, update the player's booster and tell them what they found
@@ -235,6 +240,8 @@ public class GameController
 							break;
 						}
 						channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
+						if(extraResult != null)
+							channel.sendMessage(extraResult).queue();
 					}
 					//Advance turn to next player
 					advanceTurn();
