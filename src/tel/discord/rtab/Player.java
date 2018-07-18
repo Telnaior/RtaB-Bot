@@ -69,6 +69,20 @@ class Player
 		if(bonus)
 			adjustedPrize *= winstreak;
 		money += adjustedPrize;
+		if(adjustedPrize != amount)
+		{
+			StringBuilder resultString = new StringBuilder();
+			resultString.append("...which gets boosted to **");
+			if(adjustedPrize<0)
+				resultString.append("-");
+			resultString.append("$");
+			resultString.append(String.format("%,d**",adjustedPrize));
+			if(adjustedPrize<amount)
+				resultString.append(".");
+			else
+				resultString.append("!");
+			GameController.channel.sendMessage(resultString).queue();
+		}
 	}
 	void addBooster(int amount)
 	{

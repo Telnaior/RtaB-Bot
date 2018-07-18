@@ -267,8 +267,8 @@ public class GameController
 						int winBonus = 20000*(BOARD_SIZE-spacesLeft);
 						if(spacesLeft == 0)
 							winBonus *= 2;
-						channel.sendMessage(players[currentTurn].name + " receives a win bonus of $"
-								+ String.format("%,d",winBonus) + ".").queue();
+						channel.sendMessage(players[currentTurn].name + " receives a win bonus of **$"
+								+ String.format("%,d",winBonus) + "**.").queue();
 						players[currentTurn].addMoney(winBonus,true);
 						displayBoardAndStatus();
 						saveData();
