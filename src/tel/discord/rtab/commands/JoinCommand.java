@@ -10,7 +10,7 @@ public class JoinCommand extends Command
 	public JoinCommand()
 	{
 		this.name = "join";
-		this.help = "join (or start) game";
+		this.help = "join the game";
 	}
 	@Override
 	protected void execute(CommandEvent event)
@@ -31,9 +31,6 @@ public class JoinCommand extends Command
 			break;
 		case WRONGCHANNEL:
 			event.reply("Cannot join game: Game running in channel " + GameController.channel.getName());
-		default:
-			event.reply("Unknown error occurred.");
-			break;
 		}
 	}
 

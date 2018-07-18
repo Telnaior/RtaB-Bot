@@ -233,10 +233,6 @@ public class GameController
 							resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster!");
 							players.get(currentTurn).addBooster(boostFound);
 							break;
-						default:
-							//This will never happen
-							resultString.append("**An error!** @Atia#2084 fix pls");
-							break;
 						}
 						channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 					}
