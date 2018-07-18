@@ -15,6 +15,8 @@ class Player
 	String name;
 	String uID;
 	int money;
+	int booster;
+	int winstreak;
 	Player(Member playerName)
 	{
 		user = playerName.getUser();
@@ -23,6 +25,8 @@ class Player
 			name = user.getName();
 		uID = user.getId();
 		money = 0;
+		booster = 100;
+		winstreak = 0;
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
@@ -34,11 +38,15 @@ class Player
 				 * record[0] = uID
 				 * record[1] = name
 				 * record[2] = money
+				 * record[3] = booster
+				 * record[4] = winstreak
 				 */
 				record = list.get(i).split(":");
 				if(record[0].equals(uID))
 				{
 					money = Integer.parseInt(record[2]);
+					booster = Integer.parseInt(record[3]);
+					winstreak = Integer.parseInt(record[4]);
 					break;
 				}
 			}
@@ -47,5 +55,17 @@ class Player
 		{
 			e.printStackTrace();
 		}
+	}
+	void addMoney(int amount, boolean bonus)
+	{
+		//Start with the base amount
+		int adjustedPrize = amount;
+		//Multiply by the booster (then divide by 100 since it's a percentage)
+		adjustedPrize *= booster;
+		adjustedPrize /= 100;
+		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
+		if(bonus)
+			adjustedPrize *= winstreak;
+		money += adjustedPrize;
 	}
 }

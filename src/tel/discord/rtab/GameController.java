@@ -220,7 +220,7 @@ public class GameController
 						channel.sendMessage("**BOOM**").completeAfter(5,TimeUnit.SECONDS);
 						channel.sendMessage(currentPlayer.user.getAsMention() +
 								" loses $250,000 as penalty for blowing up.").queue();
-						currentPlayer.money -= 250000;
+						currentPlayer.addMoney(-250000,false);
 						gameStatus = 4;
 					}
 					else
@@ -240,7 +240,7 @@ public class GameController
 							resultString.append(String.format("%,d",Math.abs(cashWon)));
 							resultString.append("**");
 							channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
-							currentPlayer.money += cashWon;
+							currentPlayer.addMoney(cashWon,false);
 							break;
 						default:
 							//This will never happen
@@ -251,11 +251,13 @@ public class GameController
 					if(currentPlayer.user.equals(playerA.user))
 					{
 						playerA.money = currentPlayer.money;
+						playerA.booster = currentPlayer.booster;
 						currentPlayer = playerB;
 					}
 					else
 					{
 						playerB.money = currentPlayer.money;
+						playerB.booster = currentPlayer.booster;
 						currentPlayer = playerA;
 					}
 					if(gameStatus == 4)
@@ -311,6 +313,8 @@ public class GameController
 		String nameB = playerB.name;
 		int moneyA = playerA.money;
 		int moneyB = playerB.money;
+		int boostA = playerA.booster;
+		int boostB = playerB.booster;
 		//Add one extra to name length because we want one extra space between name and cash
 		int nameLength = Math.max(nameA.length(),nameB.length())+1;
 		//And ignore the negative sign if there is one
@@ -331,7 +335,10 @@ public class GameController
 		//Then print the money itself
 		board.append("$");
 		board.append(String.format("%,"+moneyLength+"d",Math.abs(moneyA)));
-		board.append("\n");
+		//Now the booster display
+		board.append(" [");
+		board.append(String.format("%03d",boostA));
+		board.append("%]\n");
 		//Do the whole thing again for Player B!
 		if(currentPlayer.equals(playerB))
 			board.append("> ");
@@ -346,7 +353,10 @@ public class GameController
 		//Then print the money itself
 		board.append("$");
 		board.append(String.format("%,"+moneyLength+"d",Math.abs(moneyB)));
-		board.append("\n");
+		//Now the booster display
+		board.append(" [");
+		board.append(String.format("%03d",boostB));
+		board.append("%]\n");
 		//Close it off and print it out
 		board.append("```");
 		channel.sendMessage(board.toString()).queue();
@@ -361,13 +371,13 @@ public class GameController
 			aLocation = findUserInList(list,playerA.uID,false);
 			bLocation = findUserInList(list,playerB.uID,false);
 			if(aLocation == -1)
-				list.add(playerA.uID+":"+playerA.name+":"+playerA.money);
+				list.add(playerA.uID+":"+playerA.name+":"+playerA.money+":"+playerA.booster+":"+playerA.winstreak);
 			else
-				list.set(aLocation,playerA.uID+":"+playerA.name+":"+playerA.money);
+				list.set(aLocation,playerA.uID+":"+playerA.name+":"+playerA.money+":"+playerA.booster+":"+playerA.winstreak);
 			if(bLocation == -1)
-				list.add(playerB.uID+":"+playerB.name+":"+playerB.money);
+				list.add(playerB.uID+":"+playerB.name+":"+playerB.money+":"+playerB.booster+":"+playerB.winstreak);
 			else
-				list.set(bLocation,playerB.uID+":"+playerB.name+":"+playerB.money);
+				list.set(bLocation,playerB.uID+":"+playerB.name+":"+playerB.money+":"+playerB.booster+":"+playerB.winstreak);
 			//Then sort and rewrite it
 			DescendingScoreSorter sorter = new DescendingScoreSorter();
 			list.sort(sorter);
@@ -395,6 +405,8 @@ public class GameController
 		 * record[0] = uID
 		 * record[1] = name
 		 * record[2] = money
+		 * record[3] = booster
+		 * record[4] = winstreak
 		 */
 		String[] record;
 		for(int i=0; i<list.size(); i++)
