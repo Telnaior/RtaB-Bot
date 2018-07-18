@@ -16,9 +16,9 @@ Patch Versions are bugfixes found after release of minor version
  - Added multiple-player games! The board size is 5 plus another five for each player in the game, 
  	and the winstreak and win bonuses are multiplied based on how many players lose.
  	
-0.5.1 (planned)
+0.5.1
  - Money messages now mention the final amount earned, not just the pre-booster amount.
- - Reworked booster amounts and chances.
+ - Reworked cash chances, and booster values and chances. Booster caps changed to 10% and 999%.
  
 0.5.0
  - Added boosters, capped at 20% and 500%, which multiply all cash earned.

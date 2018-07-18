@@ -18,15 +18,17 @@ class Board
 		final Integer[] CASH_VALUES = {-25000,-20000,-15000,-10000,-5000, //Negative
 				10000,20000,30000,40000,50000,60000,70000,80000,90000,100000, //Small
 				125000,150000,175000,200000,250000,300000,400000,500000,750000,1000000}; //Big
-		final int[] CASH_WEIGHTS = {2,2,2,2,2, //Negative
-				3,3,3,3,3,3,3,3,3,3, //Small
-				1,1,1,1,1,1,1,1,1,1}; //Big
+		final int[] CASH_WEIGHTS = {3,3,3,3,3, //Negative
+				5,5,5,5,5,5,5,5,5,5, //Small
+				2,2,2,2,2,2,2,2,2,2}; //Big
 		cashBoard = new Integer[size];
 		cashBoard = initBoard(size,cashBoard,CASH_VALUES,CASH_WEIGHTS);
-		final Integer[] BOOST_VALUES = {-50,-40,-30,-20,-10, //Negative
-				10,20,30,40,50,75,100,150,200}; //Positive
-		final int[] BOOST_WEIGHTS = {1,2,2,3,3, //Negative
-				10,9,7,5,3,2,2,1,1}; //Positive
+		final Integer[] BOOST_VALUES = {-50,-45,-40,-35,-30,-25,-20,-15,-10,-5, //Negative
+				5,10,15,20,25,30,35,40,45,50, //Small
+				60,70,80,90,100,125,150,200,300,500}; //Big
+		final int[] BOOST_WEIGHTS = {3,3,3,3,3,3,3,3,3,3, //Negative
+				6,6,6,6,6,6,6,6,6,6, //Small
+				3,3,3,3,3,2,2,2,1,1}; //Big
 		boostBoard = new Integer[size];
 		boostBoard = initBoard(size,boostBoard,BOOST_VALUES,BOOST_WEIGHTS);
 	}

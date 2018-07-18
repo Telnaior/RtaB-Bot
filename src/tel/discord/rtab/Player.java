@@ -11,8 +11,8 @@ import net.dv8tion.jda.core.entities.User;
 
 class Player
 {
-	final int MAX_BOOSTER = 500;
-	final int MIN_BOOSTER = 020;
+	final int MAX_BOOSTER = 999;
+	final int MIN_BOOSTER = 010;
 	User user;
 	String name;
 	String uID;
