@@ -112,6 +112,8 @@ public class GameController
 		gameStatus = 1;
 		//Initialise stuff that needs initialising
 		boardSize = 5 + (5*playersJoined);
+		pickedSpaces = new boolean[boardSize];
+		bombs = new boolean[boardSize];
 		//Request players send in bombs
 		players.get(0).user.openPrivateChannel().queue(
 				(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
