@@ -21,7 +21,7 @@ public class GameController
 	static final int BOARD_SIZE = 15;
 	static final int PLAYER_COUNT = 2;
 	static MessageChannel channel = null;
-	static Player[] players = null;
+	static Player[] players = new Player[PLAYER_COUNT];
 	static int currentTurn = -1;
 	public static int playersJoined = 0;
 	public static int gameStatus = 0;
