@@ -15,13 +15,17 @@ Patch Versions are bugfixes found after release of minor version
  - Cleaned up join/quit code
  - Added multiple-player games! The board size is 5 plus another five for each player in the game, 
  	and the winstreak and win bonuses are multiplied based on how many players lose.
+ 	
+0.5.1 (planned)
+ - Money messages now mention the final amount earned, not just the pre-booster amount.
  
 0.5.0 (planned)
  - Added boosters, which multiply all cash earned.
  - Added a winstreak counter to the savefile format to serve as a bonus multiplier.
- - The winner now gets a bonus for every space left on the board.
+ - Win bonus added - $20k for each space picked during the game, doubled if the board was wiped clean.
  - Fixed the player objects to be in an array like they should have been the whole time, making everything *much* easier.
- - Cleaned up ugly code in board generation and saving scores.
+ - Cleaned up ugly code in board generation and saving scores to make use of players being kept in an array.
+ - No seriously, why didn't I do it this way from the beginning?
  
 0.4.0
  - Cash amounts now vary from -$25,000 to $1,000,000.

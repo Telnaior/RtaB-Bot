@@ -255,6 +255,13 @@ public class GameController
 						channel.sendMessage("Game Over. " + players[currentTurn].user.getAsMention() + " Wins!")
 							.completeAfter(3,TimeUnit.SECONDS);
 						players[currentTurn].winstreak ++;
+						//Award $20k for each space picked, and double it if every space was picked
+						int winBonus = 20000*(BOARD_SIZE-spacesLeft);
+						if(spacesLeft == 0)
+							winBonus *= 2;
+						channel.sendMessage(players[currentTurn].name + " receives a win bonus of $"
+								+ String.format("%,d",winBonus + "."));
+						players[currentTurn].addMoney(winBonus,true);
 						displayBoardAndStatus();
 						saveData();
 						reset();
