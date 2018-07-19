@@ -75,7 +75,12 @@ class Player
 		if(adjustedPrize != amount)
 		{
 			StringBuilder resultString = new StringBuilder();
-			resultString.append("...which gets boosted to **");
+			resultString.append("...which gets ");
+			if(Math.abs(adjustedPrize) < Math.abs(amount))
+				resultString.append("drained");
+			else
+				resultString.append("boosted");
+			resultString.append(" to **");
 			if(adjustedPrize<0)
 				resultString.append("-");
 			resultString.append("$");

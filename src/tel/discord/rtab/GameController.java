@@ -235,7 +235,11 @@ public class GameController
 						case BOOSTER:
 							//On cash, update the player's booster and tell them what they found
 							int boostFound = gameboard.boostBoard[location];
-							resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster!");
+							resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
+							if(boostFound > 0)
+								resultString.append("!");
+							else
+								resultString.append(".");
 							players.get(currentTurn).addBooster(boostFound);
 							break;
 						}
@@ -246,9 +250,11 @@ public class GameController
 					//Advance turn to next player
 					advanceTurn();
 					//Test if game over
-					if(spacesLeft == 0 || playersAlive == 1)
+					if(spacesLeft <= 0 || playersAlive == 1)
 					{
 						gameStatus = GameStatus.END_GAME;
+						if(spacesLeft < 0)
+							channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
 						channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
 						for(int i=0; i<playersAlive; i++)
 						{
@@ -261,7 +267,7 @@ public class GameController
 								players.get(currentTurn).winstreak = 1;
 							//Award $20k for each space picked, double it if every space was picked, then share with everyone in
 							int winBonus = 20000*(boardSize-spacesLeft);
-							if(spacesLeft == 0)
+							if(spacesLeft <= 0)
 								winBonus *= 2;
 							winBonus /= playersAlive;
 							channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
