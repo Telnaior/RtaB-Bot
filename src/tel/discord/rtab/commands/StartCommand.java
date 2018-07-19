@@ -21,8 +21,13 @@ public class StartCommand extends Command
 		case JOINED:
 		case UPDATED:
 		case ALREADYIN:
-			event.reply("Starting game...");
-			GameController.startTheGameAlready();
+			if(GameController.playersJoined >= 2)
+			{
+				event.reply("Starting game...");
+				GameController.startTheGameAlready();
+			}
+			else
+				event.reply("Still need another player.");
 			break;
 		case WRONGCHANNEL:
 			event.reply("Game running in channel " + GameController.channel.getName());

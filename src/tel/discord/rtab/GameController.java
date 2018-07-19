@@ -101,6 +101,7 @@ public class GameController
 			{
 				//Found them, get rid of them and call it a success
 				players.remove(i);
+				playersJoined --;
 				return PlayerQuitReturnValue.SUCCESS;
 			}
 		}
