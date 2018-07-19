@@ -1,5 +1,6 @@
 package tel.discord.rtab;
 
+import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.SpaceType;
 
 class Board
@@ -7,6 +8,7 @@ class Board
 	SpaceType[] typeBoard;
 	Integer[] cashBoard;
 	Integer[] boostBoard;
+	BombType[] bombBoard;
 	Board(int size)
 	{
 		//Initialise types
@@ -23,6 +25,7 @@ class Board
 				2,2,2,2,2,2,2,2,2,2}; //Big
 		cashBoard = new Integer[size];
 		cashBoard = initBoard(size,cashBoard,CASH_VALUES,CASH_WEIGHTS);
+		//Initialise boosters - uses Integer for same reason as cash
 		final Integer[] BOOST_VALUES = {-50,-45,-40,-35,-30,-25,-20,-15,-10,-5, //Negative
 				5,10,15,20,25,30,35,40,45,50, //Small
 				60,70,80,90,100,125,150,200,300,500}; //Big
@@ -31,6 +34,11 @@ class Board
 				3,3,3,3,3,2,2,2,1,1}; //Big
 		boostBoard = new Integer[size];
 		boostBoard = initBoard(size,boostBoard,BOOST_VALUES,BOOST_WEIGHTS);
+		//Initialise specialty bombs
+		final BombType[] BOMB_VALUES = {BombType.NORMAL,BombType.BANKRUPT,BombType.BOOSTHOLD,BombType.CHAIN,BombType.DUD};
+		final int[] BOMB_WEIGHTS = {23,4,4,4,1};
+		bombBoard = new BombType[size];
+		bombBoard = initBoard(size,bombBoard,BOMB_VALUES,BOMB_WEIGHTS);
 	}
 	private <T> T[] initBoard(int size, T[] board, T[] values, int[] weights)
 	{

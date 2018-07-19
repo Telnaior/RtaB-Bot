@@ -101,4 +101,28 @@ class Player
 		if(booster < MIN_BOOSTER)
 			booster = MIN_BOOSTER;
 	}
+	int bankrupt()
+	{
+		int oldMoney = money;
+		money = 0;
+		try
+		{
+			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			String[] record;
+			for(int i=0; i<list.size(); i++)
+			{
+				record = list.get(i).split(":");
+				if(record[0].equals(uID))
+				{
+					money = Integer.parseInt(record[2]);
+					break;
+				}
+			}
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		return oldMoney - money;
+	}
 }

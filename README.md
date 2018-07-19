@@ -21,6 +21,18 @@ Patch Versions are bugfixes found after release of minor version
  - Minigames! Pick one up during the game and survive the round to play it.
  - Also added bonus games, earned by winning three, six, and nine games in a row.
  
+0.6.2 (planned)
+ - Doubled the suspense chance (making them guaranteed for bombs and the final two spaces)
+ - Specialty bombs!
+   * Bankrupt bombs cost you everything you earned during the round
+   * Boost Hold bombs let you keep your booster
+   * Chain bombs have up to eight times the bomb penalty
+   * Dud bombs don't blow up at all!
+ 
+0.6.1
+ - Better error handling
+ - Add more variation to booster text based on context (no ! on a negative booster, "drained" if booster < 100%, etc) 
+ 
 0.6.0
  - Created more enums (game status, player alive/dead)
  - Cleaned up join/quit code

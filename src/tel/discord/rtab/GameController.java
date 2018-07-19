@@ -198,23 +198,89 @@ public class GameController
 					channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 					if(bombs[location])
 					{
-						if(Math.random()<0.5)
-							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-						channel.sendMessage("**BOOM**").completeAfter(5,TimeUnit.SECONDS);
-						channel.sendMessage(players.get(currentTurn).user.getAsMention() +
-								" loses $250,000 as penalty for blowing up.").queue();
+						channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
+						channel.sendMessage("It's a **bomb**.").completeAfter(5,TimeUnit.SECONDS);
+						//But is it a special bomb?
 						StringBuilder extraResult = null;
-						extraResult = players.get(currentTurn).addMoney(-250000,false);
+						switch(gameboard.bombBoard[location])
+						{
+						case NORMAL:
+							channel.sendMessage("It goes **BOOM**. $250,000 lost as penalty.")
+								.completeAfter(5,TimeUnit.SECONDS);
+							extraResult = players.get(currentTurn).addMoney(-250000,false);
+							players.get(currentTurn).status = PlayerStatus.OUT;
+							players.get(currentTurn).booster = 100;
+							players.get(currentTurn).winstreak = 0;
+							playersAlive --;
+							break;
+						case BANKRUPT:
+							channel.sendMessage("It goes **BOOM**...")
+									.completeAfter(5,TimeUnit.SECONDS);
+							int amountLost = players.get(currentTurn).bankrupt();
+							channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
+									.completeAfter(5,TimeUnit.SECONDS);
+							channel.sendMessage(String.format("$%,d lost, plus $250,000 penalty.",amountLost))
+									.completeAfter(3,TimeUnit.SECONDS);
+							extraResult = players.get(currentTurn).addMoney(-250000,false);
+							players.get(currentTurn).status = PlayerStatus.OUT;
+							players.get(currentTurn).booster = 100;
+							players.get(currentTurn).winstreak = 0;
+							playersAlive --;
+							break;
+						case BOOSTHOLD:
+							StringBuilder resultString = new StringBuilder().append("It ");
+							if(players.get(currentTurn).booster != 100)
+								resultString.append("holds your boost, then ");
+							resultString.append("goes **BOOM**. $250,000 lost as penalty.");
+							channel.sendMessage(resultString)
+									.completeAfter(5,TimeUnit.SECONDS);
+							extraResult = players.get(currentTurn).addMoney(-250000,false);
+							players.get(currentTurn).status = PlayerStatus.OUT;
+							players.get(currentTurn).winstreak = 0;
+							playersAlive --;
+							break;
+						case CHAIN:
+							channel.sendMessage("It goes **BOOM**...")
+									.completeAfter(5,TimeUnit.SECONDS);
+							int chain = 1;
+							do
+							{
+								chain *= 2;
+								StringBuilder nextLevel = new StringBuilder();
+								nextLevel.append("**");
+								for(int i=0; i<chain; i++)
+								{
+									nextLevel.append("BOOM");
+									if(i+1 < chain)
+										nextLevel.append(" ");
+								}
+								nextLevel.append("**");
+								if(chain < 8)
+									nextLevel.append("...");
+								else
+									nextLevel.append("!!!");
+								channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
+							}
+							while(chain < 8 && Math.random() * chain < 1);
+							channel.sendMessage(String.format("$%,d penalty!",chain*250000))
+									.completeAfter(5,TimeUnit.SECONDS);
+							extraResult = players.get(currentTurn).addMoney(chain*-1*250000,false);
+							players.get(currentTurn).status = PlayerStatus.OUT;
+							players.get(currentTurn).booster = 100;
+							players.get(currentTurn).winstreak = 0;
+							playersAlive --;
+							break;
+						case DUD:
+							channel.sendMessage("It goes _\\*fizzle*_.")
+									.completeAfter(5,TimeUnit.SECONDS);
+							break;
+						}
 						if(extraResult != null)
 							channel.sendMessage(extraResult).queue();
-						players.get(currentTurn).status = PlayerStatus.OUT;
-						players.get(currentTurn).booster = 100;
-						players.get(currentTurn).winstreak = 0;
-						playersAlive --;
 					}
 					else
 					{
-						if((Math.random()*spacesLeft)<1)
+						if((Math.random()*spacesLeft)<2)
 							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 						//Figure out what space we got
 						StringBuilder resultString = new StringBuilder();
