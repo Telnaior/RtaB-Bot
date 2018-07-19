@@ -31,6 +31,10 @@ public class JoinCommand extends Command
 			break;
 		case WRONGCHANNEL:
 			event.reply("Cannot join game: Game running in channel " + GameController.channel.getName());
+			break;
+		case BADNAME:
+			event.reply("Cannot join game: Illegal name");
+			break;
 		}
 	}
 

@@ -13,7 +13,7 @@ public class QuitCommand extends Command {
 	}
 	@Override
 	protected void execute(CommandEvent event) {
-		String name = event.getAuthor().getName();
+		String name = event.getMember().getEffectiveName();
 		switch(GameController.removePlayer(event.getChannel(),event.getAuthor()))
 		{
 		case SUCCESS:

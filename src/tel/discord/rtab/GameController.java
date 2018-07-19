@@ -64,6 +64,8 @@ public class GameController
 			return PlayerJoinReturnValue.WRONGCHANNEL;
 		//Create player object
 		Player newPlayer = new Player(playerID);
+		if(newPlayer.name.contains(":") || newPlayer.name.startsWith("#") || newPlayer.name.startsWith("!"))
+			return PlayerJoinReturnValue.BADNAME;
 		//Look for match already in player list
 		for(int i=0; i<playersJoined; i++)
 		{
@@ -509,5 +511,16 @@ public class GameController
 				return i;
 		}
 		return -1;
+	}
+	public static void listPlayers()
+	{
+		StringBuilder resultString = new StringBuilder();
+		resultString.append("Players: ");
+		for(Player next : players)
+		{
+			resultString.append(next.name);
+			resultString.append(" ");
+		}
+		channel.sendMessage(resultString).queue();
 	}
 }

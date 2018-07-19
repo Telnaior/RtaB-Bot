@@ -24,9 +24,7 @@ class Player
 	Player(Member playerName)
 	{
 		user = playerName.getUser();
-		name = playerName.getNickname();
-		if(name == null)
-			name = user.getName();
+		name = playerName.getEffectiveName();
 		uID = user.getId();
 		money = 0;
 		booster = 100;
@@ -66,8 +64,16 @@ class Player
 		//Start with the base amount
 		int adjustedPrize = amount;
 		//Multiply by the booster (then divide by 100 since it's a percentage)
-		adjustedPrize *= booster;
-		adjustedPrize /= 100;
+		if(amount%100 != 0)
+		{
+			adjustedPrize *= booster;
+			adjustedPrize /= 100;
+		}
+		else
+		{
+			adjustedPrize /= 100;
+			adjustedPrize *= booster;
+		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		if(bonus)
 			adjustedPrize *= winstreak;

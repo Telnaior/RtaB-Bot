@@ -21,6 +21,8 @@ Patch Versions are bugfixes found after release of minor version
 0.7.0 (planned)
  - Minigames! Pick one up during the game and survive the round to play it.
  - Also added bonus games, earned by winning three, six, and nine games in a row.
+ - Improved !rank command, adjusted formatting, !join command now responds with your name
+ - Added !players command, to tell you who is in the game
 
 0.6.4
  - Bugfixes with !join/!quit/!start not caring about the playercount where they should

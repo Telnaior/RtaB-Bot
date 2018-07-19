@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.JDABuilder;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
 import tel.discord.rtab.commands.PingBotCommand;
+import tel.discord.rtab.commands.PlayersCommand;
 import tel.discord.rtab.commands.QuitCommand;
 import tel.discord.rtab.commands.RankCommand;
 import tel.discord.rtab.commands.ResetCommand;
@@ -39,6 +40,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new JoinCommand());
 		utilities.addCommand(new StartCommand());
 		utilities.addCommand(new QuitCommand());
+		utilities.addCommand(new PlayersCommand());
 		utilities.addCommand(new RankCommand());
 		utilities.addCommand(new TopCommand());
 		utilities.addCommand(new PingBotCommand());
