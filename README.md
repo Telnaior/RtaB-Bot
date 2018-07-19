@@ -21,7 +21,7 @@ Patch Versions are bugfixes found after release of minor version
  - Minigames! Pick one up during the game and survive the round to play it.
  - Also added bonus games, earned by winning three, six, and nine games in a row.
  
-0.6.0 (planned)
+0.6.0
  - Created more enums (game status, player alive/dead)
  - Cleaned up join/quit code
  - Made the player list into a list, because seriously that's just so much more convenient.

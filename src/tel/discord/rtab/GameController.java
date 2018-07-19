@@ -266,7 +266,10 @@ public class GameController
 							winBonus /= playersAlive;
 							channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
 									+ String.format("%,d",winBonus) + "**.").queue();
-							players.get(currentTurn).addMoney(winBonus,true);
+							StringBuilder extraResult = null;
+							extraResult = players.get(currentTurn).addMoney(winBonus,true);
+							if(extraResult != null)
+								channel.sendMessage(extraResult).queue();
 							advanceTurn();
 						}
 						displayBoardAndStatus();
@@ -364,10 +367,16 @@ public class GameController
 			{
 				board.append(" [");
 				board.append(String.format("%03d",players.get(i).booster));
-				board.append("%]\n");
+				board.append("%");
+				if(gameStatus == GameStatus.END_GAME)
+				{
+					board.append("x");
+					board.append(players.get(i).winstreak);
+				}
 			}
 			else
-				board.append(" [OUT ]\n");
+				board.append(" [OUT ");
+			board.append("]\n");
 		}
 		//Close it off and print it out
 		board.append("```");
