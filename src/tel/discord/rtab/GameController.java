@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -164,6 +165,7 @@ public class GameController
 				//Determine first player
 				currentTurn = (int)(Math.random()*playersJoined);
 				gameboard = new Board(boardSize);
+				Collections.shuffle(players);
 				channel.sendMessage("Let's go!").queue();
 				runTurn();
 			}
@@ -507,7 +509,7 @@ public class GameController
 		for(int i=0; i<list.size(); i++)
 		{
 			record = list.get(i).split(":");
-			if(record[field].equals(userID))
+			if(record[field].compareToIgnoreCase(userID) == 0)
 				return i;
 		}
 		return -1;
