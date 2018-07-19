@@ -20,8 +20,12 @@ Patch Versions are bugfixes found after release of minor version
 0.7.0 (planned)
  - Minigames! Pick one up during the game and survive the round to play it.
  - Also added bonus games, earned by winning three, six, and nine games in a row.
- 
-0.6.2 (planned)
+
+0.6.3
+ - Suspense chance now based on number of players, since larger boards get scarier sooner
+ - Specialty bomb text formatting improved
+
+0.6.2
  - Doubled the suspense chance (making them guaranteed for bombs and the final two spaces)
  - Specialty bombs!
    * Bankrupt bombs cost you everything you earned during the round

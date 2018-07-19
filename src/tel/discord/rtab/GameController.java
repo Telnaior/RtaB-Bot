@@ -199,7 +199,7 @@ public class GameController
 					if(bombs[location])
 					{
 						channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-						channel.sendMessage("It's a **bomb**.").completeAfter(5,TimeUnit.SECONDS);
+						channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
 						//But is it a special bomb?
 						StringBuilder extraResult = null;
 						switch(gameboard.bombBoard[location])
@@ -219,7 +219,7 @@ public class GameController
 							int amountLost = players.get(currentTurn).bankrupt();
 							channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
 									.completeAfter(5,TimeUnit.SECONDS);
-							channel.sendMessage(String.format("$%,d lost, plus $250,000 penalty.",amountLost))
+							channel.sendMessage(String.format("**$%,d** lost, plus **$250,000** penalty.",amountLost))
 									.completeAfter(3,TimeUnit.SECONDS);
 							extraResult = players.get(currentTurn).addMoney(-250000,false);
 							players.get(currentTurn).status = PlayerStatus.OUT;
@@ -262,7 +262,7 @@ public class GameController
 								channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
 							}
 							while(chain < 8 && Math.random() * chain < 1);
-							channel.sendMessage(String.format("$%,d penalty!",chain*250000))
+							channel.sendMessage(String.format("**$%,d** penalty!",chain*250000))
 									.completeAfter(5,TimeUnit.SECONDS);
 							extraResult = players.get(currentTurn).addMoney(chain*-1*250000,false);
 							players.get(currentTurn).status = PlayerStatus.OUT;
@@ -280,7 +280,7 @@ public class GameController
 					}
 					else
 					{
-						if((Math.random()*spacesLeft)<2)
+						if((Math.random()*spacesLeft)<playersJoined)
 							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 						//Figure out what space we got
 						StringBuilder resultString = new StringBuilder();
