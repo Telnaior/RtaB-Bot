@@ -18,7 +18,7 @@ public class JoinCommand extends Command
 		switch(GameController.addPlayer(event.getChannel(),event.getMember()))
 		{
 		case JOINED:
-			event.reply("Successfully joined game.");
+			event.reply(event.getMember().getEffectiveName() + " successfully joined the game.");
 			break;
 		case UPDATED:
 			event.reply("Updated in-game name.");

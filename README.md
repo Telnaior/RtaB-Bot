@@ -13,6 +13,7 @@ Patch Versions are bugfixes found after release of minor version
 0.9.0 (planned)
  - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
  - Set up join cooldowns (once you bomb, you're out for a day)
+ - Set up the game actually ending at $1,000,000,000
  
 0.8.0 (planned)
  - Events! Chaos for players, and chaos to code in!
@@ -20,6 +21,9 @@ Patch Versions are bugfixes found after release of minor version
 0.7.0 (planned)
  - Minigames! Pick one up during the game and survive the round to play it.
  - Also added bonus games, earned by winning three, six, and nine games in a row.
+
+0.6.4
+ - Bugfixes with !join/!quit/!start not caring about the playercount where they should
 
 0.6.3
  - Suspense chance now based on number of players, since larger boards get scarier sooner

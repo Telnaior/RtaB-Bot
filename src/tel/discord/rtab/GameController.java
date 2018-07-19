@@ -220,7 +220,7 @@ public class GameController
 							int amountLost = players.get(currentTurn).bankrupt();
 							channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
 									.completeAfter(5,TimeUnit.SECONDS);
-							channel.sendMessage(String.format("**$%,d** lost, plus **$250,000** penalty.",amountLost))
+							channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
 									.completeAfter(3,TimeUnit.SECONDS);
 							extraResult = players.get(currentTurn).addMoney(-250000,false);
 							players.get(currentTurn).status = PlayerStatus.OUT;
@@ -439,7 +439,7 @@ public class GameController
 			if(players.get(i).status == PlayerStatus.ALIVE)
 			{
 				board.append(" [");
-				board.append(String.format("%03d",players.get(i).booster));
+				board.append(String.format("%3d",players.get(i).booster));
 				board.append("%");
 				if(gameStatus == GameStatus.END_GAME)
 				{

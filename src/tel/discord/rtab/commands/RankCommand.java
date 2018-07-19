@@ -27,20 +27,32 @@ public class RankCommand extends Command {
 			//Search for own ID if no name given (to ensure match even if name changed)
 			if(name.equals(""))
 				index = GameController.findUserInList(list,event.getAuthor().getId(),false);
+			else if(name.startsWith("#"))
+			{
+				try
+				{
+					index = Integer.parseInt(name.substring(1))-1;
+				}
+				catch(NumberFormatException e1)
+				{
+					index = GameController.findUserInList(list,name,true);
+				}
+			}
 			else
 				index = GameController.findUserInList(list,name,true);
-			if(index == -1)
+			if(index < 0 || index >= list.size())
 				event.reply("User not found.");
 			else
 			{
 				String[] record = list.get(index).split(":");
 				int money = Integer.parseInt(record[2]);
+				int booster = Integer.parseInt(record[3]);
+				int winstreak = Integer.parseInt(record[4]);
 				StringBuilder response = new StringBuilder();
 				response.append(record[1] + ": ");
 				if(money<0)
 					response.append("-");
-				response.append("$");
-				response.append(String.format("%,d",Math.abs(money)));
+				response.append(String.format("$%1$,d [%2$d%%x%3$d]",Math.abs(money),booster,winstreak));
 				response.append(" - Rank #" + (index+1) + "/" + list.size());
 				event.reply(response.toString());
 			}
