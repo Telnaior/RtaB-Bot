@@ -36,7 +36,7 @@ class Board
 		boostBoard = initBoard(size,boostBoard,BOOST_VALUES,BOOST_WEIGHTS);
 		//Initialise specialty bombs
 		final BombType[] BOMB_VALUES = {BombType.NORMAL,BombType.BANKRUPT,BombType.BOOSTHOLD,BombType.CHAIN,BombType.DUD};
-		final int[] BOMB_WEIGHTS = {23,4,4,4,1};
+		final int[] BOMB_WEIGHTS = {18,2,2,2,1};
 		bombBoard = new BombType[size];
 		bombBoard = initBoard(size,bombBoard,BOMB_VALUES,BOMB_WEIGHTS);
 	}

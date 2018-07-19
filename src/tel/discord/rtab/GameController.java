@@ -156,6 +156,7 @@ public class GameController
 		if(gameStatus == GameStatus.SIGNUPS_OPEN)
 		{
 			channel.sendMessage("Bomb placement timed out. Game aborted.").queue();
+			reset();
 		}
 		else
 		{
@@ -266,7 +267,7 @@ public class GameController
 									nextLevel.append("!!!");
 								channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
 							}
-							while(chain < 8 && Math.random() * chain < 1);
+							while(Math.random() * chain < 1);
 							channel.sendMessage(String.format("**$%,d** penalty!",chain*250000))
 									.completeAfter(5,TimeUnit.SECONDS);
 							extraResult = players.get(currentTurn).addMoney(chain*-1*250000,false);
@@ -341,6 +342,8 @@ public class GameController
 							if(spacesLeft <= 0)
 								winBonus *= 2;
 							winBonus /= playersAlive;
+							if(spacesLeft <= 0 && playersAlive == 1)
+								channel.sendMessage("**SOLO BOARD CLEAR!**").queue();
 							channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
 									+ String.format("%,d",winBonus) + "**.").queue();
 							StringBuilder extraResult = null;
@@ -452,7 +455,7 @@ public class GameController
 				}
 			}
 			else
-				board.append(" [OUT ");
+				board.append(" [OUT");
 			board.append("]\n");
 		}
 		//Close it off and print it out
