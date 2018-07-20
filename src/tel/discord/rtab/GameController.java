@@ -431,7 +431,7 @@ public class GameController
 		ListIterator<String> output = result.listIterator(0);
 		while(output.hasNext())
 		{
-			channel.sendMessage(output.next()).completeAfter(3,TimeUnit.SECONDS);
+			channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
 		}
 		//Check if the game's over
 		if(currentGame.isGameOver())

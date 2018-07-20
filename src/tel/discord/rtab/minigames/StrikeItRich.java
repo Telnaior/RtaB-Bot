@@ -11,9 +11,11 @@ public class StrikeItRich implements MiniGame {
 	final static int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
 	static int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
+	int lastSpace;
 	int lastPicked;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
+	boolean pinchMode = false;
 	
 	@Override
 	public void sendNextInput(int pick)
@@ -25,9 +27,11 @@ public class StrikeItRich implements MiniGame {
 		}
 		else
 		{
+			lastSpace = pick+1;
 			pickedSpaces[pick] = true;
 			lastPicked = board.get(pick);
-			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
+			if(++numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
+				pinchMode = true;
 		}
 	}
 
@@ -45,21 +49,23 @@ public class StrikeItRich implements MiniGame {
 			Collections.shuffle(board);
 			numberPicked = new int[VALUES.length];
 			pickedSpaces = new boolean[BOARD_SIZE];
+			pinchMode = false;
 			//Display instructions
 			output.add("In Strike it Rich, your objective is to match three of a kind.");
 			output.add("Simply keep choosing numbers until you have three the same, and that is what you will win.");
 			output.add("The top prize is $1,000,000!");
 			output.add("Make your first pick when you are ready.");
 			firstPlay = false;
-			return output;
 		}
-		if(lastPicked < 0)
+		else if(lastPicked < 0)
 		{
 			output.add("Invalid pick.");
 		}
 		else
 		{
-			output.add("...");
+			output.add(String.format("Space %d selected...",lastSpace));
+			if(pinchMode)
+				output.add("...");
 			output.add(String.format("$%,d!",lastPicked));
 		}
 		output.add(generateBoard());
@@ -86,6 +92,7 @@ public class StrikeItRich implements MiniGame {
 			else
 				display.append(" ");
 		}
+		display.append("\n");
 		//Next display how many of each we have
 		for(int i=0; i<VALUES.length; i++)
 		{
