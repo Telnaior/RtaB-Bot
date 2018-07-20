@@ -373,6 +373,7 @@ public class GameController
 				{
 					//Get the minigame
 					MiniGame currentGame = gamesToPlay.next().getGame();
+					channel.sendMessage("Time for your next minigame, " + currentGame);
 					int moneyWon;
 					try
 					{
@@ -422,7 +423,7 @@ public class GameController
 					}
 					StringBuilder boostedMini;
 					boostedMini = players.get(currentTurn).addMoney(moneyWon,true);
-					channel.sendMessage(String.format("Game Over. You won $%,d",moneyWon)).queue();
+					channel.sendMessage(String.format("Game Over. You won **$%,d**.",moneyWon)).queue();
 					channel.sendMessage(boostedMini).queue();
 				}
 				advanceTurn();
