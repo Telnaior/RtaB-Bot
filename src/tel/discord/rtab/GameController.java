@@ -258,13 +258,21 @@ public class GameController
 			playersAlive --;
 			break;
 		case BANKRUPT:
-			channel.sendMessage("It goes **BOOM**...")
-					.completeAfter(5,TimeUnit.SECONDS);
 			int amountLost = players.get(currentTurn).bankrupt();
-			channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
+			if(amountLost == 0)
+			{
+				channel.sendMessage("It goes **BOOM**. $250,000 lost as penalty.")
 					.completeAfter(5,TimeUnit.SECONDS);
-			channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
-					.completeAfter(3,TimeUnit.SECONDS);
+			}
+			else
+			{
+				channel.sendMessage("It goes **BOOM**...")
+						.completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
+						.completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
+						.completeAfter(3,TimeUnit.SECONDS);
+			}
 			extraResult = players.get(currentTurn).addMoney(-250000,false);
 			players.get(currentTurn).status = PlayerStatus.OUT;
 			players.get(currentTurn).booster = 100;

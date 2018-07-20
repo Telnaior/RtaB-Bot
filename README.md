@@ -29,6 +29,7 @@ Patch Versions are bugfixes found after release of minor version
  - Improved !rank command, adjusted formatting, !join command now responds with your name
  - Added !players command, to tell you who is in the game
  - Heaps more code cleanup, bugfixes, and formatting improvements.
+ - Bankrupt bombs are no longer visible to the player if there's no money to actually lose to it.
 
 0.6.4
  - Bugfixes with !join/!quit/!start not caring about the playercount where they should
