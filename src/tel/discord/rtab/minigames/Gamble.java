@@ -10,6 +10,7 @@ public class Gamble implements MiniGame {
 			10000,20000,30000,40000,50000,70000,100000,200000,300000,400000,500000,1000000);
 	boolean firstPlay = true;
 	boolean invalid;
+	boolean ignore = false;
 	boolean alive;
 	boolean[] pickedSpaces;
 	int lastPick;
@@ -24,7 +25,13 @@ public class Gamble implements MiniGame {
 			alive = false;
 			lastSpace = -1;
 		}
-		else if(!checkValidNumber(pick))
+		else if(!isNumber(pick))
+		{
+			ignore = true;
+			return;
+		}
+		ignore = false;
+		if(!checkValidNumber(pick))
 			invalid = true;
 		else
 		{
@@ -43,17 +50,23 @@ public class Gamble implements MiniGame {
 		}
 	}
 	
-	boolean checkValidNumber(String message)
+	boolean isNumber(String message)
 	{
 		try
 		{
-			int location = Integer.parseInt(message);
-			return (location >= 0 && location <= money.size() && !pickedSpaces[location]);
+			Integer.parseInt(message);
+			return true;
 		}
 		catch(NumberFormatException e1)
 		{
 			return false;
 		}
+	}
+	
+	boolean checkValidNumber(String message)
+	{
+		int location = Integer.parseInt(message);
+		return (location >= 0 && location <= money.size() && !pickedSpaces[location]);
 	}
 
 	@Override
@@ -78,6 +91,11 @@ public class Gamble implements MiniGame {
 					+ "and if you're lucky and brave you can win more than $2,500,000 in total.");
 			output.add("Best of luck! Pick your first space when you're ready.");
 			firstPlay = false;
+		}
+		else if(ignore)
+		{
+			//Definitely don't say anything for random strings
+			return output;
 		}
 		else if(lastSpace == -1)
 		{

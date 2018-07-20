@@ -17,9 +17,16 @@ public class MathTime implements MiniGame {
 	int total = 0;
 	String equation = "";
 	boolean invalid = false;
+	boolean ignore = false;
 	
 	@Override
 	public void sendNextInput(String pick) {
+		if(!isNumber(pick))
+		{
+			ignore = true;
+			return;
+		}
+		ignore = false;
 		if(!checkValidNumber(pick))
 			invalid = true;
 		else
@@ -30,22 +37,33 @@ public class MathTime implements MiniGame {
 		}
 	}
 	
-	boolean checkValidNumber(String message)
+	boolean isNumber(String message)
 	{
 		try
 		{
-			int location = Integer.parseInt(message)-1;
-			return !(location < 0 || location >= 7 || (stage == 3 && location == stage1Pick));
+			Integer.parseInt(message);
+			return true;
 		}
 		catch(NumberFormatException e1)
 		{
 			return false;
 		}
 	}
+	
+	boolean checkValidNumber(String message)
+	{
+		int location = Integer.parseInt(message)-1;
+		return !(location < 0 || location >= 7 || (stage == 3 && location == stage1Pick));
+	}
 
 	@Override
 	public LinkedList<String> getNextOutput() {
 		LinkedList<String> output = new LinkedList<>();
+		if(ignore)
+		{
+			//Ignore non-number picks entirely
+			return output;
+		}
 		if(invalid)
 		{
 			output.add("Invalid pick.");

@@ -20,6 +20,11 @@ public class StrikeItRich implements MiniGame {
 	@Override
 	public void sendNextInput(String pick)
 	{
+		if(!isNumber(pick))
+		{
+			lastPicked = -2;
+			return;
+		}
 		if(!checkValidNumber(pick))
 		{
 			lastPicked = -1;
@@ -35,17 +40,23 @@ public class StrikeItRich implements MiniGame {
 		}
 	}
 
-	boolean checkValidNumber(String message)
+	boolean isNumber(String message)
 	{
 		try
 		{
-			int location = Integer.parseInt(message);
-			return (location > 0 && location <= BOARD_SIZE && !pickedSpaces[location]);
+			//If this doesn't throw an exception we're good
+			Integer.parseInt(message);
+			return true;
 		}
 		catch(NumberFormatException e1)
 		{
 			return false;
 		}
+	}
+	boolean checkValidNumber(String message)
+	{
+		int location = Integer.parseInt(message);
+		return (location > 0 && location <= BOARD_SIZE && !pickedSpaces[location]);
 	}
 
 	@Override
@@ -70,7 +81,12 @@ public class StrikeItRich implements MiniGame {
 			output.add("Make your first pick when you are ready.");
 			firstPlay = false;
 		}
-		else if(lastPicked < 0)
+		else if(lastPicked == -2)
+		{
+			//Random unrelated non-number doesn't need feedback
+			return output;
+		}
+		else if(lastPicked == -1)
 		{
 			output.add("Invalid pick.");
 		}
