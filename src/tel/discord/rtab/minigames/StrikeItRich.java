@@ -56,7 +56,7 @@ public class StrikeItRich implements MiniGame {
 	boolean checkValidNumber(String message)
 	{
 		int location = Integer.parseInt(message)-1;
-		return (location > 0 && location <= BOARD_SIZE && !pickedSpaces[location]);
+		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces[location]);
 	}
 
 	@Override

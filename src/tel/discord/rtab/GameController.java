@@ -480,7 +480,10 @@ public class GameController
 			}
 			//Otherwise we'd better out it back where it belongs
 			else
+			{
 				gamesToPlay.previous();
+				break;
+			}
 		}
 		StringBuilder resultString = new StringBuilder();
 		resultString.append(String.format("Game Over. You won **$%,d**",moneyWon));

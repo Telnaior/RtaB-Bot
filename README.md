@@ -20,6 +20,7 @@ Patch Versions are bugfixes found after release of minor version
  
 0.7.1 (planned)
  - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
+ - Bugfixes up the wazoo
 
 0.7.0
  - Minigames! Pick one up during the game and survive the round to play it.
