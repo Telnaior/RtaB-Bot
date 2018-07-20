@@ -19,14 +19,27 @@ public class MathTime implements MiniGame {
 	boolean invalid = false;
 	
 	@Override
-	public void sendNextInput(int pick) {
-		if(pick >= 7 || (stage == 3 && pick == stage1Pick))
+	public void sendNextInput(String pick) {
+		if(!checkValidNumber(pick))
 			invalid = true;
 		else
 		{
-			lastPick = pick;
+			lastPick = Integer.parseInt(pick)-1;
 			if(stage == 1)
-				stage1Pick = pick;
+				stage1Pick = lastPick;
+		}
+	}
+	
+	boolean checkValidNumber(String message)
+	{
+		try
+		{
+			int location = Integer.parseInt(message)-1;
+			return !(location < 0 || location >= 7 || (stage == 3 && location == stage1Pick));
+		}
+		catch(NumberFormatException e1)
+		{
+			return false;
 		}
 	}
 

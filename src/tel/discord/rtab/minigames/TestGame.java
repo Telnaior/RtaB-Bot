@@ -5,10 +5,10 @@ import java.util.LinkedList;
 public class TestGame implements MiniGame 
 {
 	int gameState = 0;
-	int numberSent;
+	String playerSent;
 	@Override
-	public void sendNextInput(int pick) {
-		numberSent = pick+1;
+	public void sendNextInput(String pick) {
+		playerSent = pick+1;
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class TestGame implements MiniGame
 			return output;
 		case 1:
 			gameState++;
-			output.add("You picked " + numberSent);
+			output.add("You picked " + playerSent);
 			return output;
 		default:
 			output.add("If you see this message, something went wrong.");

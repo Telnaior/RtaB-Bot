@@ -139,7 +139,7 @@ public class GameController
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Check if right player, and valid bomb pick
 					e -> (e.getAuthor().equals(players.get(iInner).user)
-							&& checkValidNumber(e.getMessage().getContentRaw(),false)),
+							&& checkValidNumber(e.getMessage().getContentRaw())),
 					//Parse it and update the bomb board
 					e -> 
 					{
@@ -190,7 +190,7 @@ public class GameController
 				e ->
 				{
 					if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
-							&& checkValidNumber(e.getMessage().getContentRaw(),false))
+							&& checkValidNumber(e.getMessage().getContentRaw()))
 					{
 							int location = Integer.parseInt(e.getMessage().getContentRaw());
 							if(pickedSpaces[location-1])
@@ -444,16 +444,12 @@ public class GameController
 				//Right player and channel
 				e ->
 				{
-					if(checkValidNumber(e.getMessage().getContentRaw(),true) && e.getChannel().equals(channel)
-							&& e.getAuthor().equals(players.get(currentTurn).user))
-						return true;
-					else
-						return false;
+					return (e.getChannel().equals(channel) && e.getAuthor().equals(players.get(currentTurn).user));
 				},
 				//Parse it and call the method that does stuff
 				e -> 
 				{
-					int miniPick = Integer.parseInt(e.getMessage().getContentRaw())-1;
+					String miniPick = e.getMessage().getContentRaw();
 					currentGame.sendNextInput(miniPick);
 					runNextMiniGameTurn(currentGame);
 				});
@@ -516,14 +512,12 @@ public class GameController
 		}
 		while(!isPlayerGood);
 	}
-	static boolean checkValidNumber(String message, boolean minigame)
+	static boolean checkValidNumber(String message)
 	{
 		try
 		{
 			int location = Integer.parseInt(message);
-			if(!minigame && location > boardSize)
-				return false;
-			return (location > 0);
+			return (location > 0 && location <= boardSize);
 		}
 		catch(NumberFormatException e1)
 		{

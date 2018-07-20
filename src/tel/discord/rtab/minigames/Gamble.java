@@ -17,23 +17,42 @@ public class Gamble implements MiniGame {
 	int total;
 	
 	@Override
-	public void sendNextInput(int pick) {
-		if(pick >= money.size() || pickedSpaces[pick])
+	public void sendNextInput(String pick)
+	{
+		if(pick == "STOP")
+		{
+			alive = false;
+			lastSpace = -1;
+		}
+		else if(!checkValidNumber(pick))
 			invalid = true;
 		else
 		{
-			pickedSpaces[pick] = true;
-			lastSpace = pick+1;
-			if(money.get(pick) < lastPick)
+			lastSpace = Integer.parseInt(pick)-1;
+			pickedSpaces[lastSpace] = true;
+			if(money.get(lastSpace) < lastPick)
 			{
 				alive = false;
 				total = 0;
 			}
 			else
 			{
-				total += money.get(pick);
+				total += money.get(lastSpace);
 			}
-			lastPick = money.get(pick);
+			lastPick = money.get(lastSpace);
+		}
+	}
+	
+	boolean checkValidNumber(String message)
+	{
+		try
+		{
+			int location = Integer.parseInt(message);
+			return (location >= 0 && location <= money.size() && !pickedSpaces[location]);
+		}
+		catch(NumberFormatException e1)
+		{
+			return false;
 		}
 	}
 
@@ -60,13 +79,19 @@ public class Gamble implements MiniGame {
 			output.add("Best of luck! Pick your first space when you're ready.");
 			firstPlay = false;
 		}
+		else if(lastSpace == -1)
+		{
+			//Don't really need to say anything, they know they stopped
+			return output;
+		}
 		else if(invalid)
 		{
 			output.add("Invalid pick.");
+			invalid = false;
 		}
 		else
 		{
-			output.add(String.format("Space %d selected...",lastSpace));
+			output.add(String.format("Space %d selected...",lastSpace+1));
 			if(total != lastPick)
 				output.add("...");
 			if(alive)
@@ -79,7 +104,7 @@ public class Gamble implements MiniGame {
 					return output;
 				}
 				else
-					output.add("Choose another space if you dare, or type 0 to stop with your current total.");
+					output.add("Choose another space if you dare, or type STOP to stop with your current total.");
 			}
 			else
 			{

@@ -7,7 +7,7 @@ public interface MiniGame {
 	 * SendNextInput
 	 * Receive the next pick from the player
 	 */
-	void sendNextInput(int pick);
+	void sendNextInput(String pick);
 	/*
 	 * GetNextOutput
 	 * Returns a String that should be next sent to the player

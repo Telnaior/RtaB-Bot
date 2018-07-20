@@ -18,20 +18,33 @@ public class StrikeItRich implements MiniGame {
 	boolean pinchMode = false;
 	
 	@Override
-	public void sendNextInput(int pick)
+	public void sendNextInput(String pick)
 	{
-		if(pick >= BOARD_SIZE || pickedSpaces[pick])
+		if(!checkValidNumber(pick))
 		{
 			lastPicked = -1;
 			return;
 		}
 		else
 		{
-			lastSpace = pick+1;
-			pickedSpaces[pick] = true;
-			lastPicked = board.get(pick);
+			lastSpace = Integer.parseInt(pick)-1;
+			pickedSpaces[lastSpace] = true;
+			lastPicked = board.get(lastSpace);
 			if(++numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
 				pinchMode = true;
+		}
+	}
+
+	boolean checkValidNumber(String message)
+	{
+		try
+		{
+			int location = Integer.parseInt(message);
+			return (location > 0 && location <= BOARD_SIZE && !pickedSpaces[location]);
+		}
+		catch(NumberFormatException e1)
+		{
+			return false;
 		}
 	}
 
@@ -63,7 +76,7 @@ public class StrikeItRich implements MiniGame {
 		}
 		else
 		{
-			output.add(String.format("Space %d selected...",lastSpace));
+			output.add(String.format("Space %d selected...",lastSpace+1));
 			if(pinchMode)
 				output.add("...");
 			output.add(String.format("$%,d!",lastPicked));
