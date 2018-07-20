@@ -379,7 +379,17 @@ public class GameController
 						//Keep going until the game ends, which will get us out of this block
 						while(true)
 						{
-							currentGame.getNextOutput();
+							//Keep printing output until it runs out of output
+							String output;
+							while(true)
+							{
+								output = currentGame.getNextOutput();
+								if(output != null)
+									channel.sendMessage(output).queue();
+								else
+									break;
+							}
+							//Then let's get more input to give it
 							waiter.waitForEvent(MessageReceivedEvent.class,
 									//Right player and channel
 									e ->
@@ -406,12 +416,14 @@ public class GameController
 						}
 						//The game's over AND not over at once? Great, I stuffed up.
 						catch (GameNotOverException e2) {
-							channel.sendMessage("An error occurred, @Atia#2084 fix pls");
+							channel.sendMessage("An error occurred, @Atia#2084 fix pls").queue();
 							moneyWon = 0;
 						}
 					}
-					channel.sendMessage(String.format("Game Over. You won $%,d",moneyWon));
-					players.get(currentTurn).addMoney(moneyWon,true);
+					StringBuilder boostedMini;
+					boostedMini = players.get(currentTurn).addMoney(moneyWon,true);
+					channel.sendMessage(String.format("Game Over. You won $%,d",moneyWon)).queue();
+					channel.sendMessage(boostedMini).queue();
 				}
 				advanceTurn();
 			}
