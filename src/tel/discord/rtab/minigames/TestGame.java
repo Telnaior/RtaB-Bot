@@ -8,7 +8,7 @@ public class TestGame implements MiniGame
 	int numberSent;
 	@Override
 	public void sendNextInput(int pick) {
-		numberSent = pick;
+		numberSent = pick+1;
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class TestGame implements MiniGame
 	}
 	
 	@Override
-	public boolean gameStillRunning() {
+	public boolean isGameOver() {
 		return (gameState >= 2);
 	}
 	

@@ -23,6 +23,7 @@ Patch Versions are bugfixes found after release of minor version
  - Also added bonus games, earned by winning five, ten, fifteen, or twenty games in a row.
  - Improved !rank command, adjusted formatting, !join command now responds with your name
  - Added !players command, to tell you who is in the game
+ - Heaps more code cleanup
 
 0.6.4
  - Bugfixes with !join/!quit/!start not caring about the playercount where they should

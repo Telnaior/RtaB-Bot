@@ -15,10 +15,14 @@ public interface MiniGame {
 	 */
 	LinkedList<String> getNextOutput();
 	/*
+	 * isGameOver
+	 * Returns true if the minigame has ended
+	 */
+	boolean isGameOver();
+	/*
 	 * GetMoneyWon
 	 * Returns an int containing the player's winnings, pre-booster
 	 * Methods throws exception if game isn't over
 	 */
-	boolean gameStillRunning();
 	int getMoneyWon() throws GameNotOverException;
 }
