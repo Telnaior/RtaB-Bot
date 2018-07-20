@@ -21,7 +21,7 @@ Patch Versions are bugfixes found after release of minor version
 0.7.1 (planned)
  - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
 
-0.7.0 (planned)
+0.7.0
  - Minigames! Pick one up during the game and survive the round to play it.
    * Strike it Rich - Make three of a kind to win that amount.
    * Math Game - Make an equation out of randomly-selected cash and operations.
