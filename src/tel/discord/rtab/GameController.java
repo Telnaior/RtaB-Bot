@@ -139,7 +139,8 @@ public class GameController
 					(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Check if right player, and valid bomb pick
-					e -> (e.getAuthor().equals(players.get(iInner).user) && checkValidNumber(e.getMessage().getContentRaw())),
+					e -> (e.getAuthor().equals(players.get(iInner).user)
+							&& checkValidNumber(e.getMessage().getContentRaw(),false)),
 					//Parse it and update the bomb board
 					e -> 
 					{
@@ -190,7 +191,7 @@ public class GameController
 				e ->
 				{
 					if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
-							&& checkValidNumber(e.getMessage().getContentRaw()))
+							&& checkValidNumber(e.getMessage().getContentRaw(),false))
 					{
 							int location = Integer.parseInt(e.getMessage().getContentRaw());
 							if(pickedSpaces[location-1])
@@ -414,8 +415,9 @@ public class GameController
 		if(gamesToPlay.hasNext())
 		{
 			//Get the minigame
-			MiniGame currentGame = gamesToPlay.next().getGame();
-			channel.sendMessage("Time for your next minigame, " + currentGame).queue();
+			Games nextGame = gamesToPlay.next();
+			channel.sendMessage("Time for your next minigame, " + nextGame).queue();
+			MiniGame currentGame = nextGame.getGame();
 			runNextMiniGameTurn(currentGame);
 		}
 		else
@@ -441,7 +443,7 @@ public class GameController
 				//Right player and channel
 				e ->
 				{
-					if(checkValidNumber(e.getMessage().getContentRaw()) && e.getChannel().equals(channel)
+					if(checkValidNumber(e.getMessage().getContentRaw(),true) && e.getChannel().equals(channel)
 							&& e.getAuthor().equals(players.get(currentTurn).user))
 						return true;
 					else
@@ -499,12 +501,14 @@ public class GameController
 		}
 		while(!isPlayerGood);
 	}
-	static boolean checkValidNumber(String message)
+	static boolean checkValidNumber(String message, boolean minigame)
 	{
 		try
 		{
 			int location = Integer.parseInt(message);
-			return (location > 0 && location <= boardSize);
+			if(!minigame && location <= boardSize)
+				return false;
+			return (location > 0);
 		}
 		catch(NumberFormatException e1)
 		{
