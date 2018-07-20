@@ -33,6 +33,8 @@ public class GameController
 	static int currentTurn = -1;
 	public static int playersJoined = 0;
 	static int playersAlive = 0;
+	static int playersLeft = 0;
+	static ListIterator<Games> gamesToPlay;
 	public static GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
 	static boolean[] pickedSpaces;
 	static int spacesLeft;
@@ -222,11 +224,16 @@ public class GameController
 			runSafeLogic(location);
 		}
 		//Advance turn to next player
-		advanceTurn();
+		advanceTurn(false);
 		//Test if game over
 		if(spacesLeft <= 0 || playersAlive == 1)
 		{
-			runEndGame();
+			gameStatus = GameStatus.END_GAME;
+			playersLeft = playersAlive;
+			if(spacesLeft < 0)
+				channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
+			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
+			runNextEndGamePlayer();
 		}
 		else
 		{
@@ -356,22 +363,33 @@ public class GameController
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
 	}
-	static void runEndGame()
+	static void runNextEndGamePlayer()
 	{
-		gameStatus = GameStatus.END_GAME;
-		if(spacesLeft < 0)
-			channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
-		channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-		//Let's get some rewards for our winners!
-		for(int i=0; i<playersAlive; i++)
+		//Start by showing the board as it stands
+		displayBoardAndStatus();
+		//Are there any winners left to loop through?
+		if(playersLeft == 0)
+		{
+			saveData();
+			reset();
+			return;
+		}
+		//No? Good. Let's get someone to reward!
+		advanceTurn(true);
+		//If they're a winner, boost their winstreak (folded players don't get this)
+		if(players.get(currentTurn).status == PlayerStatus.ALIVE)
 		{
 			channel.sendMessage(players.get(currentTurn).user.getAsMention() + " Wins!")
 				.completeAfter(1,TimeUnit.SECONDS);
 			//Boost winstreak by number of opponents defeated
 			players.get(currentTurn).winstreak += (playersJoined - playersAlive);
-			//But it always gets to be at least 1
-			if(players.get(currentTurn).winstreak == 0)
-				players.get(currentTurn).winstreak = 1;
+		}
+		//But folded or not, it always gets to be at least 1
+		if(players.get(currentTurn).winstreak == 0)
+			players.get(currentTurn).winstreak = 1;
+		//If they're a winner, give them a win bonus (folded players don't get this)
+		if(players.get(currentTurn).status == PlayerStatus.ALIVE)
+		{
 			//Award $20k for each space picked, double it if every space was picked, then share with everyone in
 			int winBonus = 20000*(boardSize-spacesLeft);
 			if(spacesLeft <= 0)
@@ -385,72 +403,101 @@ public class GameController
 			extraResult = players.get(currentTurn).addMoney(winBonus,true);
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
-			//Then play out any minigames they've won
-			ListIterator<Games> gamesToPlay = players.get(currentTurn).games.listIterator(0);
-			while(gamesToPlay.hasNext())
-			{
-				//Get the minigame
-				MiniGame currentGame = gamesToPlay.next().getGame();
-				channel.sendMessage("Time for your next minigame, " + currentGame).queue();
-				int moneyWon;
-				//Keep going until the game ends, which will get us out of this block
-				while(!currentGame.isGameOver())
-				{
-					//Keep printing output until it runs out of output
-					LinkedList<String> result = currentGame.getNextOutput();
-					ListIterator<String> output = result.listIterator(0);
-					while(output.hasNext())
-					{
-						channel.sendMessage(output.next()).completeAfter(3,TimeUnit.SECONDS);
-					}
-					//Then let's get more input to give it
-					waiter.waitForEvent(MessageReceivedEvent.class,
-							//Right player and channel
-							e ->
-							{
-								if(checkValidNumber(e.getMessage().getContentRaw()) && e.getChannel().equals(channel)
-										&& e.getAuthor().equals(players.get(currentTurn).user))
-									return true;
-								else
-									return false;
-							},
-							//Parse it and call the method that does stuff
-							e -> 
-							{
-								int miniPick = Integer.parseInt(e.getMessage().getContentRaw())-1;
-								currentGame.sendNextInput(miniPick);
-							});
-				}
-				//Cool, game's over now, let's grab their winnings
-				try {
-					moneyWon = currentGame.getMoneyWon();
-				}
-				//The game's over AND not over at once? Great, I stuffed up.
-				catch (GameNotOverException e2) {
-					channel.sendMessage("An error occurred, @Atia#2084 fix pls").queue();
-					moneyWon = 0;
-				}
-				StringBuilder boostedMini;
-				boostedMini = players.get(currentTurn).addMoney(moneyWon,true);
-				channel.sendMessage(String.format("Game Over. You won **$%,d**.",moneyWon)).queue();
-				if(boostedMini != null)
-					channel.sendMessage(boostedMini).queue();
-			}
-			advanceTurn();
-			displayBoardAndStatus();
 		}
-		saveData();
-		reset();
+		//Then, folded or not, play out any minigames they've won
+		gamesToPlay = players.get(currentTurn).games.listIterator(0);
+		playersLeft --;
+		runNextMiniGame();
 	}
-	static void advanceTurn()
+	static void runNextMiniGame()
+	{
+		if(gamesToPlay.hasNext())
+		{
+			//Get the minigame
+			MiniGame currentGame = gamesToPlay.next().getGame();
+			channel.sendMessage("Time for your next minigame, " + currentGame).queue();
+			runNextMiniGameTurn(currentGame);
+		}
+		else
+			runNextEndGamePlayer();
+	}
+	static void runNextMiniGameTurn(MiniGame currentGame)
+	{
+		//Keep printing output until it runs out of output
+		LinkedList<String> result = currentGame.getNextOutput();
+		ListIterator<String> output = result.listIterator(0);
+		while(output.hasNext())
+		{
+			channel.sendMessage(output.next()).completeAfter(3,TimeUnit.SECONDS);
+		}
+		//Check if the game's over
+		if(currentGame.isGameOver())
+		{
+			completeMiniGame(currentGame);
+			return;
+		}
+		//If it isn't, let's get more input to give it
+		waiter.waitForEvent(MessageReceivedEvent.class,
+				//Right player and channel
+				e ->
+				{
+					if(checkValidNumber(e.getMessage().getContentRaw()) && e.getChannel().equals(channel)
+							&& e.getAuthor().equals(players.get(currentTurn).user))
+						return true;
+					else
+						return false;
+				},
+				//Parse it and call the method that does stuff
+				e -> 
+				{
+					int miniPick = Integer.parseInt(e.getMessage().getContentRaw())-1;
+					currentGame.sendNextInput(miniPick);
+					runNextMiniGameTurn(currentGame);
+				});
+	}
+	static void completeMiniGame(MiniGame currentGame)
+	{
+		//Cool, game's over now, let's grab their winnings
+		int moneyWon;
+		try {
+			moneyWon = currentGame.getMoneyWon();
+		}
+		//The game's over AND not over at once? Great, I stuffed up.
+		catch (GameNotOverException e2) {
+			channel.sendMessage("An error occurred, @Atia#2084 fix pls").queue();
+			moneyWon = 0;
+		}
+		StringBuilder extraResult;
+		extraResult = players.get(currentTurn).addMoney(moneyWon,true);
+		channel.sendMessage(String.format("Game Over. You won **$%,d**.",moneyWon)).queue();
+		if(extraResult != null)
+			channel.sendMessage(extraResult).queue();
+		//Off to the next minigame!
+		runNextMiniGame();
+	}
+	static void advanceTurn(boolean endGame)
 	{
 		//Keep spinning through until we've got someone who's still in the game
+		boolean isPlayerGood = false;
 		do
 		{
 			currentTurn++;
 			currentTurn = currentTurn % playersJoined;
+			//Is this player someone allowed to play now?
+			switch(players.get(currentTurn).status)
+			{
+			case ALIVE:
+				isPlayerGood = true;
+				break;
+			case FOLDED:
+				if(endGame)
+					isPlayerGood = true;
+				break;
+			default:
+				break;
+			}
 		}
-		while(players.get(currentTurn).status == PlayerStatus.OUT);
+		while(!isPlayerGood);
 	}
 	static boolean checkValidNumber(String message)
 	{

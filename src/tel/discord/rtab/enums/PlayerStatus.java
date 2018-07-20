@@ -1,5 +1,5 @@
 package tel.discord.rtab.enums;
 
 public enum PlayerStatus {
-	OUT,ALIVE;
+	OUT, ALIVE, FOLDED, DONE;
 }
