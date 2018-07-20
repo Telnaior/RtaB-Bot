@@ -417,7 +417,7 @@ public class GameController
 		{
 			//Get the minigame
 			Games nextGame = gamesToPlay.next();
-			channel.sendMessage("Time for your next minigame, " + nextGame).queue();
+			channel.sendMessage("Time for your next minigame, " + nextGame + "!").queue();
 			MiniGame currentGame = nextGame.getGame();
 			runNextMiniGameTurn(currentGame);
 		}
