@@ -70,8 +70,11 @@ public class MathTime implements MiniGame {
 			invalid = false;
 			return output;
 		}
-		output.add(String.format("Space %d selected...",(lastPick+1)));
-		output.add("...");
+		if(stage != 0)
+		{
+			output.add(String.format("Space %d selected...",(lastPick+1)));
+			output.add("...");
+		}
 		switch(stage)
 		{
 		case 0:
@@ -85,8 +88,6 @@ public class MathTime implements MiniGame {
 			output.add("In Math Time, you will pick five spaces that will, together, form an equation.");
 			output.add("If you pick well, you could win up to $1,000,000!");
 			output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
-			output.add("On each stage you will have seven spaces to choose from - "
-					+ "except that you pick from the money stage twice.");
 			output.add("When you are ready, make your first pick from the money stage.");
 			stage++;
 			break;
@@ -96,8 +97,8 @@ public class MathTime implements MiniGame {
 				total -= money.get(lastPick);
 			else
 				total += money.get(lastPick);
-			String result = String.format("$%,d!",money.get(lastPick));
-			output.add(result);
+			String result = String.format("$%,d",money.get(lastPick));
+			output.add(result + "!");
 			output.add("Next, pick an operation...");
 			equation += result;
 			stage++;
@@ -121,10 +122,10 @@ public class MathTime implements MiniGame {
 				total /= multis.get(lastPick);
 			else
 				total *= multis.get(lastPick);
-			String result5 = String.format("%d!",money.get(lastPick));
+			String result5 = String.format("%d!",multis.get(lastPick));
 			output.add(result5);
 			equation += result5 + " = ";
-			equation += String.format("$,d",total);
+			equation += String.format("%,d",total);
 			stage++;
 			break;
 		}
