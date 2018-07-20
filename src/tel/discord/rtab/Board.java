@@ -1,6 +1,7 @@
 package tel.discord.rtab;
 
 import tel.discord.rtab.enums.BombType;
+import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.SpaceType;
 
 class Board
@@ -9,11 +10,12 @@ class Board
 	Integer[] cashBoard;
 	Integer[] boostBoard;
 	BombType[] bombBoard;
+	Games[] gameBoard;
 	Board(int size)
 	{
 		//Initialise types
-		final SpaceType[] TYPE_VALUES = {SpaceType.CASH,SpaceType.BOOSTER};
-		final int[] TYPE_WEIGHTS =      {            10,                2};
+		final SpaceType[] TYPE_VALUES = {SpaceType.CASH,SpaceType.BOOSTER,SpaceType.GAME};
+		final int[] TYPE_WEIGHTS =      {            10,                2,             2};
 		typeBoard = new SpaceType[size];
 		typeBoard = initBoard(size,typeBoard,TYPE_VALUES,TYPE_WEIGHTS);
 		//Initialise cash - uses Integer because generic methods don't like int
@@ -39,6 +41,10 @@ class Board
 		final int[] BOMB_WEIGHTS = {18,2,2,2,1};
 		bombBoard = new BombType[size];
 		bombBoard = initBoard(size,bombBoard,BOMB_VALUES,BOMB_WEIGHTS);
+		final Games[] GAME_VALUES = {Games.TEST_GAME};
+		final int[] GAME_WEIGHTS = {1};
+		gameBoard = new Games[size];
+		gameBoard = initBoard(size,gameBoard,GAME_VALUES,GAME_WEIGHTS);
 	}
 	private <T> T[] initBoard(int size, T[] board, T[] values, int[] weights)
 	{

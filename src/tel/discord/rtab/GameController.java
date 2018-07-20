@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
@@ -14,9 +15,13 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import tel.discord.rtab.enums.GameStatus;
+import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
+import tel.discord.rtab.minigames.GameNotOverException;
+import tel.discord.rtab.minigames.GameOverException;
+import tel.discord.rtab.minigames.MiniGame;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -195,172 +200,229 @@ public class GameController
 					}
 					return false;
 				},
-				//Parse it, update the board, and reveal the result
+				//Parse it and call the method that does stuff
 				e -> 
 				{
 					int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
-					pickedSpaces[location] = true;
-					spacesLeft--;
-					channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
-					if(bombs[location])
-					{
-						channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-						channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
-						//But is it a special bomb?
-						StringBuilder extraResult = null;
-						switch(gameboard.bombBoard[location])
-						{
-						case NORMAL:
-							channel.sendMessage("It goes **BOOM**. $250,000 lost as penalty.")
-								.completeAfter(5,TimeUnit.SECONDS);
-							extraResult = players.get(currentTurn).addMoney(-250000,false);
-							players.get(currentTurn).status = PlayerStatus.OUT;
-							players.get(currentTurn).booster = 100;
-							players.get(currentTurn).winstreak = 0;
-							playersAlive --;
-							break;
-						case BANKRUPT:
-							channel.sendMessage("It goes **BOOM**...")
-									.completeAfter(5,TimeUnit.SECONDS);
-							int amountLost = players.get(currentTurn).bankrupt();
-							channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
-									.completeAfter(5,TimeUnit.SECONDS);
-							channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
-									.completeAfter(3,TimeUnit.SECONDS);
-							extraResult = players.get(currentTurn).addMoney(-250000,false);
-							players.get(currentTurn).status = PlayerStatus.OUT;
-							players.get(currentTurn).booster = 100;
-							players.get(currentTurn).winstreak = 0;
-							playersAlive --;
-							break;
-						case BOOSTHOLD:
-							StringBuilder resultString = new StringBuilder().append("It ");
-							if(players.get(currentTurn).booster != 100)
-								resultString.append("holds your boost, then ");
-							resultString.append("goes **BOOM**. $250,000 lost as penalty.");
-							channel.sendMessage(resultString)
-									.completeAfter(5,TimeUnit.SECONDS);
-							extraResult = players.get(currentTurn).addMoney(-250000,false);
-							players.get(currentTurn).status = PlayerStatus.OUT;
-							players.get(currentTurn).winstreak = 0;
-							playersAlive --;
-							break;
-						case CHAIN:
-							channel.sendMessage("It goes **BOOM**...")
-									.completeAfter(5,TimeUnit.SECONDS);
-							int chain = 1;
-							do
-							{
-								chain *= 2;
-								StringBuilder nextLevel = new StringBuilder();
-								nextLevel.append("**");
-								for(int i=0; i<chain; i++)
-								{
-									nextLevel.append("BOOM");
-									if(i+1 < chain)
-										nextLevel.append(" ");
-								}
-								nextLevel.append("**");
-								if(chain < 8)
-									nextLevel.append("...");
-								else
-									nextLevel.append("!!!");
-								channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
-							}
-							while(Math.random() * chain < 1);
-							channel.sendMessage(String.format("**$%,d** penalty!",chain*250000))
-									.completeAfter(5,TimeUnit.SECONDS);
-							extraResult = players.get(currentTurn).addMoney(chain*-1*250000,false);
-							players.get(currentTurn).status = PlayerStatus.OUT;
-							players.get(currentTurn).booster = 100;
-							players.get(currentTurn).winstreak = 0;
-							playersAlive --;
-							break;
-						case DUD:
-							channel.sendMessage("It goes _\\*fizzle*_.")
-									.completeAfter(5,TimeUnit.SECONDS);
-							break;
-						}
-						if(extraResult != null)
-							channel.sendMessage(extraResult).queue();
-					}
-					else
-					{
-						if((Math.random()*spacesLeft)<playersJoined)
-							channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-						//Figure out what space we got
-						StringBuilder resultString = new StringBuilder();
-						StringBuilder extraResult = null;
-						switch(gameboard.typeBoard[location])
-						{
-						case CASH:
-							//On cash, update the player's score and tell them how much they won
-							int cashWon = gameboard.cashBoard[location];
-							resultString.append("**");
-							if(cashWon<0)
-								resultString.append("-");
-							resultString.append("$");
-							resultString.append(String.format("%,d",Math.abs(cashWon)));
-							resultString.append("**");
-							extraResult = players.get(currentTurn).addMoney(cashWon,false);
-							break;
-						case BOOSTER:
-							//On cash, update the player's booster and tell them what they found
-							int boostFound = gameboard.boostBoard[location];
-							resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
-							if(boostFound > 0)
-								resultString.append("!");
-							else
-								resultString.append(".");
-							players.get(currentTurn).addBooster(boostFound);
-							break;
-						}
-						channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
-						if(extraResult != null)
-							channel.sendMessage(extraResult).queue();
-					}
-					//Advance turn to next player
-					advanceTurn();
-					//Test if game over
-					if(spacesLeft <= 0 || playersAlive == 1)
-					{
-						gameStatus = GameStatus.END_GAME;
-						if(spacesLeft < 0)
-							channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
-						channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-						for(int i=0; i<playersAlive; i++)
-						{
-							channel.sendMessage(players.get(currentTurn).user.getAsMention() + " Wins!")
-								.completeAfter(1,TimeUnit.SECONDS);
-							//Boost winstreak by number of opponents defeated
-							players.get(currentTurn).winstreak += (playersJoined - playersAlive);
-							//But it always gets to be at least 1
-							if(players.get(currentTurn).winstreak == 0)
-								players.get(currentTurn).winstreak = 1;
-							//Award $20k for each space picked, double it if every space was picked, then share with everyone in
-							int winBonus = 20000*(boardSize-spacesLeft);
-							if(spacesLeft <= 0)
-								winBonus *= 2;
-							winBonus /= playersAlive;
-							if(spacesLeft <= 0 && playersAlive == 1)
-								channel.sendMessage("**SOLO BOARD CLEAR!**").queue();
-							channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
-									+ String.format("%,d",winBonus) + "**.").queue();
-							StringBuilder extraResult = null;
-							extraResult = players.get(currentTurn).addMoney(winBonus,true);
-							if(extraResult != null)
-								channel.sendMessage(extraResult).queue();
-							advanceTurn();
-						}
-						displayBoardAndStatus();
-						saveData();
-						reset();
-					}
-					else
-					{
-						runTurn();
-					}
+					resolveTurn(location);
 				});
+	}
+	static void resolveTurn(int location)
+	{
+		pickedSpaces[location] = true;
+		spacesLeft--;
+		channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+		if(bombs[location])
+		{
+			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+			//But is it a special bomb?
+			StringBuilder extraResult = null;
+			switch(gameboard.bombBoard[location])
+			{
+			case NORMAL:
+				channel.sendMessage("It goes **BOOM**. $250,000 lost as penalty.")
+					.completeAfter(5,TimeUnit.SECONDS);
+				extraResult = players.get(currentTurn).addMoney(-250000,false);
+				players.get(currentTurn).status = PlayerStatus.OUT;
+				players.get(currentTurn).booster = 100;
+				players.get(currentTurn).winstreak = 0;
+				playersAlive --;
+				break;
+			case BANKRUPT:
+				channel.sendMessage("It goes **BOOM**...")
+						.completeAfter(5,TimeUnit.SECONDS);
+				int amountLost = players.get(currentTurn).bankrupt();
+				channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
+						.completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
+						.completeAfter(3,TimeUnit.SECONDS);
+				extraResult = players.get(currentTurn).addMoney(-250000,false);
+				players.get(currentTurn).status = PlayerStatus.OUT;
+				players.get(currentTurn).booster = 100;
+				players.get(currentTurn).winstreak = 0;
+				playersAlive --;
+				break;
+			case BOOSTHOLD:
+				StringBuilder resultString = new StringBuilder().append("It ");
+				if(players.get(currentTurn).booster != 100)
+					resultString.append("holds your boost, then ");
+				resultString.append("goes **BOOM**. $250,000 lost as penalty.");
+				channel.sendMessage(resultString)
+						.completeAfter(5,TimeUnit.SECONDS);
+				extraResult = players.get(currentTurn).addMoney(-250000,false);
+				players.get(currentTurn).status = PlayerStatus.OUT;
+				players.get(currentTurn).winstreak = 0;
+				playersAlive --;
+				break;
+			case CHAIN:
+				channel.sendMessage("It goes **BOOM**...")
+						.completeAfter(5,TimeUnit.SECONDS);
+				int chain = 1;
+				do
+				{
+					chain *= 2;
+					StringBuilder nextLevel = new StringBuilder();
+					nextLevel.append("**");
+					for(int i=0; i<chain; i++)
+					{
+						nextLevel.append("BOOM");
+						if(i+1 < chain)
+							nextLevel.append(" ");
+					}
+					nextLevel.append("**");
+					if(chain < 8)
+						nextLevel.append("...");
+					else
+						nextLevel.append("!!!");
+					channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
+				}
+				while(Math.random() * chain < 1);
+				channel.sendMessage(String.format("**$%,d** penalty!",chain*250000))
+						.completeAfter(5,TimeUnit.SECONDS);
+				extraResult = players.get(currentTurn).addMoney(chain*-1*250000,false);
+				players.get(currentTurn).status = PlayerStatus.OUT;
+				players.get(currentTurn).booster = 100;
+				players.get(currentTurn).winstreak = 0;
+				playersAlive --;
+				break;
+			case DUD:
+				channel.sendMessage("It goes _\\*fizzle*_.")
+						.completeAfter(5,TimeUnit.SECONDS);
+				break;
+			}
+			if(extraResult != null)
+				channel.sendMessage(extraResult).queue();
+		}
+		else
+		{
+			if((Math.random()*spacesLeft)<playersJoined)
+				channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
+			//Figure out what space we got
+			StringBuilder resultString = new StringBuilder();
+			StringBuilder extraResult = null;
+			switch(gameboard.typeBoard[location])
+			{
+			case CASH:
+				//On cash, update the player's score and tell them how much they won
+				int cashWon = gameboard.cashBoard[location];
+				resultString.append("**");
+				if(cashWon<0)
+					resultString.append("-");
+				resultString.append("$");
+				resultString.append(String.format("%,d",Math.abs(cashWon)));
+				resultString.append("**");
+				extraResult = players.get(currentTurn).addMoney(cashWon,false);
+				break;
+			case BOOSTER:
+				//On cash, update the player's booster and tell them what they found
+				int boostFound = gameboard.boostBoard[location];
+				resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
+				if(boostFound > 0)
+					resultString.append("!");
+				else
+					resultString.append(".");
+				players.get(currentTurn).addBooster(boostFound);
+				break;
+			case GAME:
+				//On a game, announce it and add it to their game pile
+				Games gameFound = gameboard.gameBoard[location];
+				resultString.append("It's a minigame, **" + gameFound + "**!");
+				players.get(currentTurn).games.add(gameFound);
+				break;
+			}
+			channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
+			if(extraResult != null)
+				channel.sendMessage(extraResult).queue();
+		}
+		//Advance turn to next player
+		advanceTurn();
+		//Test if game over
+		if(spacesLeft <= 0 || playersAlive == 1)
+		{
+			gameStatus = GameStatus.END_GAME;
+			if(spacesLeft < 0)
+				channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
+			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
+			//Let's get some rewards for our winners!
+			for(int i=0; i<playersAlive; i++)
+			{
+				channel.sendMessage(players.get(currentTurn).user.getAsMention() + " Wins!")
+					.completeAfter(1,TimeUnit.SECONDS);
+				//Boost winstreak by number of opponents defeated
+				players.get(currentTurn).winstreak += (playersJoined - playersAlive);
+				//But it always gets to be at least 1
+				if(players.get(currentTurn).winstreak == 0)
+					players.get(currentTurn).winstreak = 1;
+				//Award $20k for each space picked, double it if every space was picked, then share with everyone in
+				int winBonus = 20000*(boardSize-spacesLeft);
+				if(spacesLeft <= 0)
+					winBonus *= 2;
+				winBonus /= playersAlive;
+				if(spacesLeft <= 0 && playersAlive == 1)
+					channel.sendMessage("**SOLO BOARD CLEAR!**").queue();
+				channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
+						+ String.format("%,d",winBonus) + "**.").queue();
+				StringBuilder extraResult = null;
+				extraResult = players.get(currentTurn).addMoney(winBonus,true);
+				if(extraResult != null)
+					channel.sendMessage(extraResult).queue();
+				//Then play out any minigames they've won
+				ListIterator<Games> gamesToPlay = players.get(currentTurn).games.listIterator(0);
+				while(gamesToPlay.hasNext())
+				{
+					//Get the minigame
+					MiniGame currentGame = gamesToPlay.next().getGame();
+					int moneyWon;
+					try
+					{
+						//Keep going until the game ends, which will get us out of this block
+						while(true)
+						{
+							currentGame.getNextOutput();
+							waiter.waitForEvent(MessageReceivedEvent.class,
+									//Right player and channel
+									e ->
+									{
+										if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
+												&& checkValidNumber(e.getMessage().getContentRaw()))
+											return true;
+										else
+											return false;
+									},
+									//Parse it and call the method that does stuff
+									e -> 
+									{
+										int miniPick = Integer.parseInt(e.getMessage().getContentRaw())-1;
+										currentGame.sendNextInput(miniPick);
+									});
+						}
+					}
+					//Cool, game's over now, let's grab their winnings
+					catch(GameOverException e1)
+					{
+						try {
+							moneyWon = currentGame.getMoneyWon();
+						}
+						//The game's over AND not over at once? Great, I stuffed up.
+						catch (GameNotOverException e2) {
+							channel.sendMessage("An error occurred, @Atia#2084 fix pls");
+							moneyWon = 0;
+						}
+					}
+					channel.sendMessage(String.format("Game Over. You won $%,d",moneyWon));
+					players.get(currentTurn).addMoney(moneyWon,true);
+				}
+				advanceTurn();
+			}
+			displayBoardAndStatus();
+			saveData();
+			reset();
+		}
+		else
+		{
+			runTurn();
+		}
 	}
 	static void advanceTurn()
 	{

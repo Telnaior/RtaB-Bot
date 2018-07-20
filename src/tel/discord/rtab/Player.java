@@ -3,11 +3,13 @@ package tel.discord.rtab;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
 import java.util.List;
 
-import tel.discord.rtab.enums.PlayerStatus;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
+import tel.discord.rtab.enums.Games;
+import tel.discord.rtab.enums.PlayerStatus;
 
 
 class Player
@@ -21,6 +23,7 @@ class Player
 	int booster;
 	int winstreak;
 	PlayerStatus status;
+	LinkedList<Games> games; 
 	Player(Member playerName)
 	{
 		user = playerName.getUser();
@@ -30,6 +33,7 @@ class Player
 		booster = 100;
 		winstreak = 0;
 		status = PlayerStatus.OUT;
+		games = new LinkedList<>();
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
