@@ -36,6 +36,7 @@ public class MathTime implements MiniGame {
 		if(invalid)
 		{
 			output.add("Invalid pick.");
+			invalid = false;
 			return output;
 		}
 		output.add(String.format("Space %d selected...",(lastPick+1)));
@@ -44,6 +45,8 @@ public class MathTime implements MiniGame {
 		{
 		case 0:
 			//Initialise stuff
+			total = 0;
+			equation = "";
 			Collections.shuffle(money);
 			Collections.shuffle(ops1);
 			Collections.shuffle(ops2);

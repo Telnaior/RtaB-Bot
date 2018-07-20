@@ -41,8 +41,8 @@ class Board
 		final int[] BOMB_WEIGHTS = {18,2,2,2,1};
 		bombBoard = new BombType[size];
 		bombBoard = initBoard(size,bombBoard,BOMB_VALUES,BOMB_WEIGHTS);
-		final Games[] GAME_VALUES = {Games.STRIKE_IT_RICH,Games.MATH_TIME};
-		final int[] GAME_WEIGHTS = {1,1};
+		final Games[] GAME_VALUES = {Games.STRIKE_IT_RICH,Games.MATH_TIME,Games.GAMBLE};
+		final int[] GAME_WEIGHTS = {1,1,1};
 		gameBoard = new Games[size];
 		gameBoard = initBoard(size,gameBoard,GAME_VALUES,GAME_WEIGHTS);
 	}

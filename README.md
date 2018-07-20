@@ -1,9 +1,9 @@
-Version Rule:
-Major Version 0 - Features still in development
-Minor Versions are standard updates including new features
--alpha: features still being worked on
--beta : features for release finished, working on bugfixes next
-Both alpha and beta replace patch numbering
+Version Rule:  
+Major Version 0 - Features still in development  
+Minor Versions are standard updates including new features  
+-alpha: features still being worked on  
+-beta : features for release finished, working on bugfixes next  
+Both alpha and beta replace patch numbering  
 Patch Versions are bugfixes found after release of minor version
 
 1.0.0 (planned)
@@ -18,13 +18,17 @@ Patch Versions are bugfixes found after release of minor version
 0.8.0 (planned)
  - Events! Chaos for players, and chaos to code in!
  
+0.7.1 (planned)
+ - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
+
 0.7.0 (planned)
  - Minigames! Pick one up during the game and survive the round to play it.
    * Strike it Rich - Make three of a kind to win that amount.
- - Also added bonus games, earned by winning five, ten, fifteen, or twenty games in a row.
+   * Math Game - Make an equation out of randomly-selected cash and operations.
+   * The Gamble - Pick a value, then take it or try to find a larger one.
  - Improved !rank command, adjusted formatting, !join command now responds with your name
  - Added !players command, to tell you who is in the game
- - Heaps more code cleanup
+ - Heaps more code cleanup, bugfixes, and formatting improvements.
 
 0.6.4
  - Bugfixes with !join/!quit/!start not caring about the playercount where they should
