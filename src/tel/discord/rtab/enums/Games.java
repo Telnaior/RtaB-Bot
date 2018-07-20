@@ -4,7 +4,8 @@ import tel.discord.rtab.minigames.*;
 
 public enum Games {
 	//TEST_GAME("Test Game","Test",new TestGame()),
-	STRIKE_IT_RICH("Strike it Rich","Strike",new StrikeItRich());
+	STRIKE_IT_RICH("Strike it Rich","Strike",new StrikeItRich()),
+	MATH_TIME("Math Time","Math",new MathTime());
 	
 	String fullName;
 	String shortName;

@@ -20,7 +20,7 @@ public class StrikeItRich implements MiniGame {
 	@Override
 	public void sendNextInput(int pick)
 	{
-		if(pick > pickedSpaces.length || pickedSpaces[pick])
+		if(pick >= BOARD_SIZE || pickedSpaces[pick])
 		{
 			lastPicked = -1;
 			return;
