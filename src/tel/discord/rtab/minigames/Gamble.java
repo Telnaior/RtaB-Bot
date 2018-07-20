@@ -24,6 +24,7 @@ public class Gamble implements MiniGame {
 		{
 			alive = false;
 			lastSpace = -1;
+			return;
 		}
 		else if(!isNumber(pick))
 		{
