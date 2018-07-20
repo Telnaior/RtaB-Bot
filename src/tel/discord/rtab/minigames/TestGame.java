@@ -1,28 +1,43 @@
 package tel.discord.rtab.minigames;
 
-public class TestGame implements MiniGame {
-	boolean sentMessage = false;
+import java.util.LinkedList;
+
+public class TestGame implements MiniGame 
+{
+	int gameState = 0;
+	int numberSent;
 	@Override
 	public void sendNextInput(int pick) {
-		// TODO Auto-generated method stub
-
+		numberSent = pick;
 	}
 
 	@Override
-	public String getNextOutput() throws GameOverException {
-		// TODO Auto-generated method stub
-		if(sentMessage)
-			throw new GameOverException();
-		else
+	public LinkedList<String> getNextOutput() {
+		LinkedList<String> output = new LinkedList<>();
+		switch(gameState)
 		{
-			sentMessage = true;
-			return "This Test Game is just a placeholder, so here's $100,000!";
+		case 0:
+			gameState++;
+			output.add("This Test Game is just a placeholder, so pick any number to win $100,000!");
+			return output;
+		case 1:
+			gameState++;
+			output.add("You picked " + numberSent);
+			return output;
+		default:
+			output.add("If you see this message, something went wrong.");
+			gameState = 2;
+			return output;
 		}
 	}
-
+	
+	@Override
+	public boolean gameStillRunning() {
+		return (gameState >= 2);
+	}
+	
 	@Override
 	public int getMoneyWon() throws GameNotOverException {
-		// TODO Auto-generated method stub
 		return 100000;
 	}
 

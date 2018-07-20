@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,6 @@ import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
 import tel.discord.rtab.minigames.GameNotOverException;
-import tel.discord.rtab.minigames.GameOverException;
 import tel.discord.rtab.minigames.MiniGame;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -375,51 +375,42 @@ public class GameController
 					MiniGame currentGame = gamesToPlay.next().getGame();
 					channel.sendMessage("Time for your next minigame, " + currentGame);
 					int moneyWon;
-					try
+					//Keep going until the game ends, which will get us out of this block
+					while(currentGame.gameStillRunning())
 					{
-						//Keep going until the game ends, which will get us out of this block
-						while(true)
+						//Keep printing output until it runs out of output
+						LinkedList<String> result = currentGame.getNextOutput();
+						ListIterator<String> output = result.listIterator(0);
+						while(output.hasNext())
 						{
-							//Keep printing output until it runs out of output
-							String output;
-							while(true)
-							{
-								output = currentGame.getNextOutput();
-								if(output != null)
-									channel.sendMessage(output).queue();
-								else
-									break;
-							}
-							//Then let's get more input to give it
-							waiter.waitForEvent(MessageReceivedEvent.class,
-									//Right player and channel
-									e ->
-									{
-										if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
-												&& checkValidNumber(e.getMessage().getContentRaw()))
-											return true;
-										else
-											return false;
-									},
-									//Parse it and call the method that does stuff
-									e -> 
-									{
-										int miniPick = Integer.parseInt(e.getMessage().getContentRaw())-1;
-										currentGame.sendNextInput(miniPick);
-									});
+							channel.sendMessage(output.next()).completeAfter(3,TimeUnit.SECONDS);
 						}
+						//Then let's get more input to give it
+						waiter.waitForEvent(MessageReceivedEvent.class,
+								//Right player and channel
+								e ->
+								{
+									if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
+											&& checkValidNumber(e.getMessage().getContentRaw()))
+										return true;
+									else
+										return false;
+								},
+								//Parse it and call the method that does stuff
+								e -> 
+								{
+									int miniPick = Integer.parseInt(e.getMessage().getContentRaw())-1;
+									currentGame.sendNextInput(miniPick);
+								});
 					}
 					//Cool, game's over now, let's grab their winnings
-					catch(GameOverException e1)
-					{
-						try {
-							moneyWon = currentGame.getMoneyWon();
-						}
-						//The game's over AND not over at once? Great, I stuffed up.
-						catch (GameNotOverException e2) {
-							channel.sendMessage("An error occurred, @Atia#2084 fix pls").queue();
-							moneyWon = 0;
-						}
+					try {
+						moneyWon = currentGame.getMoneyWon();
+					}
+					//The game's over AND not over at once? Great, I stuffed up.
+					catch (GameNotOverException e2) {
+						channel.sendMessage("An error occurred, @Atia#2084 fix pls").queue();
+						moneyWon = 0;
 					}
 					StringBuilder boostedMini;
 					boostedMini = players.get(currentTurn).addMoney(moneyWon,true);
