@@ -18,8 +18,10 @@ Patch Versions are bugfixes found after release of minor version
 0.8.0 (planned)
  - Events! Chaos for players, and chaos to code in!
  
-0.7.1 (planned)
+0.7.2 (planned)
  - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
+ 
+0.7.1
  - Bugfixes up the wazoo
 
 0.7.0
