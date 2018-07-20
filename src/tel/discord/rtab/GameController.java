@@ -520,7 +520,7 @@ public class GameController
 		try
 		{
 			int location = Integer.parseInt(message);
-			if(!minigame && location <= boardSize)
+			if(!minigame && location > boardSize)
 				return false;
 			return (location > 0);
 		}
