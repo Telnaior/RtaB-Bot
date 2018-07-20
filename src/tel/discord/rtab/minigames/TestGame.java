@@ -37,7 +37,7 @@ public class TestGame implements MiniGame
 	}
 	
 	@Override
-	public int getMoneyWon() throws GameNotOverException {
+	public int getMoneyWon(){
 		return 100000;
 	}
 
