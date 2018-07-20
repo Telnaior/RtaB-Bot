@@ -24,5 +24,5 @@ public interface MiniGame {
 	 * Returns an int containing the player's winnings, pre-booster
 	 * Methods throws exception if game isn't over
 	 */
-	int getMoneyWon() throws GameNotOverException;
+	int getMoneyWon();
 }

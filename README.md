@@ -20,6 +20,7 @@ Patch Versions are bugfixes found after release of minor version
  
 0.7.0 (planned)
  - Minigames! Pick one up during the game and survive the round to play it.
+   * Strike it Rich - Make three of a kind to win that amount.
  - Also added bonus games, earned by winning five, ten, fifteen, or twenty games in a row.
  - Improved !rank command, adjusted formatting, !join command now responds with your name
  - Added !players command, to tell you who is in the game

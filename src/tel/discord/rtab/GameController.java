@@ -20,7 +20,6 @@ import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
-import tel.discord.rtab.minigames.GameNotOverException;
 import tel.discord.rtab.minigames.MiniGame;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -406,6 +405,7 @@ public class GameController
 				channel.sendMessage(extraResult).queue();
 		}
 		//Then, folded or not, play out any minigames they've won
+		players.get(currentTurn).games.sort(null);
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
 		playersLeft --;
 		runNextMiniGame();
@@ -460,18 +460,32 @@ public class GameController
 	static void completeMiniGame(MiniGame currentGame)
 	{
 		//Cool, game's over now, let's grab their winnings
-		int moneyWon;
-		try {
-			moneyWon = currentGame.getMoneyWon();
+		int moneyWon = currentGame.getMoneyWon();
+		int multiplier = 1;
+		//Did they have multiple copies of the game?
+		while(gamesToPlay.hasNext())
+		{
+			//Move the iterator back one, to the first instance of the game
+			gamesToPlay.previous();
+			//If it matches (ie multiple copies), remove one and add it to the multiplier
+			if(gamesToPlay.next() == gamesToPlay.next())
+			{
+				multiplier++;
+				gamesToPlay.remove();
+			}
+			//Otherwise we'd better out it back where it belongs
+			else
+				gamesToPlay.previous();
 		}
-		//The game's over AND not over at once? Great, I stuffed up.
-		catch (GameNotOverException e2) {
-			channel.sendMessage("An error occurred, @Atia#2084 fix pls").queue();
-			moneyWon = 0;
-		}
+		StringBuilder resultString = new StringBuilder();
+		resultString.append(String.format("Game Over. You won **$%,d**",moneyWon));
+		if(multiplier > 1)
+			resultString.append(String.format(" times %d copies!",multiplier));
+		else
+			resultString.append(".");
 		StringBuilder extraResult;
-		extraResult = players.get(currentTurn).addMoney(moneyWon,true);
-		channel.sendMessage(String.format("Game Over. You won **$%,d**.",moneyWon)).queue();
+		extraResult = players.get(currentTurn).addMoney((moneyWon*multiplier),true);
+		channel.sendMessage(resultString).queue();
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
 		//Off to the next minigame!
@@ -517,25 +531,28 @@ public class GameController
 	}
 	static void displayBoardAndStatus()
 	{
-		//Build up board display
 		StringBuilder board = new StringBuilder().append("```\n");
-		board.append("     RtaB     \n");
-		for(int i=0; i<boardSize; i++)
+		//Board doesn't need to be displayed if game is over
+		if(gameStatus != GameStatus.END_GAME)
 		{
-			if(pickedSpaces[i])
+			board.append("     RtaB     \n");
+			for(int i=0; i<boardSize; i++)
 			{
-				board.append("  ");
+				if(pickedSpaces[i])
+				{
+					board.append("  ");
+				}
+				else
+				{
+					board.append(String.format("%02d",(i+1)));
+				}
+				if(i%5==4)
+					board.append("\n");
+				else
+					board.append(" ");
 			}
-			else
-			{
-				board.append(String.format("%02d",(i+1)));
-			}
-			if(i%5==4)
-				board.append("\n");
-			else
-				board.append(" ");
+			board.append("\n");
 		}
-		board.append("\n");
 		//Next the status line
 		//Start by getting the lengths so we can pad the status bars appropriately
 		//Add one extra to name length because we want one extra space between name and cash
