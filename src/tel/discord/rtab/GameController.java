@@ -407,6 +407,7 @@ public class GameController
 		//Then, folded or not, play out any minigames they've won
 		players.get(currentTurn).games.sort(null);
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
+		players.get(currentTurn).status = PlayerStatus.DONE;
 		playersLeft --;
 		runNextMiniGame();
 	}
@@ -591,19 +592,24 @@ public class GameController
 			board.append("$");
 			board.append(String.format("%,"+moneyLength+"d",Math.abs(players.get(i).money)));
 			//Now the booster display
-			if(players.get(i).status == PlayerStatus.ALIVE)
+			switch(players.get(i).status)
 			{
+			case ALIVE:
+			case DONE:
 				board.append(" [");
 				board.append(String.format("%3d",players.get(i).booster));
 				board.append("%");
-				if(gameStatus == GameStatus.END_GAME)
+				if(players.get(i).status == PlayerStatus.DONE)
 				{
 					board.append("x");
 					board.append(players.get(i).winstreak);
 				}
-			}
-			else
+				break;
+			case OUT:
+			case FOLDED:
 				board.append(" [OUT");
+				break;
+			}
 			board.append("]\n");
 		}
 		//Close it off and print it out
