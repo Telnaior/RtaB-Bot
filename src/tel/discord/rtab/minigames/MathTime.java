@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MathTime implements MiniGame {
+	static final boolean BONUS = false;
 	List<Integer> money = Arrays.asList(0,5000,10000,20000,30000,40000,60000);
 	List<String> ops1 = Arrays.asList("+","+","+","+","+","-","-");
 	List<String> ops2 = Arrays.asList("x","x","x","x","/","/","/");
@@ -113,7 +114,7 @@ public class MathTime implements MiniGame {
 		case 4:
 			result4 = ops2.get(lastPick);
 			output.add("**"+result4+"**");
-			output.add("Next, pick a multiplier...");
+			output.add("Finally, pick a multiplier...");
 			equation += (" "+result4+" ");
 			stage++;
 			break;
@@ -122,10 +123,10 @@ public class MathTime implements MiniGame {
 				total /= multis.get(lastPick);
 			else
 				total *= multis.get(lastPick);
-			String result5 = String.format("%d!",multis.get(lastPick));
-			output.add(result5);
+			String result5 = String.format("%d",multis.get(lastPick));
+			output.add(result5+"!");
 			equation += result5 + " = ";
-			equation += String.format("%,d",total);
+			equation += String.format("$%,d",total);
 			stage++;
 			break;
 		}
@@ -170,6 +171,11 @@ public class MathTime implements MiniGame {
 	{
 		stage = 0;
 		return total;
+	}
+
+	@Override
+	public boolean isBonusGame() {
+		return BONUS;
 	}
 
 }

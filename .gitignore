@@ -1,6 +1,7 @@
 # Private Bot Data
-config.txt
 *.csv
+config.txt
+SuperBonusRound.java
 
 # Eclipse Files
 .classpath

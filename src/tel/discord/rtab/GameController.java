@@ -395,6 +395,29 @@ public class GameController
 		//But folded or not, it always gets to be at least 1
 		if(players.get(currentTurn).winstreak == 0)
 			players.get(currentTurn).winstreak = 1;
+		//Check to see if any bonus games have been unlocked - folded players get this too
+		List<String> list;
+		try {
+			list = Files.readAllLines(Paths.get("scores.csv"));
+			String[] record = list.get(findUserInList(list,players.get(currentTurn).uID,false)).split(":");
+			int oldWinstreak = Integer.parseInt(record[4]);
+			//Now search every multiple of 5 to see if we've got it
+			for(int i=5; i<=players.get(currentTurn).winstreak;i+=5)
+			{
+				if(oldWinstreak < i)
+					switch(i)
+					{
+					case 5:
+					case 10:
+					case 15:
+					case 20:
+					default:
+						//TODO Add bonus games as they're created
+					}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		//If they're a winner, give them a win bonus (folded players don't get this)
 		if(players.get(currentTurn).status == PlayerStatus.ALIVE)
 		{
@@ -491,8 +514,12 @@ public class GameController
 			resultString.append(String.format(" times %d copies!",multiplier));
 		else
 			resultString.append(".");
-		StringBuilder extraResult;
-		extraResult = players.get(currentTurn).addMoney((moneyWon*multiplier),true);
+		StringBuilder extraResult = null;
+		//Bypass the usual method if it's a bonus game so we don't have booster or winstreak applied
+		if(currentGame.isBonusGame())
+			players.get(currentTurn).money += (moneyWon*multiplier);
+		else
+			extraResult = players.get(currentTurn).addMoney((moneyWon*multiplier),true);
 		channel.sendMessage(resultString).queue();
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();

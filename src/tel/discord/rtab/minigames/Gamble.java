@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Gamble implements MiniGame {
+	static final boolean BONUS = false;
 	List<Integer> money = Arrays.asList(100,300,500,700,1000,3000,5000,7000,
 			10000,20000,30000,40000,50000,70000,100000,200000,300000,400000,500000,1000000);
 	boolean firstPlay = true;
@@ -173,6 +174,11 @@ public class Gamble implements MiniGame {
 	public int getMoneyWon() {
 		firstPlay = true;
 		return total;
+	}
+
+	@Override
+	public boolean isBonusGame() {
+		return BONUS;
 	}
 
 }

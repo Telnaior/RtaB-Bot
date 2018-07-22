@@ -42,7 +42,7 @@ class Board
 		bombBoard = new BombType[size];
 		bombBoard = initBoard(size,bombBoard,BOMB_VALUES,BOMB_WEIGHTS);
 		final Games[] GAME_VALUES = {Games.STRIKE_IT_RICH,Games.MATH_TIME,Games.GAMBLE};
-		final int[] GAME_WEIGHTS = {1,1,1};
+		final int[] GAME_WEIGHTS = {2,2,2};
 		gameBoard = new Games[size];
 		gameBoard = initBoard(size,gameBoard,GAME_VALUES,GAME_WEIGHTS);
 	}

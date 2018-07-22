@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class StrikeItRich implements MiniGame {
+	static final boolean BONUS = false;
 	final static int BOARD_SIZE = 15;
 	final static int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
 	final static int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
@@ -145,5 +146,10 @@ public class StrikeItRich implements MiniGame {
 	{
 		firstPlay = true;
 		return lastPicked;
+	}
+
+	@Override
+	public boolean isBonusGame() {
+		return BONUS;
 	}
 }

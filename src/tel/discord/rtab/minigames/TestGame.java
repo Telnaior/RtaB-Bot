@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 public class TestGame implements MiniGame 
 {
+	static final boolean BONUS = false;
 	int gameState = 0;
 	String playerSent;
 	@Override
@@ -39,6 +40,11 @@ public class TestGame implements MiniGame
 	@Override
 	public int getMoneyWon(){
 		return 100000;
+	}
+
+	@Override
+	public boolean isBonusGame() {
+		return BONUS;
 	}
 
 }

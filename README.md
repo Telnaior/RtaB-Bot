@@ -1,11 +1,3 @@
-Version Rule:  
-Major Version 0 - Features still in development  
-Minor Versions are standard updates including new features  
--alpha: features still being worked on  
--beta : features for release finished, working on bugfixes next  
-Both alpha and beta replace patch numbering  
-Patch Versions are bugfixes found after release of minor version
-
 1.0.0 (planned)
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
