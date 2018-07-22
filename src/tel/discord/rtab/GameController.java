@@ -412,6 +412,7 @@ public class GameController
 					case 15:
 					case 20:
 					default:
+						players.get(currentTurn).games.add(Games.SUPERCASH);
 						//TODO Add bonus games as they're created
 					}
 			}
@@ -448,8 +449,15 @@ public class GameController
 		{
 			//Get the minigame
 			Games nextGame = gamesToPlay.next();
-			channel.sendMessage("Time for your next minigame, " + nextGame + "!").queue();
 			MiniGame currentGame = nextGame.getGame();
+			StringBuilder gameMessage = new StringBuilder();
+			gameMessage.append(players.get(currentTurn).user.getAsMention());
+			if(currentGame.isBonusGame())
+				gameMessage.append(", you've unlocked a bonus game: ");
+			else
+				gameMessage.append(", time for your next minigame: ");
+			gameMessage.append(nextGame + "!");
+			channel.sendMessage(gameMessage).queue();
 			runNextMiniGameTurn(currentGame);
 		}
 		else

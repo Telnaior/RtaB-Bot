@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 
-public class StrikeItRich implements MiniGame {
-	static final boolean BONUS = false;
-	final static int BOARD_SIZE = 15;
-	final static int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
+public class Supercash implements MiniGame {
+	static final boolean BONUS = true;
+	final static int BOARD_SIZE = 24;
+	final static int MAX_VALUE = 10000000;
+	final static int[] VALUES = {0,500000,1000000,2000000,3000000,4000000,5000000,
+		6000000,7000000,8000000,9000000,MAX_VALUE}; //Bad things happen if this isn't sorted
 	final static int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
 	static int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
@@ -16,7 +18,6 @@ public class StrikeItRich implements MiniGame {
 	int lastPicked;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
-	boolean pinchMode = false;
 	
 	@Override
 	public void sendNextInput(String pick)
@@ -36,9 +37,7 @@ public class StrikeItRich implements MiniGame {
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
 			lastPicked = board.get(lastSpace);
-			//Note this does two operations at once here
-			if(++numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
-				pinchMode = true;
+			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
 		}
 	}
 
@@ -72,15 +71,18 @@ public class StrikeItRich implements MiniGame {
 			for(int i=0; i<VALUES.length; i++)
 				for(int j=0; j<NEEDED_TO_WIN; j++)
 					board.add(VALUES[i]);
+			//Switch one of the lowest values for an extra copy of the highest value
+			board.set(0,MAX_VALUE);
 			Collections.shuffle(board);
 			numberPicked = new int[VALUES.length];
 			pickedSpaces = new boolean[BOARD_SIZE];
-			pinchMode = false;
 			//Display instructions
-			output.add("In Strike it Rich, your objective is to match three of a kind.");
-			output.add("Simply keep choosing numbers until you have three the same, and that is what you will win.");
-			output.add("The top prize is $1,000,000!");
-			output.add("Make your first pick when you are ready.");
+			output.add("Congratulations on earning the chance to play this bonus game!");
+			output.add("In Supercash, you can win up to ten million dollars!");
+			output.add("Hidden on the board are three \"$10,000,000\" spaces, simply pick them all to win.");
+			output.add("There are also other, lesser values, make a pair of those to win that amount instead.");
+			output.add("Oh, and there's also a single bomb hidden somewhere on the board. If you pick that, you win nothing.");
+			output.add("Best of luck! Make your first pick when you are ready.");
 			firstPlay = false;
 		}
 		else if(lastPicked == -2)
@@ -95,8 +97,10 @@ public class StrikeItRich implements MiniGame {
 		else
 		{
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			if(pinchMode)
-				output.add("...");
+			output.add("...");
+			if(lastPicked == 0)
+			output.add("**BOOM**");
+			else
 			output.add(String.format("$%,d!",lastPicked));
 		}
 		output.add(generateBoard());
@@ -107,7 +111,7 @@ public class StrikeItRich implements MiniGame {
 	{
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
-		display.append("STRIKE IT RICH\n");
+		display.append("    SUPERCASH    \n");
 		for(int i=0; i<BOARD_SIZE; i++)
 		{
 			if(pickedSpaces[i])
@@ -118,14 +122,14 @@ public class StrikeItRich implements MiniGame {
 			{
 				display.append(String.format("%02d",(i+1)));
 			}
-			if((i%VALUES.length) == (VALUES.length-1))
+			if((i%(VALUES.length/2)) == ((VALUES.length/2)-1))
 				display.append("\n");
 			else
 				display.append(" ");
 		}
 		display.append("\n");
 		//Next display how many of each we have
-		for(int i=0; i<VALUES.length; i++)
+		for(int i=1; i<VALUES.length; i++)
 		{
 			display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]));
 		}
@@ -136,9 +140,21 @@ public class StrikeItRich implements MiniGame {
 	@Override
 	public boolean isGameOver()
 	{
-		for(int search : numberPicked)
-			if(search >= NEEDED_TO_WIN)
-				return true;
+		for(int i=0; i<VALUES.length; i++)
+		{
+			//Lowest amount is easier to win
+			if(i == 0)
+				if(numberPicked[i] >= (NEEDED_TO_WIN-1))
+					return true;
+			//Highest amount is harder to win
+			else if(i == VALUES.length-1)
+				if(numberPicked[i] >= (NEEDED_TO_WIN+1))
+					return true;
+			//Other amounts are normal rarity
+			else
+				if(numberPicked[i] >= NEEDED_TO_WIN)
+					return true;
+		}
 		return false;
 	}
 
