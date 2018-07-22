@@ -144,16 +144,22 @@ public class Supercash implements MiniGame {
 		{
 			//Lowest amount is easier to win
 			if(i == 0)
+			{
 				if(numberPicked[i] >= (NEEDED_TO_WIN-1))
 					return true;
+			}
 			//Highest amount is harder to win
-			else if(i == VALUES.length-1)
+			else if(i == (VALUES.length-1))
+			{
 				if(numberPicked[i] >= (NEEDED_TO_WIN+1))
 					return true;
+			}
 			//Other amounts are normal rarity
 			else
+			{
 				if(numberPicked[i] >= NEEDED_TO_WIN)
 					return true;
+			}
 		}
 		return false;
 	}
