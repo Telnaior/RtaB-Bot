@@ -397,25 +397,30 @@ public class GameController
 			players.get(currentTurn).winstreak = 1;
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		List<String> list;
-		try {
+		try
+		{
 			list = Files.readAllLines(Paths.get("scores.csv"));
-			String[] record = list.get(findUserInList(list,players.get(currentTurn).uID,false)).split(":");
-			int oldWinstreak = Integer.parseInt(record[4]);
-			//Now search every multiple of 5 to see if we've got it
-			for(int i=5; i<=players.get(currentTurn).winstreak;i+=5)
+			int index = findUserInList(list,players.get(currentTurn).uID,false);
+			if(index >= 0)
 			{
-				if(oldWinstreak < i)
-					switch(i)
-					{
-					case 5:
-						players.get(currentTurn).games.add(Games.SUPERCASH);
-					case 10:
-					case 15:
-					case 20:
-					default:
-						players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
-						//TODO Add bonus games as they're created
-					}
+				String[] record = list.get(index).split(":");
+				int oldWinstreak = Integer.parseInt(record[4]);
+				//Now search every multiple of 5 to see if we've got it
+				for(int i=5; i<=players.get(currentTurn).winstreak;i+=5)
+				{
+					if(oldWinstreak < i)
+						switch(i)
+						{
+						case 5:
+							players.get(currentTurn).games.add(Games.SUPERCASH);
+						case 10:
+						case 15:
+						case 20:
+						default:
+							players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
+							//TODO Add bonus games as they're created
+						}
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

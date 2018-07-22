@@ -21,7 +21,7 @@ public class Gamble implements MiniGame {
 	@Override
 	public void sendNextInput(String pick)
 	{
-		if(pick.equals("STOP"))
+		if(pick.toUpperCase().equals("STOP"))
 		{
 			alive = false;
 			lastSpace = -1;
