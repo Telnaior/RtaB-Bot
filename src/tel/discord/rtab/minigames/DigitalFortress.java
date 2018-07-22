@@ -43,7 +43,12 @@ public class DigitalFortress implements MiniGame {
 		try
 		{
 			//If this doesn't throw an exception we're good
-			Integer.parseInt(message);
+			char[] test = message.toCharArray();
+			for(char check : test)
+			{
+				if(!Character.isDigit(check))
+					return false;
+			}
 			//Needs to be exactly ten digits
 			return (message.length() == 10);
 		}
@@ -104,7 +109,7 @@ public class DigitalFortress implements MiniGame {
 		for(int i=3; i>=attemptsLeft; i--)
 		{
 			board.append("   ");
-			board.append(guesses[attemptsLeft]);
+			board.append(guesses[i]);
 			board.append("\n");
 		}
 		if(attemptsLeft == 0)
@@ -117,6 +122,7 @@ public class DigitalFortress implements MiniGame {
 			else
 				board.append("-");
 		}
+		board.append("\n```");
 		return board.toString();
 	}
 
