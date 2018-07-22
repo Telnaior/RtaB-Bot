@@ -7,7 +7,9 @@ public enum Games {
 	STRIKE_IT_RICH("Strike it Rich","Strike",new StrikeItRich()),
 	MATH_TIME("Math Time","Math",new MathTime()),
 	GAMBLE("The Gamble","Gamble",new Gamble()),
-	SUPERCASH("SUPERCASH","Super",new Supercash());
+	//Bonus games
+	SUPERCASH("SUPERCASH","Super",new Supercash()),
+	DIGITAL_FORTRESS("DIGITAL FORTRESS","Fortress",new DigitalFortress());
 	
 	String fullName;
 	String shortName;

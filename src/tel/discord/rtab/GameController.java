@@ -408,11 +408,12 @@ public class GameController
 					switch(i)
 					{
 					case 5:
+						players.get(currentTurn).games.add(Games.SUPERCASH);
 					case 10:
 					case 15:
 					case 20:
 					default:
-						players.get(currentTurn).games.add(Games.SUPERCASH);
+						players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
 						//TODO Add bonus games as they're created
 					}
 			}

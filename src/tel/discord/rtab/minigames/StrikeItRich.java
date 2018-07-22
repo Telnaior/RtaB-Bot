@@ -36,8 +36,8 @@ public class StrikeItRich implements MiniGame {
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
 			lastPicked = board.get(lastSpace);
-			//Note this does two operations at once here
-			if(++numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
+			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
+			if(numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
 				pinchMode = true;
 		}
 	}
