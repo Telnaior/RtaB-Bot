@@ -11,6 +11,7 @@ public class ResetCommand extends Command
 	{
 		this.name = "reset";
 		this.help = "resets the game state, in case something gets bugged";
+		this.hidden = true;
 		this.ownerCommand = true;
 	}
 	@Override

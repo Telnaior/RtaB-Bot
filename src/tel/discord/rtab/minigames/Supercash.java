@@ -131,7 +131,8 @@ public class Supercash implements MiniGame {
 		//Next display how many of each we have
 		for(int i=1; i<VALUES.length; i++)
 		{
-			display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]));
+			if(numberPicked[i] > 0)
+				display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]));
 		}
 		display.append("```");
 		return display.toString();

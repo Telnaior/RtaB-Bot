@@ -9,6 +9,7 @@ public class QuitCommand extends Command {
 	public QuitCommand()
 	{
 		this.name = "quit";
+		this.aliases = new String[]{"leave"};
 		this.help = "leaves the game, if it hasn't started yet";
 	}
 	@Override
