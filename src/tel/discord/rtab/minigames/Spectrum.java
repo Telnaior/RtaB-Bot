@@ -24,12 +24,12 @@ public class Spectrum implements MiniGame {
 	{
 		if(!isNumber(pick))
 		{
-			lastPicked = -2;
+			lastPicked = -3;
 			return;
 		}
 		if(!checkValidNumber(pick))
 		{
-			lastPicked = -1;
+			lastPicked = -2;
 			return;
 		}
 		else

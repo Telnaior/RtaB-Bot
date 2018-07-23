@@ -10,7 +10,8 @@ public enum Games {
 	//Bonus games
 	SUPERCASH("SUPERCASH","Super",new Supercash()),
 	DIGITAL_FORTRESS("DIGITAL FORTRESS","Fortress",new DigitalFortress()),
-	SPECTRUM("SPECTRUM","Spectrum",new Spectrum());
+	SPECTRUM("SPECTRUM","Spectrum",new Spectrum()),
+	HYPERCUBE("HYPERCUBE","Hyper^3",new Hypercube());
 	
 	String fullName;
 	String shortName;

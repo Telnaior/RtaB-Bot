@@ -418,10 +418,12 @@ public class GameController
 							players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
 							break;
 						case 15:
+							players.get(currentTurn).games.add(Games.SPECTRUM);
+							break;
 						case 20:
 						default:
-							players.get(currentTurn).games.add(Games.SPECTRUM);
-							//TODO Add bonus games as they're created
+							players.get(currentTurn).games.add(Games.HYPERCUBE);
+							break;
 						}
 				}
 			}
