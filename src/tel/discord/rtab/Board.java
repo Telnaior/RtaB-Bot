@@ -32,8 +32,8 @@ class Board
 				5,10,15,20,25,30,35,40,45,50, //Small
 				60,70,80,90,100,125,150,200,300,500}; //Big
 		final int[] BOOST_WEIGHTS = {3,3,3,3,3,3,3,3,3,3, //Negative
-				6,6,6,6,6,6,6,6,6,6, //Small
-				3,3,3,3,3,2,2,2,1,1}; //Big
+				7,7,7,7,7,7,7,7,7,7, //Small
+				4,4,4,4,4,2,2,2,1,1}; //Big
 		boostBoard = new Integer[size];
 		boostBoard = initBoard(size,boostBoard,BOOST_VALUES,BOOST_WEIGHTS);
 		//Initialise specialty bombs

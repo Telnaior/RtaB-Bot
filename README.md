@@ -9,9 +9,21 @@
  
 0.8.0 (planned)
  - Events! Chaos for players, and chaos to code in!
+   * Joker - Survive one bomb
+   * Military Aid - Immediately place an extra bomb
+   * Boost Drain - Cut boost in half
+   * Minefield - Randomly add extra bombs for the number of players alive
+   * 50/50 - Left or right, RNG $1mil or bomb
+   * Split & Share - If you lose, cut off 10% of your score and share it between the other players
+   * Fold - Ability to quit the round without penalty and still play minigames
+   * Jackpot - Win the round to get +$25mil, no boosters allowed
+   * Lockdown - All non-bomb spaces on the board become cash
+   * Starman - Remove all bombs from the board
  
 0.7.2 (planned)
  - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
+ - Extra commands and aliases (!board to display the board status)
+ - Usual mountain of bugfixes
  
 0.7.1
  - Bugfixes up the wazoo
