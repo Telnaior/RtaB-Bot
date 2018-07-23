@@ -73,6 +73,8 @@ public class Spectrum implements MiniGame {
 			for(int i=0; i<VALUES.length; i++)
 				for(int j=0; j<NEEDED_TO_WIN; j++)
 					board.add(VALUES[i]);
+			//Add an extra bomb
+			board.add(0);
 			Collections.shuffle(board);
 			numberPicked = new int[VALUES.length];
 			pickedSpaces = new boolean[BOARD_SIZE];
@@ -101,7 +103,7 @@ public class Spectrum implements MiniGame {
 			if(numberPicked[0] >= (NEEDED_TO_WIN-1))
 				output.add("...");
 			if(lastPicked == 0)
-				output.add("**BOOM**");
+				output.add("**BOMB**");
 			else
 				output.add(String.format("$%,d!",lastPicked));
 		}
@@ -132,9 +134,10 @@ public class Spectrum implements MiniGame {
 		display.append("\n");
 		//Next display how many of each we have, and our total
 		display.append("Total So Far: \n");
-		display.append(String.format("$%11,d\n",total));
+		display.append(String.format("$%,11d\n",total));
 		display.append("\n");
-		for(int i=0; i<VALUES.length; i++)
+		display.append(String.format("%dx BOMB\n",numberPicked[0]));
+		for(int i=1; i<VALUES.length; i++)
 		{
 			if(numberPicked[i] > 0 && numberPicked[i] < NEEDED_TO_WIN)
 				display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]));

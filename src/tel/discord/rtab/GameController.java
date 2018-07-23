@@ -413,8 +413,10 @@ public class GameController
 						{
 						case 5:
 							players.get(currentTurn).games.add(Games.SUPERCASH);
+							break;
 						case 10:
 							players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
+							break;
 						case 15:
 						case 20:
 						default:

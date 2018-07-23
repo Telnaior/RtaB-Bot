@@ -99,9 +99,9 @@ public class Supercash implements MiniGame {
 			output.add(String.format("Space %d selected...",lastSpace+1));
 			output.add("...");
 			if(lastPicked == 0)
-			output.add("**BOOM**");
+				output.add("**BOOM**");
 			else
-			output.add(String.format("$%,d!",lastPicked));
+				output.add(String.format("$%,d!",lastPicked));
 		}
 		output.add(generateBoard());
 		return output;
