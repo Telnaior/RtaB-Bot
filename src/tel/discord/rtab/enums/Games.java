@@ -9,7 +9,8 @@ public enum Games {
 	GAMBLE("The Gamble","Gamble",new Gamble()),
 	//Bonus games
 	SUPERCASH("SUPERCASH","Super",new Supercash()),
-	DIGITAL_FORTRESS("DIGITAL FORTRESS","Fortress",new DigitalFortress());
+	DIGITAL_FORTRESS("DIGITAL FORTRESS","Fortress",new DigitalFortress()),
+	SPECTRUM("SPECTRUM","Spectrum",new Spectrum());
 	
 	String fullName;
 	String shortName;

@@ -19,6 +19,8 @@
    * Jackpot - Win the round to get +$25mil, no boosters allowed
    * Lockdown - All non-bomb spaces on the board become cash
    * Starman - Remove all bombs from the board
+   * Repeat - Immediately pick two more spaces
+   * BLAMMO - Block the blammo, Eliminate yourself, Eliminate an opponent, or a Threshold Situation?
  
 0.7.2 (planned)
  - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
