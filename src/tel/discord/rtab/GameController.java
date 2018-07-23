@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +22,7 @@ import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
+import tel.discord.rtab.enums.SpaceType;
 import tel.discord.rtab.minigames.MiniGame;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -31,6 +33,7 @@ public class GameController
 	public static MessageChannel channel = null;
 	static List<Player> players = new ArrayList<>();
 	static int currentTurn = -1;
+	static int repeatTurn = 0;
 	public static int playersJoined = 0;
 	static int playersAlive = 0;
 	static int playersLeft = 0;
@@ -54,6 +57,7 @@ public class GameController
 		playersAlive = 0;
 		gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
+		repeatTurn = 0;
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -183,8 +187,17 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", your turn. Choose a space on the board.")
-			.completeAfter(3,TimeUnit.SECONDS);
+		if(repeatTurn > 0)
+		{
+			repeatTurn --;
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", pick again.")
+				.completeAfter(3,TimeUnit.SECONDS);
+		}
+		else
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", your turn. Choose a space on the board.")
+				.completeAfter(3,TimeUnit.SECONDS);
+		}
 		displayBoardAndStatus();
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
@@ -224,8 +237,9 @@ public class GameController
 		{
 			runSafeLogic(location);
 		}
-		//Advance turn to next player
-		advanceTurn(false);
+		//Advance turn to next player if there isn't a repeat going
+		if(repeatTurn == 0)
+			advanceTurn(false);
 		//Test if game over
 		if(spacesLeft <= 0 || playersAlive == 1)
 		{
@@ -256,6 +270,7 @@ public class GameController
 			players.get(currentTurn).status = PlayerStatus.OUT;
 			players.get(currentTurn).booster = 100;
 			players.get(currentTurn).winstreak = 0;
+			repeatTurn = 0;
 			playersAlive --;
 			break;
 		case BANKRUPT:
@@ -278,6 +293,7 @@ public class GameController
 			players.get(currentTurn).status = PlayerStatus.OUT;
 			players.get(currentTurn).booster = 100;
 			players.get(currentTurn).winstreak = 0;
+			repeatTurn = 0;
 			playersAlive --;
 			break;
 		case BOOSTHOLD:
@@ -290,6 +306,7 @@ public class GameController
 			extraResult = players.get(currentTurn).addMoney(-250000,false);
 			players.get(currentTurn).status = PlayerStatus.OUT;
 			players.get(currentTurn).winstreak = 0;
+			repeatTurn = 0;
 			playersAlive --;
 			break;
 		case CHAIN:
@@ -321,6 +338,7 @@ public class GameController
 			players.get(currentTurn).status = PlayerStatus.OUT;
 			players.get(currentTurn).booster = 100;
 			players.get(currentTurn).winstreak = 0;
+			repeatTurn = 0;
 			playersAlive --;
 			break;
 		case DUD:
@@ -368,26 +386,47 @@ public class GameController
 			players.get(currentTurn).games.add(gameFound);
 			break;
 		case EVENT:
-			resultString.append(activateEvent(gameboard.eventBoard[location]));
-			break;
+			activateEvent(gameboard.eventBoard[location]);
+			return;
 		}
 		channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
 	}
-	static String activateEvent(Events event)
+	static void activateEvent(Events event)
 	{
-		StringBuilder output = new StringBuilder();
 		switch(event)
 		{
 		case BOOST_DRAIN:
-			output.append("It's a **Boost Drain**, which cuts your booster in half...");
+			channel.sendMessage("It's a **Boost Drain**, which cuts your booster in half...")
+				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).booster /= 2;
 			if(players.get(currentTurn).booster < Player.MIN_BOOSTER)
 				players.get(currentTurn).booster = Player.MIN_BOOSTER;
 			break;
+		case MINEFIELD:
+			channel.sendMessage("Oh no, it's a **Minefield**! Adding up to " + playersJoined + " more bombs...")
+				.completeAfter(5,TimeUnit.SECONDS);
+			for(int i=0; i<playersJoined; i++)
+				bombs[(int)(Math.random()*boardSize)] = true;
+			break;
+		case LOCKDOWN:
+			channel.sendMessage("It's a **Lockdown**, all non-bomb spaces on the board are now becoming cash!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			Arrays.fill(gameboard.typeBoard,SpaceType.CASH);
+			break;
+		case STARMAN:
+			channel.sendMessage("Hooray, it's a **Starman**, here to destroy all the bombs!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			for(int i=0; i<boardSize; i++)
+				if(bombs[i])
+					pickedSpaces[i] = true;
+			break;
+		case REPEAT:
+			channel.sendMessage("It's a **Repeat**, you need to pick two more spaces in a row!");
+			repeatTurn += 2;
+			break;
 		}
-		return output.toString();
 	}
 	static void runNextEndGamePlayer()
 	{

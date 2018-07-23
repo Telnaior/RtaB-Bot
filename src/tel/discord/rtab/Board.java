@@ -1,9 +1,12 @@
 package tel.discord.rtab;
 
+import java.util.Arrays;
+
 import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.Events;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.SpaceType;
+import tel.discord.rtab.enums.WeightedSpace;
 
 class Board
 {
@@ -17,7 +20,7 @@ class Board
 	{
 		//Initialise types
 		final SpaceType[] TYPE_VALUES = {SpaceType.CASH,SpaceType.BOOSTER,SpaceType.GAME, SpaceType.EVENT};
-		final int[] TYPE_WEIGHTS =      {            10,                2,             2,               2};
+		final int[] TYPE_WEIGHTS =      {            10,                2,             2,               1};
 		typeBoard = new SpaceType[size];
 		typeBoard = initBoard(size,typeBoard,TYPE_VALUES,TYPE_WEIGHTS);
 		//Initialise cash - uses Integer because generic methods don't like int
@@ -47,10 +50,8 @@ class Board
 		final int[] GAME_WEIGHTS = {2,2,2};
 		gameBoard = new Games[size];
 		gameBoard = initBoard(size,gameBoard,GAME_VALUES,GAME_WEIGHTS);
-		final Events[] EVENT_VALUES = {Events.BOOST_DRAIN};
-		final int[] EVENT_WEIGHTS = {1};
 		eventBoard = new Events[size];
-		eventBoard = initBoard(size,eventBoard,EVENT_VALUES,EVENT_WEIGHTS);
+		eventBoard = (Events[]) initBoard(size,eventBoard,Events.values());
 	}
 	private <T> T[] initBoard(int size, T[] board, T[] values, int[] weights)
 	{
@@ -61,6 +62,31 @@ class Board
 		for(int i=0; i<weights.length; i++)
 		{
 			totalWeight += weights[i];
+			cumulativeWeights[i] = totalWeight;
+		}
+		double random;
+		for(int i=0; i<size; i++)
+		{
+			//Get random spot in weight table
+			random = Math.random() * totalWeight;
+			//Find where we actually landed
+			int search=0;
+			while(cumulativeWeights[search] < random)
+				search++;
+			//And set the value to that
+			board[i] = values[search];
+		}
+		return board;
+	}
+	private WeightedSpace[] initBoard(int size, WeightedSpace[] board, WeightedSpace[] values)
+	{
+		//Declare possible values and weights
+		//Autogenerate cumulative weights
+		int[] cumulativeWeights = new int[values.length];
+		int totalWeight = 0;
+		for(int i=0; i<values.length; i++)
+		{
+			totalWeight += values[i].getWeight();
 			cumulativeWeights[i] = totalWeight;
 		}
 		double random;

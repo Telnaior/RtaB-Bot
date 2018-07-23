@@ -15,7 +15,7 @@
    * Minefield - Randomly add extra bombs for the number of players alive
    * 50/50 - Left or right, RNG $1mil or bomb
    * Split & Share - If you lose, cut off 10% of your score and share it between the other players
-   * Fold - Ability to quit the round without penalty and still play minigames
+   * Minigame Lock - You will still get to play any minigames found during the round, even if you lose.
    * Jackpot - Win the round to get +$25mil, no boosters allowed
    * Lockdown - All non-bomb spaces on the board become cash
    * Starman - Remove all bombs from the board
