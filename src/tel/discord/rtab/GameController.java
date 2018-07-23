@@ -15,6 +15,7 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import tel.discord.rtab.enums.Events;
 import tel.discord.rtab.enums.GameStatus;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
@@ -366,10 +367,27 @@ public class GameController
 			resultString.append("It's a minigame, **" + gameFound + "**!");
 			players.get(currentTurn).games.add(gameFound);
 			break;
+		case EVENT:
+			resultString.append(activateEvent(gameboard.eventBoard[location]));
+			break;
 		}
 		channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
+	}
+	static String activateEvent(Events event)
+	{
+		StringBuilder output = new StringBuilder();
+		switch(event)
+		{
+		case BOOST_DRAIN:
+			output.append("It's a **Boost Drain**, which cuts your booster in half...");
+			players.get(currentTurn).booster /= 2;
+			if(players.get(currentTurn).booster < Player.MIN_BOOSTER)
+				players.get(currentTurn).booster = Player.MIN_BOOSTER;
+			break;
+		}
+		return output.toString();
 	}
 	static void runNextEndGamePlayer()
 	{

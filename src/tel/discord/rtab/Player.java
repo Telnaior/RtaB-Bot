@@ -14,8 +14,8 @@ import tel.discord.rtab.enums.PlayerStatus;
 
 class Player
 {
-	final int MAX_BOOSTER = 999;
-	final int MIN_BOOSTER = 010;
+	static final int MAX_BOOSTER = 999;
+	static final int MIN_BOOSTER = 010;
 	User user;
 	String name;
 	String uID;

@@ -1,5 +1,5 @@
 package tel.discord.rtab.enums;
 
 public enum SpaceType {
-	CASH, BOOSTER, GAME;
+	CASH, BOOSTER, GAME, EVENT;
 }
