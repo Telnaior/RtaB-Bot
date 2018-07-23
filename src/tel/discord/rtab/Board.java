@@ -1,7 +1,5 @@
 package tel.discord.rtab;
 
-import java.util.Arrays;
-
 import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.Events;
 import tel.discord.rtab.enums.Games;

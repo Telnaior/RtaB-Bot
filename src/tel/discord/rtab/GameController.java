@@ -419,11 +419,17 @@ public class GameController
 			channel.sendMessage("Hooray, it's a **Starman**, here to destroy all the bombs!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			for(int i=0; i<boardSize; i++)
-				if(bombs[i])
+				if(bombs[i] && !pickedSpaces[i])
+				{
+					channel.sendMessage("Bomb in space " + (i+1) + " destroyed.")
+						.queueAfter(3,TimeUnit.SECONDS);
 					pickedSpaces[i] = true;
+					spacesLeft --;
+				}
 			break;
 		case REPEAT:
-			channel.sendMessage("It's a **Repeat**, you need to pick two more spaces in a row!");
+			channel.sendMessage("It's a **Repeat**, you need to pick two more spaces in a row!")
+				.completeAfter(5,TimeUnit.SECONDS);
 			repeatTurn += 2;
 			break;
 		}
