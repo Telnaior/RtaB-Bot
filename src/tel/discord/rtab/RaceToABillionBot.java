@@ -9,6 +9,7 @@ import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
+import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
 import tel.discord.rtab.commands.PingBotCommand;
@@ -41,6 +42,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new StartCommand());
 		utilities.addCommand(new QuitCommand());
 		utilities.addCommand(new PlayersCommand());
+		utilities.addCommand(new BoardCommand());
 		utilities.addCommand(new RankCommand());
 		utilities.addCommand(new TopCommand());
 		utilities.addCommand(new PingBotCommand());

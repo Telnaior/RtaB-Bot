@@ -576,8 +576,13 @@ public class GameController
 			return false;
 		}
 	}
-	static void displayBoardAndStatus()
+	public static void displayBoardAndStatus()
 	{
+		if(gameStatus == GameStatus.SIGNUPS_OPEN)
+		{
+			//No board to display if the game isn't running!
+			return;
+		}
 		StringBuilder board = new StringBuilder().append("```\n");
 		//Board doesn't need to be displayed if game is over
 		if(gameStatus != GameStatus.END_GAME)
@@ -720,7 +725,7 @@ public class GameController
 	public static void listPlayers()
 	{
 		StringBuilder resultString = new StringBuilder();
-		resultString.append("PLAYERS");
+		resultString.append("**PLAYERS**");
 		for(Player next : players)
 		{
 			resultString.append(" | ");
