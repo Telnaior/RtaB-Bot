@@ -22,7 +22,7 @@
    * Repeat - Immediately pick two more spaces
    * BLAMMO - Block the blammo, Eliminate yourself, Eliminate an opponent, or a Threshold Situation?
  
-0.7.2 (planned)
+0.7.2
  - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
  - Extra commands and aliases (!board to display the board status)
  - Usual mountain of bugfixes
