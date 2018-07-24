@@ -31,7 +31,7 @@ public class StartCommand extends Command
 			break;
 		case WRONGCHANNEL:
 			event.reply("Game running in channel " + GameController.channel.getName());
-		default:
+		default: //Includes game already in progress
 			break;
 		}
 	}

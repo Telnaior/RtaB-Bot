@@ -14,14 +14,18 @@ import tel.discord.rtab.enums.PlayerStatus;
 
 class Player
 {
-	final int MAX_BOOSTER = 999;
-	final int MIN_BOOSTER = 010;
+	static final int MAX_BOOSTER = 999;
+	static final int MIN_BOOSTER = 010;
 	User user;
 	String name;
 	String uID;
 	int money;
 	int booster;
 	int winstreak;
+	int jokers;
+	boolean splitAndShare;
+	boolean minigameLock;
+	boolean jackpot;
 	PlayerStatus status;
 	LinkedList<Games> games; 
 	Player(Member playerName)
@@ -32,6 +36,9 @@ class Player
 		money = 0;
 		booster = 100;
 		winstreak = 0;
+		jokers = 0;
+		splitAndShare = false;
+		minigameLock = false;
 		status = PlayerStatus.OUT;
 		games = new LinkedList<>();
 		try
@@ -134,5 +141,29 @@ class Player
 			e.printStackTrace();
 		}
 		return oldMoney - money;
+	}
+	public StringBuilder blowUp(int multiplier, boolean holdBoost)
+	{
+		//Just fold if they've got a minigame lock so they still play their games
+		if(minigameLock)
+			status = PlayerStatus.FOLDED;
+		else
+			status = PlayerStatus.OUT;
+		//If they've got a split and share, they're in for a bad time
+		if(splitAndShare)
+		{
+			int moneyLost = money/10;
+			money -= moneyLost;
+			GameController.splitAndShare(moneyLost);
+		}
+		//Wipe their booster if they didn't hit a boost holder
+		if(!holdBoost)
+			booster = 100;
+		//Wipe everything else too
+		winstreak = 0;
+		GameController.repeatTurn = 0;
+		GameController.playersAlive --;
+		//And don't forget the penalty, pass the string on for the main function too
+		return addMoney(-250000*multiplier,false);
 	}
 }

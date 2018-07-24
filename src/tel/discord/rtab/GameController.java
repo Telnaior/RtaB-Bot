@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,11 +16,14 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import tel.discord.rtab.enums.BombType;
+import tel.discord.rtab.enums.Events;
 import tel.discord.rtab.enums.GameStatus;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
+import tel.discord.rtab.enums.SpaceType;
 import tel.discord.rtab.minigames.MiniGame;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -30,6 +34,7 @@ public class GameController
 	public static MessageChannel channel = null;
 	static List<Player> players = new ArrayList<>();
 	static int currentTurn = -1;
+	static int repeatTurn = 0;
 	public static int playersJoined = 0;
 	static int playersAlive = 0;
 	static int playersLeft = 0;
@@ -53,6 +58,7 @@ public class GameController
 		playersAlive = 0;
 		gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
+		repeatTurn = 0;
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -182,8 +188,17 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", your turn. Choose a space on the board.")
-			.completeAfter(3,TimeUnit.SECONDS);
+		if(repeatTurn > 0)
+		{
+			repeatTurn --;
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", pick again.")
+				.completeAfter(3,TimeUnit.SECONDS);
+		}
+		else
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", your turn. Choose a space on the board.")
+				.completeAfter(3,TimeUnit.SECONDS);
+		}
 		displayBoardAndStatus();
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
@@ -223,8 +238,9 @@ public class GameController
 		{
 			runSafeLogic(location);
 		}
-		//Advance turn to next player
-		advanceTurn(false);
+		//Advance turn to next player if there isn't a repeat going
+		if(repeatTurn == 0)
+			advanceTurn(false);
 		//Test if game over
 		if(spacesLeft <= 0 || playersAlive == 1)
 		{
@@ -244,6 +260,14 @@ public class GameController
 	{
 		channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+		//If player has a joker, force it to not explode
+		//This is a really ugly way of doing it though
+		if(players.get(currentTurn).jokers > 0)
+		{
+			channel.sendMessage("But you have a joker!").queueAfter(2,TimeUnit.SECONDS);
+			players.get(currentTurn).jokers --;
+			gameboard.bombBoard[location] = BombType.DUD;
+		}
 		//But is it a special bomb?
 		StringBuilder extraResult = null;
 		switch(gameboard.bombBoard[location])
@@ -251,11 +275,7 @@ public class GameController
 		case NORMAL:
 			channel.sendMessage("It goes **BOOM**. $250,000 lost as penalty.")
 				.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).addMoney(-250000,false);
-			players.get(currentTurn).status = PlayerStatus.OUT;
-			players.get(currentTurn).booster = 100;
-			players.get(currentTurn).winstreak = 0;
-			playersAlive --;
+			extraResult = players.get(currentTurn).blowUp(1,false);
 			break;
 		case BANKRUPT:
 			int amountLost = players.get(currentTurn).bankrupt();
@@ -273,11 +293,7 @@ public class GameController
 				channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
 						.completeAfter(3,TimeUnit.SECONDS);
 			}
-			extraResult = players.get(currentTurn).addMoney(-250000,false);
-			players.get(currentTurn).status = PlayerStatus.OUT;
-			players.get(currentTurn).booster = 100;
-			players.get(currentTurn).winstreak = 0;
-			playersAlive --;
+			extraResult = players.get(currentTurn).blowUp(1,false);
 			break;
 		case BOOSTHOLD:
 			StringBuilder resultString = new StringBuilder().append("It ");
@@ -286,10 +302,7 @@ public class GameController
 			resultString.append("goes **BOOM**. $250,000 lost as penalty.");
 			channel.sendMessage(resultString)
 					.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).addMoney(-250000,false);
-			players.get(currentTurn).status = PlayerStatus.OUT;
-			players.get(currentTurn).winstreak = 0;
-			playersAlive --;
+			extraResult = players.get(currentTurn).blowUp(1,true);
 			break;
 		case CHAIN:
 			channel.sendMessage("It goes **BOOM**...")
@@ -316,11 +329,7 @@ public class GameController
 			while(Math.random() * chain < 1);
 			channel.sendMessage(String.format("**$%,d** penalty!",chain*250000))
 					.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).addMoney(chain*-1*250000,false);
-			players.get(currentTurn).status = PlayerStatus.OUT;
-			players.get(currentTurn).booster = 100;
-			players.get(currentTurn).winstreak = 0;
-			playersAlive --;
+			extraResult = players.get(currentTurn).blowUp(chain,false);
 			break;
 		case DUD:
 			channel.sendMessage("It goes _\\*fizzle*_.")
@@ -341,7 +350,7 @@ public class GameController
 		{
 		case CASH:
 			//On cash, update the player's score and tell them how much they won
-			int cashWon = gameboard.cashBoard[location];
+			int cashWon = gameboard.cashBoard[location].getWeight();
 			resultString.append("**");
 			if(cashWon<0)
 				resultString.append("-");
@@ -352,7 +361,7 @@ public class GameController
 			break;
 		case BOOSTER:
 			//On cash, update the player's booster and tell them what they found
-			int boostFound = gameboard.boostBoard[location];
+			int boostFound = gameboard.boostBoard[location].getWeight();
 			resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
 			if(boostFound > 0)
 				resultString.append("!");
@@ -366,10 +375,74 @@ public class GameController
 			resultString.append("It's a minigame, **" + gameFound + "**!");
 			players.get(currentTurn).games.add(gameFound);
 			break;
+		case EVENT:
+			activateEvent(gameboard.eventBoard[location]);
+			return;
 		}
 		channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
+	}
+	static void activateEvent(Events event)
+	{
+		switch(event)
+		{
+		case BOOST_DRAIN:
+			channel.sendMessage("It's a **Boost Drain**, which cuts your booster in half...")
+				.completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).booster /= 2;
+			if(players.get(currentTurn).booster < Player.MIN_BOOSTER)
+				players.get(currentTurn).booster = Player.MIN_BOOSTER;
+			break;
+		case MINEFIELD:
+			channel.sendMessage("Oh no, it's a **Minefield**! Adding up to " + playersJoined + " more bombs...")
+				.completeAfter(5,TimeUnit.SECONDS);
+			for(int i=0; i<playersJoined; i++)
+				bombs[(int)(Math.random()*boardSize)] = true;
+			break;
+		case LOCKDOWN:
+			channel.sendMessage("It's a **Lockdown**, all non-bomb spaces on the board are now becoming cash!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			Arrays.fill(gameboard.typeBoard,SpaceType.CASH);
+			break;
+		case STARMAN:
+			channel.sendMessage("Hooray, it's a **Starman**, here to destroy all the bombs!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			for(int i=0; i<boardSize; i++)
+				if(bombs[i] && !pickedSpaces[i])
+				{
+					channel.sendMessage("Bomb in space " + (i+1) + " destroyed.")
+						.queueAfter(3,TimeUnit.SECONDS);
+					pickedSpaces[i] = true;
+					spacesLeft --;
+				}
+			break;
+		case REPEAT:
+			channel.sendMessage("It's a **Repeat**, you need to pick two more spaces in a row!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			repeatTurn += 2;
+			break;
+		case JOKER:
+			channel.sendMessage("Congratulations, you found a **Joker**, protecting you from a single bomb!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).jokers ++;
+			break;
+		case GAME_LOCK:
+			channel.sendMessage("It's a **Minigame Lock**, you'll get to play any minigames you have even if you bomb!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).minigameLock = true;
+			break;
+		case SPLIT_SHARE:
+			channel.sendMessage("It's **Split & Share**, don't lose the round now or you'll lose a lot of money!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).splitAndShare = true;
+			break;
+		case JACKPOT:
+			channel.sendMessage("You found the $25,000,000 **JACKPOT**, win the round to claim it!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).jackpot = true;
+			break;
+		}
 	}
 	static void runNextEndGamePlayer()
 	{
@@ -446,6 +519,12 @@ public class GameController
 			extraResult = players.get(currentTurn).addMoney(winBonus,true);
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
+			//Don't forget about the jackpot
+			if(players.get(currentTurn).jackpot)
+			{
+				channel.sendMessage("You won the $25,000,000 **JACKPOT**!").queue();
+				players.get(currentTurn).money += 25000000;
+			}
 		}
 		//Then, folded or not, play out any minigames they've won
 		players.get(currentTurn).games.sort(null);
@@ -737,5 +816,15 @@ public class GameController
 			resultString.append(next.name);
 		}
 		channel.sendMessage(resultString).queue();
+	}
+	public static void splitAndShare(int totalToShare)
+	{
+		for(int i=0; i<playersJoined; i++)
+			//Don't pass money back to the player that hit it
+			if(i != currentTurn)
+			{
+				//And divide the amount given by how many players there are to receive it
+				players.get(i).money += (totalToShare / (playersJoined-1));
+			}
 	}
 }
