@@ -4,16 +4,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import tel.discord.rtab.enums.CardRank;
+import tel.discord.rtab.enums.CardSuit;
+import tel.discord.rtab.enums.PokerHand;
 
 public class DeucesWild implements MiniGame {
 	static final boolean BONUS = false;
-	final static int BOARD_SIZE = 52;
-	final static int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
-	final static int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
+	static final int BOARD_SIZE = 52;
+	// TODO: The next two make no sense right now and need to be adjusted to handle cards. I haven't done the card object yet, though. --Coug
+	static final int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
+	static final int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
 	static int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
 	int lastSpace;
 	int lastPicked;
+	PokerHand hand = PokerHand.NOTHING;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
 	boolean pinchMode = false;
@@ -152,7 +157,19 @@ public class DeucesWild implements MiniGame {
 	public int getMoneyWon()
 	{
 		firstPlay = true;
-		return lastPicked;
+		switch(hand) {
+			case NOTHING: return 0;
+			case THREE_OF_A_KIND: return 50000;
+			case STRAIGHT: case FLUSH: return 100000;
+			case FULL_HOUSE: return 150000;
+			case FOUR_OF_A_KIND: return 250000;
+			case STRAIGHT_FLUSH: return 450000;
+			case FIVE_OF_A_KIND: return 750000;
+			case WILD_ROYAL: return 1250000;
+			case FOUR_DEUCES: return 10000000;
+			case NATURAL_ROYAL: return 40000000;
+			default: throw new IllegalArgumentException(); // since the above is supposed to already handle everything
+		}
 	}
 
 	@Override
