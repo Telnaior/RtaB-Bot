@@ -8,6 +8,10 @@
  - Set up the game actually ending at $1,000,000,000
  - New events: Bonus Multiplier +1/+2/+3
  
+0.8.3
+ - New events: Bonus Multiplier +1/+2/+3
+ - Bonus bugfixes
+ 
 0.8.2
  - Bugfixes to previous bugfixes.
  

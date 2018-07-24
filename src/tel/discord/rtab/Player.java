@@ -154,6 +154,8 @@ class Player
 		{
 			status = PlayerStatus.OUT;
 		}
+		//Bomb penalty needs to happen before resetting their booster
+		StringBuilder output = addMoney(-250000*multiplier,false);
 		//If they've got a split and share, they're in for a bad time
 		if(splitAndShare)
 		{
@@ -169,6 +171,6 @@ class Player
 		GameController.repeatTurn = 0;
 		GameController.playersAlive --;
 		//And don't forget the penalty, pass the string on for the main function too
-		return addMoney(-250000*multiplier,false);
+		return output;
 	}
 }

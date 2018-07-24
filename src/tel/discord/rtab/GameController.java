@@ -440,18 +440,29 @@ public class GameController
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).jackpot = true;
 			break;
+		case BONUSP1:
+			channel.sendMessage("It's a **+1 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).winstreak += 1;
+			break;
+		case BONUSP2:
+			channel.sendMessage("It's a **+2 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).winstreak += 2;
+			break;
+		case BONUSP3:
+			channel.sendMessage("It's a **+3 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).winstreak += 3;
+			break;
 		}
 	}
 	static void runNextEndGamePlayer()
 	{
 		//Are there any winners left to loop through?
 		advanceTurn(true);
-		//Cool, show the board then we'll figure out what we need to do this loop
-		displayBoardAndStatus();
 		//If we're out of people to run endgame stuff with, get outta here after displaying the board
 		if(currentTurn == -1)
 		{
 			saveData();
+			displayBoardAndStatus();
 			reset();
 			return;
 		}
@@ -464,6 +475,8 @@ public class GameController
 			//Boost winstreak by number of opponents defeated
 			players.get(currentTurn).winstreak += (playersJoined - playersAlive);
 		}
+		//Now the winstreak is right, we can display the board
+		displayBoardAndStatus();
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		List<String> list;
 		try
@@ -819,6 +832,8 @@ public class GameController
 	}
 	public static void splitAndShare(int totalToShare)
 	{
+		channel.sendMessage("Because " + players.get(currentTurn).user.getAsMention() + "had a split and share, "
+				+ "10% of their total will be split between the other players.").queueAfter(1,TimeUnit.SECONDS);
 		for(int i=0; i<playersJoined; i++)
 			//Don't pass money back to the player that hit it
 			if(i != currentTurn)

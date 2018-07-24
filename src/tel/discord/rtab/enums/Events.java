@@ -10,7 +10,10 @@ public enum Events implements WeightedSpace
 	LOCKDOWN	(3),
 	STARMAN		(2),
 	SPLIT_SHARE	(1),
-	JACKPOT		(1);
+	JACKPOT		(1),
+	BONUSP1		(6),
+	BONUSP2		(4),
+	BONUSP3		(2);
 
 	int weight;
 	Events(int valueWeight)
