@@ -1,13 +1,23 @@
 package tel.discord.rtab.enums;
 
-public enum Events implements WeightedSpace {
-	BOOST_DRAIN(2), MINEFIELD(3), LOCKDOWN(1), STARMAN(1), REPEAT(3);
+public enum Events implements WeightedSpace
+{
+	BOOST_DRAIN	(7),
+	REPEAT		(7),
+	GAME_LOCK	(6),
+	MINEFIELD	(5),
+	JOKER		(4),
+	LOCKDOWN	(3),
+	STARMAN		(2),
+	SPLIT_SHARE	(1),
+	JACKPOT		(1);
 
 	int weight;
-	Events(int eventWeight)
+	Events(int valueWeight)
 	{
-		this.weight = eventWeight;
+		weight = valueWeight;
 	}
+	@Override
 	public int getWeight()
 	{
 		return weight;

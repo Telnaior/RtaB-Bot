@@ -7,20 +7,18 @@
  - Set up join cooldowns (once you bomb, you're out for a day)
  - Set up the game actually ending at $1,000,000,000
  
-0.8.0 (planned)
+0.8.0
  - Events! Chaos for players, and chaos to code in!
    * Joker - Survive one bomb
-   * Military Aid - Immediately place an extra bomb
    * Boost Drain - Cut boost in half
    * Minefield - Randomly add extra bombs for the number of players alive
-   * 50/50 - Left or right, RNG $1mil or bomb
    * Split & Share - If you lose, cut off 10% of your score and share it between the other players
    * Minigame Lock - You will still get to play any minigames found during the round, even if you lose.
    * Jackpot - Win the round to get +$25mil, no boosters allowed
    * Lockdown - All non-bomb spaces on the board become cash
    * Starman - Remove all bombs from the board
    * Repeat - Immediately pick two more spaces
-   * BLAMMO - Block the blammo, Eliminate yourself, Eliminate an opponent, or a Threshold Situation?
+ - Simplified board generation code, moving weights to the enums themselves
  
 0.7.2
  - Added bonus games, earned by increasing your bonus multiplier to multiples of 5.
