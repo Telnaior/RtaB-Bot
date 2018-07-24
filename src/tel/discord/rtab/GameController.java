@@ -237,9 +237,6 @@ public class GameController
 		{
 			runSafeLogic(location);
 		}
-		//Advance turn to next player if there isn't a repeat going
-		if(repeatTurn == 0)
-			advanceTurn(false);
 		//Test if game over
 		if(spacesLeft <= 0 || playersAlive == 1)
 		{
@@ -251,6 +248,9 @@ public class GameController
 		}
 		else
 		{
+			//Advance turn to next player if there isn't a repeat going
+			if(repeatTurn == 0)
+				advanceTurn(false);
 			runTurn();
 		}
 	}
@@ -446,10 +446,7 @@ public class GameController
 	{
 		//Are there any winners left to loop through?
 		advanceTurn(true);
-		//If there are, let's start work on our next player
-		if(currentTurn != -1)
-			players.get(currentTurn).status = PlayerStatus.DONE;
-		//Start by showing the board as it stands
+		//Cool, show the board then we'll figure out what we need to do this loop
 		displayBoardAndStatus();
 		//If we're out of people to run endgame stuff with, get outta here after displaying the board
 		if(currentTurn == -1)
@@ -527,6 +524,7 @@ public class GameController
 		}
 		//Then, folded or not, play out any minigames they've won
 		players.get(currentTurn).games.sort(null);
+		players.get(currentTurn).status = PlayerStatus.DONE;
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
 		runNextMiniGame();
 	}
@@ -736,7 +734,7 @@ public class GameController
 				board.append(" [");
 				board.append(String.format("%3d",players.get(i).booster));
 				board.append("%");
-				if(players.get(i).status == PlayerStatus.DONE)
+				if(players.get(i).status == PlayerStatus.DONE || (gameStatus == GameStatus.END_GAME && currentTurn == i))
 				{
 					board.append("x");
 					board.append(players.get(i).winstreak);

@@ -6,6 +6,10 @@
  - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
  - Set up join cooldowns (once you bomb, you're out for a day)
  - Set up the game actually ending at $1,000,000,000
+ - New events: Bonus Multiplier +1/+2/+3
+ 
+0.8.2
+ - Bugfixes to previous bugfixes.
  
 0.8.1
  - Bugfixes.
