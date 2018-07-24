@@ -86,8 +86,9 @@ class Player
 			adjustedPrize *= booster;
 		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
+		//But make sure they still get something even if they're on x0
 		if(bonus)
-			adjustedPrize *= winstreak;
+			adjustedPrize *= Math.max(1,winstreak);
 		money += adjustedPrize;
 		if(adjustedPrize != amount)
 		{
@@ -146,9 +147,13 @@ class Player
 	{
 		//Just fold if they've got a minigame lock so they still play their games
 		if(minigameLock)
+		{
 			status = PlayerStatus.FOLDED;
+		}
 		else
+		{
 			status = PlayerStatus.OUT;
+		}
 		//If they've got a split and share, they're in for a bad time
 		if(splitAndShare)
 		{

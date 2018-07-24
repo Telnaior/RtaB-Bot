@@ -37,7 +37,6 @@ public class GameController
 	static int repeatTurn = 0;
 	public static int playersJoined = 0;
 	static int playersAlive = 0;
-	static int playersLeft = 0;
 	static ListIterator<Games> gamesToPlay;
 	public static GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
 	static boolean[] pickedSpaces;
@@ -245,7 +244,6 @@ public class GameController
 		if(spacesLeft <= 0 || playersAlive == 1)
 		{
 			gameStatus = GameStatus.END_GAME;
-			playersLeft = playersAlive;
 			if(spacesLeft < 0)
 				channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
 			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
@@ -350,7 +348,7 @@ public class GameController
 		{
 		case CASH:
 			//On cash, update the player's score and tell them how much they won
-			int cashWon = gameboard.cashBoard[location].getWeight();
+			int cashWon = gameboard.cashBoard[location].getValue();
 			resultString.append("**");
 			if(cashWon<0)
 				resultString.append("-");
@@ -361,7 +359,7 @@ public class GameController
 			break;
 		case BOOSTER:
 			//On cash, update the player's booster and tell them what they found
-			int boostFound = gameboard.boostBoard[location].getWeight();
+			int boostFound = gameboard.boostBoard[location].getValue();
 			resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
 			if(boostFound > 0)
 				resultString.append("!");
@@ -446,17 +444,21 @@ public class GameController
 	}
 	static void runNextEndGamePlayer()
 	{
+		//Are there any winners left to loop through?
+		advanceTurn(true);
+		//If there are, let's start work on our next player
+		if(currentTurn != -1)
+			players.get(currentTurn).status = PlayerStatus.DONE;
 		//Start by showing the board as it stands
 		displayBoardAndStatus();
-		//Are there any winners left to loop through?
-		if(playersLeft == 0)
+		//If we're out of people to run endgame stuff with, get outta here after displaying the board
+		if(currentTurn == -1)
 		{
 			saveData();
 			reset();
 			return;
 		}
 		//No? Good. Let's get someone to reward!
-		advanceTurn(true);
 		//If they're a winner, boost their winstreak (folded players don't get this)
 		if(players.get(currentTurn).status == PlayerStatus.ALIVE)
 		{
@@ -465,9 +467,6 @@ public class GameController
 			//Boost winstreak by number of opponents defeated
 			players.get(currentTurn).winstreak += (playersJoined - playersAlive);
 		}
-		//But folded or not, it always gets to be at least 1
-		if(players.get(currentTurn).winstreak == 0)
-			players.get(currentTurn).winstreak = 1;
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		List<String> list;
 		try
@@ -529,8 +528,6 @@ public class GameController
 		//Then, folded or not, play out any minigames they've won
 		players.get(currentTurn).games.sort(null);
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
-		players.get(currentTurn).status = PlayerStatus.DONE;
-		playersLeft --;
 		runNextMiniGame();
 	}
 	static void runNextMiniGame()
@@ -626,11 +623,13 @@ public class GameController
 	}
 	static void advanceTurn(boolean endGame)
 	{
-		//Keep spinning through until we've got someone who's still in the game
+		//Keep spinning through until we've got someone who's still in the game, or until we've checked everyone
+		int triesLeft = playersJoined;
 		boolean isPlayerGood = false;
 		do
 		{
 			currentTurn++;
+			triesLeft --;
 			currentTurn = currentTurn % playersJoined;
 			//Is this player someone allowed to play now?
 			switch(players.get(currentTurn).status)
@@ -646,7 +645,10 @@ public class GameController
 				break;
 			}
 		}
-		while(!isPlayerGood);
+		while(!isPlayerGood && triesLeft > 0);
+		//If we've checked everyone and no one is suitable anymore, whatever
+		if(triesLeft == 0 && !isPlayerGood)
+			currentTurn = -1;
 	}
 	static boolean checkValidNumber(String message)
 	{

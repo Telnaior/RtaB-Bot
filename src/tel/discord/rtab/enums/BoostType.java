@@ -48,4 +48,8 @@ public enum BoostType implements WeightedSpace
 	{
 		return weight;
 	}
+	public int getValue()
+	{
+		return value;
+	}
 }

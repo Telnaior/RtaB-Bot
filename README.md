@@ -7,6 +7,9 @@
  - Set up join cooldowns (once you bomb, you're out for a day)
  - Set up the game actually ending at $1,000,000,000
  
+0.8.1
+ - Bugfixes.
+ 
 0.8.0
  - Events! Chaos for players, and chaos to code in!
    * Joker - Survive one bomb
