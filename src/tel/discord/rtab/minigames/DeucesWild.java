@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import tel.discord.rtab.enums.CardRank;
 import tel.discord.rtab.enums.CardSuit;
 import tel.discord.rtab.enums.PokerHand;
+import tel.discord.rtab.objs.Card;
 
 public class DeucesWild implements MiniGame {
 	static final boolean BONUS = false;
@@ -177,5 +178,18 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public boolean isBonusGame() {
 		return BONUS;
+	}
+
+	public Card[] createDeck() {
+		CardRank[] ranks = {CardRank.ACE, CardRank.DEUCE, CardRank.THREE, CardRank.FOUR, CardRank.FIVE, CardRank.SIX, CardRank.SEVEN,
+				CardRank.EIGHT, CardRank.NINE, CardRank.TEN, CardRank.JACK, CardRank.QUEEN, CardRank.KING};
+		CardSuit[] suits = {CardSuit.CLUBS, CardSuit.DIAMONDS, CardSuit.HEARTS, CardSuit.SPADES};
+		Card[] cards = new Card[ranks.length * suits.length];
+
+		for (int i = 0; i < cards.length; i++) {
+			cards[i] = new Card(ranks[i/suits.length],suits[i%suits.length]);
+		}
+
+		return cards;
 	}
 }
