@@ -67,6 +67,11 @@ public class Card implements Comparable<Card> {
         return this.rank == other.getRank() && this.suit == other.getSuit();
     }
     
+    @Override
+    public int compareTo(Card other) {
+        return compareTo(other, false);
+    }
+
     /**
      * This function is intended for sorting purposes. For simply determining if
      * one card is higher in rank than another, {@code outranks(Card other, boolean acesHigh)}
@@ -84,7 +89,6 @@ public class Card implements Comparable<Card> {
      * argument, a negative number if this card is lower than the card in the
      * argument, and 0 if the two cards are identical
      */
-    @Override
     public int compareTo(Card other, boolean acesHigh) {
         if (other == null)
             throw new NullPointerException();
