@@ -38,11 +38,11 @@ public class Card implements Comparable<Card> {
      * @return true if the object card is higher in rank than the argument card,
      * false otherwise
      */
-    public boolean outranks(Card other) {
+    public boolean outranks(Card other, boolean acesHigh) {
         if (other == null)
             throw new NullPointerException();
         
-        return this.rank.ordinal() > other.getRank().ordinal();
+        return this.rank.getValue(acesHigh) > other.getRank().getValue(acesHigh);
     }
     
     @Override
