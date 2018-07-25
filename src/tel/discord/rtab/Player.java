@@ -12,7 +12,7 @@ import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.PlayerStatus;
 
 
-class Player
+class Player implements Comparable<Player>
 {
 	static final int MAX_BOOSTER = 999;
 	static final int MIN_BOOSTER = 010;
@@ -20,8 +20,10 @@ class Player
 	String name;
 	String uID;
 	int money;
+	int oldMoney;
 	int booster;
 	int winstreak;
+	int oldWinstreak;
 	//Event fields
 	int jokers;
 	boolean splitAndShare;
@@ -72,6 +74,8 @@ class Player
 		{
 			e.printStackTrace();
 		}
+		oldMoney = money;
+		oldWinstreak = winstreak;
 	}
 	StringBuilder addMoney(int amount, boolean bonus)
 	{
@@ -155,6 +159,7 @@ class Player
 		}
 		else
 		{
+			games.clear();
 			status = PlayerStatus.OUT;
 		}
 		//Bomb penalty needs to happen before resetting their booster
@@ -177,5 +182,12 @@ class Player
 		GameController.playersAlive --;
 		//And don't forget the penalty, pass the string on for the main function too
 		return output;
+	}
+	@Override
+	public int compareTo(Player other)
+	{
+		//THIS ISN'T CONSISTENT WITH EQUALS
+		//Sort by round delta, descending order
+		return (other.money - other.oldMoney) - (money - oldMoney);
 	}
 }

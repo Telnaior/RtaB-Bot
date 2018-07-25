@@ -14,7 +14,7 @@ public class RankCommand extends Command {
     public RankCommand()
     {
         this.name = "rank";
-        this.help = "view the rank of a player (or yourself if there's no player listed)";
+        this.help = "view the rank of a player by name, or rank with #[number]";
         this.guildOnly = false;
     }
 	@Override

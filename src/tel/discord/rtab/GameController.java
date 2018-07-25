@@ -261,7 +261,7 @@ public class GameController
 			channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", your turn. Choose a space on the board.")
 				.completeAfter(3,TimeUnit.SECONDS);
 		}
-		displayBoardAndStatus();
+		displayBoardAndStatus(true, false);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -453,6 +453,7 @@ public class GameController
 			Games gameFound = gameboard.gameBoard[location];
 			resultString.append("It's a minigame, **" + gameFound + "**!");
 			players.get(currentTurn).games.add(gameFound);
+			players.get(currentTurn).games.sort(null);
 			break;
 		case EVENT:
 			activateEvent(gameboard.eventBoard[location]);
@@ -583,7 +584,9 @@ public class GameController
 			players.get(currentTurn).minigameLock = true;
 			break;
 		case SPLIT_SHARE:
-			channel.sendMessage("It's **Split & Share**, don't lose the round now or you'll lose a lot of money!")
+			channel.sendMessage("It's **Split & Share**, "
+					+ "don't lose the round now or you'll lose 10% of your total, "
+					+ "approximately $" + (players.get(currentTurn).money/10) + "!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).splitAndShare = true;
 			break;
@@ -625,7 +628,8 @@ public class GameController
 		if(currentTurn == -1)
 		{
 			saveData();
-			displayBoardAndStatus();
+			players.sort(null);
+			displayBoardAndStatus(false, true);
 			reset();
 			return;
 		}
@@ -639,41 +643,28 @@ public class GameController
 			players.get(currentTurn).winstreak += (playersJoined - playersAlive);
 		}
 		//Now the winstreak is right, we can display the board
-		displayBoardAndStatus();
+		displayBoardAndStatus(false, false);
 		//Check to see if any bonus games have been unlocked - folded players get this too
-		List<String> list;
-		try
+		//Search every multiple of 5 to see if we've got it
+		for(int i=5; i<=players.get(currentTurn).winstreak;i+=5)
 		{
-			list = Files.readAllLines(Paths.get("scores.csv"));
-			int index = findUserInList(list,players.get(currentTurn).uID,false);
-			if(index >= 0)
-			{
-				String[] record = list.get(index).split(":");
-				int oldWinstreak = Integer.parseInt(record[4]);
-				//Now search every multiple of 5 to see if we've got it
-				for(int i=5; i<=players.get(currentTurn).winstreak;i+=5)
+			if(players.get(currentTurn).oldWinstreak < i)
+				switch(i)
 				{
-					if(oldWinstreak < i)
-						switch(i)
-						{
-						case 5:
-							players.get(currentTurn).games.add(Games.SUPERCASH);
-							break;
-						case 10:
-							players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
-							break;
-						case 15:
-							players.get(currentTurn).games.add(Games.SPECTRUM);
-							break;
-						case 20:
-						default:
-							players.get(currentTurn).games.add(Games.HYPERCUBE);
-							break;
-						}
+				case 5:
+					players.get(currentTurn).games.add(Games.SUPERCASH);
+					break;
+				case 10:
+					players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
+					break;
+				case 15:
+					players.get(currentTurn).games.add(Games.SPECTRUM);
+					break;
+				case 20:
+				default:
+					players.get(currentTurn).games.add(Games.HYPERCUBE);
+					break;
 				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		//If they're a winner, give them a win bonus (folded players don't get this)
 		if(players.get(currentTurn).status == PlayerStatus.ALIVE)
@@ -699,7 +690,6 @@ public class GameController
 			}
 		}
 		//Then, folded or not, play out any minigames they've won
-		players.get(currentTurn).games.sort(null);
 		players.get(currentTurn).status = PlayerStatus.DONE;
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
 		timer.schedule(new ClearMinigameQueueTask(), 1000);
@@ -836,7 +826,7 @@ public class GameController
 			return false;
 		}
 	}
-	public static void displayBoardAndStatus()
+	public static void displayBoardAndStatus(boolean printBoard, boolean totals)
 	{
 		if(gameStatus == GameStatus.SIGNUPS_OPEN)
 		{
@@ -845,7 +835,7 @@ public class GameController
 		}
 		StringBuilder board = new StringBuilder().append("```\n");
 		//Board doesn't need to be displayed if game is over
-		if(gameStatus != GameStatus.END_GAME)
+		if(printBoard)
 		{
 			board.append("     RtaB     \n");
 			for(int i=0; i<boardSize; i++)
@@ -873,17 +863,20 @@ public class GameController
 			nameLength = Math.max(nameLength,players.get(i).name.length());
 		nameLength ++;
 		//And ignore the negative sign if there is one
-		int moneyLength = String.valueOf(Math.abs(players.get(0).money)).length();
-		for(int i=1; i<playersJoined; i++)
-			moneyLength = Math.max(moneyLength, String.valueOf(Math.abs(players.get(i).money)).length());
-		//Do we need to worry about negatives?
-		boolean negativeExists = false;
-		for(int i=0; i<playersJoined;i++)
-			if(players.get(i).money<0)
-			{
-				negativeExists = true;
-				break;
-			}
+		int moneyLength;
+		if(totals)
+		{
+			moneyLength = String.valueOf(Math.abs(players.get(0).money)).length();
+			for(int i=1; i<playersJoined; i++)
+				moneyLength = Math.max(moneyLength, String.valueOf(Math.abs(players.get(i).money)).length());
+		}
+		else
+		{
+			moneyLength = String.valueOf(Math.abs(players.get(0).money-players.get(0).oldMoney)).length();
+			for(int i=1; i<playersJoined; i++)
+				moneyLength = Math.max(moneyLength,
+						String.valueOf(Math.abs(players.get(i).money-players.get(i).oldMoney)).length());		
+		}
 		//Make a little extra room for the commas
 		moneyLength += (moneyLength-1)/3;
 		//Then start printing - including pointer if currently their turn
@@ -895,13 +888,15 @@ public class GameController
 				board.append("  ");
 			board.append(String.format("%-"+nameLength+"s",players.get(i).name));
 			//Now figure out if we need a negative sign, a space, or neither
-			if(players.get(i).money<0)
+			int playerMoney = (players.get(i).money - players.get(i).oldMoney);
+			//What sign to print?
+			if(playerMoney<0)
 				board.append("-");
-			else if(negativeExists)
-				board.append(" ");
+			else
+				board.append("+");
 			//Then print the money itself
 			board.append("$");
-			board.append(String.format("%,"+moneyLength+"d",Math.abs(players.get(i).money)));
+			board.append(String.format("%,"+moneyLength+"d",Math.abs(playerMoney)));
 			//Now the booster display
 			switch(players.get(i).status)
 			{
@@ -915,13 +910,40 @@ public class GameController
 					board.append("x");
 					board.append(players.get(i).winstreak);
 				}
+				board.append("]");
 				break;
 			case OUT:
 			case FOLDED:
-				board.append(" [OUT");
+				board.append(" [OUT] ");
 				break;
 			}
-			board.append("]\n");
+			//If they have any games, print them too
+			if(players.get(i).games.size() > 0)
+			{
+				board.append(" {");
+				for(Games minigame : players.get(i).games)
+				{
+					board.append(" " + minigame.getShortName());
+				}
+				board.append(" }");
+			}
+			board.append("\n");
+			//If we want the totals as well, do them on a second line
+			if(totals)
+			{
+				//Get to the right spot in the line
+				for(int j=0; j<(nameLength-4); j++)
+					board.append(" ");
+				board.append("Total:");
+				//Print sign
+				if(players.get(i).money<0)
+					board.append("-");
+				else
+					board.append(" ");
+				//Then print the money itself
+				board.append("$");
+				board.append(String.format("%,"+moneyLength+"d\n\n",Math.abs(players.get(i).money)));
+			}
 		}
 		//Close it off and print it out
 		board.append("```");

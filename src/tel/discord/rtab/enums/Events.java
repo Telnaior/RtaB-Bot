@@ -9,11 +9,11 @@ public enum Events implements WeightedSpace
 	MINEFIELD		(4),
 	BONUSP2			(4),
 	JOKER			(3),
-	LOCKDOWN		(3),
+	BLAMMO_FRENZY	(3),
+	LOCKDOWN		(2),
 	BONUSP3			(2),
-	BLAMMO_FRENZY	(2),
+	SPLIT_SHARE		(2),
 	STARMAN			(1),
-	SPLIT_SHARE		(1),
 	JACKPOT			(1);
 
 	int weight;

@@ -8,6 +8,10 @@
  - Set up the game actually ending at $1,000,000,000
  - Added the BLAMMO, to threaten the safety of any round!
  - New event: Blammo Frenzy, changing a third of the cash spaces into blammos
+ - Switched over to showing round scores by default, and minigames are shown too
+ - Game now starts after two minutes, rather than waiting for a !start
+ - Also displays who it's waiting on at bomb placement
+ - HEAPS of formatting improvements
  
 0.8.3
  - New events: Bonus Multiplier +1/+2/+3

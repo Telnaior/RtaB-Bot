@@ -6,13 +6,12 @@ import tel.discord.rtab.enums.GameStatus;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
-public class BoardCommand extends Command
+public class TotalsCommand extends Command
 {
-	public BoardCommand()
+	public TotalsCommand()
 	{
-		this.name = "board";
-		this.aliases = new String[]{"table"};
-		this.help = "displays the current board (in-game)";
+		this.name = "totals";
+		this.help = "displays the total scores of the in-game players";
 	}
 	
 	@Override
@@ -24,7 +23,7 @@ public class BoardCommand extends Command
 		}
 		else
 		{	
-			GameController.displayBoardAndStatus(GameController.gameStatus != GameStatus.END_GAME, false);
+			GameController.displayBoardAndStatus(false, true);
 		}
 	}
 

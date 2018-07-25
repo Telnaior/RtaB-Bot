@@ -84,7 +84,7 @@ public class Gamble implements MiniGame {
 			Collections.shuffle(money);
 			//Give instructions
 			output.add("In The Gamble, your objective is to guess "
-					+ "if the next space picked will be higher or lower than the one before");
+					+ "if the next space picked will be higher or lower than the one before.");
 			output.add("Start by selecting one of the twenty spaces on the board.");
 			output.add("Then, you can choose to either take the money revealed or pick another one.");
 			output.add("If you pick another space, the amount revealed must be higher. If it isn't, you lose everything.");

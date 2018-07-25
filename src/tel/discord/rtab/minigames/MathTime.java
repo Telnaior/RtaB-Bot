@@ -89,6 +89,7 @@ public class MathTime implements MiniGame {
 			output.add("If you pick well, you could win up to $1,000,000!");
 			output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
 			output.add("When you are ready, make your first pick from the money stage.");
+			equation += "( ";
 			stage++;
 			break;
 		case 1:
@@ -114,7 +115,7 @@ public class MathTime implements MiniGame {
 			result4 = ops2.get(lastPick);
 			output.add("**"+result4+"**");
 			output.add("Finally, pick a multiplier...");
-			equation += (" "+result4+" ");
+			equation += (" ) "+result4+" ");
 			stage++;
 			break;
 		case 5:

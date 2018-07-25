@@ -29,6 +29,10 @@ public enum Games implements WeightedSpace {
 	{
 		return fullName;
 	}
+	public String getShortName()
+	{
+		return shortName;
+	}
 	public MiniGame getGame()
 	{
 		return game;
