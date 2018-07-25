@@ -38,6 +38,9 @@ public class JoinCommand extends Command
 		case BADNAME:
 			event.reply("Cannot join game: Illegal name");
 			break;
+		case ELIMINATED:
+			event.reply("Cannot join game: You have been eliminated from Race to a Billion.");
+			break;
 		}
 	}
 

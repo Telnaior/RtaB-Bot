@@ -5,10 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
 import tel.discord.rtab.enums.Games;
+import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerStatus;
 
 
@@ -77,26 +79,37 @@ class Player implements Comparable<Player>
 		oldMoney = money;
 		oldWinstreak = winstreak;
 	}
-	StringBuilder addMoney(int amount, boolean bonus)
+	StringBuilder addMoney(int amount, MoneyMultipliersToUse multipliers)
 	{
 		//Start with the base amount
 		int adjustedPrize = amount;
-		//Multiply by the booster (then divide by 100 since it's a percentage)
-		if(amount%100 != 0)
+		if(multipliers.useBoost)
 		{
-			adjustedPrize *= booster;
-			adjustedPrize /= 100;
-		}
-		else
-		{
-			adjustedPrize /= 100;
-			adjustedPrize *= booster;
+			//Multiply by the booster (then divide by 100 since it's a percentage)
+			if(amount%100 != 0)
+			{
+				adjustedPrize *= booster;
+				adjustedPrize /= 100;
+			}
+			else
+			{
+				adjustedPrize /= 100;
+				adjustedPrize *= booster;
+			}
 		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
-		if(bonus)
+		if(multipliers.useBonus)
 			adjustedPrize *= Math.max(1,winstreak);
 		money += adjustedPrize;
+		//Cap at +-$1,000,000,000
+		if(money > 1000000000)
+			money = 1000000000;
+		if(money <= -1000000000)
+		{
+			money = -1000000000;
+		}
+		//Build the string if we need it
 		if(adjustedPrize != amount)
 		{
 			StringBuilder resultString = new StringBuilder();
@@ -165,12 +178,12 @@ class Player implements Comparable<Player>
 		//Bomb penalty needs to happen before resetting their booster
 		if(threshold)
 			multiplier *= 4;
-		StringBuilder output = addMoney(-250000*multiplier,false);
+		StringBuilder output = addMoney(-250000*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
 		if(splitAndShare)
 		{
 			int moneyLost = money/10;
-			money -= moneyLost;
+			addMoney(-1*moneyLost,MoneyMultipliersToUse.NOTHING);
 			GameController.splitAndShare(moneyLost);
 		}
 		//Wipe their booster if they didn't hit a boost holder
@@ -180,7 +193,13 @@ class Player implements Comparable<Player>
 		winstreak = 0;
 		GameController.repeatTurn = 0;
 		GameController.playersAlive --;
-		//And don't forget the penalty, pass the string on for the main function too
+		//Dumb easter egg
+		if(money <= -1000000000)
+		{
+			GameController.channel.sendMessage("I'm impressed, "
+					+ "but no you don't get anything special for getting your score this low.").queue();
+			GameController.channel.sendMessage("See you next season!").queueAfter(1,TimeUnit.SECONDS);
+		}
 		return output;
 	}
 	@Override

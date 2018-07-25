@@ -24,6 +24,7 @@ import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.Events;
 import tel.discord.rtab.enums.GameStatus;
 import tel.discord.rtab.enums.Games;
+import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
@@ -37,6 +38,7 @@ public class GameController
 	static int boardSize = 15;
 	public static MessageChannel channel = null;
 	static List<Player> players = new ArrayList<>();
+	static List<Player> winners = new ArrayList<>();
 	static int currentTurn = -1;
 	static int repeatTurn = 0;
 	public static int playersJoined = 0;
@@ -116,6 +118,9 @@ public class GameController
 		Player newPlayer = new Player(playerID);
 		if(newPlayer.name.contains(":") || newPlayer.name.startsWith("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
+		//Dumb easter egg
+		if(newPlayer.money <= -1000000000)
+			return PlayerJoinReturnValue.ELIMINATED;
 		//Look for match already in player list
 		for(int i=0; i<playersJoined; i++)
 		{
@@ -294,7 +299,7 @@ public class GameController
 		channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 		if(players.get(currentTurn).threshold)
 		{
-			players.get(currentTurn).money -= 50000;
+			players.get(currentTurn).addMoney(50000,MoneyMultipliersToUse.NOTHING);
 			channel.sendMessage("(-$50,000)").queueAfter(1,TimeUnit.SECONDS);
 		}
 		if(bombs[location])
@@ -436,7 +441,7 @@ public class GameController
 			resultString.append("$");
 			resultString.append(String.format("%,d",Math.abs(cashWon)));
 			resultString.append("**");
-			extraResult = players.get(currentTurn).addMoney(cashWon,false);
+			extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			break;
 		case BOOSTER:
 			//On cash, update the player's booster and tell them what they found
@@ -631,6 +636,10 @@ public class GameController
 			players.sort(null);
 			displayBoardAndStatus(false, true);
 			reset();
+			if(winners.size() > 0)
+			{
+				//TODO WINNER THINGS
+			}
 			return;
 		}
 		//No? Good. Let's get someone to reward!
@@ -679,18 +688,21 @@ public class GameController
 			channel.sendMessage(players.get(currentTurn).name + " receives a win bonus of **$"
 					+ String.format("%,d",winBonus) + "**.").queue();
 			StringBuilder extraResult = null;
-			extraResult = players.get(currentTurn).addMoney(winBonus,true);
+			extraResult = players.get(currentTurn).addMoney(winBonus,MoneyMultipliersToUse.BOOSTER_AND_BONUS);
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
 			//Don't forget about the jackpot
 			if(players.get(currentTurn).jackpot)
 			{
 				channel.sendMessage("You won the $25,000,000 **JACKPOT**!").queue();
-				players.get(currentTurn).money += 25000000;
+				players.get(currentTurn).addMoney(25000000,MoneyMultipliersToUse.NOTHING);
 			}
 		}
 		//Then, folded or not, play out any minigames they've won
-		players.get(currentTurn).status = PlayerStatus.DONE;
+		if(players.get(currentTurn).status == PlayerStatus.FOLDED)
+			players.get(currentTurn).status = PlayerStatus.OUT;
+		else
+			players.get(currentTurn).status = PlayerStatus.DONE;
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
 		timer.schedule(new ClearMinigameQueueTask(), 1000);
 	}
@@ -712,7 +724,14 @@ public class GameController
 			runNextMiniGameTurn(currentGame);
 		}
 		else
+		{
+			//Check for winning the game
+			if(players.get(currentTurn).money >= 1000000000 && players.get(currentTurn).status == PlayerStatus.DONE)
+			{
+				winners.add(players.get(currentTurn));
+			}
 			runNextEndGamePlayer();
+		}
 	}
 	static void runNextMiniGameTurn(MiniGame currentGame)
 	{
@@ -776,9 +795,9 @@ public class GameController
 		StringBuilder extraResult = null;
 		//Bypass the usual method if it's a bonus game so we don't have booster or winstreak applied
 		if(currentGame.isBonusGame())
-			players.get(currentTurn).money += (moneyWon*multiplier);
+			players.get(currentTurn).addMoney(moneyWon*multiplier,MoneyMultipliersToUse.NOTHING);
 		else
-			extraResult = players.get(currentTurn).addMoney((moneyWon*multiplier),true);
+			extraResult = players.get(currentTurn).addMoney((moneyWon*multiplier),MoneyMultipliersToUse.BOOSTER_AND_BONUS);
 		channel.sendMessage(resultString).queue();
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
@@ -1030,7 +1049,7 @@ public class GameController
 			if(i != currentTurn)
 			{
 				//And divide the amount given by how many players there are to receive it
-				players.get(i).money += (totalToShare / (playersJoined-1));
+				players.get(i).addMoney(totalToShare / (playersJoined-1),MoneyMultipliersToUse.NOTHING);
 			}
 	}
 }
