@@ -2,6 +2,15 @@ package tel.discord.rtab.enums;
 
 // Swiped and slightly modified from another project of mine I did for university. The order of the ranks matter here. --Coug
 public enum CardRank {
+    ACE("Ace","A")
+    {
+    	@Override
+    	public int getValue(boolean acesHigh) {
+    		if(acesHigh)
+    			return this.ordinal() + 14;
+        	return this.ordinal() + 1;
+        }	
+    },
     DEUCE("Deuce","2"),
     THREE("Three","3"),
     FOUR("Four","4"),
@@ -13,8 +22,7 @@ public enum CardRank {
     TEN("Ten","10"),
     JACK("Jack","J"),
     QUEEN("Queen","Q"),
-    KING("King","K"),
-    ACE("Ace","A");
+    KING("King","K");
     
     private final String name, symbol;
 
@@ -29,5 +37,13 @@ public enum CardRank {
 
     public String getSymbol() {
         return symbol;
+    }
+    
+    /**
+     * @param acesHigh  true if aces should be considered the highest card (rather than the lowest)
+     * @return the value of the card - aces are 14 if aces are high, or 1 if aces are low.
+     */
+    public int getValue(boolean acesHigh) {
+    	return this.ordinal() + 1;
     }
 }
