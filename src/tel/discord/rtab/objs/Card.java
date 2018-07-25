@@ -10,14 +10,6 @@ public class Card implements Comparable<Card> {
     private final CardRank rank;
     private final CardSuit suit;
     
-    private final String[] rankNames = {"Two", "Three", "Four", "Five", "Six",
-        "Seven", "Eight", "Nine", "Ten", "Jack", "Queen",
-        "King", "Ace"};
-    private final String[] rankSymbols = {"2", "3", "4", "5", "6", "7", "8",
-        "9", "10", "J", "Q", "K", "A"};
-    private final String[] suitNames = {"Clubs", "Diamonds", "Hearts", "Spades"};
-    private final String[] suitSymbols = {"♣", "♦", "♥", "♠"};
-    
     /**
      * Sole constructor.
      * 
@@ -102,10 +94,10 @@ public class Card implements Comparable<Card> {
     
     @Override
     public String toString() {
-        return rankNames[rank.ordinal()] + " of " + suitNames[suit.ordinal()];
+        return this.rank.getName() + " of " + this.suit.getName();
     }
     
     public String toStringShort() {
-        return rankSymbols[rank.ordinal()] + suitSymbols[suit.ordinal()];
+        return this.rank.getSymbol() + " of " + this.suit.getSymbol();
     }
 }
