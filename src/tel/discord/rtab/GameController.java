@@ -297,8 +297,16 @@ public class GameController
 						.completeAfter(5,TimeUnit.SECONDS);
 				channel.sendMessage("It also goes **BANKRUPT**. _\\*whoosh*_")
 						.completeAfter(5,TimeUnit.SECONDS);
-				channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
-						.completeAfter(3,TimeUnit.SECONDS);
+				if(amountLost < 0)
+				{
+					channel.sendMessage(String.format("**$%,d** *returned*, plus $250,000 penalty.",Math.abs(amountLost)))
+							.completeAfter(3,TimeUnit.SECONDS);
+				}
+				else
+				{
+					channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
+							.completeAfter(3,TimeUnit.SECONDS);
+				}
 			}
 			extraResult = players.get(currentTurn).blowUp(1,false);
 			break;
@@ -533,6 +541,16 @@ public class GameController
 		case BONUSP3:
 			channel.sendMessage("It's a **+3 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 3;
+			break;
+		case BLAMMO_FRENZY:
+			channel.sendMessage("It's a **Blammo Frenzy**, good luck!!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			for(int i=0; i<boardSize; i++)
+			{
+				//Switch cash to blammo with 1/3 chance
+				if(gameboard.typeBoard[i] == SpaceType.CASH && Math.random()*3 < 1)
+					gameboard.typeBoard[i] = SpaceType.BLAMMO;
+			}
 			break;
 		}
 		runEndTurnLogic();
