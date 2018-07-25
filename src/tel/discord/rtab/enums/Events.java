@@ -10,9 +10,9 @@ public enum Events implements WeightedSpace
 	BONUSP2			(4),
 	JOKER			(3),
 	LOCKDOWN		(3),
-	STARMAN			(2),
 	BONUSP3			(2),
 	BLAMMO_FRENZY	(2),
+	STARMAN			(1),
 	SPLIT_SHARE		(1),
 	JACKPOT			(1);
 

@@ -68,6 +68,14 @@ public class GameController
 			channel.sendMessage(listPlayers(false)).queue();
 		}
 	}
+	private static class ClearMinigameQueueTask extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			runNextMiniGame();
+		}
+	}
 	
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -694,7 +702,7 @@ public class GameController
 		players.get(currentTurn).games.sort(null);
 		players.get(currentTurn).status = PlayerStatus.DONE;
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
-		runNextMiniGame();
+		timer.schedule(new ClearMinigameQueueTask(), 1000);
 	}
 	static void runNextMiniGame()
 	{
@@ -784,8 +792,8 @@ public class GameController
 		channel.sendMessage(resultString).queue();
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
-		//Off to the next minigame!
-		runNextMiniGame();
+		//Off to the next minigame! (After clearing the queue)
+		timer.schedule(new ClearMinigameQueueTask(), 1000);
 	}
 	static void advanceTurn(boolean endGame)
 	{
