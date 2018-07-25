@@ -10,6 +10,7 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
 import tel.discord.rtab.commands.BoardCommand;
+import tel.discord.rtab.commands.Help2Command;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
 import tel.discord.rtab.commands.PingBotCommand;
@@ -38,6 +39,7 @@ public class RaceToABillionBot
 		utilities.setPrefix("!");
 		utilities.setHelpWord("commands");
 		utilities.addCommand(new HelpCommand());
+		utilities.addCommand(new Help2Command());
 		utilities.addCommand(new JoinCommand());
 		utilities.addCommand(new StartCommand());
 		utilities.addCommand(new QuitCommand());
