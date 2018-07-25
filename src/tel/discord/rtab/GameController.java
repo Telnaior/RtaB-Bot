@@ -30,6 +30,7 @@ import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
 import tel.discord.rtab.enums.SpaceType;
 import tel.discord.rtab.minigames.MiniGame;
+import tel.discord.rtab.minigames.SuperBonusRound;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -84,7 +85,6 @@ public class GameController
 	 */
 	public static void reset()
 	{
-		channel = null;
 		players.clear();
 		currentTurn = -1;
 		playersJoined = 0;
@@ -638,7 +638,35 @@ public class GameController
 			reset();
 			if(winners.size() > 0)
 			{
-				//TODO WINNER THINGS
+				//Got a single winner, crown them!
+				if(winners.size() == 1)
+				{
+					for(int i=0; i<3; i++)
+						channel.sendMessage(winners.get(0).name + " WINS RACE TO A BILLION!")
+							.completeAfter(2,TimeUnit.SECONDS);
+					gameStatus = GameStatus.SEASON_OVER;
+					runNextMiniGameTurn(new SuperBonusRound());
+				}
+				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
+				else
+				{
+					//Tell them what's happening
+					StringBuilder announcementText = new StringBuilder();
+					for(Player next : winners)
+					{
+						next.resetPlayer();
+						announcementText.append(next.user.getAsMention() + ", ");
+					}
+					announcementText.append("you have reached the goal together.");
+					channel.sendMessage(announcementText.toString()).completeAfter(5,TimeUnit.SECONDS);
+					channel.sendMessage("BUT THERE CAN BE ONLY ONE.").completeAfter(5,TimeUnit.SECONDS);
+					channel.sendMessage("PREPARE FOR THE FINAL SHOWDOWN!").completeAfter(5,TimeUnit.SECONDS);
+					//Prepare the game
+					players.addAll(winners);
+					winners.clear();
+					playersJoined = players.size();
+					startTheGameAlready();
+				}
 			}
 			return;
 		}
@@ -767,6 +795,9 @@ public class GameController
 	{
 		//Cool, game's over now, let's grab their winnings
 		int moneyWon = currentGame.getMoneyWon();
+		//Only the Super Bonus Round will do this
+		if(moneyWon == -1000000000)
+			return;
 		int multiplier = 1;
 		//Did they have multiple copies of the game?
 		while(gamesToPlay.hasNext())

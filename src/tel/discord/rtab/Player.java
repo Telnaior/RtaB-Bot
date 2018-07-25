@@ -209,4 +209,11 @@ class Player implements Comparable<Player>
 		//Sort by round delta, descending order
 		return (other.money - other.oldMoney) - (money - oldMoney);
 	}
+	void resetPlayer()
+	{
+		oldMoney = money;
+		oldWinstreak = winstreak;
+		games.clear();
+		status = PlayerStatus.OUT;
+	}
 }
