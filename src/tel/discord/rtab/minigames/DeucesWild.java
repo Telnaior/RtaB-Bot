@@ -118,7 +118,7 @@ public class DeucesWild implements MiniGame {
 	{
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
-		display.append("DEUCES WILD\n");
+		display.append("      DEUCES WILD\n   ");
 		for(int i=0; i<BOARD_SIZE; i++)
 		{
 			if(pickedSpaces[i])
@@ -129,7 +129,9 @@ public class DeucesWild implements MiniGame {
 			{
 				display.append(String.format("%02d",(i+1)));
 			}
-			if((i%VALUES.length) == (VALUES.length-1))
+			if (i == 45)
+				display.append("\n   ");
+			else if(i == 5 || (i > 5 && i%8 == 5))
 				display.append("\n");
 			else
 				display.append(" ");
