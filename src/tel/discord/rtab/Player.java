@@ -149,7 +149,7 @@ class Player
 	public StringBuilder blowUp(int multiplier, boolean holdBoost)
 	{
 		//Just fold if they've got a minigame lock so they still play their games
-		if(minigameLock)
+		if(minigameLock && games.size() > 0)
 		{
 			status = PlayerStatus.FOLDED;
 		}

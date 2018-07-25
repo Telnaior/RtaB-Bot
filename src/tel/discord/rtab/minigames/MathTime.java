@@ -72,10 +72,9 @@ public class MathTime implements MiniGame {
 			return output;
 		}
 		if(stage != 0)
-		{
 			output.add(String.format("Space %d selected...",(lastPick+1)));
+		if(stage == 5)
 			output.add("...");
-		}
 		switch(stage)
 		{
 		case 0:

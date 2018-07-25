@@ -2,13 +2,13 @@ package tel.discord.rtab.enums;
 
 public enum Events implements WeightedSpace
 {
-	BOOST_DRAIN		(7),
-	REPEAT			(7),
-	GAME_LOCK		(6),
+	REPEAT			(6),
 	BONUSP1			(6),
-	MINEFIELD		(5),
-	JOKER			(4),
+	GAME_LOCK		(5),
+	BOOST_DRAIN		(5),
+	MINEFIELD		(4),
 	BONUSP2			(4),
+	JOKER			(3),
 	LOCKDOWN		(3),
 	STARMAN			(2),
 	BONUSP3			(2),
