@@ -1,5 +1,7 @@
 package tel.discord.rtab.commands;
 
+import java.util.Timer;
+
 import tel.discord.rtab.GameController;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -23,6 +25,8 @@ public class StartCommand extends Command
 		case JOINED:
 		case UPDATED:
 		case ALREADYIN:
+			GameController.timer.cancel();
+			GameController.timer = new Timer();
 			GameController.startTheGameAlready();
 			break;
 		case WRONGCHANNEL:

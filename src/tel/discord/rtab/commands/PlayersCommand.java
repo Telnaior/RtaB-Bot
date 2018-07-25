@@ -17,7 +17,7 @@ public class PlayersCommand extends Command {
 		if(GameController.playersJoined == 0)
 			event.reply("No one currently in game.");
 		else
-			GameController.listPlayers();
+			GameController.listPlayers(false);
 	}
 
 }

@@ -15,6 +15,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -47,7 +48,8 @@ public class GameController
 	static boolean[] bombs;
 	static Board gameboard;
 	public static EventWaiter waiter;
-	static Timer gameStartTimer = new Timer();
+	public static Timer timer = new Timer();
+	static Message waitingMessage;
 
 	private static class StartGameTask extends TimerTask
 	{
@@ -63,7 +65,7 @@ public class GameController
 		public void run()
 		{
 			channel.sendMessage("Thirty seconds before game starts!").queue();
-			listPlayers();
+			listPlayers(false);
 		}
 	}
 	
@@ -97,8 +99,8 @@ public class GameController
 		{
 			//If first player, this is the channel, now queue up starting the game
 			channel = channelID;
-			gameStartTimer.schedule(new FinalCallTask(),  90000);
-			gameStartTimer.schedule(new StartGameTask(), 120000);
+			timer.schedule(new FinalCallTask(),  90000);
+			timer.schedule(new StartGameTask(), 120000);
 		}
 		else if(channel != channelID)
 			return PlayerJoinReturnValue.WRONGCHANNEL;
@@ -158,6 +160,11 @@ public class GameController
 	 */
 	public static void startTheGameAlready()
 	{
+		//If the game's already running, just don't
+		if(gameStatus != GameStatus.SIGNUPS_OPEN)
+		{
+			return;
+		}
 		if(playersJoined < 2)
 		{
 			//Didn't get players, abort
@@ -173,6 +180,8 @@ public class GameController
 		spacesLeft = boardSize;
 		pickedSpaces = new boolean[boardSize];
 		bombs = new boolean[boardSize];
+		//Get the "waiting on" message going
+		waitingMessage = channel.sendMessage(listPlayers(true)).complete();
 		//Request players send in bombs, and set up waiter for them to return
 		for(int i=0; i<playersJoined; i++)
 		{
@@ -214,12 +223,20 @@ public class GameController
 			//If everyone has sent in, what are we waiting for?
 			if(playersAlive == playersJoined)
 			{
-				//Determine first player
+				//Delete the "waiting on" message
+				waitingMessage.delete().queue();
+				//Determine first player and player order
 				currentTurn = (int)(Math.random()*playersJoined);
 				gameboard = new Board(boardSize);
 				Collections.shuffle(players);
+				//Let's get things rolling!
 				channel.sendMessage("Let's go!").queue();
 				runTurn();
+			}
+			//If they haven't, update the message to tell us who we're still waiting on
+			else
+			{
+				waitingMessage.editMessage(listPlayers(true)).queue();
 			}
 		}
 	}
@@ -957,16 +974,22 @@ public class GameController
 		}
 		return -1;
 	}
-	public static void listPlayers()
+	public static String listPlayers(boolean waitingOn)
 	{
 		StringBuilder resultString = new StringBuilder();
-		resultString.append("**PLAYERS**");
+		if(waitingOn)
+			resultString.append("**WAITING ON**");
+		else
+			resultString.append("**PLAYERS**");
 		for(Player next : players)
 		{
-			resultString.append(" | ");
-			resultString.append(next.name);
+			if(!waitingOn || (waitingOn && next.status == PlayerStatus.OUT))
+			{
+				resultString.append(" | ");
+				resultString.append(next.name);
+			}
 		}
-		channel.sendMessage(resultString).queue();
+		return resultString.toString();
 	}
 	public static void splitAndShare(int totalToShare)
 	{
