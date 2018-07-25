@@ -39,10 +39,9 @@ public enum CardRank {
         return symbol;
     }
     
-    /*
-     * getValue(boolean acesHigh)
-     * Returns the value of the card - aces are 14 if aces are high, or 1 if aces are low.
-     * acesHigh - Determine what the value of an ace should be
+    /**
+     * @param acesHigh  true if aces should be considered the highest card (rather than the lowest)
+     * @return the value of the card - aces are 14 if aces are high, or 1 if aces are low.
      */
     public int getValue(boolean acesHigh) {
     	return this.ordinal() + 1;
