@@ -65,7 +65,7 @@ public class GameController
 		public void run()
 		{
 			channel.sendMessage("Thirty seconds before game starts!").queue();
-			listPlayers(false);
+			channel.sendMessage(listPlayers(false)).queue();
 		}
 	}
 	
