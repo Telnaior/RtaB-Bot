@@ -16,6 +16,7 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import tel.discord.rtab.enums.BlammoChoices;
 import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.Events;
 import tel.discord.rtab.enums.GameStatus;
@@ -229,6 +230,11 @@ public class GameController
 		pickedSpaces[location] = true;
 		spacesLeft--;
 		channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+		if(players.get(currentTurn).threshold)
+		{
+			players.get(currentTurn).money -= 50000;
+			channel.sendMessage("(-$50,000)").queueAfter(1,TimeUnit.SECONDS);
+		}
 		if(bombs[location])
 		{
 			runBombLogic(location);
@@ -237,6 +243,9 @@ public class GameController
 		{
 			runSafeLogic(location);
 		}
+	}
+	static void runEndTurnLogic()
+	{
 		//Test if game over
 		if(spacesLeft <= 0 || playersAlive == 1)
 		{
@@ -336,10 +345,12 @@ public class GameController
 		}
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
+		runEndTurnLogic();
 	}
 	static void runSafeLogic(int location)
 	{
-		if((Math.random()*spacesLeft)<playersJoined)
+		//Always trigger it on a blammo, otherwise based on spaces left and players in game
+		if((Math.random()*spacesLeft)<playersJoined || gameboard.typeBoard[location] == SpaceType.BLAMMO)
 			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Figure out what space we got
 		StringBuilder resultString = new StringBuilder();
@@ -376,8 +387,60 @@ public class GameController
 		case EVENT:
 			activateEvent(gameboard.eventBoard[location]);
 			return;
+		case BLAMMO:
+			channel.sendMessage("It's a **BLAMMO!** Quick, press a button!").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("```\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
+			waiter.waitForEvent(MessageReceivedEvent.class,
+					//Right player and channel
+					e ->
+					{
+						return (e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
+								&& checkValidNumber(e.getMessage().getContentRaw()) 
+										&& Integer.parseInt(e.getMessage().getContentRaw()) <= 4);
+					},
+					//Parse it and call the method that does stuff
+					e -> 
+					{
+						int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
+						runBlammo(button);
+					});
+			return;
 		}
 		channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
+		if(extraResult != null)
+			channel.sendMessage(extraResult).queue();
+		runEndTurnLogic();
+	}
+	private static void runBlammo(int buttonPressed)
+	{
+		List<BlammoChoices> buttons = Arrays.asList(BlammoChoices.values());
+		Collections.shuffle(buttons);
+		channel.sendMessage("Button " + (buttonPressed+1) + " pressed...").queue();
+		channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
+		StringBuilder extraResult = null;
+		switch(buttons.get(buttonPressed))
+		{
+		case BLOCK:
+			channel.sendMessage("You BLOCKED the BLAMMO!").completeAfter(3,TimeUnit.SECONDS);
+			break;
+		case ELIM_OPP:
+			channel.sendMessage("You ELIMINATED YOUR OPPONENT!").completeAfter(3,TimeUnit.SECONDS);
+			advanceTurn(false);
+			channel.sendMessage("Goodbye, " + players.get(currentTurn).user.getAsMention() + "!").queue();
+			extraResult = players.get(currentTurn).blowUp(4,false);
+			break;
+		case ELIM_YOU:
+			channel.sendMessage("You ELIMINATED YOURSELF!").completeAfter(3,TimeUnit.SECONDS);
+			channel.sendMessage("$1,000,000 penalty!").queue();
+			extraResult = players.get(currentTurn).blowUp(4,false);
+			break;
+		case THRESHOLD:
+			channel.sendMessage("You're entering a THRESHOLD SITUATION!").completeAfter(3,TimeUnit.SECONDS);
+			channel.sendMessage("You'll lose $50,000 for every pick you make, "
+					+ "and if you lose the bomb penalty will be four times as large!").queue();
+			players.get(currentTurn).threshold = true;
+			break;
+		}
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
 	}
@@ -410,7 +473,7 @@ public class GameController
 				if(bombs[i] && !pickedSpaces[i])
 				{
 					channel.sendMessage("Bomb in space " + (i+1) + " destroyed.")
-						.queueAfter(3,TimeUnit.SECONDS);
+						.queueAfter(2,TimeUnit.SECONDS);
 					pickedSpaces[i] = true;
 					spacesLeft --;
 				}
@@ -453,6 +516,7 @@ public class GameController
 			players.get(currentTurn).winstreak += 3;
 			break;
 		}
+		runEndTurnLogic();
 	}
 	static void runNextEndGamePlayer()
 	{
@@ -832,7 +896,7 @@ public class GameController
 	}
 	public static void splitAndShare(int totalToShare)
 	{
-		channel.sendMessage("Because " + players.get(currentTurn).user.getAsMention() + "had a split and share, "
+		channel.sendMessage("Because " + players.get(currentTurn).user.getAsMention() + " had a split and share, "
 				+ "10% of their total will be split between the other players.").queueAfter(1,TimeUnit.SECONDS);
 		for(int i=0; i<playersJoined; i++)
 			//Don't pass money back to the player that hit it

@@ -22,10 +22,12 @@ class Player
 	int money;
 	int booster;
 	int winstreak;
+	//Event fields
 	int jokers;
 	boolean splitAndShare;
 	boolean minigameLock;
 	boolean jackpot;
+	boolean threshold;
 	PlayerStatus status;
 	LinkedList<Games> games; 
 	Player(Member playerName)
@@ -39,6 +41,7 @@ class Player
 		jokers = 0;
 		splitAndShare = false;
 		minigameLock = false;
+		threshold = false;
 		status = PlayerStatus.OUT;
 		games = new LinkedList<>();
 		try
@@ -155,6 +158,8 @@ class Player
 			status = PlayerStatus.OUT;
 		}
 		//Bomb penalty needs to happen before resetting their booster
+		if(threshold)
+			multiplier *= 4;
 		StringBuilder output = addMoney(-250000*multiplier,false);
 		//If they've got a split and share, they're in for a bad time
 		if(splitAndShare)
