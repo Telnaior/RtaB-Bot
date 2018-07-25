@@ -83,13 +83,13 @@ public class Card implements Comparable<Card> {
      * argument, and 0 if the two cards are identical
      */
     @Override
-    public int compareTo(Card other) {
+    public int compareTo(Card other, boolean acesHigh) {
         if (other == null)
             throw new NullPointerException();
         
         return (this.suit.ordinal() * CardRank.values().length +
-                this.rank.ordinal()) - (other.getSuit().ordinal() *
-                CardRank.values().length + other.getRank().ordinal());
+                this.rank.getValue(acesHigh)) - (other.getSuit().ordinal() *
+                CardRank.values().length + other.getRank().getValue(acesHigh));
     }
     
     @Override
