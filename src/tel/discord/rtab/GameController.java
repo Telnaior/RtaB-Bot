@@ -413,6 +413,8 @@ public class GameController
 	}
 	private static void runBlammo(int buttonPressed)
 	{
+		//Yes I know it's generating the result after they've already picked
+		//But that's the sort of thing a blammo would do so I'm fine with it
 		List<BlammoChoices> buttons = Arrays.asList(BlammoChoices.values());
 		Collections.shuffle(buttons);
 		channel.sendMessage("Button " + (buttonPressed+1) + " pressed...").queue();
@@ -426,23 +428,35 @@ public class GameController
 		case ELIM_OPP:
 			channel.sendMessage("You ELIMINATED YOUR OPPONENT!").completeAfter(3,TimeUnit.SECONDS);
 			advanceTurn(false);
-			channel.sendMessage("Goodbye, " + players.get(currentTurn).user.getAsMention() + "!").queue();
+			channel.sendMessage("Goodbye, " + players.get(currentTurn).user.getAsMention() + "! $1,000,000 penalty!").queue();
+			if(repeatTurn > 0)
+				channel.sendMessage("(You also negated the repeat!)").queue();
 			extraResult = players.get(currentTurn).blowUp(4,false);
 			break;
+		case THRESHOLD:
+			if(players.get(currentTurn).threshold)
+			{
+				//You already have a threshold situation? Buh-bye.
+				channel.sendMessage("It's a THRESHOLD SITUATION, but you're already in one, so...")
+					.completeAfter(3,TimeUnit.SECONDS);
+			}
+			else
+			{
+				channel.sendMessage("You're entering a THRESHOLD SITUATION!").completeAfter(3,TimeUnit.SECONDS);
+				channel.sendMessage("You'll lose $50,000 for every pick you make, "
+						+ "and if you lose the penalty will be four times as large!").queue();
+				players.get(currentTurn).threshold = true;
+				break;
+			}
 		case ELIM_YOU:
 			channel.sendMessage("You ELIMINATED YOURSELF!").completeAfter(3,TimeUnit.SECONDS);
 			channel.sendMessage("$1,000,000 penalty!").queue();
 			extraResult = players.get(currentTurn).blowUp(4,false);
 			break;
-		case THRESHOLD:
-			channel.sendMessage("You're entering a THRESHOLD SITUATION!").completeAfter(3,TimeUnit.SECONDS);
-			channel.sendMessage("You'll lose $50,000 for every pick you make, "
-					+ "and if you lose the bomb penalty will be four times as large!").queue();
-			players.get(currentTurn).threshold = true;
-			break;
 		}
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
+		runEndTurnLogic();
 	}
 	static void activateEvent(Events event)
 	{
@@ -464,7 +478,12 @@ public class GameController
 		case LOCKDOWN:
 			channel.sendMessage("It's a **Lockdown**, all non-bomb spaces on the board are now becoming cash!")
 				.completeAfter(5,TimeUnit.SECONDS);
-			Arrays.fill(gameboard.typeBoard,SpaceType.CASH);
+			for(int i=0; i<boardSize; i++)
+			{
+				//Blammos aren't affected
+				if(gameboard.typeBoard[i] != SpaceType.BLAMMO)
+					gameboard.typeBoard[i] = SpaceType.CASH;
+			}
 			break;
 		case STARMAN:
 			channel.sendMessage("Hooray, it's a **Starman**, here to destroy all the bombs!")
