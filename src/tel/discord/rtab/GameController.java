@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
@@ -45,6 +47,25 @@ public class GameController
 	static boolean[] bombs;
 	static Board gameboard;
 	public static EventWaiter waiter;
+	static Timer gameStartTimer = new Timer();
+
+	private static class StartGameTask extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			startTheGameAlready();
+		}
+	}
+	private static class FinalCallTask extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			channel.sendMessage("Thirty seconds before game starts!").queue();
+			listPlayers();
+		}
+	}
 	
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -73,7 +94,12 @@ public class GameController
 			return PlayerJoinReturnValue.INPROGRESS;
 		//Are they in the right channel?
 		if(playersJoined == 0)
+		{
+			//If first player, this is the channel, now queue up starting the game
 			channel = channelID;
+			gameStartTimer.schedule(new FinalCallTask(),  90000);
+			gameStartTimer.schedule(new StartGameTask(), 120000);
+		}
 		else if(channel != channelID)
 			return PlayerJoinReturnValue.WRONGCHANNEL;
 		//Create player object
@@ -98,7 +124,10 @@ public class GameController
 		//Haven't found one, add them to the list
 		players.add(newPlayer);
 		playersJoined++;
-		return PlayerJoinReturnValue.JOINED;
+		if(playersJoined == 1)
+			return PlayerJoinReturnValue.CREATED;
+		else
+			return PlayerJoinReturnValue.JOINED;
 	}
 	/*
 	 * removePlayer - removes a player from the game.
@@ -129,7 +158,15 @@ public class GameController
 	 */
 	public static void startTheGameAlready()
 	{
+		if(playersJoined < 2)
+		{
+			//Didn't get players, abort
+			channel.sendMessage("Not enough players. Aborting game.").queue();
+			reset();
+			return;
+		}
 		//Declare game in progress so we don't get latecomers
+		channel.sendMessage("Starting game...").queue();
 		gameStatus = GameStatus.IN_PROGRESS;
 		//Initialise stuff that needs initialising
 		boardSize = 5 + (5*playersJoined);

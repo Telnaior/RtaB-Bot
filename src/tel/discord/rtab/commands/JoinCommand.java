@@ -18,6 +18,8 @@ public class JoinCommand extends Command
 	{
 		switch(GameController.addPlayer(event.getChannel(),event.getMember()))
 		{
+		case CREATED:
+			event.reply("Starting a game of Race to a Billion in two minutes. Type !join to sign up.");
 		case JOINED:
 			event.reply(event.getMember().getEffectiveName() + " successfully joined the game.");
 			break;

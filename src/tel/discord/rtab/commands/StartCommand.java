@@ -9,8 +9,10 @@ public class StartCommand extends Command
 {
 	public StartCommand()
 	{
-		this.name = "start";
+		this.name = "forcestart";
 		this.help = "start the game (joining it if not already in)";
+		this.ownerCommand = true;
+		this.hidden = true;
 	}
 	@Override
 	protected void execute(CommandEvent event)
@@ -21,13 +23,7 @@ public class StartCommand extends Command
 		case JOINED:
 		case UPDATED:
 		case ALREADYIN:
-			if(GameController.playersJoined >= 2)
-			{
-				event.reply("Starting game...");
-				GameController.startTheGameAlready();
-			}
-			else
-				event.reply("Still need another player.");
+			GameController.startTheGameAlready();
 			break;
 		case WRONGCHANNEL:
 			event.reply("Game running in channel " + GameController.channel.getName());
