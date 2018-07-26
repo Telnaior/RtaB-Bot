@@ -181,9 +181,8 @@ public class DeucesWild implements MiniGame {
 	}
 
 	public Card[] createDeck() {
-		CardRank[] ranks = {CardRank.ACE, CardRank.DEUCE, CardRank.THREE, CardRank.FOUR, CardRank.FIVE, CardRank.SIX, CardRank.SEVEN,
-				CardRank.EIGHT, CardRank.NINE, CardRank.TEN, CardRank.JACK, CardRank.QUEEN, CardRank.KING};
-		CardSuit[] suits = {CardSuit.CLUBS, CardSuit.DIAMONDS, CardSuit.HEARTS, CardSuit.SPADES};
+		CardRank[] ranks = CardRank.values();
+		CardSuit[] suits = CardSuit.values();
 		Card[] cards = new Card[ranks.length * suits.length];
 
 		for (int i = 0; i < cards.length; i++) {
@@ -290,7 +289,16 @@ public class DeucesWild implements MiniGame {
 	}
 
 	private boolean hasExtraPair(byte[] rankCount) {
-		Arrays.sort(rankCount);
-		return rankCount[rankCount.length - 2] == 2;
+		/* 
+		 * This works, but isn't entirely clear why:
+		 * There can only be a maximum of one deuce in a full house
+		 * And if there is one, it's pair + pair + deuce
+		 * Otherwise the result would be four or five of a kind and we wouldn't get to this point anyway
+		 * In any case, in a full house sorting the array comes out as either (0,2,3) or (1,2,2)
+		 * And the second-to-last value would always be 2.
+		 */
+		byte[] sortedRankCount = rankCount;
+		Arrays.sort(sortedRankCount);
+		return sortedRankCount[rankCount.length - 2] == 2;
 	}
 }
