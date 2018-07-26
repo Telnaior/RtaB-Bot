@@ -232,7 +232,7 @@ public class DeucesWild implements MiniGame {
 			case 5: return PokerHand.FIVE_OF_A_KIND;
 			case 4: return PokerHand.FOUR_OF_A_KIND;
 			case 3: 
-				if (isFullHouse(rankCount)) return PokerHand.FULL_HOUSE;
+				if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE;
 				else return PokerHand.THREE_OF_A_KIND;
 			default: return PokerHand.NOTHING;
 		}
@@ -289,12 +289,7 @@ public class DeucesWild implements MiniGame {
 		return max;	
 	}
 
-	/**
-	 * This function assumes the check for if there's a three of a kind has already been done in the
-	 * function in which it is called. If that check is not done first, this function could misidentify
-	 * a two pair, which does not pay, for a full house.
-	 */
-	private boolean isFullHouse(byte[] rankCount) {
+	private boolean hasExtraPair(byte[] rankCount) {
 		Arrays.sort(rankCount);
 		return rankCount[rankCount.length - 2] == 2;
 	}
