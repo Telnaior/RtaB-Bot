@@ -185,8 +185,8 @@ public class DeucesWild implements MiniGame {
 		if (cards.length != 5)
 			throw new IllegalArgumentException("The hand evaluator function needs 5 cards to work; it was passed " + cards.length + ".");
 
-		byte[] rankCount = new byte[13];
-		byte[] suitCount = new byte[4];
+		byte[] rankCount = new byte[CardRank.values().length];
+		byte[] suitCount = new byte[CardSuit.values().length];
 
 		for (int i = 0; i < cards.length; i++) {
 			rankCount[cards[i].getRank().ordinal()]++;
