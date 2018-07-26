@@ -591,7 +591,7 @@ public class GameController
 		case SPLIT_SHARE:
 			channel.sendMessage("It's **Split & Share**, "
 					+ "don't lose the round now or you'll lose 10% of your total, "
-					+ "approximately $" + (players.get(currentTurn).money/10) + "!")
+					+ "approximately $" + String.format("%,d",(players.get(currentTurn).money/10)) + "!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).splitAndShare = true;
 			break;

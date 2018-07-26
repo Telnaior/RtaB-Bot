@@ -13,6 +13,7 @@ import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.Help2Command;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
+import tel.discord.rtab.commands.MemeCommand;
 import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
 import tel.discord.rtab.commands.QuitCommand;
@@ -52,6 +53,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new PingBotCommand());
 		utilities.addCommand(new ResetCommand());
 		utilities.addCommand(new ShutdownBotCommand());
+		utilities.addCommand(new MemeCommand());
 		JDABuilder yayBot = new JDABuilder(AccountType.BOT);
 		yayBot.setToken(token);
 		yayBot.addEventListener(utilities.build());
