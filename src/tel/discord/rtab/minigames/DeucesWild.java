@@ -223,11 +223,19 @@ public class DeucesWild implements MiniGame {
 			}
 			else return PokerHand.STRAIGHT_FLUSH;
 		}
-
 		if (isFlush) return PokerHand.FLUSH;
 		if (highCardOfStraight != null) return PokerHand.STRAIGHT;
 
-		return PokerHand.NOTHING;
+		byte modeOfRanks = modeOfRanks(rankCount); // That is, how many are there of the most common rank?
+
+		switch (modeOfRanks) {
+			case 5: return PokerHand.FIVE_OF_A_KIND;
+			case 4: return PokerHand.FOUR_OF_A_KIND;
+			case 3: 
+				if (isFullHouse(rankCount)) return PokerHand.FULL_HOUSE;
+				else return PokerHand.THREE_OF_A_KIND;
+			default: return PokerHand.NOTHING;
+		}
 	}
 
 	private CardRank findStraightHighCard(byte[] rankCount) {
@@ -266,5 +274,28 @@ public class DeucesWild implements MiniGame {
 		}
 
 		return true;
+	}
+
+	private byte modeOfRanks(byte[] rankCount) {
+		byte deuces = rankCount[CardRank.DEUCE.ordinal()];
+		byte max = (byte)(rankCount[CardRank.ACE.ordinal()] + deuces);
+
+		for (int i = CardRank.THREE.ordinal(); i < rankCount.length; i++) {
+			byte sum = (byte)(rankCount[i] + deuces);
+			if (sum > max)
+				max = sum;
+		}
+
+		return max;	
+	}
+
+	/**
+	 * This function assumes the check for if there's a three of a kind has already been done in the
+	 * function in which it is called. If that check is not done first, this function could misidentify
+	 * a two pair, which does not pay, for a full house.
+	 */
+	private boolean isFullHouse(byte[] rankCount) {
+		Arrays.sort(rankCount);
+		return rankCount[rankCount.length - 2] == 2;
 	}
 }
