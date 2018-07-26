@@ -180,18 +180,6 @@ public class DeucesWild implements MiniGame {
 		return BONUS;
 	}
 
-	public Card[] createDeck() {
-		CardRank[] ranks = CardRank.values();
-		CardSuit[] suits = CardSuit.values();
-		Card[] cards = new Card[ranks.length * suits.length];
-
-		for (int i = 0; i < cards.length; i++) {
-			cards[i] = new Card(ranks[i/suits.length],suits[i%suits.length]);
-		}
-
-		return cards;
-	}
-
 	// This is probably not the most efficient way to write the hand evaluator--some things are checked more than once. 
 	public PokerHand evaluateHand(Card[] cards) {
 		if (cards.length != 5)
@@ -289,16 +277,7 @@ public class DeucesWild implements MiniGame {
 	}
 
 	private boolean hasExtraPair(byte[] rankCount) {
-		/* 
-		 * This works, but isn't entirely clear why:
-		 * There can only be a maximum of one deuce in a full house
-		 * And if there is one, it's pair + pair + deuce
-		 * Otherwise the result would be four or five of a kind and we wouldn't get to this point anyway
-		 * In any case, in a full house sorting the array comes out as either (0,2,3) or (1,2,2)
-		 * And the second-to-last value would always be 2.
-		 */
-		byte[] sortedRankCount = rankCount;
-		Arrays.sort(sortedRankCount);
-		return sortedRankCount[rankCount.length - 2] == 2;
+		Arrays.sort(rankCount);
+		return rankCount[rankCount.length - 2] == 2;
 	}
 }
