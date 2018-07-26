@@ -277,7 +277,16 @@ public class DeucesWild implements MiniGame {
 	}
 
 	private boolean hasExtraPair(byte[] rankCount) {
-		Arrays.sort(rankCount);
-		return rankCount[rankCount.length - 2] == 2;
+		/* 
+ 		 * This works, but isn't entirely clear why:
+ 		 * There can only be a maximum of one deuce in a full house
+ 		 * And if there is one, it's pair + pair + deuce
+ 		 * Otherwise the result would be four or five of a kind and we wouldn't get to this point anyway
+  		 * In any case, in a full house sorting the array comes out as either (0,2,3) or (1,2,2)
+ 		 * And the second-to-last value would always be 2.
+ 		 */
+ 		byte[] sortedRankCount = rankCount;
+ 		Arrays.sort(sortedRankCount);
+ 		return sortedRankCount[rankCount.length - 2] == 2;
 	}
 }
