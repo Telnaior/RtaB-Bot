@@ -85,7 +85,7 @@ public class DeucesWild implements MiniGame {
 			//Display instructions
 			output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
 			output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
-			output.add("As the name of the game suggests, deuces are wild. Those are always treated as the best card possible");
+			output.add("As the name of the game suggests, deuces are wild. Those are always treated as the best card possible.");
 			output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
 			output.add("You must get at least a three of a kind to win any money. That pays $50,000.");
             output.add("Straights and flushes each pay $100,000. A full house pays $150,000, a four of a kind pays $250,000, "
@@ -191,5 +191,80 @@ public class DeucesWild implements MiniGame {
 		}
 
 		return cards;
+	}
+
+	// This is probably not the most efficient way to write the hand evaluator--some things are checked more than once. 
+	public PokerHand evaluateHand(Card[] cards) {
+		if (cards.length != 5)
+			throw new IllegalArgumentException("The hand evaluator function needs 5 cards to work; it was passed " + cards.length + ".");
+
+		byte[] rankCount = new byte[13];
+		byte[] suitCount = new byte[4];
+
+		for (int i = 0; i < cards.length; i++) {
+			rankCount[cards[i].getRank().ordinal()]++;
+			if (cards[i].getRank() != CardRank.DEUCE)      // for the purposes of this evaluator, deuces have no suit; that's the only 
+				suitCount[cards[i].getSuit().ordinal()]++; // way I can think of to get it to work right when checking for a flush
+		}
+
+		// If we have four deuces, that precludes a natural royal flush and outpays a wild royal flush; so it's less work to check for that first
+		if (rankCount[CardRank.DEUCE.ordinal()] == 4)
+			return PokerHand.FOUR_DEUCES;
+
+		CardRank highCardOfStraight = findStraightHighCard(rankCount); // If this is null, we do not have a straight
+		boolean isFlush = isFlush(suitCount);
+
+		// Put off the five of a kind check until these are all done--if we had one, we would have paid higher for four deuces already
+		if (highCardOfStraight != null && isFlush) {
+			if (highCardOfStraight == CardRank.ACE) {
+				if (rankCount[CardRank.DEUCE.ordinal()] == 0)
+					return PokerHand.NATURAL_ROYAL;
+				else return PokerHand.WILD_ROYAL;
+			}
+			else return PokerHand.STRAIGHT_FLUSH;
+		}
+
+		if (isFlush) return PokerHand.FLUSH;
+		if (highCardOfStraight != null) return PokerHand.STRAIGHT;
+
+		return PokerHand.NOTHING;
+	}
+
+	private CardRank findStraightHighCard(byte[] rankCount) {
+		// If we have any paired cards other than deuces, it can't be a straight, so check for that first
+		for (int i = 0; i < rankCount.length; i++) {
+			if (i == CardRank.DEUCE.ordinal())
+				continue;
+			if (rankCount[i] > 1)
+				return null;
+		}
+
+		for (int i = 0; i < rankCount.length - 4; i++) {
+			if (rankCount[i] + rankCount[i+1] + rankCount[i+2] + rankCount[i+3] + rankCount[i+4] == 5)
+				return CardRank.values()[i+4];
+			if (i > CardRank.DEUCE.ordinal() && rankCount[i] + rankCount[i+1] + rankCount[i+2] + 
+					rankCount[i+3] + rankCount[i+4] + rankCount[CardRank.DEUCE.ordinal()] == 5)
+				return CardRank.values()[i+4];
+		}
+
+		// The above scan doesn't catch an ace-high straight; so that is our final check:
+		if (rankCount[CardRank.ACE.ordinal()] + rankCount[CardRank.DEUCE.ordinal()] + rankCount[CardRank.TEN.ordinal()]
+				+ rankCount[CardRank.JACK.ordinal()] + rankCount[CardRank.QUEEN.ordinal()] + rankCount[CardRank.KING.ordinal()] == 5)
+			return CardRank.ACE;
+		
+		return null;
+	}
+
+	private boolean isFlush(byte[] suitCount) {
+		boolean suitFound = suitCount[0] != 0;
+
+		for (int i = 1; i < suitCount.length; i++) {
+			if (suitCount[i] != 0) {
+				if (suitFound) return false;
+				else suitFound = true;
+			}
+		}
+
+		return true;
 	}
 }
