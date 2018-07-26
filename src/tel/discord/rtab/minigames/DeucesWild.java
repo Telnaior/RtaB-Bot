@@ -181,9 +181,8 @@ public class DeucesWild implements MiniGame {
 	}
 
 	public Card[] createDeck() {
-		CardRank[] ranks = {CardRank.ACE, CardRank.DEUCE, CardRank.THREE, CardRank.FOUR, CardRank.FIVE, CardRank.SIX, CardRank.SEVEN,
-				CardRank.EIGHT, CardRank.NINE, CardRank.TEN, CardRank.JACK, CardRank.QUEEN, CardRank.KING};
-		CardSuit[] suits = {CardSuit.CLUBS, CardSuit.DIAMONDS, CardSuit.HEARTS, CardSuit.SPADES};
+		CardRank[] ranks = CardRank.values();
+		CardSuit[] suits = CardSuit.values();
 		Card[] cards = new Card[ranks.length * suits.length];
 
 		for (int i = 0; i < cards.length; i++) {
