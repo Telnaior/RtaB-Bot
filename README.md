@@ -2,7 +2,7 @@
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
-0.9.0 (planned)
+0.9.0
  - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
  - Set up join cooldowns (three bombs and you're out for a day)
  - Set up the game actually ending at $1,000,000,000

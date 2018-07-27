@@ -48,6 +48,7 @@ class Player implements Comparable<Player>
 		name = playerName.getEffectiveName();
 		uID = user.getId();
 		lives = MAX_LIVES;
+		lifeRefillTime = Instant.now();
 		money = 0;
 		booster = 100;
 		winstreak = 0;
@@ -76,7 +77,7 @@ class Player implements Comparable<Player>
 				 * record[6] = lives
 				 * record[7] = time at which lives refill
 				 */
-				record = list.get(i).split(":");
+				record = list.get(i).split("#");
 				if(record[0].equals(uID))
 				{
 					money = Integer.parseInt(record[2]);
@@ -84,8 +85,9 @@ class Player implements Comparable<Player>
 					winstreak = Integer.parseInt(record[4]);
 					newbieProtection = Integer.parseInt(record[5]);
 					lifeRefillTime = Instant.parse(record[7]);
-					if(lifeRefillTime.isAfter(Instant.now()))
-						lives = Integer.parseInt(record[6]);
+					lives = Integer.parseInt(record[6]);
+					if(lifeRefillTime.isAfter(Instant.now()) && lives < MAX_LIVES)
+						lives = MAX_LIVES;
 					break;
 				}
 			}
@@ -167,7 +169,7 @@ class Player implements Comparable<Player>
 			String[] record;
 			for(int i=0; i<list.size(); i++)
 			{
-				record = list.get(i).split(":");
+				record = list.get(i).split("#");
 				if(record[0].equals(uID))
 				{
 					money = Integer.parseInt(record[2]);
@@ -213,6 +215,8 @@ class Player implements Comparable<Player>
 		if(!holdBoost)
 			booster = 100;
 		//Wipe everything else too, and dock them a life
+		if(lives == MAX_LIVES)
+			lifeRefillTime = Instant.now().plusSeconds(72000);
 		lives --;
 		winstreak = 0;
 		GameController.repeatTurn = 0;

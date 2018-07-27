@@ -5,7 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.time.temporal.ChronoField;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -137,7 +138,7 @@ public class GameController
 			return PlayerJoinReturnValue.WRONGCHANNEL;
 		//Create player object
 		Player newPlayer = new Player(playerID);
-		if(newPlayer.name.contains(":") || newPlayer.name.startsWith("#") || newPlayer.name.startsWith("!"))
+		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
 		//If they're out of lives, can't let them play anymore
 		if(newPlayer.lives <= 0)
@@ -348,6 +349,12 @@ public class GameController
 			{
 				pickedSpaces[spaceChosen] = true;
 				channel.sendMessage("Space " + (spaceChosen+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+				//Don't forget the threshold
+				if(players.get(currentTurn).threshold)
+				{
+					channel.sendMessage("(-$50,000)").queueAfter(1,TimeUnit.SECONDS);
+					players.get(currentTurn).addMoney(-50000,MoneyMultipliersToUse.NOTHING);
+				}
 				channel.sendMessage("It's not a bomb, so its contents are lost.").completeAfter(5,TimeUnit.SECONDS);
 				runEndTurnLogic();
 			}
@@ -584,7 +591,7 @@ public class GameController
 					},
 					30,TimeUnit.SECONDS, () ->
 					{
-						channel.sendMessage("Too slow, autopicking...").queue();
+						channel.sendMessage("Too slow, autopicking!").queue();
 						int button = (int) Math.random() * 4;
 						runBlammo(button);
 					});
@@ -1155,10 +1162,7 @@ public class GameController
 				toPrint.append(Math.max(players.get(i).newbieProtection-1,0)+":");
 				players.get(i).checkLifeRefill();
 				toPrint.append(players.get(i).lives+":");
-				if(players.get(i).lifeRefillTime.isAfter(Instant.now()) && players.get(i).lives < 3)
-					toPrint.append(players.get(i).lifeRefillTime);
-				else
-					toPrint.append(Instant.now().plusSeconds(72000));
+				toPrint.append(players.get(i).lifeRefillTime);
 				if(location == -1)
 					list.add(toPrint.toString());
 				else
@@ -1194,7 +1198,7 @@ public class GameController
 		String[] record;
 		for(int i=0; i<list.size(); i++)
 		{
-			record = list.get(i).split(":");
+			record = list.get(i).split("#");
 			if(record[field].compareToIgnoreCase(userID) == 0)
 				return i;
 		}
@@ -1240,7 +1244,7 @@ public class GameController
 				output.append("You have not played yet this season, so you have " + Player.MAX_LIVES + " lives.");
 				return output.toString();
 			}
-			String[] record = list.get(index).split(":");
+			String[] record = list.get(index).split("#");
 			output.append(record[1] + ": ");
 			output.append(record[6]);
 			if(Integer.parseInt(record[6]) == 1)
@@ -1251,18 +1255,19 @@ public class GameController
 			{
 				output.append(" Lives refill in ");
 				//Check hours, then minutes, then seconds
-				Instant lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond());
-				int hours = lifeRefillTime.get(ChronoField.HOUR_OF_DAY);
+				OffsetDateTime lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond())
+						.atOffset(ZoneOffset.UTC);
+				int hours = lifeRefillTime.getHour();
 				if(hours>0)
 				{
 					output.append(hours + " hours, ");
 				}
-				int minutes = lifeRefillTime.get(ChronoField.MINUTE_OF_HOUR);
+				int minutes = lifeRefillTime.getMinute();
 				if(hours>0 || minutes>0)
 				{
 					output.append(minutes + " minutes, ");
 				}
-				int seconds = lifeRefillTime.get(ChronoField.SECOND_OF_MINUTE);
+				int seconds = lifeRefillTime.getSecond();
 				if(hours>0 || minutes>0 || seconds>0)
 				{
 					output.append(seconds + " seconds");
