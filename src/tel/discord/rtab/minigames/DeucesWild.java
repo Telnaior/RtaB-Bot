@@ -72,16 +72,7 @@ public class DeucesWild implements MiniGame {
 	{
 		if(firstPlay)
 		{
-			//Initialise board
-			board.clear();
-			for(int i=0; i<VALUES.length; i++)
-				for(int j=0; j<NEEDED_TO_WIN; j++)
-					board.add(VALUES[i]);
-			Collections.shuffle(board);
-			numberPicked = new int[VALUES.length];
-			pickedSpaces = new boolean[BOARD_SIZE];
-			pinchMode = false;
-			firstPlay = false;
+			initialiseGame();
 		}
 		else if(lastPicked == -2)
 		{
@@ -172,6 +163,17 @@ public class DeucesWild implements MiniGame {
 	public LinkedList<String> initialiseGame() {
 		LinkedList<String> output = new LinkedList<>();
 		
+		//Initialise board
+		board.clear();
+		for(int i=0; i<VALUES.length; i++)
+			for(int j=0; j<NEEDED_TO_WIN; j++)
+				board.add(VALUES[i]);
+		Collections.shuffle(board);
+		numberPicked = new int[VALUES.length];
+		pickedSpaces = new boolean[BOARD_SIZE];
+		pinchMode = false;
+		firstPlay = false;
+
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
 		output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
 		output.add("As the name of the game suggests, deuces are wild. Those are always treated as the best card possible.");
