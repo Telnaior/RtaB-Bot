@@ -14,10 +14,11 @@ public class DeucesWild implements MiniGame {
 	static final boolean BONUS = false;
 	static final int BOARD_SIZE = 52;
 	static Deck deck;
-	static int[] numberPicked = new int[VALUES.length];
-	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
+	static Card[] cardsPicked = new Card[5];
+	static boolean[] cardsHeld = new boolean[5];
+	ArrayList<Card> board = new ArrayList<Card>(BOARD_SIZE);
 	int lastSpace;
-	int lastPicked;
+	Card lastPicked;
 	PokerHand hand = PokerHand.NOTHING;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
@@ -30,12 +31,11 @@ public class DeucesWild implements MiniGame {
 		//Initialise board
 		board.clear();
 		deck = new Deck();
-		deck.shuffle();
-		for(int i=0; i<VALUES.length; i++)
-			for(int j=0; j<NEEDED_TO_WIN; j++)
-				board.add(VALUES[i]);
-		Collections.shuffle(board);
-		numberPicked = new int[VALUES.length];
+		deck.shuffle(); // since the Deck object has its own shuffle method that can be called
+		for(int i=0; i<BOARD_SIZE; i++)
+				board.add(deck.dealCard());
+		cardsPicked = new Card[5];
+		cardsHeld = new boolean[5];
 		pickedSpaces = new boolean[BOARD_SIZE];
 		pinchMode = false;
 		firstPlay = false;
@@ -136,9 +136,13 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public boolean isGameOver()
 	{
-		for(int search : numberPicked)
-			if(search >= NEEDED_TO_WIN)
-				return true;
+		if (hand == PokerHand.NATURAL_ROYAL)
+			return true;
+
+		for (int i = 0; i < cardsHeld.length; i++)
+			if (!cardsHeld[i])
+				return false;
+		
 		return false;
 	}
 
