@@ -414,7 +414,7 @@ public class GameController
 				channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
 			}
 			while(Math.random() * chain < 1);
-			channel.sendMessage(String.format("**$%,d** penalty!",chain*penalty))
+			channel.sendMessage(String.format("**$%,d** penalty!",Math.abs(chain*penalty)))
 					.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = players.get(currentTurn).blowUp(chain,false);
 			break;
