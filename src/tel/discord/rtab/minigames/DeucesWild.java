@@ -8,13 +8,12 @@ import tel.discord.rtab.enums.CardRank;
 import tel.discord.rtab.enums.CardSuit;
 import tel.discord.rtab.enums.PokerHand;
 import tel.discord.rtab.objs.Card;
+import tel.discord.rtab.objs.Deck;
 
 public class DeucesWild implements MiniGame {
 	static final boolean BONUS = false;
 	static final int BOARD_SIZE = 52;
-	// TODO: The next two make no sense right now and need to be adjusted to handle cards. I haven't done the card object yet, though. --Coug
-	static final int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
-	static final int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
+	static Deck deck;
 	static int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
 	int lastSpace;
@@ -28,9 +27,10 @@ public class DeucesWild implements MiniGame {
 	public LinkedList<String> initialiseGame()
 	{
 		LinkedList<String> output = new LinkedList<>();
-		
 		//Initialise board
 		board.clear();
+		deck = new Deck();
+		deck.shuffle();
 		for(int i=0; i<VALUES.length; i++)
 			for(int j=0; j<NEEDED_TO_WIN; j++)
 				board.add(VALUES[i]);
