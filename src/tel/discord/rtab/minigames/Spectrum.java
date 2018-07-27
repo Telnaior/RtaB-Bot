@@ -17,20 +17,46 @@ public class Spectrum implements MiniGame {
 	int lastPicked;
 	int total;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
-	boolean firstPlay = true;
 	
 	@Override
-	public void sendNextInput(String pick)
+	public LinkedList<String> initialiseGame()
 	{
+		LinkedList<String> output = new LinkedList<>();
+		//Initialise board
+		board.clear();
+		for(int i=0; i<VALUES.length; i++)
+			for(int j=0; j<NEEDED_TO_WIN; j++)
+				board.add(VALUES[i]);
+		//Add an extra bomb
+		board.add(0);
+		Collections.shuffle(board);
+		numberPicked = new int[VALUES.length];
+		pickedSpaces = new boolean[BOARD_SIZE];
+		total = 0;
+		//Display instructions
+		output.add("For reaching a bonus multiplier of x15, you have earned the right to play the third bonus game!");
+		output.add("In Spectrum, you can win up to one hundred million dollars!");
+		output.add("Pairs of money are hidden on the board, along with three bombs.");
+		output.add("If you make a pair, you win that amount and get to keep picking!");
+		output.add("The game only ends when you make a pair of bombs.");
+		output.add("Good luck, do your best to clean up the board!");
+		output.add(generateBoard());
+		return output;
+	}
+	
+	@Override
+	public LinkedList<String> playNextTurn(String pick)
+	{
+		LinkedList<String> output = new LinkedList<>();
 		if(!isNumber(pick))
 		{
-			lastPicked = -3;
-			return;
+			//Random unrelated non-number doesn't need feedback
+			return output;
 		}
 		if(!checkValidNumber(pick))
 		{
-			lastPicked = -2;
-			return;
+			output.add("Invalid pick.");
+			return output;
 		}
 		else
 		{
@@ -40,6 +66,16 @@ public class Spectrum implements MiniGame {
 			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
 			if(numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= NEEDED_TO_WIN)
 				total += lastPicked;
+			//Print output
+			output.add(String.format("Space %d selected...",lastSpace+1));
+			if(numberPicked[0] >= (NEEDED_TO_WIN-1))
+				output.add("...");
+			if(lastPicked == 0)
+				output.add("**BOMB**");
+			else
+				output.add(String.format("$%,d!",lastPicked));
+			output.add(generateBoard());
+			return output;
 		}
 	}
 
@@ -60,55 +96,6 @@ public class Spectrum implements MiniGame {
 	{
 		int location = Integer.parseInt(message)-1;
 		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces[location]);
-	}
-
-	@Override
-	public LinkedList<String> getNextOutput()
-	{
-		LinkedList<String> output = new LinkedList<>();
-		if(firstPlay)
-		{
-			//Initialise board
-			board.clear();
-			for(int i=0; i<VALUES.length; i++)
-				for(int j=0; j<NEEDED_TO_WIN; j++)
-					board.add(VALUES[i]);
-			//Add an extra bomb
-			board.add(0);
-			Collections.shuffle(board);
-			numberPicked = new int[VALUES.length];
-			pickedSpaces = new boolean[BOARD_SIZE];
-			total = 0;
-			//Display instructions
-			output.add("For reaching a bonus multiplier of x15, you have earned the right to play the third bonus game!");
-			output.add("In Spectrum, you can win up to one hundred million dollars!");
-			output.add("Pairs of money are hidden on the board, along with three bombs.");
-			output.add("If you make a pair, you win that amount and get to keep picking!");
-			output.add("The game only ends when you make a pair of bombs.");
-			output.add("Good luck, do your best to clean up the board!");
-			firstPlay = false;
-		}
-		else if(lastPicked == -2)
-		{
-			//Random unrelated non-number doesn't need feedback
-			return output;
-		}
-		else if(lastPicked == -1)
-		{
-			output.add("Invalid pick.");
-		}
-		else
-		{
-			output.add(String.format("Space %d selected...",lastSpace+1));
-			if(numberPicked[0] >= (NEEDED_TO_WIN-1))
-				output.add("...");
-			if(lastPicked == 0)
-				output.add("**BOMB**");
-			else
-				output.add(String.format("$%,d!",lastPicked));
-		}
-		output.add(generateBoard());
-		return output;
 	}
 	
 	String generateBoard()
@@ -155,7 +142,6 @@ public class Spectrum implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		firstPlay = true;
 		return total;
 	}
 

@@ -6,6 +6,22 @@
  - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
  - Set up join cooldowns (once you bomb, you're out for a day)
  - Set up the game actually ending at $1,000,000,000
+ - Added the BLAMMO, to threaten the safety of any round!
+ - New event: Blammo Frenzy, changing a third of the cash spaces into blammos
+ - Switched over to showing round scores by default, and minigames are shown too
+ - Game now starts after two minutes, rather than waiting for a !start
+ - Also displays who it's waiting on at bomb placement
+ - HEAPS of formatting improvements
+ 
+0.8.3
+ - New events: Bonus Multiplier +1/+2/+3
+ - Bonus bugfixes
+ 
+0.8.2
+ - Bugfixes to previous bugfixes.
+ 
+0.8.1
+ - Bugfixes.
  
 0.8.0
  - Events! Chaos for players, and chaos to code in!

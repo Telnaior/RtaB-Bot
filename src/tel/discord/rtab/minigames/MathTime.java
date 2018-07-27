@@ -17,24 +17,92 @@ public class MathTime implements MiniGame {
 	int lastPick;
 	int total = 0;
 	String equation = "";
-	boolean invalid = false;
-	boolean ignore = false;
 	
 	@Override
-	public void sendNextInput(String pick) {
+	public LinkedList<String> initialiseGame()
+	{
+		LinkedList<String> output = new LinkedList<>();
+		//Initialise stuff
+		total = 0;
+		equation = "";
+		Collections.shuffle(money);
+		Collections.shuffle(ops1);
+		Collections.shuffle(ops2);
+		//Give instructions
+		output.add("In Math Time, you will pick five spaces that will, together, form an equation.");
+		output.add("If you pick well, you could win up to $1,000,000!");
+		output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
+		output.add("When you are ready, make your first pick from the money stage.");
+		equation += "( ";
+		stage = 1;
+		output.add(generateBoard());
+		return output;
+	}
+	
+	@Override
+	public LinkedList<String> playNextTurn(String pick) {
+		LinkedList<String> output = new LinkedList<>();
 		if(!isNumber(pick))
 		{
-			ignore = true;
-			return;
+			//Ignore non-number picks entirely
+			return output;
 		}
-		ignore = false;
 		if(!checkValidNumber(pick))
-			invalid = true;
+		{
+			output.add("Invalid pick.");
+			return output;
+		}
 		else
 		{
 			lastPick = Integer.parseInt(pick)-1;
 			if(stage == 1)
 				stage1Pick = lastPick;
+			//Print stuff
+			output.add(String.format("Space %d selected...",(lastPick+1)));
+			if(stage == 5)
+				output.add("...");
+			switch(stage)
+			{
+			case 1:
+			case 3:
+				if(stage == 3 && result2 == "-")
+					total -= money.get(lastPick);
+				else
+					total += money.get(lastPick);
+				String result = String.format("$%,d",money.get(lastPick));
+				output.add(result + "!");
+				output.add("Next, pick an operation...");
+				equation += result;
+				stage++;
+				break;
+			case 2:
+				result2 = ops1.get(lastPick);
+				output.add("**"+result2+"**");
+				output.add("Next, pick more cash...");
+				equation += (" "+result2+" ");
+				stage++;
+				break;
+			case 4:
+				result4 = ops2.get(lastPick);
+				output.add("**"+result4+"**");
+				output.add("Finally, pick a multiplier...");
+				equation += (" ) "+result4+" ");
+				stage++;
+				break;
+			case 5:
+				if(result4 == "/")
+					total /= multis.get(lastPick);
+				else
+					total *= multis.get(lastPick);
+				String result5 = String.format("%d",multis.get(lastPick));
+				output.add(result5+"!");
+				equation += result5 + " = ";
+				equation += String.format("$%,d",total);
+				stage++;
+				break;
+			}
+			output.add(generateBoard());
+			return output;
 		}
 	}
 	
@@ -55,83 +123,6 @@ public class MathTime implements MiniGame {
 	{
 		int location = Integer.parseInt(message)-1;
 		return !(location < 0 || location >= 7 || (stage == 3 && location == stage1Pick));
-	}
-
-	@Override
-	public LinkedList<String> getNextOutput() {
-		LinkedList<String> output = new LinkedList<>();
-		if(ignore)
-		{
-			//Ignore non-number picks entirely
-			return output;
-		}
-		if(invalid)
-		{
-			output.add("Invalid pick.");
-			invalid = false;
-			return output;
-		}
-		if(stage != 0)
-		{
-			output.add(String.format("Space %d selected...",(lastPick+1)));
-			output.add("...");
-		}
-		switch(stage)
-		{
-		case 0:
-			//Initialise stuff
-			total = 0;
-			equation = "";
-			Collections.shuffle(money);
-			Collections.shuffle(ops1);
-			Collections.shuffle(ops2);
-			//Give instructions
-			output.add("In Math Time, you will pick five spaces that will, together, form an equation.");
-			output.add("If you pick well, you could win up to $1,000,000!");
-			output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
-			output.add("When you are ready, make your first pick from the money stage.");
-			stage++;
-			break;
-		case 1:
-		case 3:
-			if(stage == 3 && result2 == "-")
-				total -= money.get(lastPick);
-			else
-				total += money.get(lastPick);
-			String result = String.format("$%,d",money.get(lastPick));
-			output.add(result + "!");
-			output.add("Next, pick an operation...");
-			equation += result;
-			stage++;
-			break;
-		case 2:
-			result2 = ops1.get(lastPick);
-			output.add("**"+result2+"**");
-			output.add("Next, pick more cash...");
-			equation += (" "+result2+" ");
-			stage++;
-			break;
-		case 4:
-			result4 = ops2.get(lastPick);
-			output.add("**"+result4+"**");
-			output.add("Finally, pick a multiplier...");
-			equation += (" "+result4+" ");
-			stage++;
-			break;
-		case 5:
-			if(result4 == "/")
-				total /= multis.get(lastPick);
-			else
-				total *= multis.get(lastPick);
-			String result5 = String.format("%d",multis.get(lastPick));
-			output.add(result5+"!");
-			equation += result5 + " = ";
-			equation += String.format("$%,d",total);
-			stage++;
-			break;
-		}
-		output.add(generateBoard());
-		return output;
 	}
 
 	String generateBoard()
