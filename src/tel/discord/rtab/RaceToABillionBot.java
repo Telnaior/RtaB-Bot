@@ -13,6 +13,7 @@ import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.Help2Command;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
+import tel.discord.rtab.commands.LivesCommand;
 import tel.discord.rtab.commands.MemeCommand;
 import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
@@ -48,6 +49,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new PlayersCommand());
 		utilities.addCommand(new BoardCommand());
 		utilities.addCommand(new TotalsCommand());
+		utilities.addCommand(new LivesCommand());
 		utilities.addCommand(new RankCommand());
 		utilities.addCommand(new TopCommand());
 		utilities.addCommand(new PingBotCommand());

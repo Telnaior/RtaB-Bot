@@ -41,7 +41,10 @@ public class JoinCommand extends Command
 		case ELIMINATED:
 			event.reply("Cannot join game: You have been eliminated from Race to a Billion.");
 			break;
+		case OUTOFLIVES:
+			event.reply("Cannot join game: Out of lives.");
+			event.reply(GameController.checkLives(event.getAuthor().getId()));
+			break;
 		}
 	}
-
 }

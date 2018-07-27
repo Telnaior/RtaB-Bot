@@ -4,7 +4,7 @@
  
 0.9.0 (planned)
  - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
- - Set up join cooldowns (once you bomb, you're out for a day)
+ - Set up join cooldowns (three bombs and you're out for a day)
  - Set up the game actually ending at $1,000,000,000
  - Added the BLAMMO, to threaten the safety of any round!
  - New event: Blammo Frenzy, changing a third of the cash spaces into blammos

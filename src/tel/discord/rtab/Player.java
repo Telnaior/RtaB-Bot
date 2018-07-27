@@ -3,6 +3,7 @@ package tel.discord.rtab;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -20,9 +21,12 @@ class Player implements Comparable<Player>
 	static final int NEWBIE_BOMB_PENALTY = -100000;
 	static final int MAX_BOOSTER = 999;
 	static final int MIN_BOOSTER = 010;
+	static final int MAX_LIVES = 3;
 	User user;
 	String name;
 	String uID;
+	int lives;
+	Instant lifeRefillTime;
 	int money;
 	int oldMoney;
 	int booster;
@@ -35,14 +39,15 @@ class Player implements Comparable<Player>
 	boolean minigameLock;
 	boolean jackpot;
 	boolean threshold;
-	public boolean warned;
+	boolean warned;
 	PlayerStatus status;
-	LinkedList<Games> games; 
+	LinkedList<Games> games;
 	Player(Member playerName)
 	{
 		user = playerName.getUser();
 		name = playerName.getEffectiveName();
 		uID = user.getId();
+		lives = MAX_LIVES;
 		money = 0;
 		booster = 100;
 		winstreak = 0;
@@ -68,6 +73,8 @@ class Player implements Comparable<Player>
 				 * record[3] = booster
 				 * record[4] = winstreak
 				 * record[5] = newbieProtection
+				 * record[6] = lives
+				 * record[7] = time at which lives refill
 				 */
 				record = list.get(i).split(":");
 				if(record[0].equals(uID))
@@ -76,6 +83,9 @@ class Player implements Comparable<Player>
 					booster = Integer.parseInt(record[3]);
 					winstreak = Integer.parseInt(record[4]);
 					newbieProtection = Integer.parseInt(record[5]);
+					lifeRefillTime = Instant.parse(record[7]);
+					if(lifeRefillTime.isAfter(Instant.now()))
+						lives = Integer.parseInt(record[6]);
 					break;
 				}
 			}
@@ -202,7 +212,8 @@ class Player implements Comparable<Player>
 		//Wipe their booster if they didn't hit a boost holder
 		if(!holdBoost)
 			booster = 100;
-		//Wipe everything else too
+		//Wipe everything else too, and dock them a life
+		lives --;
 		winstreak = 0;
 		GameController.repeatTurn = 0;
 		GameController.playersAlive --;
@@ -232,5 +243,10 @@ class Player implements Comparable<Player>
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;
+	}
+	void checkLifeRefill()
+	{
+		if(lifeRefillTime.isBefore(Instant.now()))
+			lives = MAX_LIVES;
 	}
 }

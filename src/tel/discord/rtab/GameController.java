@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -137,6 +139,9 @@ public class GameController
 		Player newPlayer = new Player(playerID);
 		if(newPlayer.name.contains(":") || newPlayer.name.startsWith("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
+		//If they're out of lives, can't let them play anymore
+		if(newPlayer.lives <= 0)
+			return PlayerJoinReturnValue.OUTOFLIVES;
 		//Dumb easter egg
 		if(newPlayer.money <= -1000000000)
 			return PlayerJoinReturnValue.ELIMINATED;
@@ -1141,13 +1146,23 @@ public class GameController
 					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection is now expired. "
 							+ "From now on, bomb penalties will be $250,000.").queue();
 				int location = findUserInList(list,players.get(i).uID,false);
-				String toPrint = players.get(i).uID+":"+players.get(i).name+":"+players.get(i).money
-						+":"+players.get(i).booster+":"+players.get(i).winstreak
-						+":"+(Math.max(players.get(i).newbieProtection-1,0));
-				if(location == -1)
-					list.add(toPrint);
+				StringBuilder toPrint = new StringBuilder();
+				toPrint.append(players.get(i).uID+":");
+				toPrint.append(players.get(i).name+":");
+				toPrint.append(players.get(i).money+":");
+				toPrint.append(players.get(i).booster+":");
+				toPrint.append(players.get(i).winstreak+":");
+				toPrint.append(Math.max(players.get(i).newbieProtection-1,0)+":");
+				players.get(i).checkLifeRefill();
+				toPrint.append(players.get(i).lives+":");
+				if(players.get(i).lifeRefillTime.isAfter(Instant.now()) && players.get(i).lives < 3)
+					toPrint.append(players.get(i).lifeRefillTime);
 				else
-					list.set(location,toPrint);
+					toPrint.append(Instant.now().plusSeconds(72000));
+				if(location == -1)
+					list.add(toPrint.toString());
+				else
+					list.set(location,toPrint.toString());
 			}
 			//Then sort and rewrite it
 			DescendingScoreSorter sorter = new DescendingScoreSorter();
@@ -1175,9 +1190,6 @@ public class GameController
 		 * record format:
 		 * record[0] = uID
 		 * record[1] = name
-		 * record[2] = money
-		 * record[3] = booster
-		 * record[4] = winstreak
 		 */
 		String[] record;
 		for(int i=0; i<list.size(); i++)
@@ -1216,5 +1228,51 @@ public class GameController
 				//And divide the amount given by how many players there are to receive it
 				players.get(i).addMoney(totalToShare / (playersJoined-1),MoneyMultipliersToUse.NOTHING);
 			}
+	}
+	public static String checkLives(String userID) {
+		StringBuilder output = new StringBuilder();
+		try
+		{
+			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			int index = findUserInList(list,userID,false);
+			if(index < 0)
+			{
+				output.append("You have not played yet this season, so you have " + Player.MAX_LIVES + " lives.");
+				return output.toString();
+			}
+			String[] record = list.get(index).split(":");
+			output.append(record[1] + ": ");
+			output.append(record[6]);
+			if(Integer.parseInt(record[6]) == 1)
+				output.append(" life left.");
+			else
+				output.append(" lives left.");
+			if(Integer.parseInt(record[6]) < Player.MAX_LIVES)
+			{
+				output.append(" Lives refill in ");
+				//Check hours, then minutes, then seconds
+				Instant lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond());
+				int hours = lifeRefillTime.get(ChronoField.HOUR_OF_DAY);
+				if(hours>0)
+				{
+					output.append(hours + " hours, ");
+				}
+				int minutes = lifeRefillTime.get(ChronoField.MINUTE_OF_HOUR);
+				if(hours>0 || minutes>0)
+				{
+					output.append(minutes + " minutes, ");
+				}
+				int seconds = lifeRefillTime.get(ChronoField.SECOND_OF_MINUTE);
+				if(hours>0 || minutes>0 || seconds>0)
+				{
+					output.append(seconds + " seconds");
+				}
+				output.append(".");
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return output.toString();
 	}
 }
