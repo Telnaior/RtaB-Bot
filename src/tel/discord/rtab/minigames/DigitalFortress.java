@@ -25,7 +25,7 @@ public class DigitalFortress implements MiniGame {
 		digitsCorrect = 0;
 		attemptsLeft = ATTEMPTS_ALLOWED;
 		//Provide help
-		output.add("For reaching a bonus multiplier of x10, you have earned the right to play the second bonus game!");
+		output.add("For reaching a streak bonus of x10, you have earned the right to play the second bonus game!");
 		output.add("In Digital Fortress, you can win up to twenty-five million dollars!");
 		output.add("The computer has created a secret ten-digit passcode, using each digit once and once only.");
 		output.add("Your job is to guess this passcode.");

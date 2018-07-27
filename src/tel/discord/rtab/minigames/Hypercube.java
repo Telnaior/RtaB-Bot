@@ -37,7 +37,7 @@ public class Hypercube implements MiniGame {
 		picksUsed = 0;
 		total = 0;
 		//Display instructions
-		output.add("For reaching a bonus multiplier of x20, you have earned the right to play the final bonus game!");
+		output.add("For reaching a streak bonus of x20, you have earned the right to play the final bonus game!");
 		output.add("In Hypercube, you can win hundreds of millions of dollars!");
 		output.add("You have ten picks to build up the largest total you can by selecting the largest numbers.");
 		output.add("But if you find one of the fifteen bombs, your total will be reset to zero!");

@@ -227,7 +227,8 @@ public class GameController
 		{
 			final int iInner = i;
 			players.get(iInner).user.openPrivateChannel().queue(
-					(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
+					(channel) -> channel.sendMessage("Please place your bomb within the next 60 seconds "
+							+ "by sending a number 1-" + boardSize).queue());
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Check if right player, and valid bomb pick
 					e -> (e.getAuthor().equals(players.get(iInner).user)
@@ -723,16 +724,16 @@ public class GameController
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).jackpot = true;
 			break;
-		case BONUSP1:
-			channel.sendMessage("It's a **+1 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+		case STREAKP1:
+			channel.sendMessage("It's a **+1 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 1;
 			break;
-		case BONUSP2:
-			channel.sendMessage("It's a **+2 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+		case STREAKP2:
+			channel.sendMessage("It's a **+2 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 2;
 			break;
-		case BONUSP3:
-			channel.sendMessage("It's a **+3 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+		case STREAKP3:
+			channel.sendMessage("It's a **+3 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 3;
 			break;
 		case BLAMMO_FRENZY:
