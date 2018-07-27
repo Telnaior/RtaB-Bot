@@ -138,8 +138,8 @@ public class GameController
 		Player newPlayer = new Player(playerID);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
-		//If they're out of lives, can't let them play anymore
-		if(newPlayer.lives <= 0)
+		//If they're out of lives and aren't a newbie, can't let them play anymore
+		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
 			return PlayerJoinReturnValue.OUTOFLIVES;
 		//Dumb easter egg
 		if(newPlayer.money <= -1000000000)

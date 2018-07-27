@@ -2,6 +2,11 @@
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
+0.9.2 (planned)
+ - Usual bugfixes etc :P
+ - Increased to 5 lives a day, and they aren't used up while on newbie protection
+ - Expanded help documents
+ 
 0.9.1
  - More bugfixes on life counting, and allowing for the potential of more than the max.
  

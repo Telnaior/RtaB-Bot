@@ -21,7 +21,7 @@ class Player implements Comparable<Player>
 	static final int NEWBIE_BOMB_PENALTY = -100000;
 	static final int MAX_BOOSTER = 999;
 	static final int MIN_BOOSTER = 010;
-	static final int MAX_LIVES = 3;
+	static final int MAX_LIVES = 5;
 	User user;
 	String name;
 	String uID;
@@ -215,10 +215,13 @@ class Player implements Comparable<Player>
 		//Wipe their booster if they didn't hit a boost holder
 		if(!holdBoost)
 			booster = 100;
-		//Set their refill time if this is their first life lost, then dock it
-		if(lives == MAX_LIVES)
-			lifeRefillTime = Instant.now().plusSeconds(72000);
-		lives --;
+		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
+		if(newbieProtection <= 0)
+		{
+			if(lives == MAX_LIVES)
+				lifeRefillTime = Instant.now().plusSeconds(72000);
+			lives --;
+		}
 		//Wipe everything else too, and dock them a life
 		winstreak = 0;
 		GameController.repeatTurn = 0;
