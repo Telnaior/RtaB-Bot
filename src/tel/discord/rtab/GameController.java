@@ -205,6 +205,7 @@ public class GameController
 		{
 			return;
 		}
+		/* TODO REMOVE ME
 		if(playersJoined < 2)
 		{
 			//Didn't get players, abort
@@ -212,6 +213,7 @@ public class GameController
 			reset();
 			return;
 		}
+		*/
 		//Declare game in progress so we don't get latecomers
 		channel.sendMessage("Starting game...").queue();
 		gameStatus = GameStatus.IN_PROGRESS;
@@ -759,14 +761,13 @@ public class GameController
 			saveData();
 			players.sort(null);
 			displayBoardAndStatus(false, true);
-			reset();
 			if(winners.size() > 0)
 			{
 				//Got a single winner, crown them!
 				if(winners.size() == 1)
 				{
 					for(int i=0; i<3; i++)
-						channel.sendMessage(winners.get(0).name + " WINS RACE TO A BILLION!")
+						channel.sendMessage(winners.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!")
 							.completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
 					startMiniGame(new SuperBonusRound());
@@ -786,12 +787,14 @@ public class GameController
 					channel.sendMessage("BUT THERE CAN BE ONLY ONE.").completeAfter(5,TimeUnit.SECONDS);
 					channel.sendMessage("PREPARE FOR THE FINAL SHOWDOWN!").completeAfter(5,TimeUnit.SECONDS);
 					//Prepare the game
+					reset();
 					players.addAll(winners);
 					winners.clear();
 					playersJoined = players.size();
 					startTheGameAlready();
 				}
 			}
+			reset();
 			return;
 		}
 		//No? Good. Let's get someone to reward!
@@ -1153,17 +1156,17 @@ public class GameController
 			for(int i=0; i<playersJoined; i++)
 			{
 				if(players.get(i).newbieProtection == 1)
-					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection is now expired. "
+					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection has expired. "
 							+ "From now on, bomb penalties will be $250,000.").queue();
 				int location = findUserInList(list,players.get(i).uID,false);
 				StringBuilder toPrint = new StringBuilder();
-				toPrint.append(players.get(i).uID+":");
-				toPrint.append(players.get(i).name+":");
-				toPrint.append(players.get(i).money+":");
-				toPrint.append(players.get(i).booster+":");
-				toPrint.append(players.get(i).winstreak+":");
-				toPrint.append(Math.max(players.get(i).newbieProtection-1,0)+":");
-				toPrint.append(players.get(i).lives+":");
+				toPrint.append(players.get(i).uID+"#");
+				toPrint.append(players.get(i).name+"#");
+				toPrint.append(players.get(i).money+"#");
+				toPrint.append(players.get(i).booster+"#");
+				toPrint.append(players.get(i).winstreak+"#");
+				toPrint.append(Math.max(players.get(i).newbieProtection-1,0)+"#");
+				toPrint.append(players.get(i).lives+"#");
 				toPrint.append(players.get(i).lifeRefillTime);
 				if(location == -1)
 					list.add(toPrint.toString());
