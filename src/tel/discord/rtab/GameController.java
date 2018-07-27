@@ -205,7 +205,6 @@ public class GameController
 		{
 			return;
 		}
-		/* TODO REMOVE ME
 		if(playersJoined < 2)
 		{
 			//Didn't get players, abort
@@ -213,7 +212,6 @@ public class GameController
 			reset();
 			return;
 		}
-		*/
 		//Declare game in progress so we don't get latecomers
 		channel.sendMessage("Starting game...").queue();
 		gameStatus = GameStatus.IN_PROGRESS;
