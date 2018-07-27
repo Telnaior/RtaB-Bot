@@ -86,6 +86,16 @@ public class GameController
 		{
 			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
 					", thirty seconds left to choose a space!").queue();
+			displayBoardAndStatus(true,false);
+		}
+	}
+	private static class MiniGameWarning extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					", are you still there? One minute left!").queue();
 		}
 	}
 	
@@ -277,7 +287,7 @@ public class GameController
 		}
 		displayBoardAndStatus(true, false);
 		TimerTask warnPlayer = new PickSpaceWarning();
-		timer.schedule(warnPlayer, 90000);
+		timer.schedule(warnPlayer, 60000);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -303,7 +313,7 @@ public class GameController
 					int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
 					resolveTurn(location);
 				},
-				120,TimeUnit.SECONDS, () ->
+				90,TimeUnit.SECONDS, () ->
 				{
 					timeOutTurn();
 				});
@@ -313,6 +323,7 @@ public class GameController
 		//If they haven't been warned, play nice and just pick a random space for them
 		if(!players.get(currentTurn).warned)
 		{
+			players.get(currentTurn).warned = true;
 			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
 					" is out of time. Wasting a random space.").queue();
 			//Get unpicked spaces
@@ -333,6 +344,7 @@ public class GameController
 				pickedSpaces[spaceChosen] = true;
 				channel.sendMessage("Space " + (spaceChosen+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 				channel.sendMessage("It's not a bomb, so its contents are lost.").completeAfter(5,TimeUnit.SECONDS);
+				runEndTurnLogic();
 			}
 		}
 		//If they've been warned, it's time to BLOW STUFF UP!
@@ -871,6 +883,8 @@ public class GameController
 	static void runNextMiniGameTurn(MiniGame currentGame)
 	{
 		//Let's get more input to give it
+		TimerTask warnPlayer = new MiniGameWarning();
+		timer.schedule(warnPlayer,120000);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -880,6 +894,7 @@ public class GameController
 				//Parse it and call the method that does stuff
 				e -> 
 				{
+					warnPlayer.cancel();
 					String miniPick = e.getMessage().getContentRaw();
 					//Keep printing output until it runs out of output
 					LinkedList<String> result = currentGame.playNextTurn(miniPick);
@@ -897,6 +912,13 @@ public class GameController
 					{
 						runNextMiniGameTurn(currentGame);
 					}
+				},
+				180,TimeUnit.SECONDS, () ->
+				{
+					channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+							" has gone missing. Cancelling their minigames.").queue();
+					players.get(currentTurn).games.clear();
+					completeMiniGame(currentGame);
 				});
 	}
 	static void completeMiniGame(MiniGame currentGame)

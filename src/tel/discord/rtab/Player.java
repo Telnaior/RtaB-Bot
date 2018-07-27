@@ -226,7 +226,11 @@ class Player implements Comparable<Player>
 	{
 		oldMoney = money;
 		oldWinstreak = winstreak;
+		warned = false;
 		games.clear();
+		splitAndShare = false;
+		minigameLock = false;
+		threshold = false;
 		status = PlayerStatus.OUT;
 	}
 }

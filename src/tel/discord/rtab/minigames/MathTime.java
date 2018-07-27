@@ -161,7 +161,9 @@ public class MathTime implements MiniGame {
 	public int getMoneyWon()
 	{
 		stage = 0;
-		return total;
+		if(isGameOver())
+			return total;
+		else return -600000;
 	}
 
 	@Override

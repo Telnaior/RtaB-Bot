@@ -152,7 +152,10 @@ public class Gamble implements MiniGame {
 
 	@Override
 	public int getMoneyWon() {
-		return total;
+		if(isGameOver())
+			return total;
+		else
+			return 0;
 	}
 
 	@Override

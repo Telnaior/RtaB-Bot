@@ -123,7 +123,10 @@ public class DigitalFortress implements MiniGame {
 
 	@Override
 	public int getMoneyWon() {
-		return (PRIZE_PER_DIGIT * digitsCorrect);
+		if(isGameOver())
+			return (PRIZE_PER_DIGIT * digitsCorrect);
+		else
+			return 0;
 	}
 
 	@Override

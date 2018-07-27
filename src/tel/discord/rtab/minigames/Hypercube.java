@@ -143,7 +143,10 @@ public class Hypercube implements MiniGame {
 
 	@Override
 	public int getMoneyWon() {
-		return (int) Math.pow(total,3);
+		if(isGameOver())
+			return (int) Math.pow(total,3);
+		else
+			return 0;
 	}
 
 	@Override
