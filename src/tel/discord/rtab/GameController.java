@@ -76,7 +76,7 @@ public class GameController
 		@Override
 		public void run()
 		{
-			runNextMiniGame();
+			prepareNextMiniGame();
 		}
 	}
 	
@@ -745,7 +745,7 @@ public class GameController
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
 		timer.schedule(new ClearMinigameQueueTask(), 1000);
 	}
-	static void runNextMiniGame()
+	static void prepareNextMiniGame()
 	{
 		if(gamesToPlay.hasNext())
 		{
@@ -760,7 +760,7 @@ public class GameController
 				gameMessage.append(", time for your next minigame: ");
 			gameMessage.append(nextGame + "!");
 			channel.sendMessage(gameMessage).queue();
-			runNextMiniGameTurn(currentGame);
+			startMiniGame(currentGame);
 		}
 		else
 		{
@@ -772,22 +772,19 @@ public class GameController
 			runNextEndGamePlayer();
 		}
 	}
-	static void runNextMiniGameTurn(MiniGame currentGame)
+	static void startMiniGame(MiniGame currentGame)
 	{
-		//Keep printing output until it runs out of output
-		LinkedList<String> result = currentGame.getNextOutput();
+		LinkedList<String> result = currentGame.initialiseGame();
 		ListIterator<String> output = result.listIterator(0);
 		while(output.hasNext())
 		{
 			channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
 		}
-		//Check if the game's over
-		if(currentGame.isGameOver())
-		{
-			completeMiniGame(currentGame);
-			return;
-		}
-		//If it isn't, let's get more input to give it
+		runNextMiniGameTurn(currentGame);
+	}
+	static void runNextMiniGameTurn(MiniGame currentGame)
+	{
+		//Let's get more input to give it
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -798,8 +795,22 @@ public class GameController
 				e -> 
 				{
 					String miniPick = e.getMessage().getContentRaw();
-					currentGame.sendNextInput(miniPick);
-					runNextMiniGameTurn(currentGame);
+					//Keep printing output until it runs out of output
+					LinkedList<String> result = currentGame.playNextTurn(miniPick);
+					ListIterator<String> output = result.listIterator(0);
+					while(output.hasNext())
+					{
+						channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
+					}
+					//Check if the game's over
+					if(currentGame.isGameOver())
+					{
+						completeMiniGame(currentGame);
+					}
+					else
+					{
+						runNextMiniGameTurn(currentGame);
+					}
 				});
 	}
 	static void completeMiniGame(MiniGame currentGame)
@@ -1020,7 +1031,7 @@ public class GameController
 			{
 				if(players.get(i).newbieProtection == 1)
 					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection is now expired. "
-							+ "From now on, bomb penalties will be $250,000.");
+							+ "From now on, bomb penalties will be $250,000.").queue();
 				int location = findUserInList(list,players.get(i).uID,false);
 				String toPrint = players.get(i).uID+":"+players.get(i).name+":"+players.get(i).money
 						+":"+players.get(i).booster+":"+players.get(i).winstreak

@@ -5,36 +5,28 @@ import java.util.LinkedList;
 public class TestGame implements MiniGame 
 {
 	static final boolean BONUS = false;
-	int gameState = 0;
-	String playerSent;
+	boolean gameOver = false;
+	
 	@Override
-	public void sendNextInput(String pick) {
-		playerSent = pick+1;
-	}
-
-	@Override
-	public LinkedList<String> getNextOutput() {
+	public LinkedList<String> initialiseGame()
+	{
+		//Reset variables
+		gameOver = false;
+		//Send help
 		LinkedList<String> output = new LinkedList<>();
-		switch(gameState)
-		{
-		case 0:
-			gameState++;
-			output.add("This Test Game is just a placeholder, so pick any number to win $100,000!");
-			return output;
-		case 1:
-			gameState++;
-			output.add("You picked " + playerSent);
-			return output;
-		default:
-			output.add("If you see this message, something went wrong.");
-			gameState = 2;
-			return output;
-		}
+		output.add("This Test Game is just a placeholder, so send any message to win $100,000!");
+		return output;
+	}
+	@Override
+	public LinkedList<String> playNextTurn(String pick) {
+		LinkedList<String> output = new LinkedList<>();
+		output.add("You picked " + pick);
+		return output;
 	}
 	
 	@Override
 	public boolean isGameOver() {
-		return (gameState >= 2);
+		return gameOver;
 	}
 	
 	@Override

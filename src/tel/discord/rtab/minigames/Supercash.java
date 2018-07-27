@@ -17,20 +17,44 @@ public class Supercash implements MiniGame {
 	int lastSpace;
 	int lastPicked;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
-	boolean firstPlay = true;
 	
 	@Override
-	public void sendNextInput(String pick)
+	public LinkedList<String> initialiseGame()
 	{
+		LinkedList<String> output = new LinkedList<>();
+		//Initialise board
+		board.clear();
+		for(int i=0; i<VALUES.length; i++)
+			for(int j=0; j<NEEDED_TO_WIN; j++)
+				board.add(VALUES[i]);
+		//Switch one of the lowest values for an extra copy of the highest value
+		board.set(0,MAX_VALUE);
+		Collections.shuffle(board);
+		numberPicked = new int[VALUES.length];
+		pickedSpaces = new boolean[BOARD_SIZE];
+		//Display instructions
+		output.add("For reaching a bonus multiplier of x5, you have earned the right to play the first bonus game!");
+		output.add("In Supercash, you can win up to ten million dollars!");
+		output.add("Hidden on the board are three \"$10,000,000\" spaces, simply pick them all to win.");
+		output.add("There are also other, lesser values, make a pair of those to win that amount instead.");
+		output.add("Oh, and there's also a single bomb hidden somewhere on the board. If you pick that, you win nothing.");
+		output.add("Best of luck! Make your first pick when you are ready.");
+		output.add(generateBoard());
+		return output;
+	}
+	
+	public LinkedList<String> playNextTurn(String pick)
+	{
+		LinkedList<String> output = new LinkedList<>();
 		if(!isNumber(pick))
 		{
-			lastPicked = -2;
-			return;
+			//Random unrelated non-number doesn't need feedback
+			return output;
 		}
-		if(!checkValidNumber(pick))
+		else if(!checkValidNumber(pick))
 		{
-			lastPicked = -1;
-			return;
+			output.add("Invalid pick.");
+			return output;
 		}
 		else
 		{
@@ -38,6 +62,14 @@ public class Supercash implements MiniGame {
 			pickedSpaces[lastSpace] = true;
 			lastPicked = board.get(lastSpace);
 			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
+			output.add(String.format("Space %d selected...",lastSpace+1));
+			output.add("...");
+			if(lastPicked == 0)
+				output.add("**BOOM**");
+			else
+				output.add(String.format("$%,d!",lastPicked));
+			output.add(generateBoard());
+			return output;
 		}
 	}
 
@@ -60,53 +92,6 @@ public class Supercash implements MiniGame {
 		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces[location]);
 	}
 
-	@Override
-	public LinkedList<String> getNextOutput()
-	{
-		LinkedList<String> output = new LinkedList<>();
-		if(firstPlay)
-		{
-			//Initialise board
-			board.clear();
-			for(int i=0; i<VALUES.length; i++)
-				for(int j=0; j<NEEDED_TO_WIN; j++)
-					board.add(VALUES[i]);
-			//Switch one of the lowest values for an extra copy of the highest value
-			board.set(0,MAX_VALUE);
-			Collections.shuffle(board);
-			numberPicked = new int[VALUES.length];
-			pickedSpaces = new boolean[BOARD_SIZE];
-			//Display instructions
-			output.add("For reaching a bonus multiplier of x5, you have earned the right to play the first bonus game!");
-			output.add("In Supercash, you can win up to ten million dollars!");
-			output.add("Hidden on the board are three \"$10,000,000\" spaces, simply pick them all to win.");
-			output.add("There are also other, lesser values, make a pair of those to win that amount instead.");
-			output.add("Oh, and there's also a single bomb hidden somewhere on the board. If you pick that, you win nothing.");
-			output.add("Best of luck! Make your first pick when you are ready.");
-			firstPlay = false;
-		}
-		else if(lastPicked == -2)
-		{
-			//Random unrelated non-number doesn't need feedback
-			return output;
-		}
-		else if(lastPicked == -1)
-		{
-			output.add("Invalid pick.");
-		}
-		else
-		{
-			output.add(String.format("Space %d selected...",lastSpace+1));
-			output.add("...");
-			if(lastPicked == 0)
-				output.add("**BOOM**");
-			else
-				output.add(String.format("$%,d!",lastPicked));
-		}
-		output.add(generateBoard());
-		return output;
-	}
-	
 	String generateBoard()
 	{
 		StringBuilder display = new StringBuilder();
@@ -168,7 +153,6 @@ public class Supercash implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		firstPlay = true;
 		return lastPicked;
 	}
 

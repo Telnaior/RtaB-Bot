@@ -15,30 +15,58 @@ public class StrikeItRich implements MiniGame {
 	int lastSpace;
 	int lastPicked;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
-	boolean firstPlay = true;
 	boolean pinchMode = false;
 	
 	@Override
-	public void sendNextInput(String pick)
+	public LinkedList<String> initialiseGame()
 	{
+		LinkedList<String> output = new LinkedList<>();
+		//Initialise board
+		board.clear();
+		for(int i=0; i<VALUES.length; i++)
+			for(int j=0; j<NEEDED_TO_WIN; j++)
+				board.add(VALUES[i]);
+		Collections.shuffle(board);
+		numberPicked = new int[VALUES.length];
+		pickedSpaces = new boolean[BOARD_SIZE];
+		pinchMode = false;
+		//Display instructions
+		output.add("In Strike it Rich, your objective is to match three of a kind.");
+		output.add("Simply keep choosing numbers until you have three the same, and that is what you will win.");
+		output.add("The top prize is $1,000,000!");
+		output.add("Make your first pick when you are ready.");
+		output.add(generateBoard());
+		return output;
+	}
+	
+	@Override
+	public LinkedList<String> playNextTurn(String pick)
+	{
+		LinkedList<String> output = new LinkedList<>();
 		if(!isNumber(pick))
 		{
-			lastPicked = -2;
-			return;
+			//Random unrelated non-number doesn't need feedback
+			return output;
 		}
 		if(!checkValidNumber(pick))
 		{
-			lastPicked = -1;
-			return;
+			output.add("Invalid pick.");
+			return output;
 		}
 		else
 		{
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
 			lastPicked = board.get(lastSpace);
+			output.add(String.format("Space %d selected...",lastSpace+1));
+			if(pinchMode)
+				output.add("...");
+			output.add(String.format("$%,d!",lastPicked));
 			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
 			if(numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
 				pinchMode = true;
+			output.add(generateBoard());
+			return output;
 		}
 	}
 
@@ -61,48 +89,6 @@ public class StrikeItRich implements MiniGame {
 		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces[location]);
 	}
 
-	@Override
-	public LinkedList<String> getNextOutput()
-	{
-		LinkedList<String> output = new LinkedList<>();
-		if(firstPlay)
-		{
-			//Initialise board
-			board.clear();
-			for(int i=0; i<VALUES.length; i++)
-				for(int j=0; j<NEEDED_TO_WIN; j++)
-					board.add(VALUES[i]);
-			Collections.shuffle(board);
-			numberPicked = new int[VALUES.length];
-			pickedSpaces = new boolean[BOARD_SIZE];
-			pinchMode = false;
-			//Display instructions
-			output.add("In Strike it Rich, your objective is to match three of a kind.");
-			output.add("Simply keep choosing numbers until you have three the same, and that is what you will win.");
-			output.add("The top prize is $1,000,000!");
-			output.add("Make your first pick when you are ready.");
-			firstPlay = false;
-		}
-		else if(lastPicked == -2)
-		{
-			//Random unrelated non-number doesn't need feedback
-			return output;
-		}
-		else if(lastPicked == -1)
-		{
-			output.add("Invalid pick.");
-		}
-		else
-		{
-			output.add(String.format("Space %d selected...",lastSpace+1));
-			if(pinchMode)
-				output.add("...");
-			output.add(String.format("$%,d!",lastPicked));
-		}
-		output.add(generateBoard());
-		return output;
-	}
-	
 	String generateBoard()
 	{
 		StringBuilder display = new StringBuilder();
@@ -145,7 +131,6 @@ public class StrikeItRich implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		firstPlay = true;
 		return lastPicked;
 	}
 
