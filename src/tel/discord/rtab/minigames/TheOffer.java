@@ -37,7 +37,7 @@ public class TheOffer implements MiniGame {
 
 			output.add("If you bomb, you lose everything. ~Duh");
 		output.add("Be aware the Bomb can explode every moment, so don't take too much time!");
-		output.add("----------------------------------------");
+		output.add("----------------------------------------"); 
 		output.add("Your first Offer is: " + String.format("**$%,d**", offer));
 		output.add("Do you "Accept" or "Refuse" ?")
 		return output;  
