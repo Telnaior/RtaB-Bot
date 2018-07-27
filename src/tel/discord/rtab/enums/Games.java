@@ -4,9 +4,10 @@ import tel.discord.rtab.minigames.*;
 
 public enum Games implements WeightedSpace {
 	//TEST_GAME("Test Game","Test",new TestGame()),
-	STRIKE_IT_RICH	(2,"Strike it Rich","Strike",new StrikeItRich()),
+	STRIKE_IT_RICH		(2,"Strike it Rich","Strike",new StrikeItRich()),
 	MATH_TIME		(2,"Math Time","Math",new MathTime()),
 	GAMBLE			(2,"The Gamble","Gamble",new Gamble()),
+	THE_OFFER		(2,"The Offer","Offer",new TheOffer()),
 	//Bonus games never appear in the pool
 	SUPERCASH		(0,"SUPERCASH","Super",new Supercash()),
 	DIGITAL_FORTRESS(0,"DIGITAL FORTRESS","Fortress",new DigitalFortress()),
