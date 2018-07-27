@@ -70,7 +70,6 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public LinkedList<String> getNextOutput()
 	{
-		LinkedList<String> output = new LinkedList<>();
 		if(firstPlay)
 		{
 			//Initialise board
@@ -82,17 +81,6 @@ public class DeucesWild implements MiniGame {
 			numberPicked = new int[VALUES.length];
 			pickedSpaces = new boolean[BOARD_SIZE];
 			pinchMode = false;
-			//Display instructions
-			output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
-			output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
-			output.add("As the name of the game suggests, deuces are wild. Those are always treated as the best card possible.");
-			output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
-			output.add("You must get at least a three of a kind to win any money. That pays $50,000.");
-            output.add("Straights and flushes each pay $100,000. A full house pays $150,000, a four of a kind pays $250,000, "
-                    + "a straight flush pays $450,000, a five of a kind pays $750,000, a wild royal flush pays $1,250,000, "
-                    + "and four deuces pay $10,000,000.");
-            output.add("If you are lucky enough to get a natural royal flush, you will win $40,000,000!");
-			output.add("Best of luck! Pick your first space when you're ready.");
 			firstPlay = false;
 		}
 		else if(lastPicked == -2)
@@ -178,6 +166,24 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public boolean isBonusGame() {
 		return BONUS;
+	}
+
+	@Override
+	public LinkedList<String> initialiseGame() {
+		LinkedList<String> output = new LinkedList<>();
+		
+		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
+		output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
+		output.add("As the name of the game suggests, deuces are wild. Those are always treated as the best card possible.");
+		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
+		output.add("You must get at least a three of a kind to win any money. That pays $50,000.");
+		output.add("Straights and flushes each pay $100,000. A full house pays $150,000, a four of a kind pays $250,000, "
+				+ "a straight flush pays $450,000, a five of a kind pays $750,000, a wild royal flush pays $1,250,000, "
+				+ "and four deuces pay $10,000,000.");
+		output.add("If you are lucky enough to get a natural royal flush, you will win $40,000,000!");
+		output.add("Best of luck! Pick your first space when you're ready.");
+
+		return output;
 	}
 
 	// This is probably not the most efficient way to write the hand evaluator--some things are checked more than once. 
