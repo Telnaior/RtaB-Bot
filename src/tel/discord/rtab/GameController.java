@@ -79,6 +79,15 @@ public class GameController
 			prepareNextMiniGame();
 		}
 	}
+	private static class PickSpaceWarning extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					", thirty seconds left to choose a space!").queue();
+		}
+	}
 	
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -267,6 +276,8 @@ public class GameController
 				.completeAfter(3,TimeUnit.SECONDS);
 		}
 		displayBoardAndStatus(true, false);
+		TimerTask warnPlayer = new PickSpaceWarning();
+		timer.schedule(warnPlayer, 90000);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -288,9 +299,78 @@ public class GameController
 				//Parse it and call the method that does stuff
 				e -> 
 				{
+					warnPlayer.cancel();
 					int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
 					resolveTurn(location);
+				},
+				120,TimeUnit.SECONDS, () ->
+				{
+					timeOutTurn();
 				});
+	}
+	private static void timeOutTurn()
+	{
+		//If they haven't been warned, play nice and just pick a random space for them
+		if(!players.get(currentTurn).warned)
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					" is out of time. Wasting a random space.").queue();
+			//Get unpicked spaces
+			ArrayList<Integer> spaceCandidates = new ArrayList<>(boardSize);
+			for(int i=0; i<boardSize; i++)
+				if(!pickedSpaces[i])
+					spaceCandidates.add(i);
+			//Pick one at random
+			int spaceChosen = (int) (Math.random() * spaceCandidates.size());
+			//If it's a bomb, it sucks to be them
+			if(bombs[spaceChosen])
+			{
+				resolveTurn(spaceChosen);
+			}
+			//If it isn't, throw out the space and let the players know what's up
+			else
+			{
+				pickedSpaces[spaceChosen] = true;
+				channel.sendMessage("Space " + (spaceChosen+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+				channel.sendMessage("It's not a bomb, so its contents are lost.").completeAfter(5,TimeUnit.SECONDS);
+			}
+		}
+		//If they've been warned, it's time to BLOW STUFF UP!
+		else
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					" is out of time. Eliminating them.").queue();
+			//Jokers? GET OUT OF HERE!
+			players.get(currentTurn).jokers = 0;
+			//Look for a bomb
+			ArrayList<Integer> bombCandidates = new ArrayList<>(boardSize);
+			for(int i=0; i<boardSize; i++)
+				if(bombs[i] && !pickedSpaces[i])
+					bombCandidates.add(i);
+			int bombChosen;
+			//Got bomb? Pick one to detonate
+			if(bombCandidates.size() > 0)
+			{
+				bombChosen = (int) (Math.random() * bombCandidates.size());
+			}
+			//No bomb? WHO CARES, THIS IS RACE TO A BILLION, WE'RE BLOWING THEM UP ANYWAY!
+			else
+			{
+				//Get unpicked spaces
+				ArrayList<Integer> spaceCandidates = new ArrayList<>(boardSize);
+				for(int i=0; i<boardSize; i++)
+					if(!pickedSpaces[i])
+						spaceCandidates.add(i);
+				//Pick one and turn it into a BOMB
+				bombChosen = (int) (Math.random() * spaceCandidates.size());
+				bombs[bombChosen] = true;
+			}
+			//NO DUDS ALLOWED
+			if(gameboard.bombBoard[bombChosen] == BombType.DUD)
+				gameboard.bombBoard[bombChosen] = BombType.NORMAL;
+			//KABOOM KABOOM KABOOM KABOOM
+			resolveTurn(bombCandidates.get(bombChosen));
+		}
 	}
 	static void resolveTurn(int location)
 	{
@@ -484,6 +564,12 @@ public class GameController
 					{
 						int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
 						runBlammo(button);
+					},
+					30,TimeUnit.SECONDS, () ->
+					{
+						channel.sendMessage("Too slow, autopicking...").queue();
+						int button = (int) Math.random() * 4;
+						runBlammo(button);
 					});
 			return;
 		}
@@ -656,7 +742,7 @@ public class GameController
 						channel.sendMessage(winners.get(0).name + " WINS RACE TO A BILLION!")
 							.completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
-					runNextMiniGameTurn(new SuperBonusRound());
+					startMiniGame(new SuperBonusRound());
 				}
 				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
 				else

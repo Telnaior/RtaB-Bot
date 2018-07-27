@@ -12,6 +12,7 @@
  - Game now starts after two minutes, rather than waiting for a !start
  - Also displays who it's waiting on at bomb placement
  - HEAPS of formatting improvements
+ - Improved minigame API for better readability and less confusing code
  
 0.8.3
  - New events: Bonus Multiplier +1/+2/+3

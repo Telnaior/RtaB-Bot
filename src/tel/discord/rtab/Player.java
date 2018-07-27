@@ -35,6 +35,7 @@ class Player implements Comparable<Player>
 	boolean minigameLock;
 	boolean jackpot;
 	boolean threshold;
+	public boolean warned;
 	PlayerStatus status;
 	LinkedList<Games> games; 
 	Player(Member playerName)
@@ -50,6 +51,7 @@ class Player implements Comparable<Player>
 		splitAndShare = false;
 		minigameLock = false;
 		threshold = false;
+		warned = false;
 		status = PlayerStatus.OUT;
 		games = new LinkedList<>();
 		try
