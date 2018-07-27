@@ -42,7 +42,6 @@ public class RaceToABillionBot
 		utilities.setPrefix("!");
 		utilities.setHelpWord("commands");
 		utilities.addCommand(new HelpCommand());
-		utilities.addCommand(new Help2Command());
 		utilities.addCommand(new JoinCommand());
 		utilities.addCommand(new StartCommand());
 		utilities.addCommand(new QuitCommand());
