@@ -2,6 +2,9 @@
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
+0.9.1
+ - More bugfixes on life counting, and allowing for the potential of more than the max.
+ 
 0.9.0
  - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
  - Set up join cooldowns (three bombs and you're out for a day)

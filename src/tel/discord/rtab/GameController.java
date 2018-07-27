@@ -131,8 +131,6 @@ public class GameController
 		{
 			//If first player, this is the channel, now queue up starting the game
 			channel = channelID;
-			timer.schedule(new FinalCallTask(),  90000);
-			timer.schedule(new StartGameTask(), 120000);
 		}
 		else if(channel != channelID)
 			return PlayerJoinReturnValue.WRONGCHANNEL;
@@ -165,7 +163,11 @@ public class GameController
 		players.add(newPlayer);
 		playersJoined++;
 		if(playersJoined == 1)
+		{
+			timer.schedule(new FinalCallTask(),  90000);
+			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
+		}
 		else
 			return PlayerJoinReturnValue.JOINED;
 	}
@@ -1160,7 +1162,6 @@ public class GameController
 				toPrint.append(players.get(i).booster+":");
 				toPrint.append(players.get(i).winstreak+":");
 				toPrint.append(Math.max(players.get(i).newbieProtection-1,0)+":");
-				players.get(i).checkLifeRefill();
 				toPrint.append(players.get(i).lives+":");
 				toPrint.append(players.get(i).lifeRefillTime);
 				if(location == -1)
@@ -1246,33 +1247,38 @@ public class GameController
 			}
 			String[] record = list.get(index).split("#");
 			output.append(record[1] + ": ");
-			output.append(record[6]);
-			if(Integer.parseInt(record[6]) == 1)
-				output.append(" life left.");
+			if(Instant.parse(record[7]).isBefore(Instant.now()) && Integer.parseInt(record[6]) < Player.MAX_LIVES)
+				output.append(Player.MAX_LIVES + " lives left.");
 			else
-				output.append(" lives left.");
-			if(Integer.parseInt(record[6]) < Player.MAX_LIVES)
 			{
-				output.append(" Lives refill in ");
-				//Check hours, then minutes, then seconds
-				OffsetDateTime lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond())
-						.atOffset(ZoneOffset.UTC);
-				int hours = lifeRefillTime.getHour();
-				if(hours>0)
+				output.append(record[6]);
+				if(Integer.parseInt(record[6]) == 1)
+					output.append(" life left.");
+				else
+					output.append(" lives left.");
+				if(Integer.parseInt(record[6]) < Player.MAX_LIVES)
 				{
-					output.append(hours + " hours, ");
+					output.append(" Lives refill in ");
+					//Check hours, then minutes, then seconds
+					OffsetDateTime lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond())
+							.atOffset(ZoneOffset.UTC);
+					int hours = lifeRefillTime.getHour();
+					if(hours>0)
+					{
+						output.append(hours + " hours, ");
+					}
+					int minutes = lifeRefillTime.getMinute();
+					if(hours>0 || minutes>0)
+					{
+						output.append(minutes + " minutes, ");
+					}
+					int seconds = lifeRefillTime.getSecond();
+					if(hours>0 || minutes>0 || seconds>0)
+					{
+						output.append(seconds + " seconds");
+					}
+					output.append(".");
 				}
-				int minutes = lifeRefillTime.getMinute();
-				if(hours>0 || minutes>0)
-				{
-					output.append(minutes + " minutes, ");
-				}
-				int seconds = lifeRefillTime.getSecond();
-				if(hours>0 || minutes>0 || seconds>0)
-				{
-					output.append(seconds + " seconds");
-				}
-				output.append(".");
 			}
 		}
 		catch (IOException e) {

@@ -86,7 +86,8 @@ class Player implements Comparable<Player>
 					newbieProtection = Integer.parseInt(record[5]);
 					lifeRefillTime = Instant.parse(record[7]);
 					lives = Integer.parseInt(record[6]);
-					if(lifeRefillTime.isAfter(Instant.now()) && lives < MAX_LIVES)
+					//If we're short on lives and we've passed the refill time, restock them
+					if(lifeRefillTime.isBefore(Instant.now()) && lives < MAX_LIVES)
 						lives = MAX_LIVES;
 					break;
 				}
@@ -214,10 +215,11 @@ class Player implements Comparable<Player>
 		//Wipe their booster if they didn't hit a boost holder
 		if(!holdBoost)
 			booster = 100;
-		//Wipe everything else too, and dock them a life
+		//Set their refill time if this is their first life lost, then dock it
 		if(lives == MAX_LIVES)
 			lifeRefillTime = Instant.now().plusSeconds(72000);
 		lives --;
+		//Wipe everything else too, and dock them a life
 		winstreak = 0;
 		GameController.repeatTurn = 0;
 		GameController.playersAlive --;
@@ -247,10 +249,5 @@ class Player implements Comparable<Player>
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;
-	}
-	void checkLifeRefill()
-	{
-		if(lifeRefillTime.isBefore(Instant.now()))
-			lives = MAX_LIVES;
 	}
 }
