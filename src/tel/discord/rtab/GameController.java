@@ -344,10 +344,13 @@ public class GameController
 		}
 		//But is it a special bomb?
 		StringBuilder extraResult = null;
+		int penalty = Player.BOMB_PENALTY;
+		if(players.get(currentTurn).newbieProtection > 0)
+			penalty = Player.NEWBIE_BOMB_PENALTY;
 		switch(gameboard.bombBoard[location])
 		{
 		case NORMAL:
-			channel.sendMessage("It goes **BOOM**. $250,000 lost as penalty.")
+			channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
 				.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = players.get(currentTurn).blowUp(1,false);
 			break;
@@ -355,7 +358,7 @@ public class GameController
 			int amountLost = players.get(currentTurn).bankrupt();
 			if(amountLost == 0)
 			{
-				channel.sendMessage("It goes **BOOM**. $250,000 lost as penalty.")
+				channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
 					.completeAfter(5,TimeUnit.SECONDS);
 			}
 			else
@@ -366,12 +369,14 @@ public class GameController
 						.completeAfter(5,TimeUnit.SECONDS);
 				if(amountLost < 0)
 				{
-					channel.sendMessage(String.format("**$%,d** *returned*, plus $250,000 penalty.",Math.abs(amountLost)))
+					channel.sendMessage(String.format("**$%1$,d** *returned*, plus $%2$,d penalty.",
+							Math.abs(amountLost),Math.abs(penalty)))
 							.completeAfter(3,TimeUnit.SECONDS);
 				}
 				else
 				{
-					channel.sendMessage(String.format("**$%,d** lost, plus $250,000 penalty.",amountLost))
+					channel.sendMessage(String.format("**$%1$,d** lost, plus $%2$,d penalty.",
+							amountLost,Math.abs(penalty)))
 							.completeAfter(3,TimeUnit.SECONDS);
 				}
 			}
@@ -381,7 +386,7 @@ public class GameController
 			StringBuilder resultString = new StringBuilder().append("It ");
 			if(players.get(currentTurn).booster != 100)
 				resultString.append("holds your boost, then ");
-			resultString.append("goes **BOOM**. $250,000 lost as penalty.");
+			resultString.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
 			channel.sendMessage(resultString)
 					.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = players.get(currentTurn).blowUp(1,true);
@@ -409,7 +414,7 @@ public class GameController
 				channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
 			}
 			while(Math.random() * chain < 1);
-			channel.sendMessage(String.format("**$%,d** penalty!",chain*250000))
+			channel.sendMessage(String.format("**$%,d** penalty!",chain*penalty))
 					.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = players.get(currentTurn).blowUp(chain,false);
 			break;
@@ -496,6 +501,7 @@ public class GameController
 		channel.sendMessage("Button " + (buttonPressed+1) + " pressed...").queue();
 		channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 		StringBuilder extraResult = null;
+		int penalty = Player.BOMB_PENALTY;
 		switch(buttons.get(buttonPressed))
 		{
 		case BLOCK:
@@ -504,7 +510,10 @@ public class GameController
 		case ELIM_OPP:
 			channel.sendMessage("You ELIMINATED YOUR OPPONENT!").completeAfter(3,TimeUnit.SECONDS);
 			advanceTurn(false);
-			channel.sendMessage("Goodbye, " + players.get(currentTurn).user.getAsMention() + "! $1,000,000 penalty!").queue();
+			if(players.get(currentTurn).newbieProtection > 0)
+				penalty = Player.NEWBIE_BOMB_PENALTY;
+			channel.sendMessage("Goodbye, " + players.get(currentTurn).user.getAsMention()
+					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
 			if(repeatTurn > 0)
 				channel.sendMessage("(You also negated the repeat!)").queue();
 			extraResult = players.get(currentTurn).blowUp(4,false);
@@ -526,7 +535,9 @@ public class GameController
 			}
 		case ELIM_YOU:
 			channel.sendMessage("You ELIMINATED YOURSELF!").completeAfter(3,TimeUnit.SECONDS);
-			channel.sendMessage("$1,000,000 penalty!").queue();
+			if(players.get(currentTurn).newbieProtection > 0)
+				penalty = Player.NEWBIE_BOMB_PENALTY;
+			channel.sendMessage(String.format("$%,d penalty!",Math.abs(penalty*4))).queue();
 			extraResult = players.get(currentTurn).blowUp(4,false);
 			break;
 		}
@@ -1007,9 +1018,13 @@ public class GameController
 			//Replace the records of the players if they're there, otherwise add them
 			for(int i=0; i<playersJoined; i++)
 			{
+				if(players.get(i).newbieProtection == 1)
+					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection is now expired. "
+							+ "From now on, bomb penalties will be $250,000.");
 				int location = findUserInList(list,players.get(i).uID,false);
 				String toPrint = players.get(i).uID+":"+players.get(i).name+":"+players.get(i).money
-						+":"+players.get(i).booster+":"+players.get(i).winstreak;
+						+":"+players.get(i).booster+":"+players.get(i).winstreak
+						+":"+(Math.max(players.get(i).newbieProtection-1,0));
 				if(location == -1)
 					list.add(toPrint);
 				else

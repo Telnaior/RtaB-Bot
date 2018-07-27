@@ -16,6 +16,8 @@ import tel.discord.rtab.enums.PlayerStatus;
 
 class Player implements Comparable<Player>
 {
+	static final int BOMB_PENALTY = -250000;
+	static final int NEWBIE_BOMB_PENALTY = -100000;
 	static final int MAX_BOOSTER = 999;
 	static final int MIN_BOOSTER = 010;
 	User user;
@@ -26,6 +28,7 @@ class Player implements Comparable<Player>
 	int booster;
 	int winstreak;
 	int oldWinstreak;
+	int newbieProtection;
 	//Event fields
 	int jokers;
 	boolean splitAndShare;
@@ -42,6 +45,7 @@ class Player implements Comparable<Player>
 		money = 0;
 		booster = 100;
 		winstreak = 0;
+		newbieProtection = 10;
 		jokers = 0;
 		splitAndShare = false;
 		minigameLock = false;
@@ -61,6 +65,7 @@ class Player implements Comparable<Player>
 				 * record[2] = money
 				 * record[3] = booster
 				 * record[4] = winstreak
+				 * record[5] = newbieProtection
 				 */
 				record = list.get(i).split(":");
 				if(record[0].equals(uID))
@@ -68,6 +73,7 @@ class Player implements Comparable<Player>
 					money = Integer.parseInt(record[2]);
 					booster = Integer.parseInt(record[3]);
 					winstreak = Integer.parseInt(record[4]);
+					newbieProtection = Integer.parseInt(record[5]);
 					break;
 				}
 			}
@@ -178,7 +184,12 @@ class Player implements Comparable<Player>
 		//Bomb penalty needs to happen before resetting their booster
 		if(threshold)
 			multiplier *= 4;
-		StringBuilder output = addMoney(-250000*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
+		int penalty;
+		if(newbieProtection > 0)
+			penalty = NEWBIE_BOMB_PENALTY;
+		else
+			penalty = BOMB_PENALTY;
+		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
 		if(splitAndShare)
 		{
