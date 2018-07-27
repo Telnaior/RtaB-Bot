@@ -101,6 +101,17 @@ public class GameController
 					", are you still there? One minute left!").queue();
 		}
 	}
+	private static class RevealTheSBR extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			channel.sendMessage(players.get(0).user.getAsMention() + "...").complete();
+			channel.sendMessage("It is time to enter the Super Bonus Round.").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("...").completeAfter(10,TimeUnit.SECONDS);
+			startMiniGame(new SuperBonusRound());
+		}
+	}
 	
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -759,16 +770,19 @@ public class GameController
 			saveData();
 			players.sort(null);
 			displayBoardAndStatus(false, true);
+			reset();
 			if(winners.size() > 0)
 			{
 				//Got a single winner, crown them!
 				if(winners.size() == 1)
 				{
+					players.addAll(winners);
+					currentTurn = 0;
 					for(int i=0; i<3; i++)
-						channel.sendMessage(winners.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!")
+						channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
 							.completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
-					startMiniGame(new SuperBonusRound());
+					timer.schedule(new RevealTheSBR(), 60000);
 				}
 				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
 				else
@@ -792,7 +806,6 @@ public class GameController
 					startTheGameAlready();
 				}
 			}
-			reset();
 			return;
 		}
 		//No? Good. Let's get someone to reward!
