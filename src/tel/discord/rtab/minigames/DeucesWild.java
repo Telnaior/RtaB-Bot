@@ -44,7 +44,8 @@ public class DeucesWild implements MiniGame {
 		//Display instructions
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
 		output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
-		output.add("As the name of the game suggests, deuces are wild. Those are always treated as the best card possible.");
+		output.add("As the name of the game suggests, deuces (twos) are wild. "
+				+ "Those are always treated as the best card possible.");
 		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
 		output.add("You must get at least a three of a kind to win any money. That pays $50,000.");
 		output.add("Straights and flushes each pay $100,000. A full house pays $150,000, a four of a kind pays $250,000, "
@@ -87,7 +88,8 @@ public class DeucesWild implements MiniGame {
 				
 				// New try-catch block; now we want to make sure the player's choices correspond to actual cards
 				try {
-					for (int i = 1; i < tokens.length; i++) {
+					for (int i = 1; i < tokens.length; i++)
+					{
 						cardsHeld[Integer.parseInt(tokens[i])-1] = true;
 					}
 					
@@ -151,6 +153,8 @@ public class DeucesWild implements MiniGame {
 				pickedSpaces[lastSpace] = true;
 				lastPicked = board.get(lastSpace);
 				cardsPicked[gameStage] = lastPicked;
+				if(redrawUsed)
+					cardsHeld[gameStage] = true;
 				do {
 					gameStage++;
 				} while (gameStage < 5 && cardsHeld[gameStage]);
@@ -160,15 +164,16 @@ public class DeucesWild implements MiniGame {
 				output.add("**" + lastPicked.toString() + "**");
 				output.add(generateBoard());
 				if (gameStage == 5) {
-					if (hand != PokerHand.NATURAL_ROYAL && redrawUsed) {
+					if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
 						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
-								+"of each card.");
-						output.add("For example, type HOLD 1 to hold only the " + cardsPicked[0] +", or type HOLD 2 5 to hold the "
+								+ "of each card.");
+						output.add("For example, type 'HOLD 1' to hold only the " + cardsPicked[0] +
+								", or type 'HOLD 2 5' **in a single message** to hold the "
 								+ cardsPicked[1] + " as well as the " + cardsPicked[4] + ".");
 						output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
-						output.add(String.format("If you like your hand, you may also type STOP to end the game and claim your "+
+						output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
 								"prize of $%,d.", getMoneyWon()));
-						output.add("Alternatively, you can redraw every single card by typing REDRAW.");
+						output.add("Alternatively, you can redraw every single card by typing 'REDRAW'.");
 					}
 				}
 				else {
@@ -220,8 +225,9 @@ public class DeucesWild implements MiniGame {
 			else
 				display.append(" ");
 		}
-		display.append("\n" + "Current hand: "); // The concatenation here is more for human legibility than anything
-		for (int i = 0; i > cardsPicked.length; i++) {
+		display.append("\n\n" + "Current hand: "); // The concatenation here is more for human legibility than anything
+		for (int i = 0; i < cardsPicked.length; i++)
+		{
 			if (cardsPicked[i] == null)
 				break;
 			if (redrawUsed && !cardsHeld[i])
