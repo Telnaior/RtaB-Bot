@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
+import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerStatus;
@@ -25,6 +26,7 @@ class Player implements Comparable<Player>
 	User user;
 	String name;
 	String uID;
+	boolean isBot;
 	int lives;
 	Instant lifeRefillTime;
 	int money;
@@ -42,17 +44,35 @@ class Player implements Comparable<Player>
 	boolean warned;
 	PlayerStatus status;
 	LinkedList<Games> games;
+	LinkedList<Integer> knownBombs;
+	//Constructor for humans
 	Player(Member playerName)
 	{
 		user = playerName.getUser();
 		name = playerName.getEffectiveName();
 		uID = user.getId();
+		isBot = false;
+		newbieProtection = 10;
+		initPlayer();
+	}
+	//Constructor for bots
+	Player(GameBot botName)
+	{
+		user = null;
+		name = botName.name;
+		uID = botName.botID;
+		isBot = true;
+		newbieProtection = 0;
+		initPlayer();
+	}
+	
+	private void initPlayer()
+	{
 		lives = MAX_LIVES;
 		lifeRefillTime = Instant.now();
 		money = 0;
 		booster = 100;
 		winstreak = 0;
-		newbieProtection = 10;
 		jokers = 0;
 		splitAndShare = false;
 		minigameLock = false;
@@ -60,6 +80,7 @@ class Player implements Comparable<Player>
 		warned = false;
 		status = PlayerStatus.OUT;
 		games = new LinkedList<>();
+		knownBombs = new LinkedList<>();
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
@@ -256,5 +277,16 @@ class Player implements Comparable<Player>
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;
+	}
+	/*
+	 * If the player is human, gets their name as a mention
+	 * If they aren't, just gets their name because user = null and null pointers are bad news bears yo!
+	 */
+	public String getSafeMention()
+	{
+		if(isBot)
+			return name;
+		else
+			return user.getAsMention();
 	}
 }

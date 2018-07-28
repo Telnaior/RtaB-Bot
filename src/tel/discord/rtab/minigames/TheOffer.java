@@ -153,4 +153,16 @@ public class TheOffer implements MiniGame {
 	public boolean isBonusGame(){
 		return BONUS;
 	}
+	
+	@Override
+	public String getBotPick()
+	{
+		//Do a "trial run", quit if it fails
+		for(int i=0; i<2; i++)
+			if(Math.random() < chanceToBomb)
+			{
+				return "ACCEPT";
+			}
+		return "REFUSE";
+	}
 }

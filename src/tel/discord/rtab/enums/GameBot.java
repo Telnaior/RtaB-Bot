@@ -1,0 +1,97 @@
+package tel.discord.rtab.enums;
+
+public enum GameBot
+{
+	BOT01("-01","Akhiles"),
+	BOT02("-02","BigBOTDawg"),
+	BOT03("-03","Bonehead"),
+	BOT04("-04","BOT Milk?"),
+	BOT05("-05","BOTIN8R"),
+	BOT06("-06","Cathode Kiss"),
+	BOT07("-07","Deathwind"),
+	BOT08("-08","Demonshriek"),
+	BOT09("-09","Devourer"),
+	BOT10("-10","Dharmic Sword"),
+	BOT11("-11","DiamondBOT"),
+	BOT12("-12","Dogstar"),
+	BOT13("-13","Doormat"),
+	BOT14("-14","Dr. BOTward"),
+	BOT15("-15","DustWitch"),
+	BOT16("-16","East BOT"),
+	BOT17("-17","ElectroJag"),
+	BOT18("-18","Evenkill"),
+	BOT19("-19","Fated to Glory"),
+	BOT20("-20","Fishbait"),
+	BOT21("-21","Frank BOTzo"),
+	BOT22("-22","Glitter"),
+	BOT23("-23","Gray Sabot"),
+	BOT24("-24","Hagstomper"),
+	BOT25("-25","Hellefleur"),
+	BOT26("-26","Heretik"),
+	BOT27("-27","HexaBOTic"),
+	BOT28("-28","Hotfoot"),
+	BOT29("-29","Hotspur"),
+	BOT30("-30","Ironbreath"),
+	BOT31("-31","Irrelevant Smoke"),
+	BOT32("-32","Jetsam"),
+	BOT33("-33","Jett BOT"),
+	BOT34("-34","Jimmy BOT"),
+	BOT35("-35","Kidney BOT"),
+	BOT36("-36","King Snake"),
+	BOT37("-37","Mameluke"),
+	BOT38("-38","Missing BOT"),
+	BOT39("-39","Mohican"),
+	BOT40("-40","Mojo Savage"),
+	BOT41("-41","Mongo BOT"),
+	BOT42("-42","Neon Blossom"),
+	BOT43("-43","Newguns"),
+	BOT44("-44","No-Dachi"),
+	BOT45("-45","Nova-9"),
+	BOT46("-46","Orphan KazBOT"),
+	BOT47("-47","Perilous"),
+	BOT48("-48","Punch"),
+	BOT49("-49","QIX BOT"),
+	BOT50("-50","Ragbinder"),
+	BOT51("-51","Rampant"),
+	BOT52("-52","Rated BOT"),
+	BOT53("-53","Red Ghost"),
+	BOT54("-54","Retch"),
+	BOT55("-55","ShazBOT"),
+	BOT56("-56","Shiver"),
+	BOT57("-57","Simrionic"),
+	BOT58("-58","Skeet BOT"),
+	BOT59("-59","Skulker"),
+	BOT60("-60","Slicer"),
+	BOT61("-61","Sne/\\kBOT"),
+	BOT62("-62","Snow LeoBOT"),
+	BOT63("-63","So Dark"),
+	BOT64("-64","Sorrow"),
+	BOT65("-65","SymBOT"),
+	BOT66("-66","Terrapin"),
+	BOT67("-67","Terrible BOT"),
+	BOT68("-68","The Golden"),
+	BOT69("-69","TickTock"),
+	BOT70("-70","Torus"),
+	BOT71("-71","Trail of Rust"),
+	BOT72("-72","Troglodyte"),
+	BOT73("-73","Twitch BOT"),
+	BOT74("-74","UberBOT"),
+	BOT75("-75","Vanguard"),
+	BOT76("-76","Velomancer"),
+	BOT77("-77","Widowmaker"),
+	BOT78("-78","Wirehead"),
+	BOT79("-79","WrongWay"),
+	BOT80("-80","Zigzag");
+	
+	public String botID;
+	public String name; 
+	GameBot(String idNo, String botName)
+	{
+		botID = idNo;
+		name = botName;
+	}
+	public GameBot next()
+	{
+        return values()[(ordinal() + 1) % values().length];
+    }
+}

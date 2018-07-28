@@ -3,6 +3,7 @@ package tel.discord.rtab.minigames;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+
 import tel.discord.rtab.enums.CardRank;
 import tel.discord.rtab.enums.CardSuit;
 import tel.discord.rtab.enums.PokerHand;
@@ -377,5 +378,17 @@ public class DeucesWild implements MiniGame {
  		byte[] sortedRankCount = rankCount;
  		Arrays.sort(sortedRankCount);
  		return sortedRankCount[rankCount.length - 2] == 2;
+	}
+
+	@Override
+	public String getBotPick() {
+		//Bot will never redraw, unless someone wants to teach it poker strategy (lol)
+		if(gameStage == 5)
+			return "STOP";
+		ArrayList<Integer> openSpaces = new ArrayList<>(BOARD_SIZE);
+		for(int i=0; i<BOARD_SIZE; i++)
+			if(!pickedSpaces[i])
+				openSpaces.add(i+1);
+		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
 	}
 }

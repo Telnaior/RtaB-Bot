@@ -25,6 +25,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import tel.discord.rtab.enums.BlammoChoices;
 import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.Events;
+import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.GameStatus;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.MoneyMultipliersToUse;
@@ -87,7 +88,7 @@ public class GameController
 		@Override
 		public void run()
 		{
-			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
 					", thirty seconds left to choose a space!").queue();
 			displayBoardAndStatus(true,false);
 		}
@@ -97,7 +98,7 @@ public class GameController
 		@Override
 		public void run()
 		{
-			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
 					", are you still there? One minute left!").queue();
 		}
 	}
@@ -106,7 +107,7 @@ public class GameController
 		@Override
 		public void run()
 		{
-			channel.sendMessage(players.get(0).user.getAsMention() + "...").complete();
+			channel.sendMessage(players.get(0).getSafeMention() + "...").complete();
 			channel.sendMessage("It is time to enter the Super Bonus Round.").completeAfter(5,TimeUnit.SECONDS);
 			channel.sendMessage("...").completeAfter(10,TimeUnit.SECONDS);
 			startMiniGame(new SuperBonusRound());
@@ -153,7 +154,7 @@ public class GameController
 		//If they're out of lives and aren't a newbie, remind them of the risk
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
 		{
-			channel.sendMessage(newPlayer.user.getAsMention() + ", you are out of lives. "
+			channel.sendMessage(newPlayer.getSafeMention() + ", you are out of lives. "
 					+ "Your gains for the rest of the day will be reduced by 80%.");
 			//return PlayerJoinReturnValue.OUTOFLIVES;
 		}
@@ -220,16 +221,67 @@ public class GameController
 	 */
 	public static void startTheGameAlready()
 	{
-		//If the game's already running, just don't
-		if(gameStatus != GameStatus.SIGNUPS_OPEN)
+		//If the game's already running or no one's in it, just don't
+		if(gameStatus != GameStatus.SIGNUPS_OPEN || playersJoined < 1)
 		{
 			return;
 		}
-		if(playersJoined < 2)
+		if(playersJoined == 1)
 		{
-			//Didn't get players, abort
-			channel.sendMessage("Not enough players. Aborting game.").queue();
-			reset();
+			//Didn't get players? How about a bot?
+			channel.sendMessage("Would you like to play against a bot? (Y/N)").queue();
+			waiter.waitForEvent(MessageReceivedEvent.class,
+					//Right player and channel
+					e ->
+					{
+						if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel))
+						{
+							String firstLetter = e.getMessage().getContentRaw().toUpperCase().substring(0,1);
+							return(firstLetter.startsWith("Y") || firstLetter.startsWith("N"));
+						}
+						return false;
+					},
+					//Parse it and call the method that does stuff
+					e -> 
+					{
+						if(e.getMessage().getContentRaw().toUpperCase().startsWith("Y"))
+						{
+							//Awesome, mark it as a two-player game and pick a random bot
+							playersJoined++;
+							GameBot chosenBot = GameBot.values()[(int)(Math.random()*GameBot.values().length)];
+							Player newPlayer;
+							int triesLeft = GameBot.values().length;
+							//Start looping through until we get a good one (one that hasn't exploded today)
+							do
+							{
+								triesLeft --;
+								chosenBot = chosenBot.next();
+								newPlayer = new Player(chosenBot);
+							}
+							while(newPlayer.lives != Player.MAX_LIVES && triesLeft > 0);
+							if(newPlayer.lives != Player.MAX_LIVES)
+							{
+								//If we've checked EVERY bot...
+								channel.sendMessage("No bots currently available. Game aborted.").queue();
+								reset();
+							}
+							else
+							{
+								//But assuming we found one, add them in and get things rolling!
+								players.add(newPlayer);
+								startTheGameAlready();
+							}
+						}
+						else
+						{
+							channel.sendMessage("Very well. Game aborted.").queue();
+						}
+					},
+					30,TimeUnit.SECONDS, () ->
+					{
+						channel.sendMessage("Game aborted.").queue();
+						reset();
+					});
 			return;
 		}
 		//Declare game in progress so we don't get latecomers
@@ -246,29 +298,42 @@ public class GameController
 		for(int i=0; i<playersJoined; i++)
 		{
 			final int iInner = i;
-			players.get(iInner).user.openPrivateChannel().queue(
-					(channel) -> channel.sendMessage("Please place your bomb within the next 60 seconds "
-							+ "by sending a number 1-" + boardSize).queue());
-			waiter.waitForEvent(MessageReceivedEvent.class,
-					//Check if right player, and valid bomb pick
-					e -> (e.getAuthor().equals(players.get(iInner).user)
-							&& checkValidNumber(e.getMessage().getContentRaw())),
-					//Parse it and update the bomb board
-					e -> 
-					{
-						bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-						players.get(iInner).user.openPrivateChannel().queue(
-								(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
-						players.get(iInner).status = PlayerStatus.ALIVE;
-						playersAlive ++;
-						checkReady();
-					},
-					//Or timeout after a minute
-					1, TimeUnit.MINUTES, () ->
-					{
-						gameStatus = GameStatus.SIGNUPS_OPEN;
-						checkReady();
-					});
+			if(players.get(iInner).isBot)
+			{
+				int bombPosition = (int) (Math.random() * boardSize);
+				players.get(iInner).knownBombs.add(bombPosition);
+				bombs[bombPosition] = true;
+				players.get(iInner).status = PlayerStatus.ALIVE;
+				playersAlive ++;
+			}
+			else
+			{
+				players.get(iInner).user.openPrivateChannel().queue(
+						(channel) -> channel.sendMessage("Please place your bomb within the next 60 seconds "
+								+ "by sending a number 1-" + boardSize).queue());
+				waiter.waitForEvent(MessageReceivedEvent.class,
+						//Check if right player, and valid bomb pick
+						e -> (e.getAuthor().equals(players.get(iInner).user)
+								&& checkValidNumber(e.getMessage().getContentRaw())),
+						//Parse it and update the bomb board
+						e -> 
+						{
+							bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
+							players.get(iInner).knownBombs.add(Integer.parseInt(e.getMessage().getContentRaw())-1);
+							players.get(iInner).user.openPrivateChannel().queue(
+									(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
+							players.get(iInner).status = PlayerStatus.ALIVE;
+							playersAlive ++;
+							checkReady();
+						},
+						//Or timeout after a minute
+						1, TimeUnit.MINUTES, () ->
+						{
+							gameStatus = GameStatus.SIGNUPS_OPEN;
+							checkReady();
+						});
+			}
+			checkReady();
 		}
 
 	}
@@ -303,49 +368,77 @@ public class GameController
 	}
 	static void runTurn()
 	{
-		if(repeatTurn > 0)
+		if(repeatTurn > 0 && !players.get(currentTurn).isBot)
 		{
 			repeatTurn --;
-			channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", pick again.")
+			channel.sendMessage(players.get(currentTurn).getSafeMention() + ", pick again.")
 				.completeAfter(3,TimeUnit.SECONDS);
 		}
-		else
+		else if(repeatTurn == 0 && !players.get(currentTurn).isBot)
 		{
-			channel.sendMessage(players.get(currentTurn).user.getAsMention() + ", your turn. Choose a space on the board.")
+			channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
 				.completeAfter(3,TimeUnit.SECONDS);
 		}
 		displayBoardAndStatus(true, false);
-		TimerTask warnPlayer = new PickSpaceWarning();
-		timer.schedule(warnPlayer, 60000);
-		waiter.waitForEvent(MessageReceivedEvent.class,
-				//Right player and channel
-				e ->
-				{
-					if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
-							&& checkValidNumber(e.getMessage().getContentRaw()))
+		if(players.get(currentTurn).isBot)
+		{
+			//Get safe spaces, starting with all unpicked spaces
+			ArrayList<Integer> openSpaces = new ArrayList<>(boardSize);
+			for(int i=0; i<boardSize; i++)
+				if(!pickedSpaces[i])
+					openSpaces.add(i);
+			//Remove all known bombs
+			ArrayList<Integer> safeSpaces = new ArrayList<>(boardSize);
+			safeSpaces.addAll(openSpaces);
+			for(Integer bomb : players.get(currentTurn).knownBombs)
+				safeSpaces.remove(bomb);
+			//If there's any pick one at random and resolve it
+			if(safeSpaces.size() > 0)
+				resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
+			//Otherwise it sucks to be you, bot, eat bomb!
+			else
+				resolveTurn(openSpaces.get((int)(Math.random()*openSpaces.size())));
+		}
+		else
+		{
+			TimerTask warnPlayer = new PickSpaceWarning();
+			timer.schedule(warnPlayer, 60000);
+			waiter.waitForEvent(MessageReceivedEvent.class,
+					//Right player and channel
+					e ->
 					{
-							int location = Integer.parseInt(e.getMessage().getContentRaw());
-							if(pickedSpaces[location-1])
-							{
-								channel.sendMessage("That space has already been picked.").queue();
-								return false;
-							}
-							else
-								return true;
-					}
-					return false;
-				},
-				//Parse it and call the method that does stuff
-				e -> 
-				{
-					warnPlayer.cancel();
-					int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
-					resolveTurn(location);
-				},
-				90,TimeUnit.SECONDS, () ->
-				{
-					timeOutTurn();
-				});
+						if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
+								&& checkValidNumber(e.getMessage().getContentRaw()))
+						{
+								int location = Integer.parseInt(e.getMessage().getContentRaw());
+								if(pickedSpaces[location-1])
+								{
+									channel.sendMessage("That space has already been picked.").queue();
+									return false;
+								}
+								else
+									return true;
+						}
+						return false;
+					},
+					//Parse it and call the method that does stuff
+					e -> 
+					{
+						warnPlayer.cancel();
+						int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
+						//If they just picked their own bomb, what do they think they're doing?
+						if(players.get(currentTurn).knownBombs.contains(location) 
+								&& spacesLeft > players.get(currentTurn).knownBombs.size());
+							System.out.println(players.get(currentTurn).name+": known bomb pick, "
+									+spacesLeft+" spaces left.");
+						//Anyway go play out their turn
+						resolveTurn(location);
+					},
+					90,TimeUnit.SECONDS, () ->
+					{
+						timeOutTurn();
+					});
+		}
 	}
 	private static void timeOutTurn()
 	{
@@ -353,7 +446,7 @@ public class GameController
 		if(!players.get(currentTurn).warned)
 		{
 			players.get(currentTurn).warned = true;
-			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
 					" is out of time. Wasting a random space.").queue();
 			//Get unpicked spaces
 			ArrayList<Integer> spaceCandidates = new ArrayList<>(boardSize);
@@ -385,7 +478,7 @@ public class GameController
 		//If they've been warned, it's time to BLOW STUFF UP!
 		else
 		{
-			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
 					" is out of time. Eliminating them.").queue();
 			//Jokers? GET OUT OF HERE!
 			players.get(currentTurn).jokers = 0;
@@ -423,7 +516,15 @@ public class GameController
 	{
 		pickedSpaces[location] = true;
 		spacesLeft--;
-		channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+		if(players.get(currentTurn).isBot)
+		{
+			channel.sendMessage(players.get(currentTurn).name + " selects space " + (location+1) + "...")
+				.completeAfter(1,TimeUnit.SECONDS);
+		}
+		else
+		{
+			channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+		}
 		if(players.get(currentTurn).threshold)
 		{
 			players.get(currentTurn).addMoney(-50000,MoneyMultipliersToUse.NOTHING);
@@ -608,26 +709,33 @@ public class GameController
 		case BLAMMO:
 			channel.sendMessage("It's a **BLAMMO!** Quick, press a button!").completeAfter(5,TimeUnit.SECONDS);
 			channel.sendMessage("```\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
-			waiter.waitForEvent(MessageReceivedEvent.class,
-					//Right player and channel
-					e ->
-					{
-						return (e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
-								&& checkValidNumber(e.getMessage().getContentRaw()) 
-										&& Integer.parseInt(e.getMessage().getContentRaw()) <= 4);
-					},
-					//Parse it and call the method that does stuff
-					e -> 
-					{
-						int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-						runBlammo(button);
-					},
-					30,TimeUnit.SECONDS, () ->
-					{
-						channel.sendMessage("Too slow, autopicking!").queue();
-						int button = (int) Math.random() * 4;
-						runBlammo(button);
-					});
+			if(players.get(currentTurn).isBot)
+			{
+				runBlammo((int) (Math.random() * 4));
+			}
+			else
+			{
+				waiter.waitForEvent(MessageReceivedEvent.class,
+						//Right player and channel
+						e ->
+						{
+							return (e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
+									&& checkValidNumber(e.getMessage().getContentRaw()) 
+											&& Integer.parseInt(e.getMessage().getContentRaw()) <= 4);
+						},
+						//Parse it and call the method that does stuff
+						e -> 
+						{
+							int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
+							runBlammo(button);
+						},
+						30,TimeUnit.SECONDS, () ->
+						{
+							channel.sendMessage("Too slow, autopicking!").queue();
+							int button = (int) Math.random() * 4;
+							runBlammo(button);
+						});
+			}
 			return;
 		}
 		channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
@@ -641,7 +749,14 @@ public class GameController
 		//But that's the sort of thing a blammo would do so I'm fine with it
 		List<BlammoChoices> buttons = Arrays.asList(BlammoChoices.values());
 		Collections.shuffle(buttons);
-		channel.sendMessage("Button " + (buttonPressed+1) + " pressed...").queue();
+		if(players.get(currentTurn).isBot)
+		{
+			channel.sendMessage(players.get(currentTurn).name + " presses button " + (buttonPressed+1) + "...").queue();
+		}
+		else
+		{
+			channel.sendMessage("Button " + (buttonPressed+1) + " pressed...").queue();
+		}
 		channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
 		StringBuilder extraResult = null;
 		int penalty = Player.BOMB_PENALTY;
@@ -655,7 +770,7 @@ public class GameController
 			advanceTurn(false);
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY;
-			channel.sendMessage("Goodbye, " + players.get(currentTurn).user.getAsMention()
+			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
 			if(repeatTurn > 0)
 				channel.sendMessage("(You also negated the repeat!)").queue();
@@ -807,8 +922,11 @@ public class GameController
 						channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
 							.completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
-					timer = new Timer();
-					timer.schedule(new RevealTheSBR(), 60000);
+					if(!players.get(0).isBot)
+					{
+						timer = new Timer();
+						timer.schedule(new RevealTheSBR(), 60000);
+					}
 				}
 				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
 				else
@@ -818,7 +936,7 @@ public class GameController
 					for(Player next : winners)
 					{
 						next.resetPlayer();
-						announcementText.append(next.user.getAsMention() + ", ");
+						announcementText.append(next.getSafeMention() + ", ");
 					}
 					announcementText.append("you have reached the goal together.");
 					channel.sendMessage(announcementText.toString()).completeAfter(5,TimeUnit.SECONDS);
@@ -837,7 +955,7 @@ public class GameController
 		//If they're a winner, boost their winstreak (folded players don't get this)
 		if(players.get(currentTurn).status == PlayerStatus.ALIVE)
 		{
-			channel.sendMessage(players.get(currentTurn).user.getAsMention() + " Wins!")
+			channel.sendMessage(players.get(currentTurn).getSafeMention() + " Wins!")
 				.completeAfter(1,TimeUnit.SECONDS);
 			//Boost winstreak by number of opponents defeated
 			players.get(currentTurn).winstreak += (playersJoined - playersAlive);
@@ -904,14 +1022,18 @@ public class GameController
 			//Get the minigame
 			Games nextGame = gamesToPlay.next();
 			MiniGame currentGame = nextGame.getGame();
-			StringBuilder gameMessage = new StringBuilder();
-			gameMessage.append(players.get(currentTurn).user.getAsMention());
-			if(currentGame.isBonusGame())
-				gameMessage.append(", you've unlocked a bonus game: ");
-			else
-				gameMessage.append(", time for your next minigame: ");
-			gameMessage.append(nextGame + "!");
-			channel.sendMessage(gameMessage).queue();
+			//Don't bother printing messages for bots
+			if(!players.get(currentTurn).isBot)
+			{
+				StringBuilder gameMessage = new StringBuilder();
+				gameMessage.append(players.get(currentTurn).getSafeMention());
+				if(currentGame.isBonusGame())
+					gameMessage.append(", you've unlocked a bonus game: ");
+				else
+					gameMessage.append(", time for your next minigame: ");
+				gameMessage.append(nextGame + "!");
+				channel.sendMessage(gameMessage).queue();
+			}
 			startMiniGame(currentGame);
 		}
 		else
@@ -927,53 +1049,80 @@ public class GameController
 	static void startMiniGame(MiniGame currentGame)
 	{
 		LinkedList<String> result = currentGame.initialiseGame();
-		ListIterator<String> output = result.listIterator(0);
-		while(output.hasNext())
+		//Don't print minigame messages for bots
+		if(!players.get(currentTurn).isBot)
 		{
-			channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
+			ListIterator<String> output = result.listIterator(0);
+			while(output.hasNext())
+			{
+				channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
+			}
 		}
 		runNextMiniGameTurn(currentGame);
 	}
 	static void runNextMiniGameTurn(MiniGame currentGame)
 	{
-		//Let's get more input to give it
-		TimerTask warnPlayer = new MiniGameWarning();
-		timer.schedule(warnPlayer,120000);
-		waiter.waitForEvent(MessageReceivedEvent.class,
-				//Right player and channel
-				e ->
-				{
-					return (e.getChannel().equals(channel) && e.getAuthor().equals(players.get(currentTurn).user));
-				},
-				//Parse it and call the method that does stuff
-				e -> 
-				{
-					warnPlayer.cancel();
-					String miniPick = e.getMessage().getContentRaw();
-					//Keep printing output until it runs out of output
-					LinkedList<String> result = currentGame.playNextTurn(miniPick);
-					ListIterator<String> output = result.listIterator(0);
-					while(output.hasNext())
+		if(players.get(currentTurn).isBot)
+		{
+			//Get their pick from the game and use it to play their next turn
+			LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
+			//Debug work
+			ListIterator<String> output = result.listIterator(0);
+			while(output.hasNext())
+			{
+				System.out.println(output.next());
+			}
+			//Check if the game's over
+			if(currentGame.isGameOver())
+			{
+				completeMiniGame(currentGame);
+			}
+			else
+			{
+				runNextMiniGameTurn(currentGame);
+			}
+		}
+		else
+		{
+			//Let's get more input to give it
+			TimerTask warnPlayer = new MiniGameWarning();
+			timer.schedule(warnPlayer,120000);
+			waiter.waitForEvent(MessageReceivedEvent.class,
+					//Right player and channel
+					e ->
 					{
-						channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
-					}
-					//Check if the game's over
-					if(currentGame.isGameOver())
+						return (e.getChannel().equals(channel) && e.getAuthor().equals(players.get(currentTurn).user));
+					},
+					//Parse it and call the method that does stuff
+					e -> 
 					{
+						warnPlayer.cancel();
+						String miniPick = e.getMessage().getContentRaw();
+						//Keep printing output until it runs out of output
+						LinkedList<String> result = currentGame.playNextTurn(miniPick);
+						ListIterator<String> output = result.listIterator(0);
+						while(output.hasNext())
+						{
+							channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
+						}
+						//Check if the game's over
+						if(currentGame.isGameOver())
+						{
+							completeMiniGame(currentGame);
+						}
+						else
+						{
+							runNextMiniGameTurn(currentGame);
+						}
+					},
+					180,TimeUnit.SECONDS, () ->
+					{
+						channel.sendMessage(players.get(currentTurn).getSafeMention() + 
+								" has gone missing. Cancelling their minigames.").queue();
+						players.get(currentTurn).games.clear();
 						completeMiniGame(currentGame);
-					}
-					else
-					{
-						runNextMiniGameTurn(currentGame);
-					}
-				},
-				180,TimeUnit.SECONDS, () ->
-				{
-					channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
-							" has gone missing. Cancelling their minigames.").queue();
-					players.get(currentTurn).games.clear();
-					completeMiniGame(currentGame);
-				});
+					});
+		}
 	}
 	static void completeMiniGame(MiniGame currentGame)
 	{
@@ -1002,11 +1151,21 @@ public class GameController
 			}
 		}
 		StringBuilder resultString = new StringBuilder();
-		resultString.append(String.format("Game Over. You won **$%,d**",moneyWon));
-		if(multiplier > 1)
-			resultString.append(String.format(" times %d copies!",multiplier));
+		if(players.get(currentTurn).isBot)
+		{
+			resultString.append(players.get(currentTurn).name + String.format(" won **$%,d** from ",moneyWon));
+			if(multiplier > 1)
+				resultString.append(String.format("%d copies of ",multiplier));
+			resultString.append(currentGame + ".");
+		}
 		else
-			resultString.append(".");
+		{
+			resultString.append(String.format("Game Over. You won **$%,d**",moneyWon));
+			if(multiplier > 1)
+				resultString.append(String.format(" times %d copies!",multiplier));
+			else
+				resultString.append(".");
+		}
 		StringBuilder extraResult = null;
 		//Bypass the usual method if it's a bonus game so we don't have booster or winstreak applied
 		if(currentGame.isBonusGame())
@@ -1192,7 +1351,7 @@ public class GameController
 			for(int i=0; i<playersJoined; i++)
 			{
 				if(players.get(i).newbieProtection == 1)
-					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection has expired. "
+					channel.sendMessage(players.get(i).getSafeMention() + ", your newbie protection has expired. "
 							+ "From now on, bomb penalties will be $250,000.").queue();
 				int location = findUserInList(list,players.get(i).uID,false);
 				StringBuilder toPrint = new StringBuilder();
@@ -1264,7 +1423,7 @@ public class GameController
 	}
 	public static void splitAndShare(int totalToShare)
 	{
-		channel.sendMessage("Because " + players.get(currentTurn).user.getAsMention() + " had a split and share, "
+		channel.sendMessage("Because " + players.get(currentTurn).getSafeMention() + " had a split and share, "
 				+ "10% of their total will be split between the other players.").queueAfter(1,TimeUnit.SECONDS);
 		for(int i=0; i<playersJoined; i++)
 			//Don't pass money back to the player that hit it

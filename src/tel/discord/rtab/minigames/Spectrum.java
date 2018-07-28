@@ -152,4 +152,14 @@ public class Spectrum implements MiniGame {
 	public boolean isBonusGame() {
 		return BONUS;
 	}
+	
+	@Override
+	public String getBotPick()
+	{
+		ArrayList<Integer> openSpaces = new ArrayList<>(BOARD_SIZE);
+		for(int i=0; i<BOARD_SIZE; i++)
+			if(!pickedSpaces[i])
+				openSpaces.add(i+1);
+		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
 }
