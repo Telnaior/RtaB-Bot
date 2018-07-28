@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,7 +54,7 @@ public class GameController
 	static boolean[] bombs;
 	static Board gameboard;
 	public static EventWaiter waiter;
-	public static Timer timer = new Timer();
+	public static Timer timer;
 	static Message waitingMessage;
 
 	private static class StartGameTask extends TimerTask
@@ -79,6 +82,36 @@ public class GameController
 			prepareNextMiniGame();
 		}
 	}
+	private static class PickSpaceWarning extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					", thirty seconds left to choose a space!").queue();
+			displayBoardAndStatus(true,false);
+		}
+	}
+	private static class MiniGameWarning extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					", are you still there? One minute left!").queue();
+		}
+	}
+	private static class RevealTheSBR extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			channel.sendMessage(players.get(0).user.getAsMention() + "...").complete();
+			channel.sendMessage("It is time to enter the Super Bonus Round.").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("...").completeAfter(10,TimeUnit.SECONDS);
+			startMiniGame(new SuperBonusRound());
+		}
+	}
 	
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -92,6 +125,7 @@ public class GameController
 		gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
 		repeatTurn = 0;
+		timer.cancel();
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -109,15 +143,16 @@ public class GameController
 		{
 			//If first player, this is the channel, now queue up starting the game
 			channel = channelID;
-			timer.schedule(new FinalCallTask(),  90000);
-			timer.schedule(new StartGameTask(), 120000);
 		}
 		else if(channel != channelID)
 			return PlayerJoinReturnValue.WRONGCHANNEL;
 		//Create player object
 		Player newPlayer = new Player(playerID);
-		if(newPlayer.name.contains(":") || newPlayer.name.startsWith("#") || newPlayer.name.startsWith("!"))
+		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
+		//If they're out of lives and aren't a newbie, can't let them play anymore
+		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
+			return PlayerJoinReturnValue.OUTOFLIVES;
 		//Dumb easter egg
 		if(newPlayer.money <= -1000000000)
 			return PlayerJoinReturnValue.ELIMINATED;
@@ -140,7 +175,12 @@ public class GameController
 		players.add(newPlayer);
 		playersJoined++;
 		if(playersJoined == 1)
+		{
+			timer = new Timer();
+			timer.schedule(new FinalCallTask(),  90000);
+			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
+		}
 		else
 			return PlayerJoinReturnValue.JOINED;
 	}
@@ -162,6 +202,9 @@ public class GameController
 				//Found them, get rid of them and call it a success
 				players.remove(i);
 				playersJoined --;
+				//Abort the game if everyone left
+				if(playersJoined == 0)
+					timer.cancel();
 				return PlayerQuitReturnValue.SUCCESS;
 			}
 		}
@@ -200,7 +243,8 @@ public class GameController
 		{
 			final int iInner = i;
 			players.get(iInner).user.openPrivateChannel().queue(
-					(channel) -> channel.sendMessage("Please PM your bomb by sending a number 1-" + boardSize).queue());
+					(channel) -> channel.sendMessage("Please place your bomb within the next 60 seconds "
+							+ "by sending a number 1-" + boardSize).queue());
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Check if right player, and valid bomb pick
 					e -> (e.getAuthor().equals(players.get(iInner).user)
@@ -267,6 +311,8 @@ public class GameController
 				.completeAfter(3,TimeUnit.SECONDS);
 		}
 		displayBoardAndStatus(true, false);
+		TimerTask warnPlayer = new PickSpaceWarning();
+		timer.schedule(warnPlayer, 60000);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -288,9 +334,86 @@ public class GameController
 				//Parse it and call the method that does stuff
 				e -> 
 				{
+					warnPlayer.cancel();
 					int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
 					resolveTurn(location);
+				},
+				90,TimeUnit.SECONDS, () ->
+				{
+					timeOutTurn();
 				});
+	}
+	private static void timeOutTurn()
+	{
+		//If they haven't been warned, play nice and just pick a random space for them
+		if(!players.get(currentTurn).warned)
+		{
+			players.get(currentTurn).warned = true;
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					" is out of time. Wasting a random space.").queue();
+			//Get unpicked spaces
+			ArrayList<Integer> spaceCandidates = new ArrayList<>(boardSize);
+			for(int i=0; i<boardSize; i++)
+				if(!pickedSpaces[i])
+					spaceCandidates.add(i);
+			//Pick one at random
+			int spaceChosen = (int) (Math.random() * spaceCandidates.size());
+			//If it's a bomb, it sucks to be them
+			if(bombs[spaceChosen])
+			{
+				resolveTurn(spaceChosen);
+			}
+			//If it isn't, throw out the space and let the players know what's up
+			else
+			{
+				pickedSpaces[spaceChosen] = true;
+				channel.sendMessage("Space " + (spaceChosen+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+				//Don't forget the threshold
+				if(players.get(currentTurn).threshold)
+				{
+					channel.sendMessage("(-$50,000)").queueAfter(1,TimeUnit.SECONDS);
+					players.get(currentTurn).addMoney(-50000,MoneyMultipliersToUse.NOTHING);
+				}
+				channel.sendMessage("It's not a bomb, so its contents are lost.").completeAfter(5,TimeUnit.SECONDS);
+				runEndTurnLogic();
+			}
+		}
+		//If they've been warned, it's time to BLOW STUFF UP!
+		else
+		{
+			channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+					" is out of time. Eliminating them.").queue();
+			//Jokers? GET OUT OF HERE!
+			players.get(currentTurn).jokers = 0;
+			//Look for a bomb
+			ArrayList<Integer> bombCandidates = new ArrayList<>(boardSize);
+			for(int i=0; i<boardSize; i++)
+				if(bombs[i] && !pickedSpaces[i])
+					bombCandidates.add(i);
+			int bombChosen;
+			//Got bomb? Pick one to detonate
+			if(bombCandidates.size() > 0)
+			{
+				bombChosen = (int) (Math.random() * bombCandidates.size());
+			}
+			//No bomb? WHO CARES, THIS IS RACE TO A BILLION, WE'RE BLOWING THEM UP ANYWAY!
+			else
+			{
+				//Get unpicked spaces
+				ArrayList<Integer> spaceCandidates = new ArrayList<>(boardSize);
+				for(int i=0; i<boardSize; i++)
+					if(!pickedSpaces[i])
+						spaceCandidates.add(i);
+				//Pick one and turn it into a BOMB
+				bombChosen = (int) (Math.random() * spaceCandidates.size());
+				bombs[bombChosen] = true;
+			}
+			//NO DUDS ALLOWED
+			if(gameboard.bombBoard[bombChosen] == BombType.DUD)
+				gameboard.bombBoard[bombChosen] = BombType.NORMAL;
+			//KABOOM KABOOM KABOOM KABOOM
+			resolveTurn(bombCandidates.get(bombChosen));
+		}
 	}
 	static void resolveTurn(int location)
 	{
@@ -299,7 +422,7 @@ public class GameController
 		channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 		if(players.get(currentTurn).threshold)
 		{
-			players.get(currentTurn).addMoney(50000,MoneyMultipliersToUse.NOTHING);
+			players.get(currentTurn).addMoney(-50000,MoneyMultipliersToUse.NOTHING);
 			channel.sendMessage("(-$50,000)").queueAfter(1,TimeUnit.SECONDS);
 		}
 		if(bombs[location])
@@ -484,6 +607,12 @@ public class GameController
 					{
 						int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
 						runBlammo(button);
+					},
+					30,TimeUnit.SECONDS, () ->
+					{
+						channel.sendMessage("Too slow, autopicking!").queue();
+						int button = (int) Math.random() * 4;
+						runBlammo(button);
 					});
 			return;
 		}
@@ -611,16 +740,16 @@ public class GameController
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).jackpot = true;
 			break;
-		case BONUSP1:
-			channel.sendMessage("It's a **+1 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+		case STREAKP1:
+			channel.sendMessage("It's a **+1 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 1;
 			break;
-		case BONUSP2:
-			channel.sendMessage("It's a **+2 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+		case STREAKP2:
+			channel.sendMessage("It's a **+2 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 2;
 			break;
-		case BONUSP3:
-			channel.sendMessage("It's a **+3 Bonus Multiplier**!").completeAfter(5,TimeUnit.SECONDS);
+		case STREAKP3:
+			channel.sendMessage("It's a **+3 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 3;
 			break;
 		case BLAMMO_FRENZY:
@@ -652,11 +781,14 @@ public class GameController
 				//Got a single winner, crown them!
 				if(winners.size() == 1)
 				{
+					players.addAll(winners);
+					currentTurn = 0;
 					for(int i=0; i<3; i++)
-						channel.sendMessage(winners.get(0).name + " WINS RACE TO A BILLION!")
+						channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
 							.completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
-					runNextMiniGameTurn(new SuperBonusRound());
+					timer = new Timer();
+					timer.schedule(new RevealTheSBR(), 60000);
 				}
 				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
 				else
@@ -785,6 +917,8 @@ public class GameController
 	static void runNextMiniGameTurn(MiniGame currentGame)
 	{
 		//Let's get more input to give it
+		TimerTask warnPlayer = new MiniGameWarning();
+		timer.schedule(warnPlayer,120000);
 		waiter.waitForEvent(MessageReceivedEvent.class,
 				//Right player and channel
 				e ->
@@ -794,6 +928,7 @@ public class GameController
 				//Parse it and call the method that does stuff
 				e -> 
 				{
+					warnPlayer.cancel();
 					String miniPick = e.getMessage().getContentRaw();
 					//Keep printing output until it runs out of output
 					LinkedList<String> result = currentGame.playNextTurn(miniPick);
@@ -811,6 +946,13 @@ public class GameController
 					{
 						runNextMiniGameTurn(currentGame);
 					}
+				},
+				180,TimeUnit.SECONDS, () ->
+				{
+					channel.sendMessage(players.get(currentTurn).user.getAsMention() + 
+							" has gone missing. Cancelling their minigames.").queue();
+					players.get(currentTurn).games.clear();
+					completeMiniGame(currentGame);
 				});
 	}
 	static void completeMiniGame(MiniGame currentGame)
@@ -1030,16 +1172,22 @@ public class GameController
 			for(int i=0; i<playersJoined; i++)
 			{
 				if(players.get(i).newbieProtection == 1)
-					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection is now expired. "
+					channel.sendMessage(players.get(i).user.getAsMention() + ", your newbie protection has expired. "
 							+ "From now on, bomb penalties will be $250,000.").queue();
 				int location = findUserInList(list,players.get(i).uID,false);
-				String toPrint = players.get(i).uID+":"+players.get(i).name+":"+players.get(i).money
-						+":"+players.get(i).booster+":"+players.get(i).winstreak
-						+":"+(Math.max(players.get(i).newbieProtection-1,0));
+				StringBuilder toPrint = new StringBuilder();
+				toPrint.append(players.get(i).uID+"#");
+				toPrint.append(players.get(i).name+"#");
+				toPrint.append(players.get(i).money+"#");
+				toPrint.append(players.get(i).booster+"#");
+				toPrint.append(players.get(i).winstreak+"#");
+				toPrint.append(Math.max(players.get(i).newbieProtection-1,0)+"#");
+				toPrint.append(players.get(i).lives+"#");
+				toPrint.append(players.get(i).lifeRefillTime);
 				if(location == -1)
-					list.add(toPrint);
+					list.add(toPrint.toString());
 				else
-					list.set(location,toPrint);
+					list.set(location,toPrint.toString());
 			}
 			//Then sort and rewrite it
 			DescendingScoreSorter sorter = new DescendingScoreSorter();
@@ -1067,14 +1215,11 @@ public class GameController
 		 * record format:
 		 * record[0] = uID
 		 * record[1] = name
-		 * record[2] = money
-		 * record[3] = booster
-		 * record[4] = winstreak
 		 */
 		String[] record;
 		for(int i=0; i<list.size(); i++)
 		{
-			record = list.get(i).split(":");
+			record = list.get(i).split("#");
 			if(record[field].compareToIgnoreCase(userID) == 0)
 				return i;
 		}
@@ -1108,5 +1253,57 @@ public class GameController
 				//And divide the amount given by how many players there are to receive it
 				players.get(i).addMoney(totalToShare / (playersJoined-1),MoneyMultipliersToUse.NOTHING);
 			}
+	}
+	public static String checkLives(String userID) {
+		StringBuilder output = new StringBuilder();
+		try
+		{
+			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			int index = findUserInList(list,userID,false);
+			if(index < 0)
+			{
+				output.append("You have not played yet this season, so you have " + Player.MAX_LIVES + " lives.");
+				return output.toString();
+			}
+			String[] record = list.get(index).split("#");
+			output.append(record[1] + ": ");
+			if(Instant.parse(record[7]).isBefore(Instant.now()) && Integer.parseInt(record[6]) < Player.MAX_LIVES)
+				output.append(Player.MAX_LIVES + " lives left.");
+			else
+			{
+				output.append(record[6]);
+				if(Integer.parseInt(record[6]) == 1)
+					output.append(" life left.");
+				else
+					output.append(" lives left.");
+				if(Integer.parseInt(record[6]) < Player.MAX_LIVES)
+				{
+					output.append(" Lives refill in ");
+					//Check hours, then minutes, then seconds
+					OffsetDateTime lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond())
+							.atOffset(ZoneOffset.UTC);
+					int hours = lifeRefillTime.getHour();
+					if(hours>0)
+					{
+						output.append(hours + " hours, ");
+					}
+					int minutes = lifeRefillTime.getMinute();
+					if(hours>0 || minutes>0)
+					{
+						output.append(minutes + " minutes, ");
+					}
+					int seconds = lifeRefillTime.getSecond();
+					if(hours>0 || minutes>0 || seconds>0)
+					{
+						output.append(seconds + " seconds");
+					}
+					output.append(".");
+				}
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return output.toString();
 	}
 }

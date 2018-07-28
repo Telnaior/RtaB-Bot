@@ -2,6 +2,7 @@
 *.csv
 config.txt
 SuperBonusRound.java
+SBRItem.java
 
 # Eclipse Files
 .classpath

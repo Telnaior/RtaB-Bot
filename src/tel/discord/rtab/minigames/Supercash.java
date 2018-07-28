@@ -33,7 +33,7 @@ public class Supercash implements MiniGame {
 		numberPicked = new int[VALUES.length];
 		pickedSpaces = new boolean[BOARD_SIZE];
 		//Display instructions
-		output.add("For reaching a bonus multiplier of x5, you have earned the right to play the first bonus game!");
+		output.add("For reaching a streak bonus of x5, you have earned the right to play the first bonus game!");
 		output.add("In Supercash, you can win up to ten million dollars!");
 		output.add("Hidden on the board are three \"$10,000,000\" spaces, simply pick them all to win.");
 		output.add("There are also other, lesser values, make a pair of those to win that amount instead.");
@@ -153,7 +153,10 @@ public class Supercash implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		return lastPicked;
+		if(isGameOver())
+			return lastPicked;
+		else
+			return 0;
 	}
 
 	@Override

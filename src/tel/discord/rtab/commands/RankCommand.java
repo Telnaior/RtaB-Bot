@@ -44,7 +44,7 @@ public class RankCommand extends Command {
 				event.reply("User not found.");
 			else
 			{
-				String[] record = list.get(index).split(":");
+				String[] record = list.get(index).split("#");
 				int money = Integer.parseInt(record[2]);
 				int booster = Integer.parseInt(record[3]);
 				int winstreak = Integer.parseInt(record[4]);

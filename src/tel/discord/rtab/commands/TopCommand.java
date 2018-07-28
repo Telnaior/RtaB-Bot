@@ -31,7 +31,7 @@ public class TopCommand extends Command {
 				 * record[1] = name
 				 * record[2] = money
 				 */
-				record = list.get(i).split(":");
+				record = list.get(i).split("#");
 				money = Integer.parseInt(record[2]);
 				//Need to actually have money to be listed
 				if(money <= 0)
