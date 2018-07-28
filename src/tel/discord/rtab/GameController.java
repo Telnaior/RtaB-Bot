@@ -54,7 +54,7 @@ public class GameController
 	static boolean[] bombs;
 	static Board gameboard;
 	public static EventWaiter waiter;
-	public static Timer timer = new Timer();
+	public static Timer timer;
 	static Message waitingMessage;
 
 	private static class StartGameTask extends TimerTask
@@ -125,6 +125,7 @@ public class GameController
 		gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
 		repeatTurn = 0;
+		timer.cancel();
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -175,6 +176,7 @@ public class GameController
 		playersJoined++;
 		if(playersJoined == 1)
 		{
+			timer = new Timer();
 			timer.schedule(new FinalCallTask(),  90000);
 			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
@@ -200,6 +202,9 @@ public class GameController
 				//Found them, get rid of them and call it a success
 				players.remove(i);
 				playersJoined --;
+				//Abort the game if everyone left
+				if(playersJoined == 0)
+					timer.cancel();
 				return PlayerQuitReturnValue.SUCCESS;
 			}
 		}
@@ -782,6 +787,7 @@ public class GameController
 						channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
 							.completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
+					timer = new Timer();
 					timer.schedule(new RevealTheSBR(), 60000);
 				}
 				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
@@ -799,7 +805,6 @@ public class GameController
 					channel.sendMessage("BUT THERE CAN BE ONLY ONE.").completeAfter(5,TimeUnit.SECONDS);
 					channel.sendMessage("PREPARE FOR THE FINAL SHOWDOWN!").completeAfter(5,TimeUnit.SECONDS);
 					//Prepare the game
-					reset();
 					players.addAll(winners);
 					winners.clear();
 					playersJoined = players.size();
