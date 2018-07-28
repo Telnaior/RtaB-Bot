@@ -40,6 +40,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class GameController
 {
+	final static int MAX_PLAYERS = 16;
 	static int boardSize = 15;
 	public static MessageChannel channel = null;
 	static List<Player> players = new ArrayList<>();
@@ -163,6 +164,9 @@ public class GameController
 		}
 		else if(channel != channelID)
 			return PlayerJoinReturnValue.WRONGCHANNEL;
+		//Watch out for too many players
+		if(playersJoined >= MAX_PLAYERS)
+			return PlayerJoinReturnValue.TOOMANYPLAYERS;
 		//Create player object
 		Player newPlayer = new Player(playerID);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
