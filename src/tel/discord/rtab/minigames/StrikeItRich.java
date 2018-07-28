@@ -131,7 +131,10 @@ public class StrikeItRich implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		return lastPicked;
+		if(isGameOver())
+			return lastPicked;
+		else
+			return 0;
 	}
 
 	@Override

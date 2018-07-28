@@ -31,7 +31,10 @@ public class TestGame implements MiniGame
 	
 	@Override
 	public int getMoneyWon(){
-		return 100000;
+		if(isGameOver())
+			return 100000;
+		else
+			return 0;
 	}
 
 	@Override

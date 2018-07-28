@@ -34,7 +34,7 @@ public class Spectrum implements MiniGame {
 		pickedSpaces = new boolean[BOARD_SIZE];
 		total = 0;
 		//Display instructions
-		output.add("For reaching a bonus multiplier of x15, you have earned the right to play the third bonus game!");
+		output.add("For reaching a streak bonus of x15, you have earned the right to play the third bonus game!");
 		output.add("In Spectrum, you can win up to one hundred million dollars!");
 		output.add("Pairs of money are hidden on the board, along with three bombs.");
 		output.add("If you make a pair, you win that amount and get to keep picking!");
@@ -142,7 +142,10 @@ public class Spectrum implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		return total;
+		if(isGameOver())
+			return total;
+		else
+			return 0;
 	}
 
 	@Override

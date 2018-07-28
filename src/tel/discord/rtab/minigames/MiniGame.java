@@ -23,8 +23,8 @@ public interface MiniGame {
 	boolean isGameOver();
 	
 	/**
-	 * Returns an int containing the player's winnings, pre-booster
-	 * Methods throws exception if game isn't over
+	 * Returns an int containing the player's winnings, pre-booster.
+	 * If game isn't over yet, should return lowest possible win (usually 0) because player timed out for inactivity.
 	 */
 	int getMoneyWon();
 	
