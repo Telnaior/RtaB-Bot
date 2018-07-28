@@ -1,9 +1,6 @@
 package tel.discord.rtab.minigames;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
 public class TheOffer implements MiniGame {
 	static final boolean BONUS = false;
@@ -18,28 +15,26 @@ public class TheOffer implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	LinkedList<String> initialiseGame(){
+	public LinkedList<String> initialiseGame(){
 		seconds = 0;                      // Starting at 0 Seconds
-		chanceToBomb = (Math.Random()*15) + 5;  // Start chance to Bomb 5-20%
-		offer = 1000 * (int)(Math.Random()*100); // First Offer starts between 1,000 and 100,000
+		chanceToBomb = 5 + (Math.random()*16);  // Start chance to Bomb 5-20%
+		offer = 1000 * (int)(Math.random()*100+1); // First Offer starts between 1,000 and 100,000
 		alive = true; 
 		accept = false; 
 		refuse = false; 
-		invalid = false; 
 
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
-			output.add("In The Offer, your will get placed in a room with a live Bomb");
+		output.add("In The Offer, you will be placed in a room with a live bomb.");
 		output.add("You will get offers while in the room to leave it.");
-			output.add("Every Second that passes increases the money you gain as an offer by atleast 100%," +
-		"But also the Chance to Bomb by atleast 5%");
+		output.add("Every second that passes increases the money you gain as an offer by at least 100%," +
+				"but the chance of the bomb exploding will also increase by at least 5%");
 		output.add("If you refuse the money you have to decide how many WHOLE seconds you want to wait.");
-
-			output.add("If you bomb, you lose everything. ~Duh");
-		output.add("Be aware the Bomb can explode every moment, so don't take too much time!");
+		output.add("If the bomb explodes, you lose everything. ~Duh");
+		output.add("Be aware the Bomb can explode at any moment, so don't take too long!");
 		output.add("----------------------------------------"); 
 		output.add("Your first Offer is: " + String.format("**$%,d**", offer));
-		output.add("Do you "Accept" or "Refuse" ?")
+		output.add("Do you 'ACCEPT' or 'REFUSE'?");
 		return output;  
 	}
 
@@ -49,9 +44,9 @@ public class TheOffer implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	LinkedList<String> playNextTurn(String pick){
+	public LinkedList<String> playNextTurn(String pick){
 		LinkedList<String> output = new LinkedList<>();
-		string choice = pick.toUpperCase();
+		String choice = pick.toUpperCase();
 		choice = choice.replaceAll("\\s","");
 		if (refuse){
 			if (!isNumber(choice)){
@@ -62,25 +57,27 @@ public class TheOffer implements MiniGame {
 			int stopAt = seconds + Integer.parseInt(choice);
 			
 			if (stopAt <= seconds){
-				output.add("Please try to wait in the Now and not in the Past");
-				output.add("Use a positive Number higher than 0");
+				output.add("Please try to wait in the Now and not in the Past.");
+				output.add("Use a positive number, higher than 0.");
 				return output;
 			}
 			
 			refuse = false;
-			bool halfSecond = false;
+			boolean halfSecond = false;
 			int boomValue;
 			
 			while(seconds < stopAt){      
 				
-				boomValue = Math.Random()*100;
+				boomValue = (int) (Math.random()*100);
 				
 				if (chanceToBomb > boomValue){
 					output.add("**BOOM**");
 					alive = false;
-				}
-				if (!alive){
 					break;
+				}
+				else
+				{
+					output.add("...");
 				}
 
 				if (!halfSecond){
@@ -88,10 +85,9 @@ public class TheOffer implements MiniGame {
 				}
 				else {
 					halfSecond = false;
-					offer += (int)(offer * (1 + (Math.Random()*0.5)));
+					offer += (int)(offer * (1 + (Math.random()*0.5)));
 					offer -= offer%100;
-					chanceToBomb += 5 + (Math.Random()*5)
-					output.Add("...")
+					chanceToBomb += 5 + (Math.random()*5);
 					seconds++;
 				}
 			}
@@ -109,17 +105,21 @@ public class TheOffer implements MiniGame {
 			
 			return output;
 		}
-		else{
-			if(choice.equals("ACCEPT") || choice.equals("DEAL")){
+		else
+		{
+			if(choice.equals("ACCEPT") || choice.equals("DEAL"))
+			{
 				accept = true;
 				output.add("Offer Accepted!");
 				return output;
 			}
-			else if(!"choice".equals("REFUSE") || !"choice".equals("NODEAL")){
+			else if(!"choice".equals("REFUSE") && !"choice".equals("NODEAL"))
+			{
 				//Definitely don't say anything for random strings
 				return output;
 			}
-			else{
+			else
+			{
 				refuse = true;
 				output.add("Offer Refused!");
 				output.add("How many seconds do you want to wait?");
@@ -144,10 +144,9 @@ public class TheOffer implements MiniGame {
 	 * Returns true if the minigame has ended
 	 */
 	@Override
-	boolean isGameOver(){
-		if (alive && accept){ 
+	public boolean isGameOver(){
+		if (alive && accept) 
 			return true;
-		}
 		return !alive;
 	}
 
@@ -157,20 +156,18 @@ public class TheOffer implements MiniGame {
 	 * If game isn't over yet, should return lowest possible win (usually 0) because player timed out for inactivity.
 	 */
 	@Override
-	int getMoneyWon(){
-		if (isGameOver() & alive){
+	public int getMoneyWon(){
+		if (isGameOver() & alive)
 			return offer;
-		}
-		else {
+		else
 			return 0;
-		}
 	}
 	/**
 	 * Returns true if the game is a bonus game (and therefore shouldn't have boosters or winstreak applied)
 	 * Returns false if it isn't (and therefore should have boosters and winstreak applied)
 	 */
 	@Override
-	boolean isBonusGame(){
-		return Bonus;
+	public boolean isBonusGame(){
+		return BONUS;
 	}
 }

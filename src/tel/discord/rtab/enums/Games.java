@@ -4,7 +4,7 @@ import tel.discord.rtab.minigames.*;
 
 public enum Games implements WeightedSpace {
 	//TEST_GAME("Test Game","Test",new TestGame()),
-	STRIKE_IT_RICH		(2,"Strike it Rich","Strike",new StrikeItRich()),
+	STRIKE_IT_RICH	(2,"Strike it Rich","Strike",new StrikeItRich()),
 	MATH_TIME		(2,"Math Time","Math",new MathTime()),
 	GAMBLE			(2,"The Gamble","Gamble",new Gamble()),
 	THE_OFFER		(2,"The Offer","Offer",new TheOffer()),
