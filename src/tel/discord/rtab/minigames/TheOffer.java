@@ -27,10 +27,10 @@ public class TheOffer implements MiniGame {
 		//Give instructions
 		output.add("In The Offer, you will be placed in a room with a live bomb.");
 		output.add("You will get offers while in the room to leave it.");
-		output.add("Every second that passes increases the money you gain as an offer by at least 100%," +
-				"but the chance of the bomb exploding will also increase by at least 5%");
+		output.add("Every second that passes increases the money you gain as an offer by at least 100%, " +
+				"but the chance of the bomb exploding will also increase by at least 5%.");
 		output.add("If you refuse the money you have to decide how many WHOLE seconds you want to wait.");
-		output.add("If the bomb explodes, you lose everything. ~Duh");
+		output.add("If the bomb explodes, you lose everything."); //~Duh
 		output.add("Be aware the Bomb can explode at any moment, so don't take too long!");
 		output.add("----------------------------------------"); 
 		output.add("Your first Offer is: " + String.format("**$%,d**", offer));
@@ -94,6 +94,7 @@ public class TheOffer implements MiniGame {
 			
 			if (seconds == stopAt && alive){
 				output.add("Your new offer is: " + String.format("**$%,d**", offer));
+				output.add("Do you 'ACCEPT' or 'REFUSE'?");
 			}
 			else if(seconds > stopAt){
 				output.add("You found a Bug! Tell a DEV! - Seconds > StopAT - Take this!");
@@ -113,16 +114,16 @@ public class TheOffer implements MiniGame {
 				output.add("Offer Accepted!");
 				return output;
 			}
-			else if(!"choice".equals("REFUSE") && !"choice".equals("NODEAL"))
-			{
-				//Definitely don't say anything for random strings
-				return output;
-			}
-			else
+			else if(choice.equals("REFUSE") || choice.equals("NODEAL"))
 			{
 				refuse = true;
 				output.add("Offer Refused!");
 				output.add("How many seconds do you want to wait?");
+				return output;
+			}
+			else
+			{
+				//Definitely don't say anything for random strings
 				return output;
 			}
 		}
