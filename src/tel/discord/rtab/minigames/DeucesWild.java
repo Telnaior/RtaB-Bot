@@ -74,9 +74,6 @@ public class DeucesWild implements MiniGame {
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
 			lastPicked = board.get(lastSpace);
-			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
-			if(numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
-				pinchMode = true;
 			output.add(generateBoard());
 			return output;
 		}
@@ -124,12 +121,7 @@ public class DeucesWild implements MiniGame {
 				display.append(" ");
 		}
 		display.append("\n");
-		//Next display how many of each we have
-		for(int i=0; i<VALUES.length; i++)
-		{
-			display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]));
-		}
-		display.append("```");
+		// TODO: Show player's cards
 		return display.toString();
 	}
 
