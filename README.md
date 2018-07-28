@@ -2,6 +2,11 @@
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
+0.9.4
+ - Reworked life system so it just cuts down on the money you win instead of outright barring you
+ - Duds no longer appear in 2p games
+ - New minigame, Deuces Wild!
+ 
 0.9.3
  - Bugfixes
  - New minigame, The Offer!
