@@ -231,8 +231,8 @@ public class DeucesWild implements MiniGame {
 			if (cardsPicked[i] == null)
 				break;
 			if (redrawUsed && !cardsHeld[i])
-				continue;
-			display.append(cardsPicked[i].toStringShort() + " ");
+				display.append("   ");
+			else display.append(cardsPicked[i].toStringShort() + " ");
 		}
 		if (gameStage == 5)
 			display.append("(" + hand.toString() + ")");
