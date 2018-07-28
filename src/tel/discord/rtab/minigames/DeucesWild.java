@@ -22,7 +22,7 @@ public class DeucesWild implements MiniGame {
 	PokerHand hand = PokerHand.NOTHING;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
-	boolean pinchMode = false;
+	boolean redrawUsed;
 
 	@Override
 	public LinkedList<String> initialiseGame()
@@ -37,7 +37,7 @@ public class DeucesWild implements MiniGame {
 		cardsPicked = new Card[5];
 		cardsHeld = new boolean[5];
 		pickedSpaces = new boolean[BOARD_SIZE];
-		pinchMode = false;
+		redrawUsed = false;
 		firstPlay = false;
 		//Display instructions
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
@@ -120,8 +120,15 @@ public class DeucesWild implements MiniGame {
 			else
 				display.append(" ");
 		}
-		display.append("\n");
-		// TODO: Show player's cards
+		display.append("\n" + "Current hand: "); // The concatenation here is more for human legibility than anything
+		for (int i = 0; i > cardsPicked.length; i++) {
+			if (cardsPicked[i] == null)
+				break;
+			if (redrawUsed && !cardsHeld[i])
+				continue;
+			display.append(cardsPicked[i].toStringShort() + " ");
+		}
+		display.append("```");
 		return display.toString();
 	}
 
@@ -198,11 +205,11 @@ public class DeucesWild implements MiniGame {
 		byte modeOfRanks = modeOfRanks(rankCount); // That is, how many are there of the most common rank?
 
 		switch (modeOfRanks) {
-			case 5: return PokerHand.FIVE_OF_A_KIND;
-			case 4: return PokerHand.FOUR_OF_A_KIND;
 			case 3: 
 				if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE;
 				else return PokerHand.THREE_OF_A_KIND;
+			case 4: return PokerHand.FOUR_OF_A_KIND;
+			case 5: return PokerHand.FIVE_OF_A_KIND;
 			default: return PokerHand.NOTHING;
 		}
 	}

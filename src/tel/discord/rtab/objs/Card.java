@@ -104,6 +104,6 @@ public class Card implements Comparable<Card> {
     }
     
     public String toStringShort() {
-        return this.rank.getSymbol() + " of " + this.suit.getSymbol();
+        return this.rank.getSymbol() + this.suit.getSymbol();
     }
 }
