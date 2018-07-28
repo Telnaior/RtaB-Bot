@@ -39,7 +39,7 @@ public class DeucesWild implements MiniGame {
 		pickedSpaces = new boolean[BOARD_SIZE];
 		redrawUsed = false;
 		firstPlay = false;
-		gameStage = 0;
+		gameStage = 0; // essentially what index in cardsPicked[] we're going to fill; if 5, then it's the end of that draw
 		//Display instructions
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
 		output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
@@ -132,7 +132,7 @@ public class DeucesWild implements MiniGame {
 				}
 			}
 			return output;
-		}
+		} // endif (gameStage == 5)
 		else {
 			if(!isNumber(pick))
 			{
