@@ -422,7 +422,7 @@ public class GameController
 		channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 		if(players.get(currentTurn).threshold)
 		{
-			players.get(currentTurn).addMoney(50000,MoneyMultipliersToUse.NOTHING);
+			players.get(currentTurn).addMoney(-50000,MoneyMultipliersToUse.NOTHING);
 			channel.sendMessage("(-$50,000)").queueAfter(1,TimeUnit.SECONDS);
 		}
 		if(bombs[location])

@@ -2,6 +2,10 @@
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - First public release, heralding the start of Season 1.
  
+0.9.3
+ - Bugfixes
+ - New minigame, The Offer!
+ 
 0.9.2
  - Usual bugfixes etc :P
  - Increased to 5 lives a day, and they aren't used up while on newbie protection
