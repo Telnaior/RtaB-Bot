@@ -9,6 +9,7 @@ import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
+import tel.discord.rtab.commands.AddBotCommand;
 import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
@@ -53,6 +54,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new PingBotCommand());
 		utilities.addCommand(new ResetCommand());
 		utilities.addCommand(new ShutdownBotCommand());
+		utilities.addCommand(new AddBotCommand());
 		utilities.addCommand(new MemeCommand());
 		JDABuilder yayBot = new JDABuilder(AccountType.BOT);
 		yayBot.setToken(token);

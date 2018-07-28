@@ -1485,4 +1485,14 @@ public class GameController
 		}
 		return output.toString();
 	}
+	public static void addBot(int botNumber)
+	{
+		//Only do this if we're in signups!
+		if(gameStatus != GameStatus.SIGNUPS_OPEN)
+			return;
+		GameBot chosenBot = GameBot.values()[botNumber];
+		Player newPlayer = new Player(chosenBot);
+		players.add(newPlayer);
+		playersJoined ++;
+	}
 }
