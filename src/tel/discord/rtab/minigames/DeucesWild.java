@@ -19,7 +19,7 @@ public class DeucesWild implements MiniGame {
 	ArrayList<Card> board = new ArrayList<Card>(BOARD_SIZE);
 	int lastSpace;
 	Card lastPicked;
-	PokerHand hand = PokerHand.NOTHING;
+	static PokerHand hand = PokerHand.NOTHING;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
 	boolean redrawUsed;
@@ -51,7 +51,7 @@ public class DeucesWild implements MiniGame {
 				+ "a straight flush pays $450,000, a five of a kind pays $750,000, a wild royal flush pays $1,250,000, "
 				+ "and four deuces pay $10,000,000.");
 		output.add("If you are lucky enough to get a natural royal flush, you will win $40,000,000!");
-		output.add("Best of luck! Pick your first space when you're ready.");
+		output.add("Best of luck! Pick your first card when you're ready.");
 
 		return output;
 	}
@@ -76,9 +76,29 @@ public class DeucesWild implements MiniGame {
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
 			lastPicked = board.get(lastSpace);
+			cardsPicked[gameStage] = lastPicked;
+			if (gameStage == 4)
+				hand = evaluateHand(cardsPicked);
 			output.add(String.format("Space %d selected...",lastSpace+1));
 			output.add(lastPicked.toString());
 			output.add(generateBoard());
+			do {
+				gameStage++;
+			} while (gameStage < 5 && cardsHeld[gameStage]);
+			if (!isGameOver()) {
+				if (gameStage == 5) {
+					output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
+							+"of each card.");
+					output.add("For example, type HOLD 1 to hold only the " + cardsPicked[0] +", or type HOLD 2 5 to hold the "
+							+ cardsPicked[1] + " as well as the " + cardsPicked[4] + ".");
+					output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
+					output.add(String.format("If you like your hand, you may also type STOP to end the game and claim your "+
+							"prize of $%,d.", getMoneyWon()));
+				}
+				else {
+					output.add("Select another card.");
+				}
+			}
 			return output;
 		}
 	}
@@ -139,12 +159,9 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public boolean isGameOver()
 	{
-		if (hand == PokerHand.NATURAL_ROYAL)
-			return true;
-
-		for (int i = 0; i < cardsHeld.length; i++)
-			if (!cardsHeld[i])
-				return false;
+		if (gameStage == 5) {
+			if (hand)
+		}
 		
 		return false;
 	}
