@@ -3,11 +3,11 @@ package tel.discord.rtab.enums;
 public enum BoostType implements WeightedSpace
 {
 	//Negative
-	N50	(- 50,3),
-	N45	(- 45,3),
-	N40	(- 40,3),
-	N35	(- 35,3),
-	N30	(- 30,3),
+	N50	(- 50,2),
+	N45	(- 45,2),
+	N40	(- 40,2),
+	N35	(- 35,2),
+	N30	(- 30,2),
 	N25	(- 25,3),
 	N20	(- 20,3),
 	N15	(- 15,3),
@@ -47,5 +47,9 @@ public enum BoostType implements WeightedSpace
 	public int getWeight()
 	{
 		return weight;
+	}
+	public int getValue()
+	{
+		return value;
 	}
 }

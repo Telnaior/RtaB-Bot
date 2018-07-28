@@ -43,4 +43,8 @@ public enum CashType implements WeightedSpace
 	{
 		return weight;
 	}
+	public int getValue()
+	{
+		return value;
+	}
 }

@@ -9,9 +9,12 @@ import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDABuilder;
+import tel.discord.rtab.commands.AddBotCommand;
 import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
+import tel.discord.rtab.commands.LivesCommand;
+import tel.discord.rtab.commands.MemeCommand;
 import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
 import tel.discord.rtab.commands.QuitCommand;
@@ -20,6 +23,7 @@ import tel.discord.rtab.commands.ResetCommand;
 import tel.discord.rtab.commands.ShutdownBotCommand;
 import tel.discord.rtab.commands.StartCommand;
 import tel.discord.rtab.commands.TopCommand;
+import tel.discord.rtab.commands.TotalsCommand;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -43,11 +47,15 @@ public class RaceToABillionBot
 		utilities.addCommand(new QuitCommand());
 		utilities.addCommand(new PlayersCommand());
 		utilities.addCommand(new BoardCommand());
+		utilities.addCommand(new TotalsCommand());
+		utilities.addCommand(new LivesCommand());
 		utilities.addCommand(new RankCommand());
 		utilities.addCommand(new TopCommand());
 		utilities.addCommand(new PingBotCommand());
 		utilities.addCommand(new ResetCommand());
 		utilities.addCommand(new ShutdownBotCommand());
+		utilities.addCommand(new AddBotCommand());
+		utilities.addCommand(new MemeCommand());
 		JDABuilder yayBot = new JDABuilder(AccountType.BOT);
 		yayBot.setToken(token);
 		yayBot.addEventListener(utilities.build());

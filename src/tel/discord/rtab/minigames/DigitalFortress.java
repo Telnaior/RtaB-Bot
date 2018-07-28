@@ -4,27 +4,49 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class DigitalFortress implements MiniGame {
 	static final boolean BONUS = true;
+	static final int PRIZE_PER_DIGIT = 2500000;
 	static final int ATTEMPTS_ALLOWED = 4;
 	List<Character> solution = Arrays.asList('0','1','2','3','4','5','6','7','8','9');
 	String[] guesses = new String[ATTEMPTS_ALLOWED];
 	boolean[] lockedIn;
 	int digitsCorrect;
 	int attemptsLeft = ATTEMPTS_ALLOWED;
-	boolean invalid = false;
-	boolean firstPlay = true;
 	
 	@Override
-	public void sendNextInput(String pick) {
-		// TODO Auto-generated method stub
+	public LinkedList<String> initialiseGame()
+	{
+		LinkedList<String> output = new LinkedList<>();
+		//Initialise stuff
+		Collections.shuffle(solution);
+		lockedIn = new boolean[solution.size()];
+		digitsCorrect = 0;
+		attemptsLeft = ATTEMPTS_ALLOWED;
+		//Provide help
+		output.add("For reaching a streak bonus of x10, you have earned the right to play the second bonus game!");
+		output.add("In Digital Fortress, you can win up to twenty-five million dollars!");
+		output.add("The computer has created a secret ten-digit passcode, using each digit once and once only.");
+		output.add("Your job is to guess this passcode.");
+		output.add("You have four attempts to do so, "
+				+ "and after each attempt you will be told which digits are in the right place.");
+		output.add("Once you have solved the passcode (or been locked out after four attempts), "
+				+ "you will earn $2,500,000 for each digit you had correct.");
+		output.add("Submit your first guess at the passcode when you are ready, and good luck!");
+		output.add(generateBoard());
+		return output;
+	}
+	
+	@Override
+	public LinkedList<String> playNextTurn(String pick) {
+		LinkedList<String> output = new LinkedList<>();
 		if(!isValidNumber(pick))
 		{
-			invalid = true;
-			return;
+			//Non-number or wrong size doesn't need feedback
+			return output;
 		}
-		invalid = false;
 		//Subtract an attempt and record the guess
 		attemptsLeft --;
 		guesses[attemptsLeft] = pick;
@@ -37,6 +59,18 @@ public class DigitalFortress implements MiniGame {
 				digitsCorrect++;
 			}
 		}
+		//Print output
+		output.add("Submitting "+guesses[attemptsLeft]+"...");
+		output.add("...");
+		if(digitsCorrect == solution.size())
+			output.add(digitsCorrect + " digits correct, congratulations!");
+		else if(digitsCorrect == 1)
+			output.add(digitsCorrect + " digit correct.");
+		else
+			output.add(digitsCorrect + " digits correct.");
+		if(digitsCorrect < 10)
+			output.add(generateBoard());
+		return output;
 	}
 
 	private boolean isValidNumber(String message) {
@@ -56,49 +90,6 @@ public class DigitalFortress implements MiniGame {
 		{
 			return false;
 		}
-	}
-
-	@Override
-	public LinkedList<String> getNextOutput() {
-		LinkedList<String> output = new LinkedList<>();
-		if(firstPlay)
-		{
-			//Initialise stuff
-			Collections.shuffle(solution);
-			lockedIn = new boolean[solution.size()];
-			digitsCorrect = 0;
-			attemptsLeft = ATTEMPTS_ALLOWED;
-			//Provide help
-			output.add("For reaching a bonus multiplier of x10, you have earned the right to play the second bonus game!");
-			output.add("In Digital Fortress, you can win up to twenty-five million dollars!");
-			output.add("The computer has created a secret ten-digit passcode, using each digit once and once only.");
-			output.add("Your job is to guess this passcode.");
-			output.add("You have four attempts to do so, "
-					+ "and after each attempt you will be told which digits are in the right place.");
-			output.add("Once you have solved the passcode (or been locked out after four attempts), "
-					+ "you will earn $2,500,000 for each digit you had correct.");
-			output.add("Submit your first guess at the passcode when you are ready, and good luck!");
-			firstPlay = false;
-		}
-		else if(invalid)
-		{
-			//Non-number or wrong size doesn't need feedback
-			return output;
-		}
-		else
-		{
-			output.add("Submitting "+guesses[attemptsLeft]+"...");
-			output.add("...");
-			if(digitsCorrect == solution.size())
-				output.add(digitsCorrect + " digits correct, congratulations!");
-			else if(digitsCorrect == 1)
-				output.add(digitsCorrect + " digit correct.");
-			else
-				output.add(digitsCorrect + " digits correct.");			
-		}
-		if(digitsCorrect < 10)
-			output.add(generateBoard());
-		return output;
 	}
 
 	private String generateBoard() {
@@ -133,12 +124,43 @@ public class DigitalFortress implements MiniGame {
 
 	@Override
 	public int getMoneyWon() {
-		return (2500000 * digitsCorrect);
+		if(isGameOver())
+			return (PRIZE_PER_DIGIT * digitsCorrect);
+		else
+			return 0;
 	}
 
 	@Override
 	public boolean isBonusGame() {
 		return BONUS;
 	}
-
+	
+	@Override
+	public String getBotPick()
+	{
+		List<Character> digits = Arrays.asList('0','1','2','3','4','5','6','7','8','9');
+		//Cycle the list once for every attempt used
+		for(int i=ATTEMPTS_ALLOWED; i>attemptsLeft; i++)
+		{
+			digits.add(digits.get(0));
+			digits.remove(0);
+		}
+		//Now remove anything we've already locked in
+		for(int i=0; i<solution.size(); i++)
+			if(lockedIn[i])
+				digits.remove(solution.get(i));
+		//Now start building up the result
+		String result = "";
+		ListIterator<Character> nextDigit = digits.listIterator();
+		//If we have the digit right then grab it directly
+		//Otherwise grab the next digit from our set
+		for(int i=0; i<solution.size(); i++)
+		{
+			if(lockedIn[i])
+				result += solution.get(i);
+			else
+				result += nextDigit.next();
+		}
+		return result;
+	}
 }

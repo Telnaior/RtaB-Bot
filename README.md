@@ -1,11 +1,46 @@
-1.0.0 (planned)
+1.0.0
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
+ - Changes made to accommodate bots mean that picks can no longer be queued up across turns.
  - First public release, heralding the start of Season 1.
  
-0.9.0 (planned)
+0.9.4
+ - Reworked life system so it just cuts down on the money you win instead of outright barring you
+ - Duds no longer appear in 2p games
+ - New minigame, Deuces Wild!
+ 
+0.9.3
+ - Bugfixes
+ - New minigame, The Offer!
+ 
+0.9.2
+ - Usual bugfixes etc :P
+ - Increased to 5 lives a day, and they aren't used up while on newbie protection
+ - Expanded help documents
+ 
+0.9.1
+ - More bugfixes on life counting, and allowing for the potential of more than the max.
+ 
+0.9.0
  - Set up timeouts on player action (first offence - waste random space, second offence - autobomb)
- - Set up join cooldowns (once you bomb, you're out for a day)
+ - Set up join cooldowns (three bombs and you're out for a day)
  - Set up the game actually ending at $1,000,000,000
+ - Added the BLAMMO, to threaten the safety of any round!
+ - New event: Blammo Frenzy, changing a third of the cash spaces into blammos
+ - Switched over to showing round scores by default, and minigames are shown too
+ - Game now starts after two minutes, rather than waiting for a !start
+ - Also displays who it's waiting on at bomb placement
+ - HEAPS of formatting improvements
+ - Improved minigame API for better readability and less confusing code
+ 
+0.8.3
+ - New events: Bonus Multiplier +1/+2/+3
+ - Bonus bugfixes
+ 
+0.8.2
+ - Bugfixes to previous bugfixes.
+ 
+0.8.1
+ - Bugfixes.
  
 0.8.0
  - Events! Chaos for players, and chaos to code in!

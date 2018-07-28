@@ -14,7 +14,7 @@ public class RankCommand extends Command {
     public RankCommand()
     {
         this.name = "rank";
-        this.help = "view the rank of a player (or yourself if there's no player listed)";
+        this.help = "view the rank of a player by name, or by rank with #[number]";
         this.guildOnly = false;
     }
 	@Override
@@ -44,7 +44,7 @@ public class RankCommand extends Command {
 				event.reply("User not found.");
 			else
 			{
-				String[] record = list.get(index).split(":");
+				String[] record = list.get(index).split("#");
 				int money = Integer.parseInt(record[2]);
 				int booster = Integer.parseInt(record[3]);
 				int winstreak = Integer.parseInt(record[4]);

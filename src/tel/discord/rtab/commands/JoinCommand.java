@@ -18,6 +18,8 @@ public class JoinCommand extends Command
 	{
 		switch(GameController.addPlayer(event.getChannel(),event.getMember()))
 		{
+		case CREATED:
+			event.reply("Starting a game of Race to a Billion in two minutes. Type !join to sign up.");
 		case JOINED:
 			event.reply(event.getMember().getEffectiveName() + " successfully joined the game.");
 			break;
@@ -36,7 +38,16 @@ public class JoinCommand extends Command
 		case BADNAME:
 			event.reply("Cannot join game: Illegal name");
 			break;
+		case ELIMINATED:
+			event.reply("Cannot join game: You have been eliminated from Race to a Billion.");
+			break;
+		case OUTOFLIVES:
+			event.reply("Cannot join game: Out of lives.");
+			event.reply(GameController.checkLives(event.getAuthor().getId()));
+			break;
+		case TOOMANYPLAYERS:
+			event.reply("Cannot join game: Too many players.");
+			break;
 		}
 	}
-
 }

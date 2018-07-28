@@ -18,20 +18,48 @@ public class Hypercube implements MiniGame {
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	int lastSpace;
 	int lastPicked;
-	boolean firstPlay = true;
 
 	@Override
-	public void sendNextInput(String pick)
+	public LinkedList<String> initialiseGame()
 	{
+		LinkedList<String> output = new LinkedList<>();
+		//Initialise board
+		board.clear();
+		//Add the numbers
+		for(int i=MIN_NUM; i<=MAX_NUM; i++)
+			board.add(i);
+		//Add the zeroes and bombs too
+		Integer[] bombBlock = new Integer[BOMBS];
+		Arrays.fill(bombBlock,0);
+		board.addAll(Arrays.asList(bombBlock));
+		Collections.shuffle(board);
+		pickedSpaces = new boolean[BOARD_SIZE];
+		picksUsed = 0;
+		total = 0;
+		//Display instructions
+		output.add("For reaching a streak bonus of x20, you have earned the right to play the final bonus game!");
+		output.add("In Hypercube, you can win hundreds of millions of dollars!");
+		output.add("You have ten picks to build up the largest total you can by selecting the largest numbers.");
+		output.add("But if you find one of the fifteen bombs, your total will be reset to zero!");
+		output.add("Once you've made all ten picks, your total is cubed and the result is the money you win.");
+		output.add("Good luck, go for a top score!");
+		output.add(generateBoard());
+		return output;
+	}
+	
+	@Override
+	public LinkedList<String> playNextTurn(String pick)
+	{
+		LinkedList<String> output = new LinkedList<>();
 		if(!isNumber(pick))
 		{
-			lastPicked = -2;
-			return;
+			//Random unrelated non-number doesn't need feedback
+			return output;
 		}
 		if(!checkValidNumber(pick))
 		{
-			lastPicked = -1;
-			return;
+			output.add("Invalid pick.");
+			return output;
 		}
 		else
 		{
@@ -45,6 +73,15 @@ public class Hypercube implements MiniGame {
 				total += lastPicked;
 				picksUsed ++;
 			}
+			//Print output
+			output.add(String.format("Space %d selected...",lastSpace+1));
+			output.add("...");
+			if(lastPicked == 0)
+				output.add("**BOOM**");
+			else
+				output.add(String.format("**%2d**",lastPicked));
+			output.add(generateBoard());
+			return output;
 		}
 	}
 
@@ -65,55 +102,6 @@ public class Hypercube implements MiniGame {
 	{
 		int location = Integer.parseInt(message)-1;
 		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces[location]);
-	}
-
-	@Override
-	public LinkedList<String> getNextOutput() {
-		LinkedList<String> output = new LinkedList<>();
-		if(firstPlay)
-		{
-			//Initialise board
-			board.clear();
-			//Add the numbers
-			for(int i=MIN_NUM; i<=MAX_NUM; i++)
-				board.add(i);
-			//Add the zeroes and bombs too
-			Integer[] bombBlock = new Integer[BOMBS];
-			Arrays.fill(bombBlock,0);
-			board.addAll(Arrays.asList(bombBlock));
-			Collections.shuffle(board);
-			pickedSpaces = new boolean[BOARD_SIZE];
-			picksUsed = 0;
-			total = 0;
-			//Display instructions
-			output.add("For reaching a bonus multiplier of x20, you have earned the right to play the final bonus game!");
-			output.add("In Hypercube, you can win hundreds of millions of dollars!");
-			output.add("You have ten picks to build up the largest total you can by selecting the largest numbers.");
-			output.add("But if you find one of the fifteen bombs, your total will be reset to zero!");
-			output.add("Once you've made all ten picks, your total is cubed and the result is the money you win.");
-			output.add("Good luck, go for a top score!");
-			firstPlay = false;
-		}
-		else if(lastPicked == -2)
-		{
-			//Random unrelated non-number doesn't need feedback
-			return output;
-		}
-		else if(lastPicked == -1)
-		{
-			output.add("Invalid pick.");
-		}
-		else
-		{
-			output.add(String.format("Space %d selected...",lastSpace+1));
-			output.add("...");
-			if(lastPicked == 0)
-				output.add("**BOOM**");
-			else
-				output.add(String.format("**%2d**",lastPicked));
-		}
-		output.add(generateBoard());
-		return output;
 	}
 
 	String generateBoard()
@@ -155,12 +143,24 @@ public class Hypercube implements MiniGame {
 
 	@Override
 	public int getMoneyWon() {
-		return (int) Math.pow(total,3);
+		if(isGameOver())
+			return (int) Math.pow(total,3);
+		else
+			return 0;
 	}
 
 	@Override
 	public boolean isBonusGame() {
 		return BONUS;
 	}
-
+	
+	@Override
+	public String getBotPick()
+	{
+		ArrayList<Integer> openSpaces = new ArrayList<>(BOARD_SIZE);
+		for(int i=0; i<BOARD_SIZE; i++)
+			if(!pickedSpaces[i])
+				openSpaces.add(i+1);
+		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
 }
