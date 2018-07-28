@@ -23,6 +23,7 @@ public class DeucesWild implements MiniGame {
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
 	boolean redrawUsed;
+	byte gameStage;
 
 	@Override
 	public LinkedList<String> initialiseGame()
@@ -39,6 +40,7 @@ public class DeucesWild implements MiniGame {
 		pickedSpaces = new boolean[BOARD_SIZE];
 		redrawUsed = false;
 		firstPlay = false;
+		gameStage = 0;
 		//Display instructions
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
 		output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
@@ -74,6 +76,8 @@ public class DeucesWild implements MiniGame {
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
 			lastPicked = board.get(lastSpace);
+			output.add(String.format("Space %d selected...",lastSpace+1));
+			output.add(lastPicked.toString());
 			output.add(generateBoard());
 			return output;
 		}
