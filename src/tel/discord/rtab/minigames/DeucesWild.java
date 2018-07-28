@@ -2,7 +2,6 @@ package tel.discord.rtab.minigames;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import tel.discord.rtab.enums.CardRank;
 import tel.discord.rtab.enums.CardSuit;
@@ -19,7 +18,7 @@ public class DeucesWild implements MiniGame {
 	ArrayList<Card> board = new ArrayList<Card>(BOARD_SIZE);
 	int lastSpace;
 	Card lastPicked;
-	static PokerHand hand = PokerHand.NOTHING;
+	PokerHand hand = PokerHand.NOTHING;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean firstPlay = true;
 	boolean redrawUsed;
@@ -52,7 +51,7 @@ public class DeucesWild implements MiniGame {
 				+ "and four deuces pay $10,000,000.");
 		output.add("If you are lucky enough to get a natural royal flush, you will win $40,000,000!");
 		output.add("Best of luck! Pick your first card when you're ready.");
-
+		output.add(generateBoard());
 		return output;
 	}
 	
@@ -61,39 +60,115 @@ public class DeucesWild implements MiniGame {
 	{
 		LinkedList<String> output = new LinkedList<>();
 		
-		if(!isNumber(pick))
-		{
-			//Random unrelated non-number doesn't need feedback
+		if (gameStage == 5) {
+			if (pick.toUpperCase().equals("STOP")) {
+				redrawUsed = true;
+			}
+			else if (pick.toUpperCase().equals("REDRAW")) {
+				output.add("Redrawing all five cards.");
+				redrawUsed = true;
+				gameStage = 0;
+				output.add(generateBoard());
+				output.add("Select your first card of the redraw when you are ready.");
+			}
+			else if (pick.toUpperCase().startsWith("HOLD ")) {
+				String[] tokens = pick.split("\\s");
+				try {
+					// If there are any non-numeric tokens after "HOLD", assume it's just the player talking
+					for (int i = 1; i < tokens.length; i++) {
+						if (!isNumber(tokens[i]))
+							return output;
+					}
+				}
+				catch (IndexOutOfBoundsException e) { // Maybe it's just "hold" by itself :P
+					return output;
+				}
+				
+				// New try-catch block; now we want to make sure the player's choices correspond to actual cards
+				try {
+					for (int i = 1; i < tokens.length; i++) {
+						cardsHeld[Integer.parseInt(tokens[i])-1] = true;
+					}
+					
+					// If we get here, we're good :)
+					redrawUsed = true;
+					gameStage = 0;
+					
+					String cardsHeldAsString = "Cards held: ";
+					String cardsRedrawingAsString = "Cards being redrawn: ";
+					
+
+					for (int i = 0; i < cardsHeld.length; i++) {
+						if (cardsHeld[i])
+							cardsHeldAsString += cardsPicked[i].toStringShort() + " ";
+						else cardsRedrawingAsString += cardsPicked[i].toStringShort() + " ";
+					}
+					
+					if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
+						output.add("All five cards held; ending game.");
+						gameStage = 5;
+						return output;
+					}
+					
+					output.add(cardsHeldAsString);
+					output.add(cardsRedrawingAsString);
+					
+					// Find out what stage we should be on now
+					for (int i = 0; i < cardsHeld.length; i++) {
+						if (!cardsHeld[i])
+							break;
+						else gameStage++;
+					}
+					output.add(generateBoard());
+					output.add("Select your first card of the redraw when you are ready.");
+				}
+				catch (IndexOutOfBoundsException e) {
+					// Clear out the hold flags to be safe
+					for (int i = 0; i < cardsHeld.length; i++) {
+						cardsHeld[i] = false;
+					}
+					output.add("Invalid card(s).");
+					return output;
+				}
+			}
 			return output;
 		}
-		if(!checkValidNumber(pick))
-		{
-			output.add("Invalid pick.");
-			return output;
-		}
-		else
-		{
-			lastSpace = Integer.parseInt(pick)-1;
-			pickedSpaces[lastSpace] = true;
-			lastPicked = board.get(lastSpace);
-			cardsPicked[gameStage] = lastPicked;
-			if (gameStage == 4)
-				hand = evaluateHand(cardsPicked);
-			output.add(String.format("Space %d selected...",lastSpace+1));
-			output.add(lastPicked.toString());
-			output.add(generateBoard());
-			do {
-				gameStage++;
-			} while (gameStage < 5 && cardsHeld[gameStage]);
-			if (!isGameOver()) {
+		else {
+			if(!isNumber(pick))
+			{
+				//Random unrelated non-number doesn't need feedback
+				return output;
+			}
+			if(!checkValidNumber(pick))
+			{
+				output.add("Invalid pick.");
+				return output;
+			}
+			else
+			{
+				lastSpace = Integer.parseInt(pick)-1;
+				pickedSpaces[lastSpace] = true;
+				lastPicked = board.get(lastSpace);
+				cardsPicked[gameStage] = lastPicked;
+				do {
+					gameStage++;
+				} while (gameStage < 5 && cardsHeld[gameStage]);
+				if (gameStage == 5)
+					hand = evaluateHand(cardsPicked);
+				output.add(String.format("Space %d selected...",lastSpace+1));
+				output.add("**" + lastPicked.toString() + "**");
+				output.add(generateBoard());
 				if (gameStage == 5) {
-					output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
-							+"of each card.");
-					output.add("For example, type HOLD 1 to hold only the " + cardsPicked[0] +", or type HOLD 2 5 to hold the "
-							+ cardsPicked[1] + " as well as the " + cardsPicked[4] + ".");
-					output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
-					output.add(String.format("If you like your hand, you may also type STOP to end the game and claim your "+
-							"prize of $%,d.", getMoneyWon()));
+					if (hand != PokerHand.NATURAL_ROYAL && redrawUsed) {
+						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
+								+"of each card.");
+						output.add("For example, type HOLD 1 to hold only the " + cardsPicked[0] +", or type HOLD 2 5 to hold the "
+								+ cardsPicked[1] + " as well as the " + cardsPicked[4] + ".");
+						output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
+						output.add(String.format("If you like your hand, you may also type STOP to end the game and claim your "+
+								"prize of $%,d.", getMoneyWon()));
+						output.add("Alternatively, you can redraw every single card by typing REDRAW.");
+					}
 				}
 				else {
 					output.add("Select another card.");
@@ -152,6 +227,8 @@ public class DeucesWild implements MiniGame {
 				continue;
 			display.append(cardsPicked[i].toStringShort() + " ");
 		}
+		if (gameStage == 5)
+			display.append("(" + hand.toString() + ")");
 		display.append("```");
 		return display.toString();
 	}
@@ -160,7 +237,9 @@ public class DeucesWild implements MiniGame {
 	public boolean isGameOver()
 	{
 		if (gameStage == 5) {
-			if (hand)
+			if (hand == PokerHand.NATURAL_ROYAL)
+				return true;
+			else return redrawUsed;
 		}
 		
 		return false;
