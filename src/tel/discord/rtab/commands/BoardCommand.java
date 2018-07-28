@@ -11,7 +11,7 @@ public class BoardCommand extends Command
 	public BoardCommand()
 	{
 		this.name = "board";
-		this.aliases = new String[]{"table"};
+		this.aliases = new String[]{"table","status"};
 		this.help = "displays the current board (in-game)";
 	}
 	

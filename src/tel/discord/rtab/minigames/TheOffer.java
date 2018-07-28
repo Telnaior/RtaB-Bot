@@ -27,9 +27,8 @@ public class TheOffer implements MiniGame {
 		//Give instructions
 		output.add("In The Offer, you will be placed in a room with a live bomb.");
 		output.add("You will get offers while in the room to leave it.");
-		output.add("Every second that passes increases the money you gain as an offer by at least 100%, " +
+		output.add("Every offer that passes increases the money you gain as an offer by at least 100%, " +
 				"but the chance of the bomb exploding will also increase by at least 5%.");
-		output.add("If you refuse the money you have to decide how many WHOLE seconds you want to wait.");
 		output.add("If the bomb explodes, you lose everything."); //~Duh
 		output.add("Be aware the Bomb can explode at any moment, so don't take too long!");
 		output.add("----------------------------------------"); 
@@ -48,19 +47,12 @@ public class TheOffer implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		String choice = pick.toUpperCase();
 		choice = choice.replaceAll("\\s","");
-		if (refuse){
-			if (!isNumber(choice)){
-				//Definitely don't say anything for random strings
-				return output;
-			}
+		if(choice.equals("REFUSE") || choice.equals("NODEAL"))
+		{
+			refuse = true;
+			output.add("Offer Refused!");
 
-			int stopAt = seconds + Integer.parseInt(choice);
-			
-			if (stopAt <= seconds){
-				output.add("Please try to wait in the Now and not in the Past.");
-				output.add("Use a positive number, higher than 0.");
-				return output;
-			}
+			int stopAt = seconds + 1;
 			
 			refuse = false;
 			boolean halfSecond = false;
@@ -87,7 +79,7 @@ public class TheOffer implements MiniGame {
 					halfSecond = false;
 					offer += (int)(offer * (1 + (Math.random()*0.5)));
 					offer -= offer%100;
-					chanceToBomb += 5 + (Math.random()*5);
+					chanceToBomb += 5 + (Math.random()*6);
 					seconds++;
 				}
 			}
@@ -106,26 +98,16 @@ public class TheOffer implements MiniGame {
 			
 			return output;
 		}
+		else if(choice.equals("ACCEPT") || choice.equals("DEAL"))
+		{
+			accept = true;
+			output.add("Offer Accepted!");
+			return output;
+		}
 		else
 		{
-			if(choice.equals("ACCEPT") || choice.equals("DEAL"))
-			{
-				accept = true;
-				output.add("Offer Accepted!");
-				return output;
-			}
-			else if(choice.equals("REFUSE") || choice.equals("NODEAL"))
-			{
-				refuse = true;
-				output.add("Offer Refused!");
-				output.add("How many seconds do you want to wait?");
-				return output;
-			}
-			else
-			{
-				//Definitely don't say anything for random strings
-				return output;
-			}
+			//Definitely don't say anything for random strings
+			return output;
 		}
 	}
 

@@ -118,6 +118,9 @@ class Player implements Comparable<Player>
 				adjustedPrize *= booster;
 			}
 		}
+		//If they're out of lives and it's a positive, hit 'em hard
+		if(lives <= 0 && adjustedPrize > 0)
+			adjustedPrize /= 5;
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
 		if(multipliers.useBonus)
@@ -204,6 +207,14 @@ class Player implements Comparable<Player>
 			penalty = NEWBIE_BOMB_PENALTY;
 		else
 			penalty = BOMB_PENALTY;
+		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
+		if(newbieProtection <= 0)
+		{
+			if(lives == MAX_LIVES)
+				lifeRefillTime = Instant.now().plusSeconds(72000);
+			if(lives > 0)
+				lives --;
+		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
 		if(splitAndShare)
@@ -215,13 +226,6 @@ class Player implements Comparable<Player>
 		//Wipe their booster if they didn't hit a boost holder
 		if(!holdBoost)
 			booster = 100;
-		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
-		if(newbieProtection <= 0)
-		{
-			if(lives == MAX_LIVES)
-				lifeRefillTime = Instant.now().plusSeconds(72000);
-			lives --;
-		}
 		//Wipe everything else too, and dock them a life
 		winstreak = 0;
 		GameController.repeatTurn = 0;

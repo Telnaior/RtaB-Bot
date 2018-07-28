@@ -76,7 +76,7 @@ public class HelpCommand extends Command
 			helpList.append("Once you are out of newbie protection, you will have a limited number of lives.\n");
 			helpList.append("By default, you have five lives. Every time you blow up in a game, you lose a life.\n");
 			helpList.append("You can check how many lives you have remaining with !lives. "
-					+ "If you run out of lives, you won't be able to play any more games.\n");
+					+ "If you run out of lives you can keep playing, but any money you win will be reduced by 80%.\n");
 			helpList.append("But never fear! They'll all come back tomorrow. "
 					+ "20 hours after you lose your first life, you'll be restocked to 5.");
 			break;

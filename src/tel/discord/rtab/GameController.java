@@ -54,7 +54,7 @@ public class GameController
 	static boolean[] bombs;
 	static Board gameboard;
 	public static EventWaiter waiter;
-	public static Timer timer;
+	public static Timer timer = new Timer();
 	static Message waitingMessage;
 
 	private static class StartGameTask extends TimerTask
@@ -150,9 +150,13 @@ public class GameController
 		Player newPlayer = new Player(playerID);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
-		//If they're out of lives and aren't a newbie, can't let them play anymore
+		//If they're out of lives and aren't a newbie, remind them of the risk
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
-			return PlayerJoinReturnValue.OUTOFLIVES;
+		{
+			channel.sendMessage(newPlayer.user.getAsMention() + ", you are out of lives. "
+					+ "Your gains for the rest of the day will be reduced by 80%.");
+			//return PlayerJoinReturnValue.OUTOFLIVES;
+		}
 		//Dumb easter egg
 		if(newPlayer.money <= -1000000000)
 			return PlayerJoinReturnValue.ELIMINATED;
@@ -741,16 +745,22 @@ public class GameController
 			players.get(currentTurn).jackpot = true;
 			break;
 		case STREAKP1:
-			channel.sendMessage("It's a **+1 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 1;
+			channel.sendMessage(String.format("It's a **+1 Streak Bonus**, raising you to x%d!",
+					players.get(currentTurn).winstreak))
+				.completeAfter(5,TimeUnit.SECONDS);
 			break;
 		case STREAKP2:
-			channel.sendMessage("It's a **+2 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 2;
+			channel.sendMessage(String.format("It's a **+2 Streak Bonus**, raising you to x%d!",
+					players.get(currentTurn).winstreak))
+				.completeAfter(5,TimeUnit.SECONDS);
 			break;
 		case STREAKP3:
-			channel.sendMessage("It's a **+3 Streak Bonus**!").completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).winstreak += 3;
+			channel.sendMessage(String.format("It's a **+3 Streak Bonus**, raising you to x%d!",
+					players.get(currentTurn).winstreak))
+				.completeAfter(5,TimeUnit.SECONDS);
 			break;
 		case BLAMMO_FRENZY:
 			channel.sendMessage("It's a **Blammo Frenzy**, good luck!!")
