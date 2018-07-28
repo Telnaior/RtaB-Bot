@@ -102,6 +102,22 @@ public class GameController
 					", are you still there? One minute left!").queue();
 		}
 	}
+	private static class WaitForNextTurn extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			runTurn();
+		}
+	}
+	private static class WaitForEndGame extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			runNextEndGamePlayer();
+		}
+	}
 	private static class RevealTheSBR extends TimerTask
 	{
 		@Override
@@ -222,19 +238,20 @@ public class GameController
 	public static void startTheGameAlready()
 	{
 		//If the game's already running or no one's in it, just don't
-		if(gameStatus != GameStatus.SIGNUPS_OPEN || playersJoined < 1)
+		if((gameStatus != GameStatus.SIGNUPS_OPEN && gameStatus != GameStatus.ADD_BOT_QUESTION) || playersJoined < 1)
 		{
 			return;
 		}
 		if(playersJoined == 1)
 		{
 			//Didn't get players? How about a bot?
-			channel.sendMessage("Would you like to play against a bot? (Y/N)").queue();
+			channel.sendMessage(players.get(0).getSafeMention()+", would you like to play against a bot? (Y/N)").queue();
+			gameStatus = GameStatus.ADD_BOT_QUESTION;
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Right player and channel
 					e ->
 					{
-						if(e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel))
+						if(e.getAuthor().equals(players.get(0).user) && e.getChannel().equals(channel))
 						{
 							String firstLetter = e.getMessage().getContentRaw().toUpperCase().substring(0,1);
 							return(firstLetter.startsWith("Y") || firstLetter.startsWith("N"));
@@ -275,6 +292,7 @@ public class GameController
 						else
 						{
 							channel.sendMessage("Very well. Game aborted.").queue();
+							reset();
 						}
 					},
 					30,TimeUnit.SECONDS, () ->
@@ -428,9 +446,11 @@ public class GameController
 						int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
 						//If they just picked their own bomb, what do they think they're doing?
 						if(players.get(currentTurn).knownBombs.contains(location) 
-								&& spacesLeft > players.get(currentTurn).knownBombs.size());
+								&& spacesLeft > players.get(currentTurn).knownBombs.size())
+						{
 							System.out.println(players.get(currentTurn).name+": known bomb pick, "
 									+spacesLeft+" spaces left.");
+						}
 						//Anyway go play out their turn
 						resolveTurn(location);
 					},
@@ -548,14 +568,14 @@ public class GameController
 			if(spacesLeft < 0)
 				channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
 			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-			runNextEndGamePlayer();
+			timer.schedule(new WaitForEndGame(), 1000);
 		}
 		else
 		{
 			//Advance turn to next player if there isn't a repeat going
 			if(repeatTurn == 0)
 				advanceTurn(false);
-			runTurn();
+			timer.schedule(new WaitForNextTurn(), 1000);
 		}
 	}
 	static void runBombLogic(int location)
@@ -1065,13 +1085,16 @@ public class GameController
 		if(players.get(currentTurn).isBot)
 		{
 			//Get their pick from the game and use it to play their next turn
-			LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
-			//Debug work
+			//Uncomment code to debug minigames
+			/*LinkedList<String> result =*/ currentGame.playNextTurn(currentGame.getBotPick());
+			/*
 			ListIterator<String> output = result.listIterator(0);
 			while(output.hasNext())
 			{
 				System.out.println(output.next());
 			}
+			*/
+			
 			//Check if the game's over
 			if(currentGame.isGameOver())
 			{
@@ -1156,7 +1179,7 @@ public class GameController
 			resultString.append(players.get(currentTurn).name + String.format(" won **$%,d** from ",moneyWon));
 			if(multiplier > 1)
 				resultString.append(String.format("%d copies of ",multiplier));
-			resultString.append(currentGame + ".");
+			resultString.append(currentGame.toString() + ".");
 		}
 		else
 		{

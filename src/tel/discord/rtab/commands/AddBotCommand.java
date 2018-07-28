@@ -17,6 +17,15 @@ public class AddBotCommand extends Command {
 	@Override
 	protected void execute(CommandEvent event)
 	{
-		GameController.addBot(Integer.parseInt(event.getArgs()));
+		//Let's have some fun
+		if(event.getArgs().equals("all"))
+		{
+			for(int i=0; i<80; i++)
+				GameController.addBot(i);
+		}
+		else
+		{
+			GameController.addBot(Integer.parseInt(event.getArgs()));
+		}
 	}
 }

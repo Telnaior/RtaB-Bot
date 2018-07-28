@@ -1,5 +1,6 @@
 1.0.0 (planned)
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
+ - Changes made to accommodate bots mean that picks can no longer be queued up across turns.
  - First public release, heralding the start of Season 1.
  
 0.9.4
