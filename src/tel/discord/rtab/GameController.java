@@ -916,6 +916,26 @@ public class GameController
 					gameboard.typeBoard[i] = SpaceType.BLAMMO;
 			}
 			break;
+		case COMMUNISM:
+			channel.sendMessage("It's a **Bowser Revolution**, everyone's money is now equalised!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			//Get the total money added during the round
+			int delta = 0;
+			for(Player next : players)
+			{
+				//Add their delta to the pile
+				delta += (next.money - next.oldMoney);
+				//And reset their delta to +$0
+				next.money = next.oldMoney;
+			}
+			//Divide the total by the number of players
+			delta /= playersJoined;
+			//And give it to each of them
+			for(Player next : players)
+			{
+				next.addMoney(delta,MoneyMultipliersToUse.NOTHING);
+			}
+			break;
 		}
 		runEndTurnLogic();
 	}
