@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class MathTime implements MiniGame {
+	static final String NAME = "Math Time";
 	static final boolean BONUS = false;
 	List<Integer> money = Arrays.asList(0,5000,10000,20000,30000,40000,60000);
 	List<String> ops1 = Arrays.asList("+","+","+","+","+","-","-");
@@ -180,5 +181,11 @@ public class MathTime implements MiniGame {
 		}
 		while(!(stage == 3 && pick == stage1Pick));
 		return String.valueOf(pick+1);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DoubleTrouble implements MiniGame {
+	static final String NAME = "Double Trouble";
 	static final boolean BONUS = false;
 	int rounds;
 	int mystery;
@@ -211,22 +212,28 @@ public class DoubleTrouble implements MiniGame {
 	}
 	
 	@Override
-public String getBotPick()
-	{
-		//We don't need to check if we need to stop if we haven't even picked once yet
-		if(rounds > 0)
+	public String getBotPick()
 		{
-			int stopChance = 5+(rounds*5);
-			if (stopChance>90)
-				stopChance=90;
-			if(Math.random()*100<stopChance)
-				return "STOP";
-		}
-		//If we aren't going to stop, let's just pick our next space
-		ArrayList<Integer> openSpaces = new ArrayList<>(money.size());
-		for(int i=0; i<money.size(); i++)
-			if(!pickedSpaces[i])
-				openSpaces.add(i+1);
-		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
-}
+			//We don't need to check if we need to stop if we haven't even picked once yet
+			if(rounds > 0)
+			{
+				int stopChance = 5+(rounds*5);
+				if (stopChance>90)
+					stopChance=90;
+				if(Math.random()*100<stopChance)
+					return "STOP";
+			}
+			//If we aren't going to stop, let's just pick our next space
+			ArrayList<Integer> openSpaces = new ArrayList<>(money.size());
+			for(int i=0; i<money.size(); i++)
+				if(!pickedSpaces[i])
+					openSpaces.add(i+1);
+			return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
+	}
 }

@@ -11,6 +11,7 @@ import tel.discord.rtab.objs.Card;
 import tel.discord.rtab.objs.Deck;
 
 public class DeucesWild implements MiniGame {
+	static final String NAME = "Deuces Wild";
 	static final boolean BONUS = false;
 	static final int BOARD_SIZE = 52;
 	static Deck deck;
@@ -392,5 +393,11 @@ public class DeucesWild implements MiniGame {
 			if(!pickedSpaces[i])
 				openSpaces.add(i+1);
 		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

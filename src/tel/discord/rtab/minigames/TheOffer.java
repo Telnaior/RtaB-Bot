@@ -3,6 +3,7 @@ package tel.discord.rtab.minigames;
 import java.util.LinkedList;
 
 public class TheOffer implements MiniGame {
+	static final String NAME = "The Offer";
 	static final boolean BONUS = false;
 	double chanceToBomb; 
 	int offer; 
@@ -164,5 +165,11 @@ public class TheOffer implements MiniGame {
 				return "ACCEPT";
 			}
 		return "REFUSE";
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }
