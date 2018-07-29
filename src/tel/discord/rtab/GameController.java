@@ -1258,7 +1258,7 @@ public class GameController
 				board.append("     RtaB     \n");
 			else
 			{
-				for(int i=7; i<boardWidth; i++)
+				for(int i=7; i<=boardWidth; i++)
 				{
 					//One space for odd numbers, two spaces for even numbers
 					board.append(" ");
