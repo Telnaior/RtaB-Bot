@@ -22,7 +22,8 @@ public class HelpCommand extends Command
 		case "":
 			helpList.append("Race to a Billion is a game where you pick spaces off a board to win cash, "
 					+ "while trying not to hit your opponents' bombs.\n");
-			helpList.append("Type !join to get into a game. If you need to leave a game before it starts, type !quit.\n");
+			helpList.append("Type !start or !join to get into a game. "
+					+ "If you need to leave a game before it starts, type !quit.\n");
 			helpList.append("Once the game starts, you'll need to DM the bot with a space to place a bomb on.\n");
 			helpList.append("Your opponents will do the same, and then you'll take turns choosing spaces.\n");
 			helpList.append("All actions have a time limit, so don't go AFK or bad things may happen!\n");
