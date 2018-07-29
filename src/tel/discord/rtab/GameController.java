@@ -267,31 +267,8 @@ public class GameController
 					{
 						if(e.getMessage().getContentRaw().toUpperCase().startsWith("Y"))
 						{
-							//Awesome, mark it as a two-player game and pick a random bot
-							playersJoined++;
-							GameBot chosenBot = GameBot.values()[(int)(Math.random()*GameBot.values().length)];
-							Player newPlayer;
-							int triesLeft = GameBot.values().length;
-							//Start looping through until we get a good one (one that hasn't exploded today)
-							do
-							{
-								triesLeft --;
-								chosenBot = chosenBot.next();
-								newPlayer = new Player(chosenBot);
-							}
-							while(newPlayer.lives != Player.MAX_LIVES && triesLeft > 0);
-							if(newPlayer.lives != Player.MAX_LIVES)
-							{
-								//If we've checked EVERY bot...
-								channel.sendMessage("No bots currently available. Game aborted.").queue();
-								reset();
-							}
-							else
-							{
-								//But assuming we found one, add them in and get things rolling!
-								players.add(newPlayer);
-								startTheGameAlready();
-							}
+							addRandomBot();
+							startTheGameAlready();
 						}
 						else
 						{
@@ -1556,5 +1533,34 @@ public class GameController
 		Player newPlayer = new Player(chosenBot);
 		players.add(newPlayer);
 		playersJoined ++;
+	}
+	public static void addRandomBot()
+	{
+		//Only do this if we're in signups!
+		if(gameStatus != GameStatus.SIGNUPS_OPEN)
+			return;
+		GameBot chosenBot = GameBot.values()[(int)(Math.random()*GameBot.values().length)];
+		Player newPlayer;
+		int triesLeft = GameBot.values().length;
+		//Start looping through until we get a good one (one that hasn't exploded today)
+		do
+		{
+			triesLeft --;
+			chosenBot = chosenBot.next();
+			newPlayer = new Player(chosenBot);
+		}
+		while(newPlayer.lives != Player.MAX_LIVES && triesLeft > 0);
+		if(newPlayer.lives != Player.MAX_LIVES)
+		{
+			//If we've checked EVERY bot...
+			channel.sendMessage("No bots currently available. Game aborted.").queue();
+			reset();
+		}
+		else
+		{
+			//But assuming we found one, add them in and get things rolling!
+			players.add(newPlayer);
+		}
+		playersJoined++;
 	}
 }
