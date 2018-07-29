@@ -172,11 +172,11 @@ public class GameController
 		Player newPlayer = new Player(playerID);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
-		//If they're out of lives and aren't a newbie, remind them of the risk
+		//If they're out of lives, remind them of the risk
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
 		{
 			channel.sendMessage(newPlayer.getSafeMention() + ", you are out of lives. "
-					+ "Your gains for the rest of the day will be reduced by 80%.");
+					+ "Your gains for the rest of the day will be reduced by 80%.").queue();
 			//return PlayerJoinReturnValue.OUTOFLIVES;
 		}
 		//Dumb easter egg
