@@ -144,6 +144,7 @@ public class GameController
 		gameboard = null;
 		repeatTurn = 0;
 		timer.cancel();
+		timer = new Timer();
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -201,7 +202,6 @@ public class GameController
 		playersJoined++;
 		if(playersJoined == 1)
 		{
-			timer = new Timer();
 			timer.schedule(new FinalCallTask(),  90000);
 			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
@@ -229,7 +229,7 @@ public class GameController
 				playersJoined --;
 				//Abort the game if everyone left
 				if(playersJoined == 0)
-					timer.cancel();
+					reset();
 				return PlayerQuitReturnValue.SUCCESS;
 			}
 		}
@@ -940,7 +940,6 @@ public class GameController
 					gameStatus = GameStatus.SEASON_OVER;
 					if(!players.get(0).isBot)
 					{
-						timer = new Timer();
 						timer.schedule(new RevealTheSBR(), 60000);
 					}
 				}
