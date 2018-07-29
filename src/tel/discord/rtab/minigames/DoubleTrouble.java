@@ -23,7 +23,9 @@ public class DoubleTrouble implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame(){
+	public LinkedList<String> initialiseGame()
+	{
+		alive = true;
 		rounds = 0;
 		total = 10000; // Player starts with $10,000
 		mystery = (int)(1000 + (Math.random()*9501)); // Generates a random number from 1,000-10,500, otherwise only a 1/9001 chance of 10k and that's too low imo
