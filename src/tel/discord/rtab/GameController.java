@@ -1080,14 +1080,7 @@ public class GameController
 		if(players.get(currentTurn).isBot)
 		{
 			//Get their pick from the game and use it to play their next turn
-			//Comment code here to remove console spam
-			LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
-			
-			ListIterator<String> output = result.listIterator(0);
-			while(output.hasNext())
-			{
-				System.out.println(output.next());
-			}
+			currentGame.playNextTurn(currentGame.getBotPick());
 			
 			
 			//Check if the game's over
