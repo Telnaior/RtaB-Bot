@@ -1537,7 +1537,7 @@ public class GameController
 	public static void addRandomBot()
 	{
 		//Only do this if we're in signups!
-		if(gameStatus != GameStatus.SIGNUPS_OPEN)
+		if(gameStatus != GameStatus.SIGNUPS_OPEN && gameStatus != GameStatus.ADD_BOT_QUESTION)
 			return;
 		GameBot chosenBot = GameBot.values()[(int)(Math.random()*GameBot.values().length)];
 		Player newPlayer;
@@ -1560,7 +1560,7 @@ public class GameController
 		{
 			//But assuming we found one, add them in and get things rolling!
 			players.add(newPlayer);
+			playersJoined++;
 		}
-		playersJoined++;
 	}
 }
