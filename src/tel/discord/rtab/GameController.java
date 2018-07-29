@@ -594,6 +594,11 @@ public class GameController
 			players.get(currentTurn).jokers --;
 			gameboard.bombBoard[location] = BombType.DUD;
 		}
+		else if(playersJoined == 2 && gameboard.bombBoard[location] == BombType.DUD)
+		{
+			//No bombs in 2p, but jokers still override that
+			gameboard.bombBoard[location] = BombType.NORMAL;
+		}
 		//But is it a special bomb?
 		StringBuilder extraResult = null;
 		int penalty = Player.BOMB_PENALTY;
@@ -671,18 +676,8 @@ public class GameController
 			extraResult = players.get(currentTurn).blowUp(chain,false);
 			break;
 		case DUD:
-			if(playersJoined == 2)
-			{
-				//No duds in 2p, do a normal bomb instead
-				channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
-					.completeAfter(5,TimeUnit.SECONDS);
-				extraResult = players.get(currentTurn).blowUp(1,false);
-			}
-			else
-			{
-				channel.sendMessage("It goes _\\*fizzle*_.")
+			channel.sendMessage("It goes _\\*fizzle*_.")
 				.completeAfter(5,TimeUnit.SECONDS);
-			}
 			break;
 		}
 		if(extraResult != null)
