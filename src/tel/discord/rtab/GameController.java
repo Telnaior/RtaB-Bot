@@ -478,7 +478,7 @@ public class GameController
 				if(!pickedSpaces[i])
 					spaceCandidates.add(i);
 			//Pick one at random
-			int spaceChosen = (int) (Math.random() * spaceCandidates.size());
+			int spaceChosen = spaceCandidates.get((int) (Math.random() * spaceCandidates.size()));
 			//If it's a bomb, it sucks to be them
 			if(bombs[spaceChosen])
 			{
