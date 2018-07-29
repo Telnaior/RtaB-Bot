@@ -1263,7 +1263,8 @@ public class GameController
 				{
 					board.append(String.format("%02d",(i+1)));
 				}
-				if(i%5==4)
+				int boardWidth = Math.max(5,playersJoined+1);
+				if((i%boardWidth) == (boardWidth-1))
 					board.append("\n");
 				else
 					board.append(" ");
