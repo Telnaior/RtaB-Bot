@@ -21,7 +21,7 @@ class Player implements Comparable<Player>
 	static final int BOMB_PENALTY = -250000;
 	static final int NEWBIE_BOMB_PENALTY = -100000;
 	static final int MAX_BOOSTER = 999;
-	static final int MIN_BOOSTER = 010;
+	static final int MIN_BOOSTER =  10;
 	static final int MAX_LIVES = 5;
 	User user;
 	String name;

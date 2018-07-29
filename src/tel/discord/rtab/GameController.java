@@ -144,6 +144,7 @@ public class GameController
 		gameboard = null;
 		repeatTurn = 0;
 		timer.cancel();
+		timer = new Timer();
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -173,7 +174,8 @@ public class GameController
 			return PlayerJoinReturnValue.BADNAME;
 		//If they're out of lives and aren't a newbie, remind them of the risk
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
-			channel.sendMessage(newPlayer.user.getAsMention() + ", you are out of lives. "
+		{
+			channel.sendMessage(newPlayer.getSafeMention() + ", you are out of lives. "
 					+ "Your gains for the rest of the day will be reduced by 80%.");
 			//return PlayerJoinReturnValue.OUTOFLIVES;
 		}
@@ -200,7 +202,6 @@ public class GameController
 		playersJoined++;
 		if(playersJoined == 1)
 		{
-			timer = new Timer();
 			timer.schedule(new FinalCallTask(),  90000);
 			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
@@ -228,7 +229,7 @@ public class GameController
 				playersJoined --;
 				//Abort the game if everyone left
 				if(playersJoined == 0)
-					timer.cancel();
+					reset();
 				return PlayerQuitReturnValue.SUCCESS;
 			}
 		}
@@ -266,31 +267,8 @@ public class GameController
 					{
 						if(e.getMessage().getContentRaw().toUpperCase().startsWith("Y"))
 						{
-							//Awesome, mark it as a two-player game and pick a random bot
-							playersJoined++;
-							GameBot chosenBot = GameBot.values()[(int)(Math.random()*GameBot.values().length)];
-							Player newPlayer;
-							int triesLeft = GameBot.values().length;
-							//Start looping through until we get a good one (one that hasn't exploded today)
-							do
-							{
-								triesLeft --;
-								chosenBot = chosenBot.next();
-								newPlayer = new Player(chosenBot);
-							}
-							while(newPlayer.lives != Player.MAX_LIVES && triesLeft > 0);
-							if(newPlayer.lives != Player.MAX_LIVES)
-							{
-								//If we've checked EVERY bot...
-								channel.sendMessage("No bots currently available. Game aborted.").queue();
-								reset();
-							}
-							else
-							{
-								//But assuming we found one, add them in and get things rolling!
-								players.add(newPlayer);
-								startTheGameAlready();
-							}
+							addRandomBot();
+							startTheGameAlready();
 						}
 						else
 						{
@@ -477,7 +455,7 @@ public class GameController
 				if(!pickedSpaces[i])
 					spaceCandidates.add(i);
 			//Pick one at random
-			int spaceChosen = (int) (Math.random() * spaceCandidates.size());
+			int spaceChosen = spaceCandidates.get((int) (Math.random() * spaceCandidates.size()));
 			//If it's a bomb, it sucks to be them
 			if(bombs[spaceChosen])
 			{
@@ -593,6 +571,11 @@ public class GameController
 			players.get(currentTurn).jokers --;
 			gameboard.bombBoard[location] = BombType.DUD;
 		}
+		else if(playersJoined == 2 && gameboard.bombBoard[location] == BombType.DUD)
+		{
+			//No duds in 2p, but jokers still override that
+			gameboard.bombBoard[location] = BombType.NORMAL;
+		}
 		//But is it a special bomb?
 		StringBuilder extraResult = null;
 		int penalty = Player.BOMB_PENALTY;
@@ -670,18 +653,8 @@ public class GameController
 			extraResult = players.get(currentTurn).blowUp(chain,false);
 			break;
 		case DUD:
-			if(playersJoined == 2)
-			{
-				//No duds in 2p, do a normal bomb instead
-				channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
-					.completeAfter(5,TimeUnit.SECONDS);
-				extraResult = players.get(currentTurn).blowUp(1,false);
-			}
-			else
-			{
-				channel.sendMessage("It goes _\\*fizzle*_.")
+			channel.sendMessage("It goes _\\*fizzle*_.")
 				.completeAfter(5,TimeUnit.SECONDS);
-			}
 			break;
 		}
 		if(extraResult != null)
@@ -920,6 +893,26 @@ public class GameController
 					gameboard.typeBoard[i] = SpaceType.BLAMMO;
 			}
 			break;
+		case COMMUNISM:
+			channel.sendMessage("It's a **Bowser Revolution**, everyone's money is now equalised!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			//Get the total money added during the round
+			int delta = 0;
+			for(Player next : players)
+			{
+				//Add their delta to the pile
+				delta += (next.money - next.oldMoney);
+				//And reset their delta to +$0
+				next.money = next.oldMoney;
+			}
+			//Divide the total by the number of players
+			delta /= playersJoined;
+			//And give it to each of them
+			for(Player next : players)
+			{
+				next.addMoney(delta,MoneyMultipliersToUse.NOTHING);
+			}
+			break;
 		}
 		runEndTurnLogic();
 	}
@@ -947,7 +940,6 @@ public class GameController
 					gameStatus = GameStatus.SEASON_OVER;
 					if(!players.get(0).isBot)
 					{
-						timer = new Timer();
 						timer.schedule(new RevealTheSBR(), 60000);
 					}
 				}
@@ -1088,15 +1080,15 @@ public class GameController
 		if(players.get(currentTurn).isBot)
 		{
 			//Get their pick from the game and use it to play their next turn
-			//Uncomment code to debug minigames
-			/*LinkedList<String> result =*/ currentGame.playNextTurn(currentGame.getBotPick());
-			/*
+			//Comment code here to remove console spam
+			LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
+			
 			ListIterator<String> output = result.listIterator(0);
 			while(output.hasNext())
 			{
 				System.out.println(output.next());
 			}
-			*/
+			
 			
 			//Check if the game's over
 			if(currentGame.isGameOver())
@@ -1256,7 +1248,27 @@ public class GameController
 		//Board doesn't need to be displayed if game is over
 		if(printBoard)
 		{
-			board.append("     RtaB     \n");
+			//Do we need a complex header, or should we use the simple one?
+			int boardWidth = Math.max(5,playersJoined+1);
+			if(boardWidth < 6)
+				board.append("     RtaB     \n");
+			else
+			{
+				for(int i=7; i<=boardWidth; i++)
+				{
+					//One space for odd numbers, two spaces for even numbers
+					board.append(" ");
+					if(i%2==0)
+						board.append(" ");
+				}
+				//Then print the first part
+				board.append("Race to ");
+				//Extra space if it's odd
+				if(boardWidth%2 == 1)
+					board.append(" ");
+				//Then the rest of the header
+				board.append("a Billion\n");
+			}
 			for(int i=0; i<boardSize; i++)
 			{
 				if(pickedSpaces[i])
@@ -1267,7 +1279,7 @@ public class GameController
 				{
 					board.append(String.format("%02d",(i+1)));
 				}
-				if(i%5==4)
+				if((i%boardWidth) == (boardWidth-1))
 					board.append("\n");
 				else
 					board.append(" ");
@@ -1520,5 +1532,34 @@ public class GameController
 		Player newPlayer = new Player(chosenBot);
 		players.add(newPlayer);
 		playersJoined ++;
+	}
+	public static void addRandomBot()
+	{
+		//Only do this if we're in signups!
+		if(gameStatus != GameStatus.SIGNUPS_OPEN && gameStatus != GameStatus.ADD_BOT_QUESTION)
+			return;
+		GameBot chosenBot = GameBot.values()[(int)(Math.random()*GameBot.values().length)];
+		Player newPlayer;
+		int triesLeft = GameBot.values().length;
+		//Start looping through until we get a good one (one that hasn't exploded today)
+		do
+		{
+			triesLeft --;
+			chosenBot = chosenBot.next();
+			newPlayer = new Player(chosenBot);
+		}
+		while(newPlayer.lives != Player.MAX_LIVES && triesLeft > 0);
+		if(newPlayer.lives != Player.MAX_LIVES)
+		{
+			//If we've checked EVERY bot...
+			channel.sendMessage("No bots currently available. Game aborted.").queue();
+			reset();
+		}
+		else
+		{
+			//But assuming we found one, add them in and get things rolling!
+			players.add(newPlayer);
+			playersJoined++;
+		}
 	}
 }

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Gamble implements MiniGame {
+	static final String NAME = "The Gamble";
 	static final boolean BONUS = false;
 	List<Integer> money = Arrays.asList(100,300,500,700,1000,3000,5000,7000,
 			10000,20000,30000,40000,50000,70000,100000,200000,300000,400000,500000,1000000);
@@ -189,5 +190,11 @@ public class Gamble implements MiniGame {
 			if(!pickedSpaces[i])
 				openSpaces.add(i+1);
 		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

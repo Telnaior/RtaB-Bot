@@ -10,8 +10,8 @@ public class JoinCommand extends Command
 	public JoinCommand()
 	{
 		this.name = "join";
-		this.aliases = new String[]{"in","enter"};
-		this.help = "join the game";
+		this.aliases = new String[]{"in","enter","start"};
+		this.help = "join the game (or start one if no game is running)";
 	}
 	@Override
 	protected void execute(CommandEvent event)

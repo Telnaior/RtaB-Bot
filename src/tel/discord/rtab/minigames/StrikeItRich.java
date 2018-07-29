@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class StrikeItRich implements MiniGame {
+	static final String NAME = "Strike it Rich";
 	static final boolean BONUS = false;
 	final static int BOARD_SIZE = 15;
 	final static int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
@@ -150,5 +151,11 @@ public class StrikeItRich implements MiniGame {
 			if(!pickedSpaces[i])
 				openSpaces.add(i+1);
 		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

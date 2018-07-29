@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 public class TestGame implements MiniGame 
 {
+	static final String NAME = "Test Game";
 	static final boolean BONUS = false;
 	boolean gameOver = false;
 	
@@ -46,5 +47,11 @@ public class TestGame implements MiniGame
 	public String getBotPick()
 	{
 		return "I am a bot.";
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

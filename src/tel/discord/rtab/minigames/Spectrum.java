@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class Spectrum implements MiniGame {
+	static final String NAME = "Spectrum";
 	static final boolean BONUS = true;
 	final static int BOARD_SIZE = 25;
 	final static int[] VALUES = {0,1000000,2000000,3000000,4000000,5000000,6000000,
@@ -161,5 +162,11 @@ public class Spectrum implements MiniGame {
 			if(!pickedSpaces[i])
 				openSpaces.add(i+1);
 		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

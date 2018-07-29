@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class DigitalFortress implements MiniGame {
+	static final String NAME = "Digital Fortress";
 	static final boolean BONUS = true;
 	static final int PRIZE_PER_DIGIT = 2500000;
 	static final int ATTEMPTS_ALLOWED = 4;
@@ -162,5 +163,11 @@ public class DigitalFortress implements MiniGame {
 				result += nextDigit.next();
 		}
 		return result;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

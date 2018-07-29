@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class Hypercube implements MiniGame {
+	static final String NAME = "Hypercube";
 	static final boolean BONUS = true;
 	static final int MAX_PICKS = 10;
 	static final int MIN_NUM = 51;
@@ -162,5 +163,11 @@ public class Hypercube implements MiniGame {
 			if(!pickedSpaces[i])
 				openSpaces.add(i+1);
 		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }

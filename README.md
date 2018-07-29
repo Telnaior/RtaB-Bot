@@ -1,3 +1,11 @@
+1.1.0
+ - Board now gets wider instead of taller once it gets larger than 25 spaces.
+ - New minigame, Double Trouble!
+ - Added !start as an alias for !join so newbies don't get confused thinking "when does the next game start?"
+ - New event, Bowser Revolution!
+ - Added demo mode (currently only happens manually)
+ - Do I even need to mention the bugfixes at this point? Heaps of them.
+
 1.0.0
  - Added bots! Bots will play the game if no one else joins within 2 minutes.
  - Changes made to accommodate bots mean that picks can no longer be queued up across turns.

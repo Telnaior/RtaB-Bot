@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 public class Supercash implements MiniGame {
+	static final String NAME = "Supercash";
 	static final boolean BONUS = true;
 	final static int BOARD_SIZE = 24;
 	final static int MAX_VALUE = 10000000;
@@ -172,5 +173,11 @@ public class Supercash implements MiniGame {
 			if(!pickedSpaces[i])
 				openSpaces.add(i+1);
 		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
 	}
 }
