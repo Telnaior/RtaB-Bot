@@ -596,7 +596,7 @@ public class GameController
 		}
 		else if(playersJoined == 2 && gameboard.bombBoard[location] == BombType.DUD)
 		{
-			//No bombs in 2p, but jokers still override that
+			//No duds in 2p, but jokers still override that
 			gameboard.bombBoard[location] = BombType.NORMAL;
 		}
 		//But is it a special bomb?
