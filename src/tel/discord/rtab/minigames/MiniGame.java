@@ -33,4 +33,10 @@ public interface MiniGame {
 	 * Returns false if it isn't (and therefore should have boosters and winstreak applied)
 	 */
 	boolean isBonusGame();
+
+	/**
+	 * Calculates the next choice a bot should make in the minigame.
+	 * @return The next input the bot should send to the minigame.
+	 */
+	String getBotPick();
 }

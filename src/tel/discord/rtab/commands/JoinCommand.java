@@ -45,6 +45,9 @@ public class JoinCommand extends Command
 			event.reply("Cannot join game: Out of lives.");
 			event.reply(GameController.checkLives(event.getAuthor().getId()));
 			break;
+		case TOOMANYPLAYERS:
+			event.reply("Cannot join game: Too many players.");
+			break;
 		}
 	}
 }

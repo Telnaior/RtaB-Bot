@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.User;
+import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerStatus;
@@ -25,6 +26,7 @@ class Player implements Comparable<Player>
 	User user;
 	String name;
 	String uID;
+	boolean isBot;
 	int lives;
 	Instant lifeRefillTime;
 	int money;
@@ -42,17 +44,35 @@ class Player implements Comparable<Player>
 	boolean warned;
 	PlayerStatus status;
 	LinkedList<Games> games;
+	LinkedList<Integer> knownBombs;
+	//Constructor for humans
 	Player(Member playerName)
 	{
 		user = playerName.getUser();
 		name = playerName.getEffectiveName();
 		uID = user.getId();
+		isBot = false;
+		newbieProtection = 10;
+		initPlayer();
+	}
+	//Constructor for bots
+	Player(GameBot botName)
+	{
+		user = null;
+		name = botName.name;
+		uID = botName.botID;
+		isBot = true;
+		newbieProtection = 0;
+		initPlayer();
+	}
+	
+	private void initPlayer()
+	{
 		lives = MAX_LIVES;
 		lifeRefillTime = Instant.now();
 		money = 0;
 		booster = 100;
 		winstreak = 0;
-		newbieProtection = 10;
 		jokers = 0;
 		splitAndShare = false;
 		minigameLock = false;
@@ -60,6 +80,7 @@ class Player implements Comparable<Player>
 		warned = false;
 		status = PlayerStatus.OUT;
 		games = new LinkedList<>();
+		knownBombs = new LinkedList<>();
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
@@ -118,6 +139,9 @@ class Player implements Comparable<Player>
 				adjustedPrize *= booster;
 			}
 		}
+		//If they're out of lives and it's a positive, hit 'em hard
+		if(lives <= 0 && adjustedPrize > 0)
+			adjustedPrize /= 5;
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
 		if(multipliers.useBonus)
@@ -204,6 +228,14 @@ class Player implements Comparable<Player>
 			penalty = NEWBIE_BOMB_PENALTY;
 		else
 			penalty = BOMB_PENALTY;
+		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
+		if(newbieProtection <= 0)
+		{
+			if(lives == MAX_LIVES)
+				lifeRefillTime = Instant.now().plusSeconds(72000);
+			if(lives > 0)
+				lives --;
+		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
 		if(splitAndShare)
@@ -215,13 +247,6 @@ class Player implements Comparable<Player>
 		//Wipe their booster if they didn't hit a boost holder
 		if(!holdBoost)
 			booster = 100;
-		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
-		if(newbieProtection <= 0)
-		{
-			if(lives == MAX_LIVES)
-				lifeRefillTime = Instant.now().plusSeconds(72000);
-			lives --;
-		}
 		//Wipe everything else too, and dock them a life
 		winstreak = 0;
 		GameController.repeatTurn = 0;
@@ -248,9 +273,21 @@ class Player implements Comparable<Player>
 		oldWinstreak = winstreak;
 		warned = false;
 		games.clear();
+		knownBombs.clear();
 		splitAndShare = false;
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;
+	}
+	/*
+	 * If the player is human, gets their name as a mention
+	 * If they aren't, just gets their name because user = null and null pointers are bad news bears yo!
+	 */
+	public String getSafeMention()
+	{
+		if(isBot)
+			return name;
+		else
+			return user.getAsMention();
 	}
 }

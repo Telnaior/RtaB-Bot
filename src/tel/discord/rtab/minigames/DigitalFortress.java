@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class DigitalFortress implements MiniGame {
 	static final boolean BONUS = true;
@@ -132,5 +133,34 @@ public class DigitalFortress implements MiniGame {
 	@Override
 	public boolean isBonusGame() {
 		return BONUS;
+	}
+	
+	@Override
+	public String getBotPick()
+	{
+		List<Character> digits = Arrays.asList('0','1','2','3','4','5','6','7','8','9');
+		//Cycle the list once for every attempt used
+		for(int i=ATTEMPTS_ALLOWED; i>attemptsLeft; i++)
+		{
+			digits.add(digits.get(0));
+			digits.remove(0);
+		}
+		//Now remove anything we've already locked in
+		for(int i=0; i<solution.size(); i++)
+			if(lockedIn[i])
+				digits.remove(solution.get(i));
+		//Now start building up the result
+		String result = "";
+		ListIterator<Character> nextDigit = digits.listIterator();
+		//If we have the digit right then grab it directly
+		//Otherwise grab the next digit from our set
+		for(int i=0; i<solution.size(); i++)
+		{
+			if(lockedIn[i])
+				result += solution.get(i);
+			else
+				result += nextDigit.next();
+		}
+		return result;
 	}
 }

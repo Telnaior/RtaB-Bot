@@ -1,5 +1,6 @@
 package tel.discord.rtab.minigames;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -162,5 +163,31 @@ public class Gamble implements MiniGame {
 	public boolean isBonusGame() {
 		return BONUS;
 	}
-
+	
+	@Override
+	public String getBotPick()
+	{
+		//We don't need to check if we need to stop if we haven't even picked once yet
+		if(lastPick > 0)
+		{
+			boolean willStop = false;
+			//Get number of values lower than current pick
+			int pickPosition = Arrays.binarySearch(money.toArray(),lastPick);
+			int spacesPicked = 0;
+			for(boolean next : pickedSpaces)
+				if(next)
+					spacesPicked ++;
+			int badPicks = pickPosition + 1 - spacesPicked;
+			//Basically take a "trial" pick and stop if it comes up bad
+			willStop = (Math.random() * (money.size() - spacesPicked)) < badPicks;
+			if(willStop)
+				return "STOP";
+		}
+		//If we aren't going to stop, let's just pick our next space
+		ArrayList<Integer> openSpaces = new ArrayList<>(money.size());
+		for(int i=0; i<money.size(); i++)
+			if(!pickedSpaces[i])
+				openSpaces.add(i+1);
+		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+	}
 }

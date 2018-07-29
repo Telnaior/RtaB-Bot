@@ -169,5 +169,16 @@ public class MathTime implements MiniGame {
 	public boolean isBonusGame() {
 		return BONUS;
 	}
-
+	
+	@Override
+	public String getBotPick()
+	{
+		int pick;
+		do
+		{
+		pick = (int) (Math.random() * 7);
+		}
+		while(!(stage == 3 && pick == stage1Pick));
+		return String.valueOf(pick+1);
+	}
 }

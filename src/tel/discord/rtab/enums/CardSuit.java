@@ -4,10 +4,10 @@ package tel.discord.rtab.enums;
 // Order shouldn't matter *TOO* much here so long as it's also updated in Card.java. --Coug
 
 public enum CardSuit {
-    CLUBS("Clubs","♣"),
-    DIAMONDS("Diamonds","♦"),
-    HEARTS("Hearts","♥"),
-    SPADES("Spades","♠");
+    CLUBS("Clubs","C"),
+    DIAMONDS("Diamonds","D"),
+    HEARTS("Hearts","H"),
+    SPADES("Spades","S");
     
     private final String name, symbol;
 

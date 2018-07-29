@@ -41,5 +41,10 @@ public class TestGame implements MiniGame
 	public boolean isBonusGame() {
 		return BONUS;
 	}
-
+	
+	@Override
+	public String getBotPick()
+	{
+		return "I am a bot.";
+	}
 }

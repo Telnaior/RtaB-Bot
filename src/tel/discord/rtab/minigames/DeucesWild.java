@@ -75,18 +75,14 @@ public class DeucesWild implements MiniGame {
 			}
 			else if (pick.toUpperCase().startsWith("HOLD ")) {
 				String[] tokens = pick.split("\\s");
-				try {
-					// If there are any non-numeric tokens after "HOLD", assume it's just the player talking
-					for (int i = 1; i < tokens.length; i++) {
-						if (!isNumber(tokens[i]))
-							return output;
-					}
-				}
-				catch (IndexOutOfBoundsException e) { // Maybe it's just "hold" by itself :P
-					return output;
+				
+				// If there are any non-numeric tokens after "HOLD", assume it's just the player talking
+				for (int i = 1; i < tokens.length; i++) {
+					if (!isNumber(tokens[i]))
+						return output;
 				}
 				
-				// New try-catch block; now we want to make sure the player's choices correspond to actual cards
+				// Make sure the player's choices correspond to actual cards
 				try {
 					for (int i = 1; i < tokens.length; i++)
 					{
