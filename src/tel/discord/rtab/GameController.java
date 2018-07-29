@@ -1252,7 +1252,27 @@ public class GameController
 		//Board doesn't need to be displayed if game is over
 		if(printBoard)
 		{
-			board.append("     RtaB     \n");
+			//Do we need a complex header, or should we use the simple one?
+			int boardWidth = Math.max(5,playersJoined+1);
+			if(boardWidth < 6)
+				board.append("     RtaB     \n");
+			else
+			{
+				for(int i=7; i<boardWidth; i++)
+				{
+					//One space for odd numbers, two spaces for even numbers
+					board.append(" ");
+					if(i%2==0)
+						board.append(" ");
+				}
+				//Then print the first part
+				board.append("Race to ");
+				//Extra space if it's odd
+				if(boardWidth%2 == 1)
+					board.append(" ");
+				//Then the rest of the header
+				board.append("a Billion\n");
+			}
 			for(int i=0; i<boardSize; i++)
 			{
 				if(pickedSpaces[i])
@@ -1263,7 +1283,6 @@ public class GameController
 				{
 					board.append(String.format("%02d",(i+1)));
 				}
-				int boardWidth = Math.max(5,playersJoined+1);
 				if((i%boardWidth) == (boardWidth-1))
 					board.append("\n");
 				else
