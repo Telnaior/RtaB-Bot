@@ -19,7 +19,7 @@ public enum CardRank {
     SEVEN("Seven","7"),
     EIGHT("Eight","8"),
     NINE("Nine","9"),
-    TEN("Ten","T"),
+    TEN("Ten","10"),
     JACK("Jack","J"),
     QUEEN("Queen","Q"),
     KING("King","K");

@@ -173,8 +173,7 @@ public class GameController
 			return PlayerJoinReturnValue.BADNAME;
 		//If they're out of lives and aren't a newbie, remind them of the risk
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
-		{
-			channel.sendMessage(newPlayer.getSafeMention() + ", you are out of lives. "
+			channel.sendMessage(newPlayer.user.getAsMention() + ", you are out of lives. "
 					+ "Your gains for the rest of the day will be reduced by 80%.");
 			//return PlayerJoinReturnValue.OUTOFLIVES;
 		}
