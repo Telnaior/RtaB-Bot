@@ -22,7 +22,6 @@ public class DeucesWild implements MiniGame {
 	Card lastPicked;
 	PokerHand hand = PokerHand.NOTHING;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
-	boolean firstPlay = true;
 	boolean redrawUsed;
 	byte gameStage;
 
@@ -40,7 +39,6 @@ public class DeucesWild implements MiniGame {
 		cardsHeld = new boolean[5];
 		pickedSpaces = new boolean[BOARD_SIZE];
 		redrawUsed = false;
-		firstPlay = false;
 		gameStage = 0;
 		//Display instructions
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
@@ -48,11 +46,12 @@ public class DeucesWild implements MiniGame {
 		output.add("As the name of the game suggests, deuces (twos) are wild. "
 				+ "Those are always treated as the best card possible.");
 		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
-		output.add("You must get at least a three of a kind to win any money. That pays $50,000.");
-		output.add("Straights and flushes each pay $100,000. A full house pays $150,000, a four of a kind pays $250,000, "
-				+ "a straight flush pays $450,000, a five of a kind pays $750,000, a wild royal flush pays $1,250,000, "
-				+ "and four deuces pay $10,000,000.");
-		output.add("If you are lucky enough to get a natural royal flush, you will win $40,000,000!");
+		output.add("You must get at least a pair to win any money. That pays $10,000.");
+		output.add("Two pairs win $50,000, while a three of a kind pays $100,000.");
+		output.add("Straights pay $150,000, flushes pay $200,000, a full house pays $250,000, a four of a kind pays $500,000, "
+				+ "a straight flush pays $750,000, a five of a kind pays $1,000,000, a wild royal flush pays $2,000,000, "
+				+ "and four deuces pay $5,000,000.");
+		output.add("If you are lucky enough to get a natural royal flush, you will win $10,000,000!");
 		output.add("Best of luck! Pick your first card when you're ready.");
 		output.add(generateBoard());
 		return output;
@@ -252,18 +251,20 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		firstPlay = true;
 		switch(hand) {
 			case NOTHING: return 0;
-			case THREE_OF_A_KIND: return 50000;
-			case STRAIGHT: case FLUSH: return 100000;
-			case FULL_HOUSE: return 150000;
-			case FOUR_OF_A_KIND: return 250000;
-			case STRAIGHT_FLUSH: return 450000;
-			case FIVE_OF_A_KIND: return 750000;
-			case WILD_ROYAL: return 1250000;
-			case FOUR_DEUCES: return 10000000;
-			case NATURAL_ROYAL: return 40000000;
+			case ONE_PAIR: return 10000;
+			case TWO_PAIR: return 50000;
+			case THREE_OF_A_KIND: return 100000;
+			case STRAIGHT: return 150000;
+			case FLUSH: return 200000;
+			case FULL_HOUSE: return 250000;
+			case FOUR_OF_A_KIND: return 500000;
+			case STRAIGHT_FLUSH: return 750000;
+			case FIVE_OF_A_KIND: return 1000000;
+			case WILD_ROYAL: return 2000000;
+			case FOUR_DEUCES: return 5000000;
+			case NATURAL_ROYAL: return 10000000;
 			default: throw new IllegalArgumentException(); // since the above is supposed to already handle everything
 		}
 	}
@@ -309,6 +310,9 @@ public class DeucesWild implements MiniGame {
 		byte modeOfRanks = modeOfRanks(rankCount); // That is, how many are there of the most common rank?
 
 		switch (modeOfRanks) {
+			case 2: 
+				if (hasExtraPair(rankCount)) return PokerHand.TWO_PAIR;
+				else return PokerHand.ONE_PAIR;
 			case 3: 
 				if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE;
 				else return PokerHand.THREE_OF_A_KIND;
@@ -376,7 +380,8 @@ public class DeucesWild implements MiniGame {
  		 * And if there is one, it's pair + pair + deuce
  		 * Otherwise the result would be four or five of a kind and we wouldn't get to this point anyway
   		 * In any case, in a full house sorting the array comes out as either (0,2,3) or (1,2,2)
- 		 * And the second-to-last value would always be 2.
+		 * And the second-to-last value would always be 2.
+		 * Further, a two-pair will always be a natural hand; otherwise it'd be at least a three of a kind.
  		 */
  		byte[] sortedRankCount = rankCount;
  		Arrays.sort(sortedRankCount);
