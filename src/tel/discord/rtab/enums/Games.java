@@ -9,6 +9,7 @@ public enum Games implements WeightedSpace {
 	GAMBLE			(2,"The Gamble","Gamble",new Gamble()),
 	THE_OFFER		(2,"The Offer","Offer",new TheOffer()),
 	DEUCES_WILD		(2,"Deuces Wild","Deuces",new DeucesWild()),
+	DOUBLE_TROUBLE	(2,"Double Trouble","Double",new DoubleTrouble()),
 	//Bonus games never appear in the pool
 	SUPERCASH		(0,"SUPERCASH","Super",new Supercash()),
 	DIGITAL_FORTRESS(0,"DIGITAL FORTRESS","Fortress",new DigitalFortress()),
