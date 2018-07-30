@@ -66,13 +66,44 @@ public class DeucesWild implements MiniGame {
 			if (pick.toUpperCase().equals("STOP")) {
 				redrawUsed = true;
 			}
-			else if (pick.toUpperCase().equals("REDRAW")) {
-				output.add("Redrawing all five cards.");
+			else if (pick.toUpperCase().equals("DEAL")) {
 				redrawUsed = true;
 				gameStage = 0;
+
+				String cardsHeldAsString = "Cards held: ";
+				String cardsRedrawingAsString = "Cards being redrawn: ";
+
+				for (int i = 0; i < cardsHeld.length; i++) {
+					if (cardsHeld[i])
+						cardsHeldAsString += cardsPicked[i].toStringShort() + " ";
+					else cardsRedrawingAsString += cardsPicked[i].toStringShort() + " ";
+				}
+				
+				if (cardsRedrawingAsString.equals("Cards held: ")) { // i.e. we're redrawing everything
+						output.add("Redrawing all five cards.");
+				}
+				else if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
+					output.add("All five cards held; ending game.");
+					gameStage = 5;
+					return output;
+				}
+				else {
+					output.add(cardsHeldAsString);
+					output.add(cardsRedrawingAsString);
+				}
+				
+				// Find out what stage we should be on now
+				for (int i = 0; i < cardsHeld.length; i++) {
+					if (!cardsHeld[i])
+						break;
+					else gameStage++;
+				}
 				output.add(generateBoard());
 				output.add("Select your first card of the redraw when you are ready.");
 			}
+
+			// The next two if-else blocks could *probably* be merged together since they do the same thing with two
+			// exceptions, but I'm lazy :P --Coug
 			else if (pick.toUpperCase().startsWith("HOLD ")) {
 				String[] tokens = pick.split("\\s");
 				
@@ -84,48 +115,49 @@ public class DeucesWild implements MiniGame {
 				
 				// Make sure the player's choices correspond to actual cards
 				try {
+					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
+					boolean[] testCardsHeld = deepCopy(cardsHeld);
+
 					for (int i = 1; i < tokens.length; i++)
 					{
 						cardsHeld[Integer.parseInt(tokens[i])-1] = true;
 					}
-					
-					// If we get here, we're good :)
-					redrawUsed = true;
-					gameStage = 0;
-					
-					String cardsHeldAsString = "Cards held: ";
-					String cardsRedrawingAsString = "Cards being redrawn: ";
-					
-
-					for (int i = 0; i < cardsHeld.length; i++) {
-						if (cardsHeld[i])
-							cardsHeldAsString += cardsPicked[i].toStringShort() + " ";
-						else cardsRedrawingAsString += cardsPicked[i].toStringShort() + " ";
-					}
-					
-					if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
-						output.add("All five cards held; ending game.");
-						gameStage = 5;
-						return output;
-					}
-					
-					output.add(cardsHeldAsString);
-					output.add(cardsRedrawingAsString);
-					
-					// Find out what stage we should be on now
-					for (int i = 0; i < cardsHeld.length; i++) {
-						if (!cardsHeld[i])
-							break;
-						else gameStage++;
-					}
-					output.add(generateBoard());
-					output.add("Select your first card of the redraw when you are ready.");
+					cardsHeld = testCardsHeld;
+					output.add("Cards held.");
+					output.add(generateHand());
+					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
+					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
-					// Clear out the hold flags to be safe
-					for (int i = 0; i < cardsHeld.length; i++) {
-						cardsHeld[i] = false;
+					output.add("Invalid card(s).");
+					return output;
+				}
+			}
+			else if (pick.toUpperCase().startsWith("RELEASE ")) {
+				String[] tokens = pick.split("\\s");
+				
+				// If there are any non-numeric tokens after "RELEASE", assume it's just the player talking
+				for (int i = 1; i < tokens.length; i++) {
+					if (!isNumber(tokens[i]))
+						return output;
+				}
+				
+				// Make sure the player's choices correspond to actual cards
+				try {
+					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
+					boolean[] testCardsHeld = deepCopy(cardsHeld);
+
+					for (int i = 1; i < tokens.length; i++)
+					{
+						cardsHeld[Integer.parseInt(tokens[i])-1] = false;
 					}
+					cardsHeld = testCardsHeld;
+					output.add("Cards released.");
+					output.add(generateHand());
+					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
+					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
+				}
+				catch (IndexOutOfBoundsException e) {
 					output.add("Invalid card(s).");
 					return output;
 				}
@@ -163,13 +195,15 @@ public class DeucesWild implements MiniGame {
 					if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
 						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
 								+ "of each card.");
-						output.add("For example, type 'HOLD 1' to hold only the " + cardsPicked[0] +
-								", or type 'HOLD 2 5' **in a single message** to hold the "
-								+ cardsPicked[1] + " as well as the " + cardsPicked[4] + ".");
+						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ".");
+						output.add("If you change your mind or make a mistake, type RELEASE followed by the position number of the card " +
+								"you would rather redraw, e.g. 'RELEASE 2' to remove any hold on the " + cardsPicked[1] + ".");
+						output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
+								"hold the " + cardsPicked[2] + ", the " + cardsPicked[3]  + ", and the " + cardsPicked[4] + ".");
 						output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
 						output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
 								"prize of $%,d.", getMoneyWon()));
-						output.add("Alternatively, you can redraw every single card by typing 'REDRAW'.");
+						output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
 					}
 				}
 				else {
@@ -230,8 +264,34 @@ public class DeucesWild implements MiniGame {
 				display.append("   ");
 			else display.append(cardsPicked[i].toStringShort() + " ");
 		}
-		if (gameStage == 5)
+		if (gameStage == 5) {
 			display.append("(" + hand.toString() + ")");
+			if (!redrawUsed && hand != PokerHand.NATURAL_ROYAL)
+				display.append("\n" + "              1  2  3  4  5");
+		}
+		display.append("```");
+		return display.toString();
+	}
+
+	String generateHand() {
+		StringBuilder display = new StringBuilder();
+
+		display.append("```\n" + "Current hand: ");
+		for (int i = 0; i < cardsPicked.length; i++)
+		{
+			display.append(cardsPicked[i].toStringShort() + " ");
+		}
+		display.append("\n" + "              ");
+		for (int i = 0; i < cardsPicked.length; i++)
+		{
+			display.append(i-1);
+
+			if (cardsHeld[i])
+				display.append ("*");
+			else display.append(" ");
+
+			display.append(" ");
+		}
 		display.append("```");
 		return display.toString();
 	}
@@ -386,6 +446,15 @@ public class DeucesWild implements MiniGame {
  		byte[] sortedRankCount = rankCount;
  		Arrays.sort(sortedRankCount);
  		return sortedRankCount[rankCount.length - 2] == 2;
+	}
+
+	private boolean[] deepCopy (boolean[] arr) { // Here for DRY purposes
+		boolean copiedArr[] = new boolean[arr.length];
+
+		for (int i = 0; i < arr.length; i++)
+			copiedArr[i] = arr[i];
+
+		return copiedArr;
 	}
 
 	@Override
