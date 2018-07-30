@@ -29,7 +29,9 @@ public enum CashType implements WeightedSpace
 	P400K	(  400000,2),
 	P500K	(  500000,2),
 	P750K	(  750000,2),
-	P1000K	( 1000000,2);
+	P1000K	( 1000000,2),
+	//Meme
+	P50		(      50,1);
 	
 	int value;
 	int weight;
