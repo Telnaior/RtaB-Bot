@@ -82,16 +82,17 @@ public class RaceToABillionBot
 				if(channel.getTopic().startsWith("~ GAME CHANNEL ~"))
 				{
 					game.add(new GameController(channel));
-					System.out.println("Game Channel: " + channel.getId());
+					System.out.println("Game Channel: " + channel.getName());
 				}
 				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))
 				{
 					String linkChannel = channel.getTopic().substring(19);
 					for(GameController gameChannel : game)
 					{
-						if(linkChannel.equals(gameChannel.channel.getId()))
+						if(linkChannel.equals(gameChannel.channel.getName()) 
+								&& channel.getGuild() == gameChannel.channel.getGuild())
 						{
-							System.out.println("Result Channel: " + channel.getId() + " : " + linkChannel);
+							System.out.println("Result Channel: " + channel.getName() + " : " + linkChannel);
 							gameChannel.setResultChannel(channel);
 							//We found the right channel, so
 							break;

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import tel.discord.rtab.enums.BlammoChoices;
@@ -41,8 +42,8 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 public class GameController
 {
 	final static int MAX_PLAYERS = 16;
-	public MessageChannel channel;
-	MessageChannel resultChannel;
+	public TextChannel channel;
+	TextChannel resultChannel;
 	int boardSize = 15;
 	List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
@@ -145,12 +146,12 @@ public class GameController
 		}
 	}
 	
-	public GameController(MessageChannel channelID)
+	public GameController(TextChannel channelID)
 	{
 		channel = channelID;
 	}
 	
-	void setResultChannel(MessageChannel channelID)
+	void setResultChannel(TextChannel channelID)
 	{
 		resultChannel = channelID;
 	}
