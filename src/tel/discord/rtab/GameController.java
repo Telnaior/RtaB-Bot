@@ -926,6 +926,11 @@ public class GameController
 				next.addMoney(delta,MoneyMultipliersToUse.NOTHING);
 			}
 			break;
+		case SHUFFLE_ORDER:
+			channel.sendMessage("It's a **Scramble**, everybody get up and change position!")
+			.completeAfter(5,TimeUnit.SECONDS);
+			Collections.shuffle(players);
+			break;
 		}
 		runEndTurnLogic();
 	}
