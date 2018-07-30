@@ -120,7 +120,7 @@ public class DeucesWild implements MiniGame {
 
 					for (int i = 1; i < tokens.length; i++)
 					{
-						cardsHeld[Integer.parseInt(tokens[i])-1] = true;
+						testCardsHeld[Integer.parseInt(tokens[i])-1] = true;
 					}
 					cardsHeld = testCardsHeld;
 					output.add("Cards held.");
@@ -149,7 +149,7 @@ public class DeucesWild implements MiniGame {
 
 					for (int i = 1; i < tokens.length; i++)
 					{
-						cardsHeld[Integer.parseInt(tokens[i])-1] = false;
+						testCardsHeld[Integer.parseInt(tokens[i])-1] = false;
 					}
 					cardsHeld = testCardsHeld;
 					output.add("Cards released.");
@@ -284,7 +284,7 @@ public class DeucesWild implements MiniGame {
 		display.append("\n" + "              ");
 		for (int i = 0; i < cardsPicked.length; i++)
 		{
-			display.append(i-1);
+			display.append(i+1);
 
 			if (cardsHeld[i])
 				display.append ("*");
