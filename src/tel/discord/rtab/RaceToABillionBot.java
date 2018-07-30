@@ -10,6 +10,7 @@ import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Guild;
 import tel.discord.rtab.commands.AddBotCommand;
 import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.DemoCommand;
@@ -64,5 +65,6 @@ public class RaceToABillionBot
 		prepareBot.addEventListener(utilities.build());
 		prepareBot.addEventListener(waiter);
 		JDA yayBot = prepareBot.buildBlocking();
+		List<Guild> guildList = yayBot.getGuilds();
 	}
 }
