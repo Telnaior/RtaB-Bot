@@ -1554,7 +1554,7 @@ public class GameController
 			chosenBot = chosenBot.next();
 			newPlayer = new Player(chosenBot);
 		}
-		while(newPlayer.lives != Player.MAX_LIVES && triesLeft > 0);
+		while((newPlayer.lives != Player.MAX_LIVES || players.contains(newPlayer)) && triesLeft > 0);
 		if(newPlayer.lives != Player.MAX_LIVES)
 		{
 			//If we've checked EVERY bot...
