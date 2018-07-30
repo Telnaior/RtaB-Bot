@@ -1,3 +1,9 @@
+1.2.0
+ - Nerfed Double Trouble
+ - Bugfixes (notably, fixed choosing a space too close to the deadline opening a second thread that corrupts the game)
+ - New events: "Scramble" randomises the player order, while "End Round" immediately declares everyone alive a winner.
+ - Also a $50 cash space for people who don't have enough memes in their life
+
 1.1.0
  - Board now gets wider instead of taller once it gets larger than 25 spaces.
  - New minigame, Double Trouble!
