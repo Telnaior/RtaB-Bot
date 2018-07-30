@@ -234,12 +234,14 @@ class Player implements Comparable<Player>
 			if(lives == MAX_LIVES)
 				lifeRefillTime = Instant.now().plusSeconds(72000);
 			if(lives > 0)
+			{
 				if(lives == 1)
 				{
 					GameController.channel.sendMessage(getSafeMention() + ", you are out of lives. "
 							+ "Your gains for the rest of the day will be reduced by 80%.").queue();
 				}
 				lives --;
+			}
 		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time

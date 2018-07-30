@@ -130,6 +130,19 @@ public class GameController
 			startMiniGame(new SuperBonusRound());
 		}
 	}
+	private static class PickSpace extends TimerTask
+	{
+		final int location;
+		private PickSpace(int space)
+		{
+			location = space;
+		}
+		@Override
+		public void run()
+		{
+			resolveTurn(location);
+		}
+	}
 	
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
@@ -433,7 +446,7 @@ public class GameController
 									+spacesLeft+" spaces left.");
 						}
 						//Anyway go play out their turn
-						resolveTurn(location);
+						timer.schedule(new PickSpace(location),1000);
 					},
 					90,TimeUnit.SECONDS, () ->
 					{
@@ -520,7 +533,7 @@ public class GameController
 		if(players.get(currentTurn).isBot)
 		{
 			channel.sendMessage(players.get(currentTurn).name + " selects space " + (location+1) + "...")
-				.completeAfter(1,TimeUnit.SECONDS);
+				.complete();
 		}
 		else
 		{
