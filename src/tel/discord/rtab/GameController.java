@@ -1092,10 +1092,9 @@ public class GameController
 		//Don't print minigame messages for bots
 		if(!players.get(currentTurn).isBot)
 		{
-			ListIterator<String> output = result.listIterator(0);
-			while(output.hasNext())
+			for(String output : result)
 			{
-				channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
+				channel.sendMessage(output).completeAfter(2,TimeUnit.SECONDS);
 			}
 		}
 		runNextMiniGameTurn(currentGame);
@@ -1136,10 +1135,9 @@ public class GameController
 						String miniPick = e.getMessage().getContentRaw();
 						//Keep printing output until it runs out of output
 						LinkedList<String> result = currentGame.playNextTurn(miniPick);
-						ListIterator<String> output = result.listIterator(0);
-						while(output.hasNext())
+						for(String output : result)
 						{
-							channel.sendMessage(output.next()).completeAfter(2,TimeUnit.SECONDS);
+							channel.sendMessage(output).completeAfter(2,TimeUnit.SECONDS);
 						}
 						//Check if the game's over
 						if(currentGame.isGameOver())
