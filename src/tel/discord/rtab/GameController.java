@@ -692,7 +692,7 @@ public class GameController
 				resultString.append("-");
 			resultString.append("$");
 			resultString.append(String.format("%,d",Math.abs(cashWon)));
-			resultString.append("**");
+			resultString.append("**!");
 			extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			break;
 		case BOOSTER:
@@ -1560,13 +1560,23 @@ public class GameController
 		Player newPlayer;
 		int triesLeft = GameBot.values().length;
 		//Start looping through until we get a good one (one that hasn't exploded today)
+		boolean goodPick;
 		do
 		{
 			triesLeft --;
 			chosenBot = chosenBot.next();
 			newPlayer = new Player(chosenBot);
+			goodPick = true;
+			for(int i=0; i<playersJoined; i++)
+			{
+				if(players.get(i).uID.equals(newPlayer.uID))
+				{
+					goodPick = false;
+					break;
+				}
+			}
 		}
-		while((newPlayer.lives != Player.MAX_LIVES || players.contains(newPlayer)) && triesLeft > 0);
+		while((newPlayer.lives != Player.MAX_LIVES || !goodPick) && triesLeft > 0);
 		if(newPlayer.lives != Player.MAX_LIVES)
 		{
 			//If we've checked EVERY bot...

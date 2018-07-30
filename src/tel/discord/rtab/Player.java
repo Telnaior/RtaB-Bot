@@ -108,7 +108,7 @@ class Player implements Comparable<Player>
 					lifeRefillTime = Instant.parse(record[7]);
 					lives = Integer.parseInt(record[6]);
 					//If we're short on lives and we've passed the refill time, restock them
-					if(lifeRefillTime.isBefore(Instant.now()) && lives < MAX_LIVES)
+					if(lifeRefillTime.isBefore(Instant.now()) && lives < MAX_LIVES && lives >= 0)
 						lives = MAX_LIVES;
 					break;
 				}
@@ -140,7 +140,7 @@ class Player implements Comparable<Player>
 			}
 		}
 		//If they're out of lives and it's a positive, hit 'em hard
-		if(lives <= 0 && adjustedPrize > 0)
+		if(lives == 0 && adjustedPrize > 0)
 			adjustedPrize /= 5;
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0

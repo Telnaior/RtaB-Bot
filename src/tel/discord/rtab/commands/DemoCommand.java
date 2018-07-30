@@ -17,8 +17,11 @@ public class DemoCommand extends Command {
 	@Override
 	protected void execute(CommandEvent event)
 	{
+		int playerCount = 4;
+		if(!event.getArgs().equals(""))
+			playerCount = Integer.parseInt(event.getArgs());
 		GameController.channel = event.getChannel();
-		for(int i=0; i<4; i++)
+		for(int i=0; i<playerCount; i++)
 		{
 			GameController.addRandomBot();
 		}
