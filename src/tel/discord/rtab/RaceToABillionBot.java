@@ -8,6 +8,7 @@ import java.util.List;
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import tel.discord.rtab.commands.AddBotCommand;
 import tel.discord.rtab.commands.BoardCommand;
@@ -58,10 +59,10 @@ public class RaceToABillionBot
 		utilities.addCommand(new AddBotCommand());
 		utilities.addCommand(new DemoCommand());
 		utilities.addCommand(new MemeCommand());
-		JDABuilder yayBot = new JDABuilder(AccountType.BOT);
-		yayBot.setToken(token);
-		yayBot.addEventListener(utilities.build());
-		yayBot.addEventListener(waiter);
-		yayBot.buildBlocking();
+		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
+		prepareBot.setToken(token);
+		prepareBot.addEventListener(utilities.build());
+		prepareBot.addEventListener(waiter);
+		JDA yayBot = prepareBot.buildBlocking();
 	}
 }
