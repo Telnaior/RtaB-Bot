@@ -15,6 +15,7 @@ public enum Events implements WeightedSpace
 	BLAMMO_FRENZY	(2),
 	STREAKP3		(2),
 	SPLIT_SHARE		(2),
+	END_ROUND		(1),
 	STARMAN			(1),
 	JACKPOT			(1);
 
