@@ -928,9 +928,16 @@ public class GameController
 			break;
 		case SHUFFLE_ORDER:
 			channel.sendMessage("It's a **Scramble**, everybody get up and change position!")
-			.completeAfter(5,TimeUnit.SECONDS);
+				.completeAfter(5,TimeUnit.SECONDS);
 			Collections.shuffle(players);
 			break;
+		case END_ROUND:
+			channel.sendMessage("It's the **End** of the **Round**!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			gameStatus = GameStatus.END_GAME;
+			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
+			timer.schedule(new WaitForEndGame(), 1000);
+			return;
 		}
 		runEndTurnLogic();
 	}
