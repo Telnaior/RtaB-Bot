@@ -79,7 +79,7 @@ public class DeucesWild implements MiniGame {
 					else cardsRedrawingAsString += cardsPicked[i].toStringShort() + " ";
 				}
 				
-				if (cardsRedrawingAsString.equals("Cards held: ")) { // i.e. we're redrawing everything
+				if (cardsHeldAsString.equals("Cards held: ")) { // i.e. we're redrawing everything
 						output.add("Redrawing all five cards.");
 				}
 				else if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
