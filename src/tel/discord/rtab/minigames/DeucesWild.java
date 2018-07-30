@@ -22,7 +22,6 @@ public class DeucesWild implements MiniGame {
 	Card lastPicked;
 	PokerHand hand = PokerHand.NOTHING;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
-	boolean firstPlay = true;
 	boolean redrawUsed;
 	byte gameStage;
 
@@ -40,7 +39,6 @@ public class DeucesWild implements MiniGame {
 		cardsHeld = new boolean[5];
 		pickedSpaces = new boolean[BOARD_SIZE];
 		redrawUsed = false;
-		firstPlay = false;
 		gameStage = 0;
 		//Display instructions
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
@@ -48,11 +46,12 @@ public class DeucesWild implements MiniGame {
 		output.add("As the name of the game suggests, deuces (twos) are wild. "
 				+ "Those are always treated as the best card possible.");
 		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
-		output.add("You must get at least a three of a kind to win any money. That pays $50,000.");
-		output.add("Straights and flushes each pay $100,000. A full house pays $150,000, a four of a kind pays $250,000, "
-				+ "a straight flush pays $450,000, a five of a kind pays $750,000, a wild royal flush pays $1,250,000, "
-				+ "and four deuces pay $10,000,000.");
-		output.add("If you are lucky enough to get a natural royal flush, you will win $40,000,000!");
+		output.add("You must get at least a pair to win any money. That pays $10,000.");
+		output.add("Two pairs win $50,000, while a three of a kind pays $100,000.");
+		output.add("Straights pay $150,000, flushes pay $200,000, a full house pays $250,000, a four of a kind pays $500,000, "
+				+ "a straight flush pays $750,000, a five of a kind pays $1,000,000, a wild royal flush pays $2,000,000, "
+				+ "and four deuces pay $5,000,000.");
+		output.add("If you are lucky enough to get a natural royal flush, you will win $10,000,000!");
 		output.add("Best of luck! Pick your first card when you're ready.");
 		output.add(generateBoard());
 		return output;
@@ -67,13 +66,44 @@ public class DeucesWild implements MiniGame {
 			if (pick.toUpperCase().equals("STOP")) {
 				redrawUsed = true;
 			}
-			else if (pick.toUpperCase().equals("REDRAW")) {
-				output.add("Redrawing all five cards.");
+			else if (pick.toUpperCase().equals("DEAL")) {
 				redrawUsed = true;
 				gameStage = 0;
+
+				String cardsHeldAsString = "Cards held: ";
+				String cardsRedrawingAsString = "Cards being redrawn: ";
+
+				for (int i = 0; i < cardsHeld.length; i++) {
+					if (cardsHeld[i])
+						cardsHeldAsString += cardsPicked[i].toStringShort() + " ";
+					else cardsRedrawingAsString += cardsPicked[i].toStringShort() + " ";
+				}
+				
+				if (cardsRedrawingAsString.equals("Cards held: ")) { // i.e. we're redrawing everything
+						output.add("Redrawing all five cards.");
+				}
+				else if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
+					output.add("All five cards held; ending game.");
+					gameStage = 5;
+					return output;
+				}
+				else {
+					output.add(cardsHeldAsString);
+					output.add(cardsRedrawingAsString);
+				}
+				
+				// Find out what stage we should be on now
+				for (int i = 0; i < cardsHeld.length; i++) {
+					if (!cardsHeld[i])
+						break;
+					else gameStage++;
+				}
 				output.add(generateBoard());
 				output.add("Select your first card of the redraw when you are ready.");
 			}
+
+			// The next two if-else blocks could *probably* be merged together since they do the same thing with two
+			// exceptions, but I'm lazy :P --Coug
 			else if (pick.toUpperCase().startsWith("HOLD ")) {
 				String[] tokens = pick.split("\\s");
 				
@@ -85,48 +115,49 @@ public class DeucesWild implements MiniGame {
 				
 				// Make sure the player's choices correspond to actual cards
 				try {
+					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
+					boolean[] testCardsHeld = deepCopy(cardsHeld);
+
 					for (int i = 1; i < tokens.length; i++)
 					{
 						cardsHeld[Integer.parseInt(tokens[i])-1] = true;
 					}
-					
-					// If we get here, we're good :)
-					redrawUsed = true;
-					gameStage = 0;
-					
-					String cardsHeldAsString = "Cards held: ";
-					String cardsRedrawingAsString = "Cards being redrawn: ";
-					
-
-					for (int i = 0; i < cardsHeld.length; i++) {
-						if (cardsHeld[i])
-							cardsHeldAsString += cardsPicked[i].toStringShort() + " ";
-						else cardsRedrawingAsString += cardsPicked[i].toStringShort() + " ";
-					}
-					
-					if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
-						output.add("All five cards held; ending game.");
-						gameStage = 5;
-						return output;
-					}
-					
-					output.add(cardsHeldAsString);
-					output.add(cardsRedrawingAsString);
-					
-					// Find out what stage we should be on now
-					for (int i = 0; i < cardsHeld.length; i++) {
-						if (!cardsHeld[i])
-							break;
-						else gameStage++;
-					}
-					output.add(generateBoard());
-					output.add("Select your first card of the redraw when you are ready.");
+					cardsHeld = testCardsHeld;
+					output.add("Cards held.");
+					output.add(generateHand());
+					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
+					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
-					// Clear out the hold flags to be safe
-					for (int i = 0; i < cardsHeld.length; i++) {
-						cardsHeld[i] = false;
+					output.add("Invalid card(s).");
+					return output;
+				}
+			}
+			else if (pick.toUpperCase().startsWith("RELEASE ")) {
+				String[] tokens = pick.split("\\s");
+				
+				// If there are any non-numeric tokens after "RELEASE", assume it's just the player talking
+				for (int i = 1; i < tokens.length; i++) {
+					if (!isNumber(tokens[i]))
+						return output;
+				}
+				
+				// Make sure the player's choices correspond to actual cards
+				try {
+					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
+					boolean[] testCardsHeld = deepCopy(cardsHeld);
+
+					for (int i = 1; i < tokens.length; i++)
+					{
+						cardsHeld[Integer.parseInt(tokens[i])-1] = false;
 					}
+					cardsHeld = testCardsHeld;
+					output.add("Cards released.");
+					output.add(generateHand());
+					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
+					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
+				}
+				catch (IndexOutOfBoundsException e) {
 					output.add("Invalid card(s).");
 					return output;
 				}
@@ -164,13 +195,15 @@ public class DeucesWild implements MiniGame {
 					if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
 						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
 								+ "of each card.");
-						output.add("For example, type 'HOLD 1' to hold only the " + cardsPicked[0] +
-								", or type 'HOLD 2 5' **in a single message** to hold the "
-								+ cardsPicked[1] + " as well as the " + cardsPicked[4] + ".");
+						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ".");
+						output.add("If you change your mind or make a mistake, type RELEASE followed by the position number of the card " +
+								"you would rather redraw, e.g. 'RELEASE 2' to remove any hold on the " + cardsPicked[1] + ".");
+						output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
+								"hold the " + cardsPicked[2] + ", the " + cardsPicked[3]  + ", and the " + cardsPicked[4] + ".");
 						output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
 						output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
 								"prize of $%,d.", getMoneyWon()));
-						output.add("Alternatively, you can redraw every single card by typing 'REDRAW'.");
+						output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
 					}
 				}
 				else {
@@ -231,8 +264,34 @@ public class DeucesWild implements MiniGame {
 				display.append("   ");
 			else display.append(cardsPicked[i].toStringShort() + " ");
 		}
-		if (gameStage == 5)
+		if (gameStage == 5) {
 			display.append("(" + hand.toString() + ")");
+			if (!redrawUsed && hand != PokerHand.NATURAL_ROYAL)
+				display.append("\n" + "              1  2  3  4  5");
+		}
+		display.append("```");
+		return display.toString();
+	}
+
+	String generateHand() {
+		StringBuilder display = new StringBuilder();
+
+		display.append("```\n" + "Current hand: ");
+		for (int i = 0; i < cardsPicked.length; i++)
+		{
+			display.append(cardsPicked[i].toStringShort() + " ");
+		}
+		display.append("\n" + "              ");
+		for (int i = 0; i < cardsPicked.length; i++)
+		{
+			display.append(i-1);
+
+			if (cardsHeld[i])
+				display.append ("*");
+			else display.append(" ");
+
+			display.append(" ");
+		}
 		display.append("```");
 		return display.toString();
 	}
@@ -252,18 +311,20 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		firstPlay = true;
 		switch(hand) {
 			case NOTHING: return 0;
-			case THREE_OF_A_KIND: return 50000;
-			case STRAIGHT: case FLUSH: return 100000;
-			case FULL_HOUSE: return 150000;
-			case FOUR_OF_A_KIND: return 250000;
-			case STRAIGHT_FLUSH: return 450000;
-			case FIVE_OF_A_KIND: return 750000;
-			case WILD_ROYAL: return 1250000;
-			case FOUR_DEUCES: return 10000000;
-			case NATURAL_ROYAL: return 40000000;
+			case ONE_PAIR: return 10000;
+			case TWO_PAIR: return 50000;
+			case THREE_OF_A_KIND: return 100000;
+			case STRAIGHT: return 150000;
+			case FLUSH: return 200000;
+			case FULL_HOUSE: return 250000;
+			case FOUR_OF_A_KIND: return 500000;
+			case STRAIGHT_FLUSH: return 750000;
+			case FIVE_OF_A_KIND: return 1000000;
+			case WILD_ROYAL: return 2000000;
+			case FOUR_DEUCES: return 5000000;
+			case NATURAL_ROYAL: return 10000000;
 			default: throw new IllegalArgumentException(); // since the above is supposed to already handle everything
 		}
 	}
@@ -309,6 +370,9 @@ public class DeucesWild implements MiniGame {
 		byte modeOfRanks = modeOfRanks(rankCount); // That is, how many are there of the most common rank?
 
 		switch (modeOfRanks) {
+			case 2: 
+				if (hasExtraPair(rankCount)) return PokerHand.TWO_PAIR;
+				else return PokerHand.ONE_PAIR;
 			case 3: 
 				if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE;
 				else return PokerHand.THREE_OF_A_KIND;
@@ -376,11 +440,21 @@ public class DeucesWild implements MiniGame {
  		 * And if there is one, it's pair + pair + deuce
  		 * Otherwise the result would be four or five of a kind and we wouldn't get to this point anyway
   		 * In any case, in a full house sorting the array comes out as either (0,2,3) or (1,2,2)
- 		 * And the second-to-last value would always be 2.
+		 * And the second-to-last value would always be 2.
+		 * Further, a two-pair will always be a natural hand; otherwise it'd be at least a three of a kind.
  		 */
  		byte[] sortedRankCount = rankCount;
  		Arrays.sort(sortedRankCount);
  		return sortedRankCount[rankCount.length - 2] == 2;
+	}
+
+	private boolean[] deepCopy (boolean[] arr) { // Here for DRY purposes
+		boolean copiedArr[] = new boolean[arr.length];
+
+		for (int i = 0; i < arr.length; i++)
+			copiedArr[i] = arr[i];
+
+		return copiedArr;
 	}
 
 	@Override
