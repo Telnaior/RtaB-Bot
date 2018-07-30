@@ -6,4 +6,4 @@ If you want to work on improving the bot, great! More minigames and events are a
 
 Major updates are generally timed to coincide with someone reaching the goal, so about halfway to that we lock down the "current" version and start looking at more significant changes to make for the next season. You can still contribute as normal during that time (and I would welcome it), but new features won't be added to the game right away.
 
-If you want to run the bot on your own server, let me know (you can get in touch with me through that server) and I can try to help out, though ultimately responsibility for hosting and maintaining your fork would be on you.
+If you want to run the bot on your own server, let me know (you can get in touch with me through the invite link above) and we can arrange terms!

@@ -3,12 +3,16 @@ package tel.discord.rtab;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
 import tel.discord.rtab.commands.AddBotCommand;
 import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.DemoCommand;
@@ -31,6 +35,8 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class RaceToABillionBot
 {
+	public static ArrayList<GameController> game = new ArrayList<>(1);
+	
 	public static void main(String[] args) throws LoginException, InterruptedException, IOException
 	{
 		List<String> list = Files.readAllLines(Paths.get("config.txt"));
@@ -58,10 +64,42 @@ public class RaceToABillionBot
 		utilities.addCommand(new AddBotCommand());
 		utilities.addCommand(new DemoCommand());
 		utilities.addCommand(new MemeCommand());
-		JDABuilder yayBot = new JDABuilder(AccountType.BOT);
-		yayBot.setToken(token);
-		yayBot.addEventListener(utilities.build());
-		yayBot.addEventListener(waiter);
-		yayBot.buildBlocking();
+		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
+		prepareBot.setToken(token);
+		prepareBot.addEventListener(utilities.build());
+		prepareBot.addEventListener(waiter);
+		JDA yayBot = prepareBot.buildBlocking();
+		//Get all the guilds we're in
+		List<Guild> guildList = yayBot.getGuilds();
+		//And for each guild, get the list of channels in it
+		for(Guild guild : guildList)
+		{
+			List<TextChannel> channelList = guild.getTextChannels();
+			//And for each channel...
+			for(TextChannel channel : channelList)
+			{
+				//If it's a designated game channel, make a controller here!
+				if(channel.getTopic().startsWith("~ GAME CHANNEL ~"))
+				{
+					game.add(new GameController(channel));
+					System.out.println("Game Channel: " + channel.getName());
+				}
+				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))
+				{
+					String linkChannel = channel.getTopic().substring(19);
+					for(GameController gameChannel : game)
+					{
+						if(linkChannel.equals(gameChannel.channel.getName()) 
+								&& channel.getGuild() == gameChannel.channel.getGuild())
+						{
+							System.out.println("Result Channel: " + channel.getName() + " : " + linkChannel);
+							gameChannel.setResultChannel(channel);
+							//We found the right channel, so
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 }
