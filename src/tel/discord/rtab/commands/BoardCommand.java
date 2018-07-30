@@ -1,6 +1,7 @@
 package tel.discord.rtab.commands;
 
 import tel.discord.rtab.GameController;
+import tel.discord.rtab.RaceToABillionBot;
 import tel.discord.rtab.enums.GameStatus;
 
 import com.jagrosh.jdautilities.command.Command;
@@ -17,14 +18,22 @@ public class BoardCommand extends Command
 	
 	@Override
 	protected void execute(CommandEvent event) {
-		if(GameController.gameStatus == GameStatus.SIGNUPS_OPEN)
+		for(GameController game : RaceToABillionBot.game)
 		{
-			//No board to display if the game isn't running!
-			event.reply("No game currently running.");
-		}
-		else
-		{	
-			GameController.displayBoardAndStatus(GameController.gameStatus != GameStatus.END_GAME, false);
+			if(game.channel == event.getChannel())
+			{
+				if(game.gameStatus == GameStatus.SIGNUPS_OPEN)
+				{
+					//No board to display if the game isn't running!
+					event.reply("No game currently running.");
+				}
+				else
+				{	
+					game.displayBoardAndStatus(game.gameStatus != GameStatus.END_GAME, false);
+				}
+				//We found the right channel, so
+				return;
+			}
 		}
 	}
 

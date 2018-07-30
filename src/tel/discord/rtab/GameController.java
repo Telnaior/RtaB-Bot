@@ -41,25 +41,25 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 public class GameController
 {
 	final static int MAX_PLAYERS = 16;
-	static int boardSize = 15;
-	public static MessageChannel channel = null;
-	static List<Player> players = new ArrayList<>();
-	static List<Player> winners = new ArrayList<>();
-	static int currentTurn = -1;
-	static int repeatTurn = 0;
-	public static int playersJoined = 0;
-	static int playersAlive = 0;
-	static ListIterator<Games> gamesToPlay;
-	public static GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
-	static boolean[] pickedSpaces;
-	static int spacesLeft;
-	static boolean[] bombs;
-	static Board gameboard;
+	public MessageChannel channel;
+	int boardSize = 15;
+	List<Player> players = new ArrayList<>();
+	List<Player> winners = new ArrayList<>();
+	int currentTurn = -1;
+	int repeatTurn = 0;
+	public int playersJoined = 0;
+	int playersAlive = 0;
+	ListIterator<Games> gamesToPlay;
+	public GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
+	boolean[] pickedSpaces;
+	int spacesLeft;
+	boolean[] bombs;
+	Board gameboard;
 	public static EventWaiter waiter;
-	public static Timer timer = new Timer();
-	static Message waitingMessage;
+	public Timer timer = new Timer();
+	Message waitingMessage;
 
-	private static class StartGameTask extends TimerTask
+	private class StartGameTask extends TimerTask
 	{
 		@Override
 		public void run()
@@ -67,7 +67,7 @@ public class GameController
 			startTheGameAlready();
 		}
 	}
-	private static class FinalCallTask extends TimerTask
+	private class FinalCallTask extends TimerTask
 	{
 		@Override
 		public void run()
@@ -76,7 +76,7 @@ public class GameController
 			channel.sendMessage(listPlayers(false)).queue();
 		}
 	}
-	private static class ClearMinigameQueueTask extends TimerTask
+	private class ClearMinigameQueueTask extends TimerTask
 	{
 		@Override
 		public void run()
@@ -84,7 +84,7 @@ public class GameController
 			prepareNextMiniGame();
 		}
 	}
-	private static class PickSpaceWarning extends TimerTask
+	private class PickSpaceWarning extends TimerTask
 	{
 		@Override
 		public void run()
@@ -94,7 +94,7 @@ public class GameController
 			displayBoardAndStatus(true,false);
 		}
 	}
-	private static class MiniGameWarning extends TimerTask
+	private class MiniGameWarning extends TimerTask
 	{
 		@Override
 		public void run()
@@ -103,7 +103,7 @@ public class GameController
 					", are you still there? One minute left!").queue();
 		}
 	}
-	private static class WaitForNextTurn extends TimerTask
+	private class WaitForNextTurn extends TimerTask
 	{
 		@Override
 		public void run()
@@ -111,7 +111,7 @@ public class GameController
 			runTurn();
 		}
 	}
-	private static class WaitForEndGame extends TimerTask
+	private class WaitForEndGame extends TimerTask
 	{
 		@Override
 		public void run()
@@ -119,7 +119,7 @@ public class GameController
 			runNextEndGamePlayer();
 		}
 	}
-	private static class RevealTheSBR extends TimerTask
+	private class RevealTheSBR extends TimerTask
 	{
 		@Override
 		public void run()
@@ -130,7 +130,7 @@ public class GameController
 			startMiniGame(new SuperBonusRound());
 		}
 	}
-	private static class PickSpace extends TimerTask
+	private class PickSpace extends TimerTask
 	{
 		final int location;
 		private PickSpace(int space)
@@ -144,10 +144,15 @@ public class GameController
 		}
 	}
 	
+	public GameController(MessageChannel channelID)
+	{
+		channel = channelID;
+	}
+	
 	/*
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
 	 */
-	public static void reset()
+	public void reset()
 	{
 		players.clear();
 		currentTurn = -1;
@@ -165,24 +170,16 @@ public class GameController
 	 * String playerID - ID of player to be added.
 	 * Returns an enum which gives the result of the join attempt.
 	 */
-	public static PlayerJoinReturnValue addPlayer(MessageChannel channelID, Member playerID)
+	public PlayerJoinReturnValue addPlayer(Member playerID)
 	{
 		//Make sure game isn't already running
 		if(gameStatus != GameStatus.SIGNUPS_OPEN)
 			return PlayerJoinReturnValue.INPROGRESS;
-		//Are they in the right channel?
-		if(playersJoined == 0)
-		{
-			//If first player, this is the channel, now queue up starting the game
-			channel = channelID;
-		}
-		else if(channel != channelID)
-			return PlayerJoinReturnValue.WRONGCHANNEL;
 		//Watch out for too many players
 		if(playersJoined >= MAX_PLAYERS)
 			return PlayerJoinReturnValue.TOOMANYPLAYERS;
 		//Create player object
-		Player newPlayer = new Player(playerID);
+		Player newPlayer = new Player(playerID,channel);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
 		//If they're out of lives, remind them of the risk
@@ -190,7 +187,6 @@ public class GameController
 		{
 			channel.sendMessage(newPlayer.getSafeMention() + ", you are out of lives. "
 					+ "Your gains for the rest of the day will be reduced by 80%.").queue();
-			//return PlayerJoinReturnValue.OUTOFLIVES;
 		}
 		//Dumb easter egg
 		if(newPlayer.money <= -1000000000)
@@ -227,7 +223,7 @@ public class GameController
 	 * MessageChannel channelID - channel the request was registered in.
 	 * String playerID - ID of player to be removed.
 	 */
-	public static PlayerQuitReturnValue removePlayer(MessageChannel channelID, User playerID)
+	public PlayerQuitReturnValue removePlayer(MessageChannel channelID, User playerID)
 	{
 		//Make sure game isn't running, too late to quit now
 		if(gameStatus != GameStatus.SIGNUPS_OPEN)
@@ -252,7 +248,7 @@ public class GameController
 	/*
 	 * startTheGameAlready - prompts for players to choose bombs.
 	 */
-	public static void startTheGameAlready()
+	public void startTheGameAlready()
 	{
 		//If the game's already running or no one's in it, just don't
 		if((gameStatus != GameStatus.SIGNUPS_OPEN && gameStatus != GameStatus.ADD_BOT_QUESTION) || playersJoined < 1)
@@ -349,7 +345,7 @@ public class GameController
 		}
 
 	}
-	static void checkReady()
+	void checkReady()
 	{
 		if(gameStatus == GameStatus.SIGNUPS_OPEN)
 		{
@@ -378,7 +374,7 @@ public class GameController
 			}
 		}
 	}
-	static void runTurn()
+	void runTurn()
 	{
 		if(repeatTurn > 0 && !players.get(currentTurn).isBot)
 		{
@@ -454,7 +450,7 @@ public class GameController
 					});
 		}
 	}
-	private static void timeOutTurn()
+	private void timeOutTurn()
 	{
 		//If they haven't been warned, play nice and just pick a random space for them
 		if(!players.get(currentTurn).warned)
@@ -526,7 +522,7 @@ public class GameController
 			resolveTurn(bombCandidates.get(bombChosen));
 		}
 	}
-	static void resolveTurn(int location)
+	void resolveTurn(int location)
 	{
 		pickedSpaces[location] = true;
 		spacesLeft--;
@@ -553,7 +549,7 @@ public class GameController
 			runSafeLogic(location);
 		}
 	}
-	static void runEndTurnLogic()
+	void runEndTurnLogic()
 	{
 		//Test if game over
 		if(spacesLeft <= 0 || playersAlive == 1)
@@ -572,7 +568,7 @@ public class GameController
 			timer.schedule(new WaitForNextTurn(), 1000);
 		}
 	}
-	static void runBombLogic(int location)
+	void runBombLogic(int location)
 	{
 		channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
@@ -674,7 +670,7 @@ public class GameController
 			channel.sendMessage(extraResult).queue();
 		runEndTurnLogic();
 	}
-	static void runSafeLogic(int location)
+	void runSafeLogic(int location)
 	{
 		//Always trigger it on a blammo, otherwise based on spaces left and players in game
 		if((Math.random()*spacesLeft)<playersJoined || gameboard.typeBoard[location] == SpaceType.BLAMMO)
@@ -752,7 +748,7 @@ public class GameController
 			channel.sendMessage(extraResult).queue();
 		runEndTurnLogic();
 	}
-	private static void runBlammo(int buttonPressed)
+	private void runBlammo(int buttonPressed)
 	{
 		//Yes I know it's generating the result after they've already picked
 		//But that's the sort of thing a blammo would do so I'm fine with it
@@ -812,7 +808,7 @@ public class GameController
 			channel.sendMessage(extraResult).queue();
 		runEndTurnLogic();
 	}
-	static void activateEvent(Events event)
+	void activateEvent(Events event)
 	{
 		switch(event)
 		{
@@ -941,7 +937,7 @@ public class GameController
 		}
 		runEndTurnLogic();
 	}
-	static void runNextEndGamePlayer()
+	void runNextEndGamePlayer()
 	{
 		//Are there any winners left to loop through?
 		advanceTurn(true);
@@ -1055,7 +1051,7 @@ public class GameController
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
 		timer.schedule(new ClearMinigameQueueTask(), 1000);
 	}
-	static void prepareNextMiniGame()
+	void prepareNextMiniGame()
 	{
 		if(gamesToPlay.hasNext())
 		{
@@ -1086,7 +1082,7 @@ public class GameController
 			runNextEndGamePlayer();
 		}
 	}
-	static void startMiniGame(MiniGame currentGame)
+	void startMiniGame(MiniGame currentGame)
 	{
 		LinkedList<String> result = currentGame.initialiseGame();
 		//Don't print minigame messages for bots
@@ -1099,7 +1095,7 @@ public class GameController
 		}
 		runNextMiniGameTurn(currentGame);
 	}
-	static void runNextMiniGameTurn(MiniGame currentGame)
+	void runNextMiniGameTurn(MiniGame currentGame)
 	{
 		if(players.get(currentTurn).isBot)
 		{
@@ -1158,7 +1154,7 @@ public class GameController
 					});
 		}
 	}
-	static void completeMiniGame(MiniGame currentGame)
+	void completeMiniGame(MiniGame currentGame)
 	{
 		//Cool, game's over now, let's grab their winnings
 		int moneyWon = currentGame.getMoneyWon();
@@ -1212,7 +1208,7 @@ public class GameController
 		//Off to the next minigame! (After clearing the queue)
 		timer.schedule(new ClearMinigameQueueTask(), 1000);
 	}
-	static void advanceTurn(boolean endGame)
+	void advanceTurn(boolean endGame)
 	{
 		//Keep spinning through until we've got someone who's still in the game, or until we've checked everyone
 		int triesLeft = playersJoined;
@@ -1241,7 +1237,7 @@ public class GameController
 		if(triesLeft == 0 && !isPlayerGood)
 			currentTurn = -1;
 	}
-	static boolean checkValidNumber(String message)
+	boolean checkValidNumber(String message)
 	{
 		try
 		{
@@ -1253,7 +1249,7 @@ public class GameController
 			return false;
 		}
 	}
-	public static void displayBoardAndStatus(boolean printBoard, boolean totals)
+	public void displayBoardAndStatus(boolean printBoard, boolean totals)
 	{
 		if(gameStatus == GameStatus.SIGNUPS_OPEN)
 		{
@@ -1396,11 +1392,11 @@ public class GameController
 		board.append("```");
 		channel.sendMessage(board.toString()).queue();
 	}
-	static void saveData()
+	void saveData()
 	{
 		try
 		{
-			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
 			//Replace the records of the players if they're there, otherwise add them
 			for(int i=0; i<playersJoined; i++)
 			{
@@ -1425,10 +1421,7 @@ public class GameController
 			//Then sort and rewrite it
 			DescendingScoreSorter sorter = new DescendingScoreSorter();
 			list.sort(sorter);
-			Path file = Paths.get("scores.csv");
-			Path fileOld = Paths.get("scoresOld.csv");
-			Files.delete(fileOld);
-			Files.copy(file,fileOld);
+			Path file = Paths.get("scores"+channel.getId()+".csv");
 			Files.delete(file);
 			Files.write(file, list);
 		}
@@ -1458,7 +1451,7 @@ public class GameController
 		}
 		return -1;
 	}
-	public static String listPlayers(boolean waitingOn)
+	public String listPlayers(boolean waitingOn)
 	{
 		StringBuilder resultString = new StringBuilder();
 		if(waitingOn)
@@ -1475,7 +1468,7 @@ public class GameController
 		}
 		return resultString.toString();
 	}
-	public static void splitAndShare(int totalToShare)
+	public void splitAndShare(int totalToShare)
 	{
 		channel.sendMessage("Because " + players.get(currentTurn).getSafeMention() + " had a split and share, "
 				+ "10% of their total will be split between the other players.").queueAfter(1,TimeUnit.SECONDS);
@@ -1487,11 +1480,11 @@ public class GameController
 				players.get(i).addMoney(totalToShare / (playersJoined-1),MoneyMultipliersToUse.NOTHING);
 			}
 	}
-	public static String checkLives(String userID) {
+	public String checkLives(String userID) {
 		StringBuilder output = new StringBuilder();
 		try
 		{
-			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
 			int index = findUserInList(list,userID,false);
 			if(index < 0)
 			{
@@ -1539,17 +1532,17 @@ public class GameController
 		}
 		return output.toString();
 	}
-	public static void addBot(int botNumber)
+	public void addBot(int botNumber)
 	{
 		//Only do this if we're in signups!
 		if(gameStatus != GameStatus.SIGNUPS_OPEN)
 			return;
 		GameBot chosenBot = GameBot.values()[botNumber];
-		Player newPlayer = new Player(chosenBot);
+		Player newPlayer = new Player(chosenBot,channel);
 		players.add(newPlayer);
 		playersJoined ++;
 	}
-	public static void addRandomBot()
+	public void addRandomBot()
 	{
 		//Only do this if we're in signups!
 		if(gameStatus != GameStatus.SIGNUPS_OPEN && gameStatus != GameStatus.ADD_BOT_QUESTION)
@@ -1563,7 +1556,7 @@ public class GameController
 		{
 			triesLeft --;
 			chosenBot = chosenBot.next();
-			newPlayer = new Player(chosenBot);
+			newPlayer = new Player(chosenBot,channel);
 			goodPick = true;
 			for(int i=0; i<playersJoined; i++)
 			{

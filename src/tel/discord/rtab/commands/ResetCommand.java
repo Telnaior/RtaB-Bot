@@ -1,6 +1,7 @@
 package tel.discord.rtab.commands;
 
 import tel.discord.rtab.GameController;
+import tel.discord.rtab.RaceToABillionBot;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -12,11 +13,18 @@ public class ResetCommand extends Command
 		this.name = "reset";
 		this.help = "resets the game state, in case something gets bugged";
 		this.hidden = true;
-		this.ownerCommand = true;
+		this.requiredRole = "Mod";
 	}
 	@Override
 	protected void execute(CommandEvent event)
 	{
-		GameController.reset();
+		for(GameController game : RaceToABillionBot.game)
+		{
+			if(game.channel == event.getChannel())
+			{
+				game.reset();
+				return;
+			}
+		}
 	}
 }
