@@ -42,6 +42,7 @@ public class GameController
 {
 	final static int MAX_PLAYERS = 16;
 	public MessageChannel channel;
+	MessageChannel resultChannel;
 	int boardSize = 15;
 	List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
@@ -91,7 +92,7 @@ public class GameController
 		{
 			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
 					", thirty seconds left to choose a space!").queue();
-			displayBoardAndStatus(true,false);
+			displayBoardAndStatus(true,false,false);
 		}
 	}
 	private class MiniGameWarning extends TimerTask
@@ -147,6 +148,11 @@ public class GameController
 	public GameController(MessageChannel channelID)
 	{
 		channel = channelID;
+	}
+	
+	void setResultChannel(MessageChannel channelID)
+	{
+		resultChannel = channelID;
 	}
 	
 	/*
@@ -387,7 +393,7 @@ public class GameController
 			channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
 				.completeAfter(3,TimeUnit.SECONDS);
 		}
-		displayBoardAndStatus(true, false);
+		displayBoardAndStatus(true, false, false);
 		if(players.get(currentTurn).isBot)
 		{
 			//Get safe spaces, starting with all unpicked spaces
@@ -946,7 +952,7 @@ public class GameController
 		{
 			saveData();
 			players.sort(null);
-			displayBoardAndStatus(false, true);
+			displayBoardAndStatus(false, true, true);
 			reset();
 			if(winners.size() > 0)
 			{
@@ -997,7 +1003,7 @@ public class GameController
 			players.get(currentTurn).winstreak += (playersJoined - playersAlive);
 		}
 		//Now the winstreak is right, we can display the board
-		displayBoardAndStatus(false, false);
+		displayBoardAndStatus(false, false, false);
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		//Search every multiple of 5 to see if we've got it
 		for(int i=5; i<=players.get(currentTurn).winstreak;i+=5)
@@ -1249,7 +1255,7 @@ public class GameController
 			return false;
 		}
 	}
-	public void displayBoardAndStatus(boolean printBoard, boolean totals)
+	public void displayBoardAndStatus(boolean printBoard, boolean totals, boolean copyToResultChannel)
 	{
 		if(gameStatus == GameStatus.SIGNUPS_OPEN)
 		{
@@ -1391,6 +1397,8 @@ public class GameController
 		//Close it off and print it out
 		board.append("```");
 		channel.sendMessage(board.toString()).queue();
+		if(copyToResultChannel && resultChannel != null)
+			resultChannel.sendMessage(board.toString()).queue();
 	}
 	void saveData()
 	{

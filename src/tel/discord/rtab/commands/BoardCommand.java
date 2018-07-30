@@ -29,7 +29,7 @@ public class BoardCommand extends Command
 				}
 				else
 				{	
-					game.displayBoardAndStatus(game.gameStatus != GameStatus.END_GAME, false);
+					game.displayBoardAndStatus(game.gameStatus != GameStatus.END_GAME, false, false);
 				}
 				//We found the right channel, so
 				return;

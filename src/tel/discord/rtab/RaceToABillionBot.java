@@ -84,6 +84,19 @@ public class RaceToABillionBot
 					game.add(new GameController(channel));
 					System.out.println("Game Channel: " + channel.getId());
 				}
+				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))
+				{
+					String linkChannel = channel.getTopic().substring(20);
+					for(GameController game : game)
+					{
+						if(linkChannel == game.channel.getId())
+						{
+							game.setResultChannel(channel);
+							//We found the right channel, so
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
