@@ -2,10 +2,10 @@ package tel.discord.rtab.enums;
 
 public enum SpaceType implements WeightedSpace
 {
-	CASH	(60),
-	BOOSTER	(13),
-	GAME	(13),
-	EVENT	(13),
+	CASH	(55),
+	BOOSTER	(12),
+	GAME	(12),
+	EVENT	(20),
 	BLAMMO  ( 1);
 	
 	int weight;

@@ -941,6 +941,16 @@ public class GameController
 			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
 			timer.schedule(new WaitForEndGame(), 1000);
 			return;
+		case MYSTERY_MONEY:
+			channel.sendMessage("It's **Mystery Money**, which today awards you...")
+				.completeAfter(5,TimeUnit.SECONDS);
+			int cashWon = (int)Math.pow((Math.random()*39)+1,4);
+			StringBuilder resultString = new StringBuilder();
+			resultString.append(String.format("**$%,d**!",Math.abs(cashWon)));
+			StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
+			channel.sendMessage(resultString.toString()).completeAfter(2,TimeUnit.SECONDS);
+			channel.sendMessage(extraResult.toString()).queue();
+			break;
 		}
 		runEndTurnLogic();
 	}
