@@ -1,3 +1,10 @@
+1.3.0
+ - Set up the bot to run games in multiple channels at once, with each channel having separate leaderboards
+ - Also created the possibility for "result channels", where the results of each game get crossposted to
+ - Deuces Wild rebalanced
+ - Mystery Money added to the board
+ - Bugfixes (looks like it might actually be stable enough to not have to constantly keep an eye on now)
+
 1.2.0
  - Nerfed Double Trouble
  - Bugfixes (notably, fixed choosing a space too close to the deadline opening a second thread that corrupts the game)
