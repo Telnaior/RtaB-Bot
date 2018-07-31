@@ -1,6 +1,7 @@
 package tel.discord.rtab.commands;
 
 import tel.discord.rtab.GameController;
+import tel.discord.rtab.RaceToABillionBot;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -17,19 +18,28 @@ public class AddBotCommand extends Command {
 	@Override
 	protected void execute(CommandEvent event)
 	{
-		if(event.getArgs().equals(""))
+		for(GameController game : RaceToABillionBot.game)
 		{
-			GameController.addRandomBot();
+			if(game.channel == event.getChannel())
+			{
+				if(event.getArgs().equals(""))
+				{
+					game.addRandomBot();
+				}
+				//Let's have some fun
+				else if(event.getArgs().equals("all"))
+				{
+					for(int i=0; i<80; i++)
+						game.addBot(i);
+				}
+				else
+				{
+					game.addBot(Integer.parseInt(event.getArgs()));
+				}
+				//We found the right channel, so
+				return;
+			}
 		}
-		//Let's have some fun
-		else if(event.getArgs().equals("all"))
-		{
-			for(int i=0; i<80; i++)
-				GameController.addBot(i);
-		}
-		else
-		{
-			GameController.addBot(Integer.parseInt(event.getArgs()));
-		}
+		
 	}
 }

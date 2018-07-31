@@ -6,6 +6,7 @@ public enum Events implements WeightedSpace
 	STREAKP1		(6),
 	GAME_LOCK		(5),
 	BOOST_DRAIN		(5),
+	SHUFFLE_ORDER	(5),
 	MINEFIELD		(4),
 	STREAKP2		(4),
 	JOKER			(3),
@@ -14,6 +15,7 @@ public enum Events implements WeightedSpace
 	BLAMMO_FRENZY	(2),
 	STREAKP3		(2),
 	SPLIT_SHARE		(2),
+	END_ROUND		(1),
 	STARMAN			(1),
 	JACKPOT			(1);
 

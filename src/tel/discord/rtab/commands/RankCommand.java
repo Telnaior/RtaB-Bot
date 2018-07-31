@@ -21,7 +21,7 @@ public class RankCommand extends Command {
 	protected void execute(CommandEvent event) {
 		try
 		{
-			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			List<String> list = Files.readAllLines(Paths.get("scores"+event.getChannel().getId()+".csv"));
 			String name = event.getArgs();
 			int index;
 			//Search for own ID if no name given (to ensure match even if name changed)

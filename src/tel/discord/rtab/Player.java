@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.Games;
@@ -23,6 +24,7 @@ class Player implements Comparable<Player>
 	static final int MAX_BOOSTER = 999;
 	static final int MIN_BOOSTER =  10;
 	static final int MAX_LIVES = 5;
+	MessageChannel channel;
 	User user;
 	String name;
 	String uID;
@@ -46,28 +48,29 @@ class Player implements Comparable<Player>
 	LinkedList<Games> games;
 	LinkedList<Integer> knownBombs;
 	//Constructor for humans
-	Player(Member playerName)
+	Player(Member playerName, MessageChannel channelID)
 	{
 		user = playerName.getUser();
 		name = playerName.getEffectiveName();
 		uID = user.getId();
 		isBot = false;
 		newbieProtection = 10;
-		initPlayer();
+		initPlayer(channelID);
 	}
 	//Constructor for bots
-	Player(GameBot botName)
+	Player(GameBot botName, MessageChannel channelID)
 	{
 		user = null;
 		name = botName.name;
 		uID = botName.botID;
 		isBot = true;
 		newbieProtection = 0;
-		initPlayer();
+		initPlayer(channelID);
 	}
 	
-	private void initPlayer()
+	private void initPlayer(MessageChannel channelID)
 	{
+		channel = channelID;
 		lives = MAX_LIVES;
 		lifeRefillTime = Instant.now();
 		money = 0;
@@ -83,7 +86,7 @@ class Player implements Comparable<Player>
 		knownBombs = new LinkedList<>();
 		try
 		{
-			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
 			String[] record;
 			for(int i=0; i<list.size(); i++)
 			{
@@ -108,7 +111,7 @@ class Player implements Comparable<Player>
 					lifeRefillTime = Instant.parse(record[7]);
 					lives = Integer.parseInt(record[6]);
 					//If we're short on lives and we've passed the refill time, restock them
-					if(lifeRefillTime.isBefore(Instant.now()) && lives < MAX_LIVES)
+					if(lifeRefillTime.isBefore(Instant.now()) && lives < MAX_LIVES && lives >= 0)
 						lives = MAX_LIVES;
 					break;
 				}
@@ -140,7 +143,7 @@ class Player implements Comparable<Player>
 			}
 		}
 		//If they're out of lives and it's a positive, hit 'em hard
-		if(lives <= 0 && adjustedPrize > 0)
+		if(lives == 0 && adjustedPrize > 0)
 			adjustedPrize /= 5;
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
@@ -190,7 +193,7 @@ class Player implements Comparable<Player>
 		money = 0;
 		try
 		{
-			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			List<String> list = Files.readAllLines(Paths.get("scores"+channel+".csv"));
 			String[] record;
 			for(int i=0; i<list.size(); i++)
 			{
@@ -234,7 +237,14 @@ class Player implements Comparable<Player>
 			if(lives == MAX_LIVES)
 				lifeRefillTime = Instant.now().plusSeconds(72000);
 			if(lives > 0)
+			{
+				if(lives == 1)
+				{
+					channel.sendMessage(getSafeMention() + ", you are out of lives. "
+							+ "Your gains for the rest of the day will be reduced by 80%.").queue();
+				}
 				lives --;
+			}
 		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
@@ -242,21 +252,37 @@ class Player implements Comparable<Player>
 		{
 			int moneyLost = money/10;
 			addMoney(-1*moneyLost,MoneyMultipliersToUse.NOTHING);
-			GameController.splitAndShare(moneyLost);
+			for(GameController game : RaceToABillionBot.game)
+			{
+				if(game.channel == channel)
+				{
+					game.splitAndShare(moneyLost);
+					//We found the right channel, so
+					break;
+				}
+			}
 		}
 		//Wipe their booster if they didn't hit a boost holder
 		if(!holdBoost)
 			booster = 100;
 		//Wipe everything else too, and dock them a life
 		winstreak = 0;
-		GameController.repeatTurn = 0;
-		GameController.playersAlive --;
+		for(GameController game : RaceToABillionBot.game)
+		{
+			if(game.channel == channel)
+			{
+				game.repeatTurn = 0;
+				game.playersAlive --;
+				//We found the right channel, so
+				break;
+			}
+		}
 		//Dumb easter egg
 		if(money <= -1000000000)
 		{
-			GameController.channel.sendMessage("I'm impressed, "
+			channel.sendMessage("I'm impressed, "
 					+ "but no you don't get anything special for getting your score this low.").queue();
-			GameController.channel.sendMessage("See you next season!").queueAfter(1,TimeUnit.SECONDS);
+			channel.sendMessage("See you next season!").queueAfter(1,TimeUnit.SECONDS);
 		}
 		return output;
 	}
