@@ -949,7 +949,8 @@ public class GameController
 			resultString.append(String.format("**$%,d**!",Math.abs(cashWon)));
 			StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			channel.sendMessage(resultString.toString()).completeAfter(2,TimeUnit.SECONDS);
-			channel.sendMessage(extraResult.toString()).queue();
+			if(extraResult != null)
+				channel.sendMessage(extraResult.toString()).queue();
 			break;
 		}
 		runEndTurnLogic();

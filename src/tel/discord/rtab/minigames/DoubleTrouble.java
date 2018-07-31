@@ -129,10 +129,6 @@ public class DoubleTrouble implements MiniGame {
 					output.add(generateBoard());
 				}
 			}
-			else
-			{
-				output.add("Unfortunately, you've won nothing.");
-			}
 			return output;
 		}
 }
