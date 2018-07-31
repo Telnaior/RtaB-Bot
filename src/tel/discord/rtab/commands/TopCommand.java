@@ -13,12 +13,11 @@ public class TopCommand extends Command {
     {
         this.name = "top";
         this.help = "view the top ten players on the leaderboard";
-        this.guildOnly = false;
     }
 	@Override
 	protected void execute(CommandEvent event) {
 		try {
-			List<String> list = Files.readAllLines(Paths.get("scores.csv"));
+			List<String> list = Files.readAllLines(Paths.get("scores"+event.getChannel().getId()+".csv"));
 			StringBuilder response = new StringBuilder().append("```\n");
 			String[] record;
 			int money, moneyLength = 0;
@@ -51,7 +50,7 @@ public class TopCommand extends Command {
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			event.reply("This command must be used in a game channel.");
 		}
 	}
 

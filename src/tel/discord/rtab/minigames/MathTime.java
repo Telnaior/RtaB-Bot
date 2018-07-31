@@ -13,7 +13,7 @@ public class MathTime implements MiniGame {
 	List<String> ops2 = Arrays.asList("x","x","x","x","/","/","/");
 	List<Integer> multis = Arrays.asList(1,2,3,4,5,7,10);
 	int stage = 0;
-	int stage1Pick;
+	int stage1Pick = 0;
 	String result2, result4;
 	int lastPick;
 	int total = 0;
@@ -179,7 +179,7 @@ public class MathTime implements MiniGame {
 		{
 		pick = (int) (Math.random() * 7);
 		}
-		while(!(stage == 3 && pick == stage1Pick));
+		while(stage == 3 && pick == stage1Pick);
 		return String.valueOf(pick+1);
 	}
 	

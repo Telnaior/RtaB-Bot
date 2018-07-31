@@ -189,27 +189,9 @@ class Player implements Comparable<Player>
 	}
 	int bankrupt()
 	{
-		int oldMoney = money;
-		money = 0;
-		try
-		{
-			List<String> list = Files.readAllLines(Paths.get("scores"+channel+".csv"));
-			String[] record;
-			for(int i=0; i<list.size(); i++)
-			{
-				record = list.get(i).split("#");
-				if(record[0].equals(uID))
-				{
-					money = Integer.parseInt(record[2]);
-					break;
-				}
-			}
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
-		return oldMoney - money;
+		int lostMoney = money - oldMoney;
+		money = oldMoney;
+		return lostMoney;
 	}
 	public StringBuilder blowUp(int multiplier, boolean holdBoost)
 	{
