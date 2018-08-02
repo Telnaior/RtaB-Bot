@@ -216,6 +216,11 @@ public class GameController
 		//Haven't found one, add them to the list
 		players.add(newPlayer);
 		playersJoined++;
+		if(newPlayer.money > 900000000)
+		{
+			channel.sendMessage(String.format("%1$s needs only $%2$,d more to reach the goal!",
+					newPlayer.name,(1000000000-newPlayer.money)));
+		}
 		if(playersJoined == 1)
 		{
 			timer.schedule(new FinalCallTask(),  90000);
@@ -446,8 +451,8 @@ public class GameController
 						if(players.get(currentTurn).knownBombs.contains(location) 
 								&& spacesLeft > players.get(currentTurn).knownBombs.size())
 						{
-							System.out.println(players.get(currentTurn).name+": known bomb pick, "
-									+spacesLeft+" spaces left.");
+							System.out.println(Instant.now().toString() + " - " + players.get(currentTurn).name + 
+									": known bomb pick, " + spacesLeft + " spaces left.");
 						}
 						//Anyway go play out their turn
 						timer.schedule(new PickSpace(location),1000);
@@ -1563,6 +1568,11 @@ public class GameController
 		Player newPlayer = new Player(chosenBot,channel);
 		players.add(newPlayer);
 		playersJoined ++;
+		if(newPlayer.money > 900000000)
+		{
+			channel.sendMessage(String.format("%1$s needs only $%2$,d more to reach the goal!",
+					newPlayer.name,(1000000000-newPlayer.money)));
+		}
 	}
 	public void addRandomBot()
 	{
@@ -1601,6 +1611,11 @@ public class GameController
 			//But assuming we found one, add them in and get things rolling!
 			players.add(newPlayer);
 			playersJoined++;
+			if(newPlayer.money > 900000000)
+			{
+				channel.sendMessage(String.format("%1$s needs only $%2$,d more to reach the goal!",
+						newPlayer.name,(1000000000-newPlayer.money)));
+			}
 		}
 	}
 }
