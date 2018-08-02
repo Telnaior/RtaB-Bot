@@ -206,9 +206,6 @@ public class DeucesWild implements MiniGame {
 						output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
 					}
 				}
-				else {
-					output.add("Select another card.");
-				}
 			}
 			return output;
 		}

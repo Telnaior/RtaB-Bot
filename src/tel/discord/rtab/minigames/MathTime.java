@@ -8,12 +8,11 @@ import java.util.List;
 public class MathTime implements MiniGame {
 	static final String NAME = "Math Time";
 	static final boolean BONUS = false;
-	List<Integer> money = Arrays.asList(0,5000,10000,20000,30000,40000,60000);
+	List<Integer> money = Arrays.asList(0,10000,20000,30000,50000,75000,100000);
 	List<String> ops1 = Arrays.asList("+","+","+","+","+","-","-");
 	List<String> ops2 = Arrays.asList("x","x","x","x","/","/","/");
 	List<Integer> multis = Arrays.asList(1,2,3,4,5,7,10);
 	int stage = 0;
-	int stage1Pick = 0;
 	String result2, result4;
 	int lastPick;
 	int total = 0;
@@ -29,9 +28,10 @@ public class MathTime implements MiniGame {
 		Collections.shuffle(money);
 		Collections.shuffle(ops1);
 		Collections.shuffle(ops2);
+		Collections.shuffle(money);
 		//Give instructions
 		output.add("In Math Time, you will pick five spaces that will, together, form an equation.");
-		output.add("If you pick well, you could win up to $1,000,000!");
+		output.add("If you pick well, you could win up to $2,000,000!");
 		output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
 		output.add("When you are ready, make your first pick from the money stage.");
 		equation += "( ";
@@ -56,8 +56,6 @@ public class MathTime implements MiniGame {
 		else
 		{
 			lastPick = Integer.parseInt(pick)-1;
-			if(stage == 1)
-				stage1Pick = lastPick;
 			//Print stuff
 			output.add(String.format("Space %d selected...",(lastPick+1)));
 			if(stage == 5)
@@ -72,15 +70,20 @@ public class MathTime implements MiniGame {
 					total += money.get(lastPick);
 				String result = String.format("$%,d",money.get(lastPick));
 				output.add(result + "!");
-				output.add("Next, pick an operation...");
-				equation += result;
 				stage++;
+				if(stage > 3 && total == 0)
+					output.add("That equals... nothing. Sorry.");
+				else
+					output.add("Next, pick an operation...");
+				equation += result;
 				break;
 			case 2:
 				result2 = ops1.get(lastPick);
 				output.add("**"+result2+"**");
 				output.add("Next, pick more cash...");
 				equation += (" "+result2+" ");
+				//Reshuffle the money so stage 3 isn't the same as stage 1
+				Collections.shuffle(money);
 				stage++;
 				break;
 			case 4:
@@ -123,7 +126,7 @@ public class MathTime implements MiniGame {
 	boolean checkValidNumber(String message)
 	{
 		int location = Integer.parseInt(message)-1;
-		return !(location < 0 || location >= 7 || (stage == 3 && location == stage1Pick));
+		return !(location < 0 || location >= 7);
 	}
 
 	String generateBoard()
@@ -135,14 +138,7 @@ public class MathTime implements MiniGame {
 			display.append("    MATH    TIME    \n");
 			for(int i=0; i<7; i++)
 			{
-				if(stage == 3 && i == stage1Pick)
-				{
-					display.append("  ");
-				}
-				else
-				{
-					display.append(String.format("%02d",(i+1)));
-				}
+				display.append(String.format("%02d",(i+1)));
 				display.append(" ");	
 			}
 			display.append("\n\n");
@@ -155,7 +151,7 @@ public class MathTime implements MiniGame {
 	@Override
 	public boolean isGameOver()
 	{
-		return stage >= 6;
+		return (stage >= 6 || (stage > 3 && total == 0));
 	}
 
 	@Override
@@ -163,7 +159,7 @@ public class MathTime implements MiniGame {
 	{
 		if(isGameOver())
 			return total;
-		else return -600000;
+		else return -1000000;
 	}
 
 	@Override
@@ -174,12 +170,7 @@ public class MathTime implements MiniGame {
 	@Override
 	public String getBotPick()
 	{
-		int pick;
-		do
-		{
-		pick = (int) (Math.random() * 7);
-		}
-		while(stage == 3 && pick == stage1Pick);
+		int pick = (int) (Math.random() * 7);
 		return String.valueOf(pick+1);
 	}
 	
