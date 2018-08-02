@@ -43,9 +43,9 @@ public class DoubleTrouble implements MiniGame {
 		output.add("Nine of them are Double spaces, and will double your winnings for the round.");
 		output.add("Nine of them have dollar amounts, which could range from $100 to $20,000.");
 		output.add("Two are bombs. If you hit a bomb, you lose everything.");
-		output.add("You may STOP at any time after your first pick or pick a number to go on. Good luck!");
+		output.add("You may STOP at any time or pick a number to go on. Good luck!");
 		output.add(generateBoard());
-		return output;  
+		return output;
 	}
 
 	/**
@@ -59,14 +59,7 @@ public class DoubleTrouble implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		if(pick.toUpperCase().equals("STOP"))
 		{
-			if(rounds == 0)
-			{
-				output.add("You haven't picked yet!");
-			}
-			else
-			{
-				alive = false;
-			}
+			alive = false;
 			return output;
 		}
 		else if(!isNumber(pick))
