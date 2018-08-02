@@ -383,11 +383,12 @@ public class GameController
 	}
 	void runTurn()
 	{
-		if(repeatTurn > 0 && !players.get(currentTurn).isBot)
+		if(repeatTurn > 0)
 		{
 			repeatTurn --;
-			channel.sendMessage(players.get(currentTurn).getSafeMention() + ", pick again.")
-				.completeAfter(3,TimeUnit.SECONDS);
+			if(!(players.get(currentTurn).isBot))
+				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", pick again.")
+					.completeAfter(3,TimeUnit.SECONDS);
 		}
 		else if(repeatTurn == 0 && !players.get(currentTurn).isBot)
 		{
@@ -481,6 +482,7 @@ public class GameController
 			else
 			{
 				pickedSpaces[spaceChosen] = true;
+				spacesLeft --;
 				channel.sendMessage("Space " + (spaceChosen+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 				//Don't forget the threshold
 				if(players.get(currentTurn).threshold)
