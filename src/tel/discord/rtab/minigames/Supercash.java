@@ -64,7 +64,6 @@ public class Supercash implements MiniGame {
 			lastPicked = board.get(lastSpace);
 			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			output.add("...");
 			if(lastPicked == 0)
 				output.add("**BOOM**");
 			else
