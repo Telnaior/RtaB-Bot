@@ -14,8 +14,8 @@ public class StartCommand extends Command
 	{
 		this.name = "forcestart";
 		this.help = "starts the game immediately";
-		this.ownerCommand = true;
 		this.hidden = true;
+		this.requiredRole = "Mod";
 	}
 	@Override
 	protected void execute(CommandEvent event)

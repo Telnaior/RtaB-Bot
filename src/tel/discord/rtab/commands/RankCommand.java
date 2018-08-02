@@ -58,7 +58,7 @@ public class RankCommand extends Command {
 			}
 		} catch (IOException e)
 		{
-			e.printStackTrace();
+			event.reply("This command must be used in a game channel.");
 		}
 	}
 
