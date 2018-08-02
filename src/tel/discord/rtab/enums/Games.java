@@ -3,13 +3,16 @@ package tel.discord.rtab.enums;
 import tel.discord.rtab.minigames.*;
 
 public enum Games implements WeightedSpace {
-	//TEST_GAME("Test Game","Test",new TestGame()),
-	STRIKE_IT_RICH	(2,"Strike it Rich","Strike",new StrikeItRich()),
+	//Test game please ignore
+	TEST_GAME		(0,"Test Game","Test",new TestGame()),
+	//Minigame Pool
 	MATH_TIME		(2,"Math Time","Math",new MathTime()),
+	STRIKE_IT_RICH	(2,"Strike it Rich","Strike",new StrikeItRich()),
 	GAMBLE			(2,"The Gamble","Gamble",new Gamble()),
 	THE_OFFER		(2,"The Offer","Offer",new TheOffer()),
 	DEUCES_WILD		(2,"Deuces Wild","Deuces",new DeucesWild()),
 	DOUBLE_TROUBLE	(2,"Double Trouble","Double",new DoubleTrouble()),
+	//Don't have enough games in the pool to have a rotation yet
 	//Bonus games never appear in the pool
 	SUPERCASH		(0,"SUPERCASH","Super",new Supercash()),
 	DIGITAL_FORTRESS(0,"DIGITAL FORTRESS","Fortress",new DigitalFortress()),

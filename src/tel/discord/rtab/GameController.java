@@ -723,7 +723,7 @@ public class GameController
 			players.get(currentTurn).games.sort(null);
 			break;
 		case EVENT:
-			activateEvent(gameboard.eventBoard[location]);
+			activateEvent(gameboard.eventBoard[location],location);
 			return;
 		case BLAMMO:
 			channel.sendMessage("It's a **BLAMMO!** Quick, press a button!").completeAfter(5,TimeUnit.SECONDS);
@@ -822,7 +822,7 @@ public class GameController
 			channel.sendMessage(extraResult).queue();
 		runEndTurnLogic();
 	}
-	void activateEvent(Events event)
+	void activateEvent(Events event, int location)
 	{
 		switch(event)
 		{
@@ -872,21 +872,55 @@ public class GameController
 			players.get(currentTurn).jokers ++;
 			break;
 		case GAME_LOCK:
-			channel.sendMessage("It's a **Minigame Lock**, you'll get to play any minigames you have even if you bomb!")
-				.completeAfter(5,TimeUnit.SECONDS);
-			players.get(currentTurn).minigameLock = true;
-			break;
+			if(!players.get(currentTurn).minigameLock)
+			{
+				channel.sendMessage("It's a **Minigame Lock**, you'll get to play any minigames you have even if you bomb!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				players.get(currentTurn).minigameLock = true;
+				break;
+			}
+			else
+			{
+				channel.sendMessage("It's a **Minigame Lock**, but you already have one.")
+					.completeAfter(5,TimeUnit.SECONDS);
+				Games gameFound = gameboard.gameBoard[location];
+				channel.sendMessage("Instead, let's give you a **" + gameFound + "** to use it with!")
+					.completeAfter(3,TimeUnit.SECONDS);
+				players.get(currentTurn).games.add(gameFound);
+				players.get(currentTurn).games.sort(null);
+				return;
+			}
 		case SPLIT_SHARE:
-			channel.sendMessage("It's **Split & Share**, "
-					+ "don't lose the round now or you'll lose 10% of your total, "
-					+ "approximately $" + String.format("%,d",(players.get(currentTurn).money/10)) + "!")
-				.completeAfter(5,TimeUnit.SECONDS);
-			players.get(currentTurn).splitAndShare = true;
+			if(!(players.get(currentTurn).splitAndShare))
+			{
+				channel.sendMessage("It's a **Split & Share**, "
+						+ "don't lose the round now or you'll lose 10% of your total, "
+						+ "approximately $" + String.format("%,d",(players.get(currentTurn).money/10)) + "!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				players.get(currentTurn).splitAndShare = true;
+			}
+			else
+			{
+				channel.sendMessage("It's a **Split & Share**, but you already have one...")
+					.completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage("Well then, how about we activate it~?").completeAfter(3,TimeUnit.SECONDS);
+				players.get(currentTurn).blowUp(0,true);
+			}
 			break;
 		case JACKPOT:
-			channel.sendMessage("You found the $25,000,000 **JACKPOT**, win the round to claim it!")
-				.completeAfter(5,TimeUnit.SECONDS);
-			players.get(currentTurn).jackpot = true;
+			if(!(players.get(currentTurn).jackpot))
+			{
+				channel.sendMessage("You found the $25,000,000 **JACKPOT**, win the round to claim it!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				players.get(currentTurn).jackpot = true;
+			}
+			else
+			{
+				channel.sendMessage("You found a **JACKPOT**, but you already have one!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage("So you can cash this one in right away!").completeAfter(3,TimeUnit.SECONDS);
+				players.get(currentTurn).addMoney(25000000,MoneyMultipliersToUse.NOTHING);
+			}
 			break;
 		case STREAKP1:
 			players.get(currentTurn).winstreak += 1;
