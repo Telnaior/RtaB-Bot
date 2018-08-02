@@ -1,3 +1,11 @@
+1.4.0
+ - Final update for Season 1
+ - Bugfixes, obv
+ - Math Time buffed, Double Trouble nerfed, Event weights rejiggled
+ - Non-stacking events (Minigame Lock, Split & Share, Jackpot) now recognise if they've already been picked
+ - Double Trouble can now be quit immediately
+ - Players over $900m get a warning displayed when they join
+
 1.3.0
  - Set up the bot to run games in multiple channels at once, with each channel having separate leaderboards
  - Also created the possibility for "result channels", where the results of each game get crossposted to
