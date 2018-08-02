@@ -145,6 +145,19 @@ public class GameController
 			resolveTurn(location);
 		}
 	}
+	private class BlammoHype extends TimerTask
+	{
+		final int location;
+		private BlammoHype(int space)
+		{
+			location = space;
+		}
+		@Override
+		public void run()
+		{
+			runBlammo(location);
+		}
+	}
 	
 	public GameController(TextChannel channelID)
 	{
@@ -746,7 +759,7 @@ public class GameController
 						e -> 
 						{
 							int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-							runBlammo(button);
+							timer.schedule(new BlammoHype(button),1000);
 						},
 						30,TimeUnit.SECONDS, () ->
 						{
@@ -877,7 +890,6 @@ public class GameController
 				channel.sendMessage("It's a **Minigame Lock**, you'll get to play any minigames you have even if you bomb!")
 					.completeAfter(5,TimeUnit.SECONDS);
 				players.get(currentTurn).minigameLock = true;
-				break;
 			}
 			else
 			{
@@ -888,8 +900,8 @@ public class GameController
 					.completeAfter(3,TimeUnit.SECONDS);
 				players.get(currentTurn).games.add(gameFound);
 				players.get(currentTurn).games.sort(null);
-				return;
 			}
+			break;
 		case SPLIT_SHARE:
 			if(!(players.get(currentTurn).splitAndShare))
 			{
