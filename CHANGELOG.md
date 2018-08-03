@@ -1,4 +1,4 @@
-1.4.0
+1.3.1
  - Final update for Season 1
  - Bugfixes, obv
  - Math Time buffed, Double Trouble nerfed, Event weights rejiggled
