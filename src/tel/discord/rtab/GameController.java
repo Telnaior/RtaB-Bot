@@ -202,6 +202,9 @@ public class GameController
 		Player newPlayer = new Player(playerID,channel);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
+		//Dumb easter egg
+		if(newPlayer.money <= -1000000000)
+			return PlayerJoinReturnValue.ELIMINATED;
 		//If they're out of lives, charge them and let them know
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
 		{
@@ -211,9 +214,6 @@ public class GameController
 			channel.sendMessage(newPlayer.getSafeMention() + String.format(", you are out of lives. "
 					+ "Playing this round will incur an entry fee of $%,d.",entryFee)).queue();
 		}
-		//Dumb easter egg
-		if(newPlayer.money <= -1000000000)
-			return PlayerJoinReturnValue.ELIMINATED;
 		//Look for match already in player list
 		for(int i=0; i<playersJoined; i++)
 		{
@@ -387,10 +387,10 @@ public class GameController
 			{
 				//Delete the "waiting on" message
 				waitingMessage.delete().queue();
-				//Determine first player and player order
-				currentTurn = (int)(Math.random()*playersJoined);
-				gameboard = new Board(boardSize);
+				//Determine player order
 				Collections.shuffle(players);
+				currentTurn = 0;
+				gameboard = new Board(boardSize);
 				//Let's get things rolling!
 				channel.sendMessage("Let's go!").queue();
 				runTurn();
