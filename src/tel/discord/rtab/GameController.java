@@ -598,7 +598,11 @@ public class GameController
 	void runBombLogic(int location)
 	{
 		channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-		channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+		//Mock them appropriately if they self-bombed
+		if(players.get(currentTurn).knownBombs.contains(location)
+				channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+		else
+			channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
 		//If player has a joker, force it to not explode
 		//This is a really ugly way of doing it though
 		if(players.get(currentTurn).jokers > 0)
