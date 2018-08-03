@@ -52,9 +52,11 @@ public class HelpCommand extends Command
 			helpList.append("Boosters carry over between games, but will (usually) be reset when you hit a bomb.\n");
 			break;
 		case "streak":
-			helpList.append("When you win a game, you earn a streak bonus.\n");
-			helpList.append("Every opponent you beat gains you +1 to this multiplier.\n");
-			helpList.append("For example, if you win alone in a four-player game, you will gain +3 to your streak bonus.\n");
+			helpList.append("When you win a game, you earn a streak bonus. "
+					+ "The amount won is determined by how many opponents you beat.\n");
+			helpList.append("The first opponent defeated in a round earns you +1.0, the second +0.9, and so on.\n");
+			helpList.append("For example, if you win alone in a four-player game, "
+					+ "you will gain (1.0 + 0.9 + 0.8 =) +2.7 to your streak bonus.\n");
 			helpList.append("You also receive a win bonus. "
 					+ "The base win bonus is $20,000 for every space picked during the game.\n");
 			helpList.append("If the board was cleared entirely, the win bonus is doubled.\n");
@@ -77,7 +79,8 @@ public class HelpCommand extends Command
 			helpList.append("Once you are out of newbie protection, you will have a limited number of lives.\n");
 			helpList.append("By default, you have five lives. Every time you blow up in a game, you lose a life.\n");
 			helpList.append("You can check how many lives you have remaining with !lives. "
-					+ "If you run out of lives you can keep playing, but any money you win will be reduced by 80%.\n");
+					+ "If you run out of lives you can keep playing, but every additional game will cost an entry fee.\n");
+			helpList.append("The entry fee is 1% of your total bank or $100,000, whichever is greater.\n");
 			helpList.append("But never fear! They'll all come back tomorrow. "
 					+ "20 hours after you lose your first life, you'll be restocked to 5.");
 			break;

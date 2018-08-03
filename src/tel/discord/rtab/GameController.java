@@ -202,11 +202,14 @@ public class GameController
 		Player newPlayer = new Player(playerID,channel);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
-		//If they're out of lives, remind them of the risk
+		//If they're out of lives, charge them and let them know
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
 		{
-			channel.sendMessage(newPlayer.getSafeMention() + ", you are out of lives. "
-					+ "Your gains for the rest of the day will be reduced by 80%.").queue();
+			int entryFee = Math.max(newPlayer.money/100,100000);
+			newPlayer.money -= entryFee;
+			newPlayer.oldMoney -= entryFee;
+			channel.sendMessage(newPlayer.getSafeMention() + String.format(", you are out of lives. "
+					+ "Playing this round will incur an entry fee of $%,d.",entryFee)).queue();
 		}
 		//Dumb easter egg
 		if(newPlayer.money <= -1000000000)

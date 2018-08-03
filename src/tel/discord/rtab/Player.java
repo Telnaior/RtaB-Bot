@@ -142,9 +142,6 @@ class Player implements Comparable<Player>
 				adjustedPrize *= booster;
 			}
 		}
-		//If they're out of lives and it's a positive, hit 'em hard
-		if(lives == 0 && adjustedPrize > 0)
-			adjustedPrize /= 5;
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
 		if(multipliers.useBonus)
@@ -223,7 +220,7 @@ class Player implements Comparable<Player>
 				if(lives == 1)
 				{
 					channel.sendMessage(getSafeMention() + ", you are out of lives. "
-							+ "Your gains for the rest of the day will be reduced by 80%.").queue();
+							+ "Further games today will incur an entry fee.").queue();
 				}
 				lives --;
 			}
