@@ -59,6 +59,7 @@ public class GameController
 	Board gameboard;
 	public static EventWaiter waiter;
 	public Timer timer = new Timer();
+	public TimerTask demoMode;
 	Message waitingMessage;
 
 	private class StartGameTask extends TimerTask
@@ -158,10 +159,22 @@ public class GameController
 			runBlammo(location);
 		}
 	}
+	private class RunDemo extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			for(int i=0; i<4; i++)
+				addRandomBot();
+			startTheGameAlready();
+		}
+	}
 	
 	public GameController(TextChannel channelID)
 	{
 		channel = channelID;
+		demoMode = new RunDemo();
+		timer.schedule(demoMode, 3600000);
 	}
 	
 	void setResultChannel(TextChannel channelID)
@@ -183,6 +196,8 @@ public class GameController
 		repeatTurn = 0;
 		timer.cancel();
 		timer = new Timer();
+		demoMode = new RunDemo();
+		timer.schedule(demoMode, 3600000);
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -236,6 +251,7 @@ public class GameController
 		}
 		if(playersJoined == 1)
 		{
+			demoMode.cancel();
 			timer.schedule(new FinalCallTask(),  90000);
 			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
@@ -600,7 +616,7 @@ public class GameController
 		channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Mock them appropriately if they self-bombed
 		if(players.get(currentTurn).knownBombs.contains(location))
-				channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
 		else
 			channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
 		//If player has a joker, force it to not explode
