@@ -205,6 +205,14 @@ public class GameController
 	 * String playerID - ID of player to be added.
 	 * Returns an enum which gives the result of the join attempt.
 	 */
+	public int findPlayerInGame(String playerID)
+	{
+		for(int i=0; i < players.size(); i++)
+			if(players.get(i).uID.equals(playerID))
+				return i;
+		return -1;
+	}
+	
 	public PlayerJoinReturnValue addPlayer(Member playerID)
 	{
 		//Make sure game isn't already running
@@ -227,18 +235,16 @@ public class GameController
 		if(newPlayer.money <= -1000000000)
 			return PlayerJoinReturnValue.ELIMINATED;
 		//Look for match already in player list
-		for(int i=0; i<playersJoined; i++)
+		int playerLocation = findPlayerInGame(newPlayer.uID);
+		if(playerLocation != -1)
 		{
-			if(players.get(i).uID.equals(newPlayer.uID))
+			//Found them, check if we should update their name or just laugh at them
+			if(players.get(playerLocation).name == newPlayer.name)
+				return PlayerJoinReturnValue.ALREADYIN;
+			else
 			{
-				//Found them, check if we should update their name or just laugh at them
-				if(players.get(i).name == newPlayer.name)
-					return PlayerJoinReturnValue.ALREADYIN;
-				else
-				{
-					players.set(i,newPlayer);
-					return PlayerJoinReturnValue.UPDATED;
-				}
+				players.set(playerLocation,newPlayer);
+				return PlayerJoinReturnValue.UPDATED;
 			}
 		}
 		//Haven't found one, add them to the list
@@ -270,18 +276,15 @@ public class GameController
 		if(gameStatus != GameStatus.SIGNUPS_OPEN)
 			return PlayerQuitReturnValue.GAMEINPROGRESS;
 		//Search for player
-		for(int i=0; i<playersJoined; i++)
+		int playerLocation = findPlayerInGame(playerID.getId());
+		if(playerLocation != -1)
 		{
-			if(players.get(i).uID.equals(playerID.getId()))
-			{
-				//Found them, get rid of them and call it a success
-				players.remove(i);
-				playersJoined --;
-				//Abort the game if everyone left
-				if(playersJoined == 0)
-					reset();
-				return PlayerQuitReturnValue.SUCCESS;
-			}
+			players.remove(playerLocation);
+			playersJoined --;
+			//Abort the game if everyone left
+			if(playersJoined == 0)
+				reset();
+			return PlayerQuitReturnValue.SUCCESS;
 		}
 		//Didn't find them, why are they trying to quit in the first place?
 		return PlayerQuitReturnValue.NOTINGAME;
