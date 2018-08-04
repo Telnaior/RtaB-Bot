@@ -12,7 +12,7 @@ public class DoubleTrouble implements MiniGame {
 	int rounds;
 	int mystery;
 	int total;
-	List<Integer> money = Arrays.asList(0,1,25000,10000,10000,5000,5000,5000,5000,5000,2,2,2,2,2,2,2,2,2,2);
+	List<Integer> money = Arrays.asList(0,0,1,10000,5000,5000,2500,2500,2500,2500,2500,2,2,2,2,2,2,2,2,2);
 	// 0 = Bomb, 1 = Mystery, 2 = Double
 	boolean alive;
 	boolean[] pickedSpaces;
@@ -28,20 +28,10 @@ public class DoubleTrouble implements MiniGame {
 	{
 		alive = true;
 		rounds = 0;
-		total = 10000; // Player starts with $10,000
-		mystery = (int)(1000 + (Math.random()*9501)); // Generates a random number from 1,000-10,500, otherwise only a 1/9001 chance of 10k and that's too low imo
-		if(mystery>10000)
-		{
-			mystery = 10000; // Max mystery is 10,000.
-		}	
-		if(Math.random()<.8)
-		{
-			mystery -= (mystery % 1000); // 80% chance to have a clean thousand (if not 10k)
-		}
-		else
-		{
-			mystery -= (mystery % 100);  // Otherwise have a clean hundred
-		}
+		total = 5000; // Player starts with $5,000
+		mystery = 100*(int)((Math.random()*100+1)); // Generates a random number from 100 - 10,000 in $100 increments
+		if(Math.random() < 0.25) //With 25% chance, give it another random number with the same distribution
+			mystery += 100*(int)((Math.random()*100+1));
 	
 		pickedSpaces = new boolean[money.size()];
 		Collections.shuffle(money);
@@ -49,13 +39,13 @@ public class DoubleTrouble implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("In Double Trouble, you will see twenty spaces.");
-		output.add("You'll start with $10,000 and will pick spaces one at a time.");
-		output.add("Ten of them are Double spaces, and will double your winnings for the round.");
-		output.add("Nine of them have dollar amounts, which could range from $1,000 to $25,000.");
-		output.add("One is the bomb. If you hit the bomb, you lose everything.");
-		output.add("You may STOP at any time after your first pick or pick a number to go on. Good luck!");
+		output.add("You'll start with $5,000 and will pick spaces one at a time.");
+		output.add("Nine of them are Double spaces, and will double your winnings for the round.");
+		output.add("Nine of them have dollar amounts, which could range from $100 to $20,000.");
+		output.add("Two are bombs. If you hit a bomb, you lose everything.");
+		output.add("You may STOP at any time or pick a number to go on. Good luck!");
 		output.add(generateBoard());
-		return output;  
+		return output;
 	}
 
 	/**
@@ -69,14 +59,7 @@ public class DoubleTrouble implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		if(pick.toUpperCase().equals("STOP"))
 		{
-			if(rounds == 0)
-			{
-				output.add("You haven't picked yet!");
-			}
-			else
-			{
-				alive = false;
-			}
+			alive = false;
 			return output;
 		}
 		else if(!isNumber(pick))
@@ -103,7 +86,7 @@ public class DoubleTrouble implements MiniGame {
 			{
 				alive = false; // BOMB, tough cookies
 				total = 0;
-				output.add("It's a BOMB.");
+				output.add("It's a **BOMB**.");
 				output.add("Sorry, you lose.");
 			}
 			else if(money.get(lastSpace) == 1)
@@ -127,9 +110,9 @@ public class DoubleTrouble implements MiniGame {
 			}
 			if(alive)
 			{
-				if(rounds == 19)
+				if(rounds == 18)
 				{
-					output.add("You left the bomb for last! How daring you must be!");
+					output.add("You left the bombs for last! How daring you must be!");
 					alive = false;
 				}
 				else
@@ -138,10 +121,6 @@ public class DoubleTrouble implements MiniGame {
 							+ "or type STOP to stop with your current total: " + String.format("**$%,d!**",total));
 					output.add(generateBoard());
 				}
-			}
-			else
-			{
-				output.add("Unfortunately, you've won nothing.");
 			}
 			return output;
 		}

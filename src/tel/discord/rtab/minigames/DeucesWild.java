@@ -123,9 +123,7 @@ public class DeucesWild implements MiniGame {
 						testCardsHeld[Integer.parseInt(tokens[i])-1] = true;
 					}
 					cardsHeld = testCardsHeld;
-					output.add("Cards held.");
 					output.add(generateHand());
-					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
 					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
@@ -205,9 +203,6 @@ public class DeucesWild implements MiniGame {
 								"prize of $%,d.", getMoneyWon()));
 						output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
 					}
-				}
-				else {
-					output.add("Select another card.");
 				}
 			}
 			return output;

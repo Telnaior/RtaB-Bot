@@ -1,6 +1,7 @@
 package tel.discord.rtab.commands;
 
 import tel.discord.rtab.GameController;
+import tel.discord.rtab.RaceToABillionBot;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -16,7 +17,15 @@ public class LivesCommand extends Command {
 	@Override
 	protected void execute(CommandEvent event)
 	{
-		event.reply(GameController.checkLives(event.getAuthor().getId()));
+		for(GameController game : RaceToABillionBot.game)
+		{
+			if(game.channel == event.getChannel())
+			{
+				event.reply(game.checkLives(event.getAuthor().getId()));
+				//We found the right channel, so
+				return;
+			}
+		}
 	}
 
 }
