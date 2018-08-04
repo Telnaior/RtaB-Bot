@@ -45,7 +45,7 @@ public class GameController
 	public TextChannel channel;
 	TextChannel resultChannel;
 	int boardSize = 15;
-	List<Player> players = new ArrayList<>();
+	public List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
 	int currentTurn = -1;
 	int repeatTurn = 0;
