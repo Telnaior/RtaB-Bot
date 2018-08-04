@@ -202,15 +202,18 @@ public class GameController
 		Player newPlayer = new Player(playerID,channel);
 		if(newPlayer.name.contains(":") || newPlayer.name.contains("#") || newPlayer.name.startsWith("!"))
 			return PlayerJoinReturnValue.BADNAME;
-		//If they're out of lives, remind them of the risk
-		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
-		{
-			channel.sendMessage(newPlayer.getSafeMention() + ", you are out of lives. "
-					+ "Your gains for the rest of the day will be reduced by 80%.").queue();
-		}
 		//Dumb easter egg
 		if(newPlayer.money <= -1000000000)
 			return PlayerJoinReturnValue.ELIMINATED;
+		//If they're out of lives, charge them and let them know
+		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
+		{
+			int entryFee = Math.max(newPlayer.money/100,100000);
+			newPlayer.money -= entryFee;
+			newPlayer.oldMoney -= entryFee;
+			channel.sendMessage(newPlayer.getSafeMention() + String.format(", you are out of lives. "
+					+ "Playing this round will incur an entry fee of $%,d.",entryFee)).queue();
+		}
 		//Look for match already in player list
 		for(int i=0; i<playersJoined; i++)
 		{
@@ -384,10 +387,10 @@ public class GameController
 			{
 				//Delete the "waiting on" message
 				waitingMessage.delete().queue();
-				//Determine first player and player order
-				currentTurn = (int)(Math.random()*playersJoined);
-				gameboard = new Board(boardSize);
+				//Determine player order
 				Collections.shuffle(players);
+				currentTurn = 0;
+				gameboard = new Board(boardSize);
 				//Let's get things rolling!
 				channel.sendMessage("Let's go!").queue();
 				runTurn();
@@ -939,21 +942,21 @@ public class GameController
 			}
 			break;
 		case STREAKP1:
-			players.get(currentTurn).winstreak += 1;
-			channel.sendMessage(String.format("It's a **+1 Streak Bonus**, raising you to x%d!",
-					players.get(currentTurn).winstreak))
+			players.get(currentTurn).winstreak += 10;
+			channel.sendMessage(String.format("It's a **+1 Streak Bonus**, raising you to x%1$d.%2$d!",
+					players.get(currentTurn).winstreak/10,players.get(currentTurn).winstreak%10))
 				.completeAfter(5,TimeUnit.SECONDS);
 			break;
 		case STREAKP2:
-			players.get(currentTurn).winstreak += 2;
-			channel.sendMessage(String.format("It's a **+2 Streak Bonus**, raising you to x%d!",
-					players.get(currentTurn).winstreak))
+			players.get(currentTurn).winstreak += 20;
+			channel.sendMessage(String.format("It's a **+2 Streak Bonus**, raising you to x%1$d.%2$d!",
+					players.get(currentTurn).winstreak/10,players.get(currentTurn).winstreak%10))
 				.completeAfter(5,TimeUnit.SECONDS);
 			break;
 		case STREAKP3:
-			players.get(currentTurn).winstreak += 3;
-			channel.sendMessage(String.format("It's a **+3 Streak Bonus**, raising you to x%d!",
-					players.get(currentTurn).winstreak))
+			players.get(currentTurn).winstreak += 30;
+			channel.sendMessage(String.format("It's a **+3 Streak Bonus**, raising you to x%1$d.%2$d!",
+					players.get(currentTurn).winstreak/10,players.get(currentTurn).winstreak%10))
 				.completeAfter(5,TimeUnit.SECONDS);
 			break;
 		case BLAMMO_FRENZY:
@@ -1068,28 +1071,31 @@ public class GameController
 		{
 			channel.sendMessage(players.get(currentTurn).getSafeMention() + " Wins!")
 				.completeAfter(1,TimeUnit.SECONDS);
-			//Boost winstreak by number of opponents defeated
-			players.get(currentTurn).winstreak += (playersJoined - playersAlive);
+			//+1 for first opponent defeated, +0.9 for second opponent, down to +0.1 for 10th+
+			for(int i=0; i<(playersJoined-playersAlive); i++)
+			{
+				players.get(currentTurn).winstreak += Math.max(10-i, 1);
+			}
 		}
 		//Now the winstreak is right, we can display the board
 		displayBoardAndStatus(false, false, false);
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		//Search every multiple of 5 to see if we've got it
-		for(int i=5; i<=players.get(currentTurn).winstreak;i+=5)
+		for(int i=50; i<=players.get(currentTurn).winstreak;i+=50)
 		{
 			if(players.get(currentTurn).oldWinstreak < i)
 				switch(i)
 				{
-				case 5:
+				case 50:
 					players.get(currentTurn).games.add(Games.SUPERCASH);
 					break;
-				case 10:
+				case 100:
 					players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
 					break;
-				case 15:
+				case 150:
 					players.get(currentTurn).games.add(Games.SPECTRUM);
 					break;
-				case 20:
+				case 200:
 				default:
 					players.get(currentTurn).games.add(Games.HYPERCUBE);
 					break;
@@ -1426,7 +1432,7 @@ public class GameController
 				if(players.get(i).status == PlayerStatus.DONE || (gameStatus == GameStatus.END_GAME && currentTurn == i))
 				{
 					board.append("x");
-					board.append(players.get(i).winstreak);
+					board.append(String.format("%1$d.%2$d",players.get(i).winstreak/10,players.get(i).winstreak%10));
 				}
 				board.append("]");
 				break;
