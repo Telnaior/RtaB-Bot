@@ -115,8 +115,7 @@ public class DeucesWild implements MiniGame {
 				
 				// Make sure the player's choices correspond to actual cards
 				try {
-					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
-					boolean[] testCardsHeld = deepCopy(cardsHeld);
+					boolean[] testCardsHeld = Arrays.copyOf(cardsHeld, cardsHeld.length);
 
 					for (int i = 1; i < tokens.length; i++)
 					{
@@ -142,17 +141,14 @@ public class DeucesWild implements MiniGame {
 				
 				// Make sure the player's choices correspond to actual cards
 				try {
-					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
-					boolean[] testCardsHeld = deepCopy(cardsHeld);
+					boolean[] testCardsHeld = Arrays.copyOf(cardsHeld, cardsHeld.length);
 
 					for (int i = 1; i < tokens.length; i++)
 					{
 						testCardsHeld[Integer.parseInt(tokens[i])-1] = false;
 					}
 					cardsHeld = testCardsHeld;
-					output.add("Cards released.");
 					output.add(generateHand());
-					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
 					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
@@ -287,7 +283,7 @@ public class DeucesWild implements MiniGame {
 
 			display.append(" ");
 		}
-		display.append("```");
+		display.append("(" + hand.toString() + ")```");
 		return display.toString();
 	}
 
@@ -441,15 +437,6 @@ public class DeucesWild implements MiniGame {
  		byte[] sortedRankCount = rankCount;
  		Arrays.sort(sortedRankCount);
  		return sortedRankCount[rankCount.length - 2] == 2;
-	}
-
-	private boolean[] deepCopy (boolean[] arr) { // Here for DRY purposes
-		boolean copiedArr[] = new boolean[arr.length];
-
-		for (int i = 0; i < arr.length; i++)
-			copiedArr[i] = arr[i];
-
-		return copiedArr;
 	}
 
 	@Override
