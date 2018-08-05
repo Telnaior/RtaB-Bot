@@ -17,7 +17,7 @@ import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerStatus;
 
 
-class Player implements Comparable<Player>
+public class Player implements Comparable<Player>
 {
 	static final int BOMB_PENALTY = -250000;
 	static final int NEWBIE_BOMB_PENALTY = -100000;
@@ -294,5 +294,17 @@ class Player implements Comparable<Player>
 			return name;
 		else
 			return user.getAsMention();
+	}
+	public String printBombs()
+	{
+		StringBuilder result = new StringBuilder();
+		result.append(name);
+		result.append(":");
+		for(int bomb : knownBombs)
+		{
+			result.append(" ");
+			result.append(String.format("%02d",bomb+1));
+		}
+		return result.toString();
 	}
 }
