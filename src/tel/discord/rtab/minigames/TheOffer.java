@@ -18,8 +18,8 @@ public class TheOffer implements MiniGame {
 	@Override
 	public LinkedList<String> initialiseGame(){
 		seconds = 0;                      // Starting at 0 Seconds
-		chanceToBomb = 5 + (Math.random()*16);  // Start chance to Bomb 5-20%
-		offer = 1000 * (int)(Math.random()*100+1); // First Offer starts between 1,000 and 100,000
+		offer = 1000 * (int)(Math.random()*76+25); // First Offer starts between 25,000 and 100,000
+		chanceToBomb = offer/5000;  // Start chance to Bomb 5-20% based on first offer
 		alive = true; 
 		accept = false; 
 		refuse = false; 
