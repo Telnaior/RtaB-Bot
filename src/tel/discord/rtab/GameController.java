@@ -643,12 +643,15 @@ public class GameController
 		int penalty = Player.BOMB_PENALTY;
 		if(players.get(currentTurn).newbieProtection > 0)
 			penalty = Player.NEWBIE_BOMB_PENALTY;
+		//Reduce penalty for others out
+		penalty /= 5;
+		penalty *= (5 - Math.min(5,playersJoined-playersAlive));
 		switch(gameboard.bombBoard[location])
 		{
 		case NORMAL:
 			channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
 				.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).blowUp(1,false);
+			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
 			break;
 		case BANKRUPT:
 			int amountLost = players.get(currentTurn).bankrupt();
@@ -676,7 +679,7 @@ public class GameController
 							.completeAfter(3,TimeUnit.SECONDS);
 				}
 			}
-			extraResult = players.get(currentTurn).blowUp(1,false);
+			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
 			break;
 		case BOOSTHOLD:
 			StringBuilder resultString = new StringBuilder().append("It ");
@@ -685,7 +688,7 @@ public class GameController
 			resultString.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
 			channel.sendMessage(resultString)
 					.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).blowUp(1,true);
+			extraResult = players.get(currentTurn).blowUp(1,true,(playersJoined-playersAlive));
 			break;
 		case CHAIN:
 			channel.sendMessage("It goes **BOOM**...")
@@ -712,7 +715,7 @@ public class GameController
 			while(Math.random() * chain < 1);
 			channel.sendMessage(String.format("**$%,d** penalty!",Math.abs(chain*penalty)))
 					.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).blowUp(chain,false);
+			extraResult = players.get(currentTurn).blowUp(chain,false,(playersJoined-playersAlive));
 			break;
 		case DUD:
 			channel.sendMessage("It goes _\\*fizzle*_.")
@@ -828,11 +831,13 @@ public class GameController
 			advanceTurn(false);
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY;
+			penalty /= 5;
+			penalty *= (5 - (playersJoined - playersAlive));
 			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
 			if(repeatTurn > 0)
 				channel.sendMessage("(You also negated the repeat!)").queue();
-			extraResult = players.get(currentTurn).blowUp(4,false);
+			extraResult = players.get(currentTurn).blowUp(4,false,(playersJoined-playersAlive));
 			break;
 		case THRESHOLD:
 			if(players.get(currentTurn).threshold)
@@ -853,8 +858,10 @@ public class GameController
 			channel.sendMessage("You ELIMINATED YOURSELF!").completeAfter(3,TimeUnit.SECONDS);
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY;
+			penalty /= 5;
+			penalty *= (5 - Math.min(5,playersJoined-playersAlive));
 			channel.sendMessage(String.format("$%,d penalty!",Math.abs(penalty*4))).queue();
-			extraResult = players.get(currentTurn).blowUp(4,false);
+			extraResult = players.get(currentTurn).blowUp(4,false,(playersJoined-playersAlive));
 			break;
 		}
 		if(extraResult != null)
@@ -942,7 +949,7 @@ public class GameController
 				channel.sendMessage("It's a **Split & Share**, but you already have one...")
 					.completeAfter(5,TimeUnit.SECONDS);
 				channel.sendMessage("Well then, how about we activate it~?").completeAfter(3,TimeUnit.SECONDS);
-				players.get(currentTurn).blowUp(0,true);
+				players.get(currentTurn).blowUp(0,true,(playersJoined-playersAlive));
 			}
 			break;
 		case JACKPOT:

@@ -190,7 +190,7 @@ public class Player implements Comparable<Player>
 		money = oldMoney;
 		return lostMoney;
 	}
-	public StringBuilder blowUp(int multiplier, boolean holdBoost)
+	public StringBuilder blowUp(int multiplier, boolean holdBoost, int othersOut)
 	{
 		//Just fold if they've got a minigame lock so they still play their games
 		if(minigameLock && games.size() > 0)
@@ -210,6 +210,9 @@ public class Player implements Comparable<Player>
 			penalty = NEWBIE_BOMB_PENALTY;
 		else
 			penalty = BOMB_PENALTY;
+		//Reduce penalty by 20% for each player already gone
+		penalty /= 5;
+		penalty *= (5 - Math.min(5,othersOut));
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
