@@ -919,7 +919,7 @@ public class GameController
 				channel.sendMessage("It's a **Minigame Lock**, but you already have one.")
 					.completeAfter(5,TimeUnit.SECONDS);
 				Games gameFound = gameboard.gameBoard[location];
-				channel.sendMessage("Instead, let's give you a **" + gameFound + "** to use it with!")
+				channel.sendMessage("Instead, let's give you **" + gameFound + "** to use it with!")
 					.completeAfter(3,TimeUnit.SECONDS);
 				players.get(currentTurn).games.add(gameFound);
 				players.get(currentTurn).games.sort(null);
