@@ -886,7 +886,7 @@ public class GameController
 				bombs[(int)(Math.random()*boardSize)] = true;
 			break;
 		case LOCKDOWN:
-			channel.sendMessage("It's a **Lockdown**, all non-bomb spaces on the board are now becoming cash!")
+			channel.sendMessage("It's a **Lockdown**, all non-bomb non-blammo spaces on the board are now becoming cash!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			for(int i=0; i<boardSize; i++)
 			{
@@ -929,7 +929,7 @@ public class GameController
 				channel.sendMessage("It's a **Minigame Lock**, but you already have one.")
 					.completeAfter(5,TimeUnit.SECONDS);
 				Games gameFound = gameboard.gameBoard[location];
-				channel.sendMessage("Instead, let's give you a **" + gameFound + "** to use it with!")
+				channel.sendMessage("Instead, let's give you **" + gameFound + "** to use it with!")
 					.completeAfter(3,TimeUnit.SECONDS);
 				players.get(currentTurn).games.add(gameFound);
 				players.get(currentTurn).games.sort(null);
@@ -1033,8 +1033,14 @@ public class GameController
 			int cashWon = (int)Math.pow((Math.random()*39)+1,4);
 			StringBuilder resultString = new StringBuilder();
 			resultString.append(String.format("**$%,d**!",Math.abs(cashWon)));
-			StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			channel.sendMessage(resultString.toString()).completeAfter(2,TimeUnit.SECONDS);
+			//Dumb easter egg
+			if(cashWon == 1)
+			{
+				channel.sendMessage(":clap: HOLLA :clap: HOLLA :clap: "
+						+ "GET :money_with_wings: 1 :money_with_wings: DOLLA :clap:").queue();
+			}
+			StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult.toString()).queue();
 			break;
