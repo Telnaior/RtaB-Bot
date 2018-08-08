@@ -607,6 +607,7 @@ public class GameController
 			if(spacesLeft < 0)
 				channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
 			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
+			detonateBombs();
 			timer.schedule(new WaitForEndGame(), 1000);
 		}
 		else
@@ -906,14 +907,7 @@ public class GameController
 		case STARMAN:
 			channel.sendMessage("Hooray, it's a **Starman**, here to destroy all the bombs!")
 				.completeAfter(5,TimeUnit.SECONDS);
-			for(int i=0; i<boardSize; i++)
-				if(bombs[i] && !pickedSpaces[i])
-				{
-					channel.sendMessage("Bomb in space " + (i+1) + " destroyed.")
-						.queueAfter(2,TimeUnit.SECONDS);
-					pickedSpaces[i] = true;
-					spacesLeft --;
-				}
+			detonateBombs();
 			break;
 		case REPEAT:
 			channel.sendMessage("It's a **Repeat**, you need to pick two more spaces in a row!")
@@ -1713,5 +1707,16 @@ public class GameController
 						newPlayer.name,(1000000000-newPlayer.money)));
 			}
 		}
+	}
+	void detonateBombs()
+	{
+		for(int i=0; i<boardSize; i++)
+			if(bombs[i] && !pickedSpaces[i])
+			{
+				channel.sendMessage("Bomb in space " + (i+1) + " destroyed.")
+					.queueAfter(2,TimeUnit.SECONDS);
+				pickedSpaces[i] = true;
+				spacesLeft --;
+			}
 	}
 }
