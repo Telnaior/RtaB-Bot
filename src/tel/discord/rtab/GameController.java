@@ -717,6 +717,14 @@ public class GameController
 					.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = players.get(currentTurn).blowUp(chain,false,(playersJoined-playersAlive));
 			break;
+		case REVERSE:
+			channel.sendMessage("It goes **BOOM**...")
+				.completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage(String.format("But it's a REVERSE bomb. $%,d penalty awarded to other players!",
+					Math.abs(penalty))).completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).blowUp(0,false,(playersJoined-playersAlive));
+			splitMoney(penalty,false);
+			break;
 		case DUD:
 			channel.sendMessage("It goes _\\*fizzle*_.")
 				.completeAfter(5,TimeUnit.SECONDS);
@@ -1583,18 +1591,18 @@ public class GameController
 		}
 		return resultString.toString();
 	}
-	public void splitAndShare(int totalToShare)
+	
+	public void splitMoney(int totalToShare, boolean divide)
 	{
-		channel.sendMessage("Because " + players.get(currentTurn).getSafeMention() + " had a split and share, "
-				+ "10% of their total will be split between the other players.").queueAfter(1,TimeUnit.SECONDS);
+		//If needed, divide the amount given by how many players there are to receive it
+		if(divide)
+			totalToShare /= (playersJoined - 1);
 		for(int i=0; i<playersJoined; i++)
 			//Don't pass money back to the player that hit it
 			if(i != currentTurn)
-			{
-				//And divide the amount given by how many players there are to receive it
-				players.get(i).addMoney(totalToShare / (playersJoined-1),MoneyMultipliersToUse.NOTHING);
-			}
+				players.get(i).addMoney(totalToShare,MoneyMultipliersToUse.NOTHING);
 	}
+	
 	public String checkLives(String userID) {
 		StringBuilder output = new StringBuilder();
 		try

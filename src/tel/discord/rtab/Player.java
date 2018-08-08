@@ -238,7 +238,9 @@ public class Player implements Comparable<Player>
 			{
 				if(game.channel == channel)
 				{
-					game.splitAndShare(moneyLost);
+					channel.sendMessage("Because " + getSafeMention() + " had a split and share, "
+							+ "10% of their total will be split between the other players.").queueAfter(1,TimeUnit.SECONDS);
+					game.splitMoney(moneyLost,true);
 					//We found the right channel, so
 					break;
 				}
