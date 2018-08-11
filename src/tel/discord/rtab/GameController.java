@@ -1724,7 +1724,12 @@ public class GameController
 		for(int i=0; i<playersJoined; i++)
 			//Don't pass money back to the player that hit it
 			if(i != currentTurn)
-				players.get(i).addMoney(totalToShare,MoneyMultipliersToUse.NOTHING);
+			{
+				if(divide)
+					players.get(i).addMoney(totalToShare,MoneyMultipliersToUse.NOTHING);
+				else
+					players.get(i).addMoney(totalToShare,MoneyMultipliersToUse.BOOSTER_ONLY);
+			}
 	}
 	
 	public String checkLives(String userID) {
