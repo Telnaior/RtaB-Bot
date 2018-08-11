@@ -12,6 +12,7 @@ public enum Events implements WeightedSpace
 	JOKER			( 3),
 	LOCKDOWN		( 3),
 	COMMUNISM		( 3),
+	DOUBLE_DEAL		( 2),
 	BLAMMO_FRENZY	( 2),
 	STREAKP3		( 2),
 	SPLIT_SHARE		( 1),

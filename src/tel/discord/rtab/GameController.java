@@ -52,6 +52,7 @@ public class GameController
 	int repeatTurn = 0;
 	public int playersJoined = 0;
 	int playersAlive = 0;
+	int boardMultiplier = 1;
 	ListIterator<Games> gamesToPlay;
 	public GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
 	boolean[] pickedSpaces;
@@ -192,6 +193,7 @@ public class GameController
 		currentTurn = -1;
 		playersJoined = 0;
 		playersAlive = 0;
+		boardMultiplier = 1;
 		gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
 		repeatTurn = 0;
@@ -762,6 +764,8 @@ public class GameController
 			{
 				cashWon = gameboard.cashBoard[location].getValue();
 			}
+			//Boost by board multiplier
+			cashWon *= boardMultiplier;
 			//On cash, update the player's score and tell them how much they won
 			resultString.append("**");
 			if(cashWon<0)
@@ -1047,6 +1051,11 @@ public class GameController
 			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
 			timer.schedule(new WaitForEndGame(), 1000);
 			return;
+		case DOUBLE_DEAL:
+			channel.sendMessage("It's a **Double Deal**, all cash left on the board is doubled in value!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			boardMultiplier *= 2;
+			break;
 		}
 		runEndTurnLogic();
 	}
