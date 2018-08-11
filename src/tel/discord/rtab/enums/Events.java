@@ -5,6 +5,7 @@ public enum Events implements WeightedSpace
 	REPEAT			( 6),
 	STREAKP1		( 6),
 	GAME_LOCK		( 5),
+	BOOST_CHARGER	( 5),
 	SHUFFLE_ORDER	( 5),
 	BOOST_DRAIN		( 4),
 	MINEFIELD		( 4),

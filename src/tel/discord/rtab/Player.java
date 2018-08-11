@@ -40,6 +40,7 @@ public class Player implements Comparable<Player>
 	//Event fields
 	int jokers;
 	int splitAndShare;
+	int boostCharge;
 	boolean minigameLock;
 	boolean jackpot;
 	boolean threshold;
@@ -78,6 +79,7 @@ public class Player implements Comparable<Player>
 		winstreak = 0;
 		jokers = 0;
 		splitAndShare = 0;
+		boostCharge = 0;
 		minigameLock = false;
 		threshold = false;
 		warned = false;
@@ -286,6 +288,7 @@ public class Player implements Comparable<Player>
 		games.clear();
 		knownBombs.clear();
 		splitAndShare = 0;
+		boostCharge = 0;
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;

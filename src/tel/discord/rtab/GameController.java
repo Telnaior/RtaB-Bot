@@ -587,11 +587,19 @@ public class GameController
 		{
 			channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 		}
+		//Event things
 		if(players.get(currentTurn).threshold)
 		{
 			players.get(currentTurn).addMoney(-50000,MoneyMultipliersToUse.NOTHING);
 			channel.sendMessage("(-$50,000)").queueAfter(1,TimeUnit.SECONDS);
 		}
+		if(players.get(currentTurn).boostCharge != 0)
+		{
+			players.get(currentTurn).addBooster(players.get(currentTurn).boostCharge);
+			channel.sendMessage(String.format("(%+d%%)",players.get(currentTurn).boostCharge))
+				.queueAfter(1,TimeUnit.SECONDS);
+		}
+		//Alright, moving on
 		if(bombs[location])
 		{
 			runBombLogic(location);
@@ -1055,6 +1063,11 @@ public class GameController
 			channel.sendMessage("It's a **Double Deal**, all cash left on the board is doubled in value!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			boardMultiplier *= 2;
+			break;
+		case BOOST_CHARGER:
+			channel.sendMessage("It's a **Boost Charger**, you'll gain 5% boost every turn for the rest of the round!")
+				.completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).boostCharge += 5;
 			break;
 		}
 		runEndTurnLogic();
