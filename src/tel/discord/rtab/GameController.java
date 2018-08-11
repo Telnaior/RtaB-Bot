@@ -737,6 +737,73 @@ public class GameController
 			players.get(currentTurn).blowUp(0,false,(playersJoined-playersAlive));
 			splitMoney(penalty,false);
 			break;
+		case DETONATION:
+			channel.sendMessage("It goes **KABLAM**! "
+					+ String.format("$%,d lost as penalty, plus board damage.",Math.abs(penalty)))
+				.completeAfter(5,TimeUnit.SECONDS);
+			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			//Wipe out adjacent spaces
+			int boardWidth = Math.max(5,playersJoined+1);
+			boolean canAbove = (location >= boardWidth);
+			boolean canBelow = (boardSize - location > boardWidth);
+			boolean canLeft  = (location % boardWidth != 0);
+			boolean canRight = (location % boardWidth != (boardWidth-1));
+			//Orthogonal or diagonal?
+			if(Math.random() < 0.5)
+			{
+				//Above
+				if(canAbove && !pickedSpaces[location-boardWidth])
+				{
+					pickedSpaces[location-boardWidth] = true;
+					spacesLeft --;
+				}
+				//Below
+				if(canBelow && !pickedSpaces[location+boardWidth])
+				{
+					pickedSpaces[location+boardWidth] = true;
+					spacesLeft --;
+				}
+				//Left
+				if(canLeft && !pickedSpaces[location-1])
+				{
+					pickedSpaces[location-1] = true;
+					spacesLeft --;
+				}
+				//Right
+				if(canRight && !pickedSpaces[location+1])
+				{
+					pickedSpaces[location+1] = true;
+					spacesLeft --;
+				}
+			}
+			else
+			{
+				//Up-left
+				if(canAbove && canLeft && !pickedSpaces[(location-1)-boardWidth])
+				{
+					pickedSpaces[(location-1)-boardWidth] = true;
+					spacesLeft --;
+				}
+				//Up-right
+				if(canAbove && canRight && !pickedSpaces[(location+1)-boardWidth])
+				{
+					pickedSpaces[(location+1)-boardWidth] = true;
+					spacesLeft --;
+				}
+				//Down-left
+				if(canBelow && canLeft && !pickedSpaces[(location-1)+boardWidth])
+				{
+					pickedSpaces[(location-1)+boardWidth] = true;
+					spacesLeft --;
+				}
+				//Down-right
+				if(canBelow && canRight && !pickedSpaces[(location-1)+boardWidth])
+				{
+					pickedSpaces[(location-1)+boardWidth] = true;
+					spacesLeft --;
+				}
+			}
+			break;
 		case DUD:
 			channel.sendMessage("It goes _\\*fizzle*_.")
 				.completeAfter(5,TimeUnit.SECONDS);
