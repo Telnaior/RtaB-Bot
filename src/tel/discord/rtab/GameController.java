@@ -819,57 +819,43 @@ public class GameController
 		if((Math.random()*spacesLeft)<playersJoined || gameboard.typeBoard[location] == SpaceType.BLAMMO)
 			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Figure out what space we got
-		StringBuilder resultString = new StringBuilder();
-		StringBuilder extraResult = null;
+		LinkedList<String> cashOutput;
+		ListIterator<String> outputIterator;
 		switch(gameboard.typeBoard[location])
 		{
 		case CASH:
-			int cashWon;
-			//Is it Mystery Money? Do that thing instead then
-			if(gameboard.cashBoard[location] == CashType.MYSTERY)
+			cashOutput = awardCash(location);
+			outputIterator = cashOutput.listIterator();
+			//Will always have at least one
+			channel.sendMessage(outputIterator.next()).completeAfter(5,TimeUnit.SECONDS);
+			while(outputIterator.hasNext())
 			{
-				channel.sendMessage("It's **Mystery Money**, which today awards you...")
-					.completeAfter(5,TimeUnit.SECONDS);
-				if(Math.random() < 0.1)
-					cashWon = -1*(int)Math.pow((Math.random()*39)+1,3);
-				else
-					cashWon = (int)Math.pow((Math.random()*39)+1,4);
+				channel.sendMessage(outputIterator.next()).queueAfter(2,TimeUnit.SECONDS);
 			}
-			else
-			{
-				cashWon = gameboard.cashBoard[location].getValue();
-			}
-			//Boost by board multiplier
-			cashWon *= boardMultiplier;
-			//On cash, update the player's score and tell them how much they won
-			resultString.append("**");
-			if(cashWon<0)
-				resultString.append("-");
-			resultString.append("$");
-			resultString.append(String.format("%,d",Math.abs(cashWon)));
-			resultString.append("**!");
-			extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			break;
 		case BOOSTER:
-			//On cash, update the player's booster and tell them what they found
-			int boostFound = gameboard.boostBoard[location].getValue();
-			resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
-			if(boostFound > 0)
-				resultString.append("!");
-			else
-				resultString.append(".");
-			players.get(currentTurn).addBooster(boostFound);
+			channel.sendMessage(awardBoost(location)).completeAfter(5,TimeUnit.SECONDS);
 			break;
 		case GAME:
-			//On a game, announce it and add it to their game pile
-			Games gameFound = gameboard.gameBoard[location];
-			resultString.append("It's a minigame, **" + gameFound + "**!");
-			players.get(currentTurn).games.add(gameFound);
-			players.get(currentTurn).games.sort(null);
+			channel.sendMessage(awardGame(location)).completeAfter(5,TimeUnit.SECONDS);
 			break;
+		case GRAB_BAG:
+			channel.sendMessage("It's a **Grab Bag**, you're winning some of everything!").completeAfter(5,TimeUnit.SECONDS);
+			//Award everything in quick succession
+			channel.sendMessage(awardGame(location)).queueAfter(1,TimeUnit.SECONDS);
+			channel.sendMessage(awardBoost(location)).queueAfter(2,TimeUnit.SECONDS);
+			cashOutput = awardCash(location);
+			outputIterator = cashOutput.listIterator();
+			//Will always have at least one
+			channel.sendMessage(outputIterator.next()).completeAfter(3,TimeUnit.SECONDS);
+			while(outputIterator.hasNext())
+			{
+				channel.sendMessage(outputIterator.next()).queueAfter(1,TimeUnit.SECONDS);
+			}
+			//No break, finish with event
 		case EVENT:
 			activateEvent(gameboard.eventBoard[location],location);
-			return;
+			break;
 		case BLAMMO:
 			channel.sendMessage("It's a **BLAMMO!** Quick, press a button!").completeAfter(5,TimeUnit.SECONDS);
 			channel.sendMessage("```\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
@@ -902,11 +888,66 @@ public class GameController
 			}
 			return;
 		}
-		channel.sendMessage(resultString).completeAfter(5,TimeUnit.SECONDS);
-		if(extraResult != null)
-			channel.sendMessage(extraResult).queue();
 		runEndTurnLogic();
 	}
+	
+	private LinkedList<String> awardCash(int location)
+	{
+		LinkedList<String> output = new LinkedList<>();
+		int cashWon;
+		//Is it Mystery Money? Do that thing instead then
+		if(gameboard.cashBoard[location] == CashType.MYSTERY)
+		{
+			output.add("It's **Mystery Money**, which today awards you...");
+			if(Math.random() < 0.1)
+				cashWon = -1*(int)Math.pow((Math.random()*39)+1,3);
+			else
+				cashWon = (int)Math.pow((Math.random()*39)+1,4);
+		}
+		else
+		{
+			cashWon = gameboard.cashBoard[location].getValue();
+		}
+		//Boost by board multiplier
+		cashWon *= boardMultiplier;
+		//On cash, update the player's score and tell them how much they won
+		StringBuilder resultString = new StringBuilder();
+		resultString.append("**");
+		if(cashWon<0)
+			resultString.append("-");
+		resultString.append("$");
+		resultString.append(String.format("%,d",Math.abs(cashWon)));
+		resultString.append("**!");
+		output.add(resultString.toString());
+		StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
+		if(extraResult != null)
+			output.add(extraResult.toString());
+		return output;
+	}
+
+	private String awardBoost(int location)
+	{
+		//On cash, update the player's booster and tell them what they found
+		int boostFound = gameboard.boostBoard[location].getValue();
+		StringBuilder resultString = new StringBuilder();
+		resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
+		if(boostFound > 0)
+			resultString.append("!");
+		else
+			resultString.append(".");
+		players.get(currentTurn).addBooster(boostFound);
+		return resultString.toString();
+	}
+
+	private String awardGame(int location)
+	{
+		//On a game, announce it and add it to their game pile
+		Games gameFound = gameboard.gameBoard[location];
+		players.get(currentTurn).games.add(gameFound);
+		players.get(currentTurn).games.sort(null);
+		return ("It's a minigame, **" + gameFound + "**!");
+	}
+
 	private void runBlammo(int buttonPressed)
 	{
 		//Yes I know it's generating the result after they've already picked
@@ -1137,7 +1178,6 @@ public class GameController
 			players.get(currentTurn).boostCharge += 5;
 			break;
 		}
-		runEndTurnLogic();
 	}
 	void runNextEndGamePlayer()
 	{
