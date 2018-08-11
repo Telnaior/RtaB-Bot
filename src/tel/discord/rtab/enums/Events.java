@@ -2,7 +2,6 @@ package tel.discord.rtab.enums;
 
 public enum Events implements WeightedSpace
 {
-	MYSTERY_MONEY	(15),
 	REPEAT			( 6),
 	STREAKP1		( 6),
 	GAME_LOCK		( 5),

@@ -25,6 +25,7 @@ import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import tel.discord.rtab.enums.BlammoChoices;
 import tel.discord.rtab.enums.BombType;
+import tel.discord.rtab.enums.CashType;
 import tel.discord.rtab.enums.Events;
 import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.GameStatus;
@@ -746,8 +747,22 @@ public class GameController
 		switch(gameboard.typeBoard[location])
 		{
 		case CASH:
+			int cashWon;
+			//Is it Mystery Money? Do that thing instead then
+			if(gameboard.cashBoard[location] == CashType.MYSTERY)
+			{
+				channel.sendMessage("It's **Mystery Money**, which today awards you...")
+					.completeAfter(5,TimeUnit.SECONDS);
+				if(Math.random() < 0.1)
+					cashWon = -1*(int)Math.pow((Math.random()*39)+1,3);
+				else
+					cashWon = (int)Math.pow((Math.random()*39)+1,4);
+			}
+			else
+			{
+				cashWon = gameboard.cashBoard[location].getValue();
+			}
 			//On cash, update the player's score and tell them how much they won
-			int cashWon = gameboard.cashBoard[location].getValue();
 			resultString.append("**");
 			if(cashWon<0)
 				resultString.append("-");
@@ -1032,23 +1047,6 @@ public class GameController
 			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
 			timer.schedule(new WaitForEndGame(), 1000);
 			return;
-		case MYSTERY_MONEY:
-			channel.sendMessage("It's **Mystery Money**, which today awards you...")
-				.completeAfter(5,TimeUnit.SECONDS);
-			int cashWon = (int)Math.pow((Math.random()*39)+1,4);
-			StringBuilder resultString = new StringBuilder();
-			resultString.append(String.format("**$%,d**!",Math.abs(cashWon)));
-			channel.sendMessage(resultString.toString()).completeAfter(2,TimeUnit.SECONDS);
-			//Dumb easter egg
-			if(cashWon == 1)
-			{
-				channel.sendMessage(":clap: HOLLA :clap: HOLLA :clap: "
-						+ "GET :money_with_wings: 1 :money_with_wings: DOLLA :clap:").queue();
-			}
-			StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
-			if(extraResult != null)
-				channel.sendMessage(extraResult.toString()).queue();
-			break;
 		}
 		runEndTurnLogic();
 	}
