@@ -39,7 +39,7 @@ public class Player implements Comparable<Player>
 	int newbieProtection;
 	//Event fields
 	int jokers;
-	boolean splitAndShare;
+	int splitAndShare;
 	boolean minigameLock;
 	boolean jackpot;
 	boolean threshold;
@@ -77,7 +77,7 @@ public class Player implements Comparable<Player>
 		booster = 100;
 		winstreak = 0;
 		jokers = 0;
-		splitAndShare = false;
+		splitAndShare = 0;
 		minigameLock = false;
 		threshold = false;
 		warned = false;
@@ -230,16 +230,17 @@ public class Player implements Comparable<Player>
 		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
-		if(splitAndShare)
+		if(splitAndShare > 0)
 		{
-			int moneyLost = money/10;
+			int moneyLost = (int)(money/(100.0/splitAndShare));
 			addMoney(-1*moneyLost,MoneyMultipliersToUse.NOTHING);
 			for(GameController game : RaceToABillionBot.game)
 			{
 				if(game.channel == channel)
 				{
 					channel.sendMessage("Because " + getSafeMention() + " had a split and share, "
-							+ "10% of their total will be split between the other players.").queueAfter(1,TimeUnit.SECONDS);
+							+ String.format("%d%% of their total will be split between the other players.",splitAndShare))
+							.queueAfter(1,TimeUnit.SECONDS);
 					game.splitMoney(moneyLost,true);
 					//We found the right channel, so
 					break;
@@ -284,7 +285,7 @@ public class Player implements Comparable<Player>
 		warned = false;
 		games.clear();
 		knownBombs.clear();
-		splitAndShare = false;
+		splitAndShare = 0;
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;

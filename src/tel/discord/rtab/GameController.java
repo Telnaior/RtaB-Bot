@@ -938,13 +938,16 @@ public class GameController
 			}
 			break;
 		case SPLIT_SHARE:
-			if(!(players.get(currentTurn).splitAndShare))
+			if(players.get(currentTurn).splitAndShare == 0)
 			{
+				int sasPercentage = 0;
+				for(int i=1; i<playersJoined; i++)
+					sasPercentage += Math.max(1,6-i);
 				channel.sendMessage("It's a **Split & Share**, "
-						+ "don't lose the round now or you'll lose 10% of your total, "
+						+ String.format("don't lose the round now or you'll lose %d%% of your total, ",sasPercentage)
 						+ "approximately $" + String.format("%,d",(players.get(currentTurn).money/10)) + "!")
 					.completeAfter(5,TimeUnit.SECONDS);
-				players.get(currentTurn).splitAndShare = true;
+				players.get(currentTurn).splitAndShare = sasPercentage;
 			}
 			else
 			{
