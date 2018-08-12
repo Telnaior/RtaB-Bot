@@ -181,10 +181,17 @@ public class Player implements Comparable<Player>
 	void addBooster(int amount)
 	{
 		booster += amount;
+		//Convert excess boost to cash
 		if(booster > MAX_BOOSTER)
+		{
+			addMoney(10000*(booster - MAX_BOOSTER), MoneyMultipliersToUse.NOTHING);
 			booster = MAX_BOOSTER;
+		}
 		if(booster < MIN_BOOSTER)
+		{
+			addMoney(10000*(booster - MIN_BOOSTER), MoneyMultipliersToUse.NOTHING);
 			booster = MIN_BOOSTER;
+		}
 	}
 	int bankrupt()
 	{
