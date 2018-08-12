@@ -412,7 +412,7 @@ public class GameController
 				//Determine player order
 				Collections.shuffle(players);
 				currentTurn = 0;
-				gameboard = new Board(boardSize);
+				gameboard = new Board(boardSize,playersJoined);
 				//Let's get things rolling!
 				channel.sendMessage("Let's go!").queue();
 				runTurn();
@@ -568,8 +568,8 @@ public class GameController
 				bombs[bombChosen] = true;
 			}
 			//NO DUDS ALLOWED
-			if(gameboard.bombBoard[bombChosen] == BombType.DUD)
-				gameboard.bombBoard[bombChosen] = BombType.NORMAL;
+			if(gameboard.bombBoard.get(bombChosen) == BombType.DUD)
+				gameboard.bombBoard.set(bombChosen,BombType.NORMAL);
 			//KABOOM KABOOM KABOOM KABOOM
 			resolveTurn(bombCandidates.get(bombChosen));
 		}
@@ -639,16 +639,18 @@ public class GameController
 			channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
 		//If player has a joker, force it to not explode
 		//This is a really ugly way of doing it though
-		if(players.get(currentTurn).jokers > 0)
+		if(players.get(currentTurn).jokers != 0)
 		{
 			channel.sendMessage("But you have a joker!").queueAfter(2,TimeUnit.SECONDS);
-			players.get(currentTurn).jokers --;
-			gameboard.bombBoard[location] = BombType.DUD;
+			//Don't deduct if negative, to allow for unlimited joker
+			if(players.get(currentTurn).jokers > 0)
+				players.get(currentTurn).jokers --;
+			gameboard.bombBoard.set(location,BombType.DUD);
 		}
-		else if(playersJoined == 2 && gameboard.bombBoard[location] == BombType.DUD)
+		else if(playersJoined == 2 && gameboard.bombBoard.get(location) == BombType.DUD)
 		{
 			//No duds in 2p, but jokers still override that
-			gameboard.bombBoard[location] = BombType.NORMAL;
+			gameboard.bombBoard.set(location,BombType.NORMAL);
 		}
 		//But is it a special bomb?
 		StringBuilder extraResult = null;
@@ -658,7 +660,7 @@ public class GameController
 		//Reduce penalty for others out
 		penalty /= 5;
 		penalty *= (5 - Math.min(5,playersJoined-playersAlive));
-		switch(gameboard.bombBoard[location])
+		switch(gameboard.bombBoard.get(location))
 		{
 		case NORMAL:
 			channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
@@ -816,12 +818,12 @@ public class GameController
 	void runSafeLogic(int location)
 	{
 		//Always trigger it on a blammo, otherwise based on spaces left and players in game
-		if((Math.random()*spacesLeft)<playersJoined || gameboard.typeBoard[location] == SpaceType.BLAMMO)
+		if((Math.random()*spacesLeft)<playersJoined || gameboard.typeBoard.get(location) == SpaceType.BLAMMO)
 			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Figure out what space we got
 		LinkedList<String> cashOutput;
 		ListIterator<String> outputIterator;
-		switch(gameboard.typeBoard[location])
+		switch(gameboard.typeBoard.get(location))
 		{
 		case CASH:
 			cashOutput = awardCash(location);
@@ -854,7 +856,7 @@ public class GameController
 			}
 			//No break, finish with event
 		case EVENT:
-			activateEvent(gameboard.eventBoard[location],location);
+			activateEvent(gameboard.eventBoard.get(location),location);
 			break;
 		case BLAMMO:
 			channel.sendMessage("It's a **BLAMMO!** Quick, press a button!").completeAfter(5,TimeUnit.SECONDS);
@@ -896,7 +898,7 @@ public class GameController
 		LinkedList<String> output = new LinkedList<>();
 		int cashWon;
 		//Is it Mystery Money? Do that thing instead then
-		if(gameboard.cashBoard[location] == CashType.MYSTERY)
+		if(gameboard.cashBoard.get(location) == CashType.MYSTERY)
 		{
 			output.add("It's **Mystery Money**, which today awards you...");
 			if(Math.random() < 0.1)
@@ -906,7 +908,7 @@ public class GameController
 		}
 		else
 		{
-			cashWon = gameboard.cashBoard[location].getValue();
+			cashWon = gameboard.cashBoard.get(location).getValue();
 		}
 		//Boost by board multiplier
 		cashWon *= boardMultiplier;
@@ -928,7 +930,7 @@ public class GameController
 	private String awardBoost(int location)
 	{
 		//On cash, update the player's booster and tell them what they found
-		int boostFound = gameboard.boostBoard[location].getValue();
+		int boostFound = gameboard.boostBoard.get(location).getValue();
 		StringBuilder resultString = new StringBuilder();
 		resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
 		if(boostFound > 0)
@@ -942,7 +944,7 @@ public class GameController
 	private String awardGame(int location)
 	{
 		//On a game, announce it and add it to their game pile
-		Games gameFound = gameboard.gameBoard[location];
+		Games gameFound = gameboard.gameBoard.get(location);
 		players.get(currentTurn).games.add(gameFound);
 		players.get(currentTurn).games.sort(null);
 		return ("It's a minigame, **" + gameFound + "**!");
@@ -1035,8 +1037,8 @@ public class GameController
 			for(int i=0; i<boardSize; i++)
 			{
 				//Blammos aren't affected
-				if(gameboard.typeBoard[i] != SpaceType.BLAMMO)
-					gameboard.typeBoard[i] = SpaceType.CASH;
+				if(gameboard.typeBoard.get(i) != SpaceType.BLAMMO)
+					gameboard.typeBoard.set(i,SpaceType.CASH);
 			}
 			break;
 		case STARMAN:
@@ -1065,7 +1067,7 @@ public class GameController
 			{
 				channel.sendMessage("It's a **Minigame Lock**, but you already have one.")
 					.completeAfter(5,TimeUnit.SECONDS);
-				Games gameFound = gameboard.gameBoard[location];
+				Games gameFound = gameboard.gameBoard.get(location);
 				channel.sendMessage("Instead, let's give you **" + gameFound + "** to use it with!")
 					.completeAfter(3,TimeUnit.SECONDS);
 				players.get(currentTurn).games.add(gameFound);
@@ -1131,8 +1133,8 @@ public class GameController
 			for(int i=0; i<boardSize; i++)
 			{
 				//Switch cash to blammo with 1/3 chance
-				if(gameboard.typeBoard[i] == SpaceType.CASH && Math.random()*3 < 1)
-					gameboard.typeBoard[i] = SpaceType.BLAMMO;
+				if(gameboard.typeBoard.get(i) == SpaceType.CASH && Math.random()*3 < 1)
+					gameboard.typeBoard.set(i,SpaceType.BLAMMO);
 			}
 			break;
 		case COMMUNISM:

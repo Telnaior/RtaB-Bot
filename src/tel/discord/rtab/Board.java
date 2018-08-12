@@ -1,5 +1,7 @@
 package tel.discord.rtab;
 
+import java.util.ArrayList;
+
 import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.BoostType;
 import tel.discord.rtab.enums.CashType;
@@ -10,24 +12,35 @@ import tel.discord.rtab.enums.WeightedSpace;
 
 class Board
 {
-	SpaceType[] typeBoard;
-	CashType[] cashBoard;
-	BoostType[] boostBoard;
-	BombType[] bombBoard;
-	Games[] gameBoard;
-	Events[] eventBoard;
+	ArrayList<SpaceType> typeBoard;
+	ArrayList<CashType> cashBoard;
+	ArrayList<BoostType> boostBoard;
+	ArrayList<BombType> bombBoard;
+	ArrayList<Games> gameBoard;
+	ArrayList<Events> eventBoard;
 	
-	Board(int size)
+	Board(int size, int players)
 	{
-		//Initialise types
-		typeBoard = initBoard(new SpaceType[size],SpaceType.values());
-		cashBoard = initBoard(new CashType[size],CashType.values());
-		boostBoard = initBoard(new BoostType[size],BoostType.values());
-		bombBoard = initBoard(new BombType[size],BombType.values());
-		gameBoard = initBoard(new Games[size],Games.values());
-		eventBoard = initBoard(new Events[size],Events.values());
+		typeBoard = new ArrayList<>(size+5);
+		cashBoard = new ArrayList<>(size+5);
+		boostBoard = new ArrayList<>(size+5);
+		bombBoard = new ArrayList<>(size+5);
+		gameBoard = new ArrayList<>(size+5);
+		eventBoard = new ArrayList<>(size+5);
+		addSpaces(size, players);
 	}
-	private <T extends WeightedSpace> T[] initBoard(T[] board, T[] values)
+	
+	void addSpaces(int size, int players)
+	{
+		//Boost each board
+		addToBoard(size, players, typeBoard,SpaceType.values());
+		addToBoard(size, players, cashBoard,CashType.values());
+		addToBoard(size, players, boostBoard,BoostType.values());
+		addToBoard(size, players, bombBoard,BombType.values());
+		addToBoard(size, players, gameBoard,Games.values());
+		addToBoard(size, players, eventBoard,Events.values());
+	}
+	private <T extends WeightedSpace> void addToBoard(int spaces, int players, ArrayList<T> board, T[] values)
 	{
 		//Declare possible values and weights
 		//Autogenerate cumulative weights
@@ -39,7 +52,7 @@ class Board
 			cumulativeWeights[i] = totalWeight;
 		}
 		double random;
-		for(int i=0; i<board.length; i++)
+		for(int i=0; i<spaces; i++)
 		{
 			//Get random spot in weight table
 			random = Math.random() * totalWeight;
@@ -48,8 +61,8 @@ class Board
 			while(cumulativeWeights[search] < random)
 				search++;
 			//And set the value to that
-			board[i] = values[search];
+			board.add(values[search]);
 		}
-		return board;
+		return;
 	}
 }
