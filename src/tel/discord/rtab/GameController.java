@@ -603,7 +603,9 @@ public class GameController
 		//Diamond armour check
 		if(players.get(currentTurn).jokers == -1)
 		{
-			gameboard.typeBoard.set(location,SpaceType.CASH);
+			//Blammos are still immune :P
+			if(gameboard.typeBoard.get(location) != SpaceType.BLAMMO)
+				gameboard.typeBoard.set(location,SpaceType.CASH);
 			runSafeLogic(location);
 		}
 		else if(bombs[location])
