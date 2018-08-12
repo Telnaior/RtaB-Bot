@@ -17,6 +17,7 @@ public enum Events implements WeightedSpace
 	COMMUNISM		( 2),
 	BLAMMO_FRENZY	( 2),
 	SPLIT_SHARE		( 2),
+	SUPER_JOKER		( 1),
 	END_ROUND		( 1),
 	STARMAN			( 1),
 	JACKPOT			( 1);

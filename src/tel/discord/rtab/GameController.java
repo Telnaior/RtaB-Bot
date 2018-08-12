@@ -600,7 +600,13 @@ public class GameController
 				.queueAfter(1,TimeUnit.SECONDS);
 		}
 		//Alright, moving on
-		if(bombs[location])
+		//Diamond armour check
+		if(players.get(currentTurn).jokers == -1)
+		{
+			gameboard.typeBoard.set(location,SpaceType.CASH);
+			runSafeLogic(location);
+		}
+		else if(bombs[location])
 		{
 			runBombLogic(location);
 		}
@@ -817,8 +823,14 @@ public class GameController
 	}
 	void runSafeLogic(int location)
 	{
-		//Always trigger it on a blammo, otherwise based on spaces left and players in game
-		if((Math.random()*spacesLeft)<playersJoined || gameboard.typeBoard.get(location) == SpaceType.BLAMMO)
+		/*
+		 * Suspense rules:
+		 * Always trigger on a blammo
+		 * Otherwise, don't trigger if they have a joker
+		 * Otherwise trigger randomly, chance determined by spaces left and players in the game
+		 */
+		if(((Math.random()*spacesLeft)<playersJoined && players.get(currentTurn).jokers == 0)
+				|| gameboard.typeBoard.get(location) == SpaceType.BLAMMO)
 			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Figure out what space we got
 		LinkedList<String> cashOutput;
@@ -1052,9 +1064,25 @@ public class GameController
 			repeatTurn += 2;
 			break;
 		case JOKER:
-			channel.sendMessage("Congratulations, you found a **Joker**, protecting you from a single bomb!")
+			//This check shouldn't be needed right now, but in case we change things later
+			if(players.get(currentTurn).jokers >= 0)
+			{
+				channel.sendMessage("Congratulations, you found a **Joker**, protecting you from a single bomb!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				players.get(currentTurn).jokers ++;
+			}
+			else
+			{
+				channel.sendMessage("You found a **Joker**, but you don't need it.")
+					.completeAfter(5,TimeUnit.SECONDS);
+			}
+			break;
+		case SUPER_JOKER:
+			channel.sendMessage("You found **DIAMOND ARMOUR**!"
+					+ "Every space you pick for the rest of the round (even bombs) will be converted to cash, "
+					+ "but you won't receive a win bonus at the end.")
 				.completeAfter(5,TimeUnit.SECONDS);
-			players.get(currentTurn).jokers ++;
+			players.get(currentTurn).jokers = -1;
 			break;
 		case GAME_LOCK:
 			if(!players.get(currentTurn).minigameLock)
@@ -1267,8 +1295,8 @@ public class GameController
 					break;
 				}
 		}
-		//If they're a winner, give them a win bonus (folded players don't get this)
-		if(players.get(currentTurn).status == PlayerStatus.ALIVE)
+		//If they're a winner and they weren't running diamond armour, give them a win bonus (folded players don't get this)
+		if(players.get(currentTurn).status == PlayerStatus.ALIVE && players.get(currentTurn).jokers >= 0)
 		{
 			//Award $20k for each space picked, double it if every space was picked, then share with everyone in
 			int winBonus = 20000*(boardSize-spacesLeft);
