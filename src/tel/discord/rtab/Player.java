@@ -146,34 +146,23 @@ public class Player implements Comparable<Player>
 		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
-		if(multipliers.useBonus)
-			adjustedPrize *= Math.max(1,winstreak/10);
+		if(multipliers.useBonus) adjustedPrize *= Math.max(1,winstreak/10);
 		money += adjustedPrize;
 		//Cap at +-$1,000,000,000
-		if(money > 1000000000)
-			money = 1000000000;
-		if(money <= -1000000000)
-		{
-			money = -1000000000;
-		}
+		if(money > 1000000000) money = 1000000000;
+		if(money <= -1000000000) money = -1000000000;
 		//Build the string if we need it
 		if(adjustedPrize != amount)
 		{
 			StringBuilder resultString = new StringBuilder();
 			resultString.append("...which gets ");
-			if(Math.abs(adjustedPrize) < Math.abs(amount))
-				resultString.append("drained");
-			else
-				resultString.append("boosted");
+			resultString.append(Math.abs(adjustedPrize) < Math.abs(amount) ? "drained" : "boosted");
 			resultString.append(" to **");
 			if(adjustedPrize<0)
 				resultString.append("-");
 			resultString.append("$");
 			resultString.append(String.format("%,d**",Math.abs(adjustedPrize)));
-			if(adjustedPrize<amount)
-				resultString.append(".");
-			else
-				resultString.append("!");
+			resultString.append(adjustedPrize<amount ? "." : "!");
 			return resultString;
 		}
 		return null;
@@ -212,21 +201,16 @@ public class Player implements Comparable<Player>
 			status = PlayerStatus.OUT;
 		}
 		//Bomb penalty needs to happen before resetting their booster
-		if(threshold)
-			multiplier *= 4;
+		if(threshold) multiplier *= 4;
 		int penalty;
-		if(newbieProtection > 0)
-			penalty = NEWBIE_BOMB_PENALTY;
-		else
-			penalty = BOMB_PENALTY;
+		penalty = newbieProtection > 0 ? NEWBIE_BOMB_PENALTY : BOMB_PENALTY;
 		//Reduce penalty by 20% for each player already gone
 		penalty /= 5;
 		penalty *= (5 - Math.min(5,othersOut));
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
-			if(lives == MAX_LIVES)
-				lifeRefillTime = Instant.now().plusSeconds(72000);
+			if(lives == MAX_LIVES) lifeRefillTime = Instant.now().plusSeconds(72000);
 			if(lives > 0)
 			{
 				if(lives == 1)
@@ -306,11 +290,9 @@ public class Player implements Comparable<Player>
 	 */
 	public String getSafeMention()
 	{
-		if(isBot)
-			return name;
-		else
-			return user.getAsMention();
+		return isBot ? name : user.getAsMention();
 	}
+	
 	public String printBombs()
 	{
 		StringBuilder result = new StringBuilder();

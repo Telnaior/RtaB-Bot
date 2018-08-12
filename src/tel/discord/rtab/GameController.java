@@ -931,9 +931,7 @@ public class GameController
 		resultString.append("**");
 		if(cashWon<0)
 			resultString.append("-");
-		resultString.append("$");
-		resultString.append(String.format("%,d",Math.abs(cashWon)));
-		resultString.append("**!");
+		resultString.append(String.format("$%,d**!",Math.abs(cashWon)));
 		output.add(resultString.toString());
 		StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 		if(extraResult != null)
@@ -946,11 +944,8 @@ public class GameController
 		//On cash, update the player's booster and tell them what they found
 		int boostFound = gameboard.boostBoard.get(location).getValue();
 		StringBuilder resultString = new StringBuilder();
-		resultString.append("A **" + String.format("%+d",boostFound) + "%** Booster");
-		if(boostFound > 0)
-			resultString.append("!");
-		else
-			resultString.append(".");
+		resultString.append(String.format("A **%+d%%** Booster",boostFound));
+		resultString.append(boostFound > 0 ? "!" : ".");
 		players.get(currentTurn).addBooster(boostFound);
 		return resultString.toString();
 	}
@@ -1080,7 +1075,7 @@ public class GameController
 			}
 			break;
 		case SUPER_JOKER:
-			channel.sendMessage("You found **DIAMOND ARMOUR**!"
+			channel.sendMessage("You found the **MIDAS TOUCH**!"
 					+ "Every space you pick for the rest of the round (even bombs) will be converted to cash, "
 					+ "but you won't receive a win bonus at the end.")
 				.completeAfter(5,TimeUnit.SECONDS);
@@ -1546,32 +1541,19 @@ public class GameController
 				for(int i=7; i<=boardWidth; i++)
 				{
 					//One space for odd numbers, two spaces for even numbers
-					board.append(" ");
-					if(i%2==0)
-						board.append(" ");
+					board.append(i%2==0 ? "  " : " ");
 				}
 				//Then print the first part
 				board.append("Race to ");
 				//Extra space if it's odd
-				if(boardWidth%2 == 1)
-					board.append(" ");
+				if(boardWidth%2 == 1) board.append(" ");
 				//Then the rest of the header
 				board.append("a Billion\n");
 			}
 			for(int i=0; i<boardSize; i++)
 			{
-				if(pickedSpaces[i])
-				{
-					board.append("  ");
-				}
-				else
-				{
-					board.append(String.format("%02d",(i+1)));
-				}
-				if((i%boardWidth) == (boardWidth-1))
-					board.append("\n");
-				else
-					board.append(" ");
+				board.append(pickedSpaces[i] ? "  " : String.format("%02d",(i+1)));
+				board.append((i%boardWidth) == (boardWidth-1) ? "\n" : " ");
 			}
 			board.append("\n");
 		}
@@ -1602,34 +1584,22 @@ public class GameController
 		//Then start printing - including pointer if currently their turn
 		for(int i=0; i<playersJoined; i++)
 		{
-			if(currentTurn == i)
-				board.append("> ");
-			else
-				board.append("  ");
+			board.append(currentTurn == i ? "> " : "  ");
 			board.append(String.format("%-"+nameLength+"s",players.get(i).name));
 			//Now figure out if we need a negative sign, a space, or neither
 			int playerMoney = (players.get(i).money - players.get(i).oldMoney);
 			//What sign to print?
-			if(playerMoney<0)
-				board.append("-");
-			else
-				board.append("+");
+			board.append(playerMoney<0 ? "-" : "+");
 			//Then print the money itself
-			board.append("$");
-			board.append(String.format("%,"+moneyLength+"d",Math.abs(playerMoney)));
+			board.append(String.format("$%,"+moneyLength+"d",Math.abs(playerMoney)));
 			//Now the booster display
 			switch(players.get(i).status)
 			{
 			case ALIVE:
 			case DONE:
-				board.append(" [");
-				board.append(String.format("%3d",players.get(i).booster));
-				board.append("%");
+				board.append(String.format(" [%3d%%",players.get(i).booster));
 				if(players.get(i).status == PlayerStatus.DONE || (gameStatus == GameStatus.END_GAME && currentTurn == i))
-				{
-					board.append("x");
-					board.append(String.format("%1$d.%2$d",players.get(i).winstreak/10,players.get(i).winstreak%10));
-				}
+					board.append(String.format("x%1$d.%2$d",players.get(i).winstreak/10,players.get(i).winstreak%10));
 				board.append("]");
 				break;
 			case OUT:
@@ -1652,14 +1622,10 @@ public class GameController
 			if(totals)
 			{
 				//Get to the right spot in the line
-				for(int j=0; j<(nameLength-4); j++)
-					board.append(" ");
+				for(int j=0; j<(nameLength-4); j++) board.append(" ");
 				board.append("Total:");
 				//Print sign
-				if(players.get(i).money<0)
-					board.append("-");
-				else
-					board.append(" ");
+				board.append(players.get(i).money<0 ? "-" : " ");
 				//Then print the money itself
 				board.append("$");
 				board.append(String.format("%,"+moneyLength+"d\n\n",Math.abs(players.get(i).money)));
