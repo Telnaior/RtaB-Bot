@@ -140,6 +140,7 @@ public class DigitalFortress implements MiniGame {
 	@Override
 	public String getBotPick()
 	{
+		//This isn't a perfect way of doing it but whatever, it's a bot
 		//Arrays.asList is fixed-size, so we copy it over to a new list we can actually add/remove to
 		List<Character> digitsOld = Arrays.asList('0','1','2','3','4','5','6','7','8','9');
 		ArrayList<Character> digits = new ArrayList<>(11);
@@ -149,7 +150,7 @@ public class DigitalFortress implements MiniGame {
 			if(lockedIn[i])
 				digits.remove(solution.get(i));
 		//Cycle the list once for every attempt used
-		for(int i=ATTEMPTS_ALLOWED; i>attemptsLeft; i++)
+		for(int i=ATTEMPTS_ALLOWED; i>attemptsLeft; i--)
 		{
 			digits.add(digits.get(0));
 			digits.remove(0);
