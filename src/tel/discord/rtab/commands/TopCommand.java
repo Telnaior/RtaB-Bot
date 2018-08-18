@@ -12,7 +12,7 @@ public class TopCommand extends Command {
     public TopCommand()
     {
         this.name = "top";
-        this.help = "view the top ten players on the leaderboard";
+        this.help = "view ten players on the leaderboard (top ten by default, or give page number)";
     }
 	@Override
 	protected void execute(CommandEvent event) {
@@ -20,9 +20,19 @@ public class TopCommand extends Command {
 			List<String> list = Files.readAllLines(Paths.get("scores"+event.getChannel().getId()+".csv"));
 			StringBuilder response = new StringBuilder().append("```\n");
 			String[] record;
+			int offset = 0;
+			try
+			{
+				//If this doesn't throw an exception we're good
+				offset = Math.max(Integer.parseInt(event.getArgs()) - 1,0);
+			}
+			catch(NumberFormatException e1)
+			{
+				//We can swallow this, it's fine, just let it default to top ten
+			}
 			int money, moneyLength = 0;
 			//Get top 10, or fewer if list isn't long enough
-			for(int i=0; i<Math.min(list.size(),10); i++)
+			for(int i=10*offset; i<Math.min(list.size(),(10*offset)+10); i++)
 			{
 				/*
 				 * record format:
@@ -36,12 +46,12 @@ public class TopCommand extends Command {
 				if(money <= 0)
 					break;
 				//Get the length to format all values to
-				if(i == 0)
+				if(i%10 == 0)
 				{
 					moneyLength = String.valueOf(money).length();
 					moneyLength += (moneyLength-1)/3;
 				}
-				response.append("#" + String.format("%02d",(i+1)) + ": $"); 
+				response.append("#" + String.format("%03d",(i+1)) + ": $"); 
 				response.append(String.format("%,"+moneyLength+"d",money));
 				response.append(" - " + record[1] + "\n");
 			}
