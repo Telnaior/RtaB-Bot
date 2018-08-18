@@ -1116,7 +1116,8 @@ public class GameController
 		case JACKPOT:
 			if(!(players.get(currentTurn).jackpot))
 			{
-				channel.sendMessage("You found the $25,000,000 **JACKPOT**, win the round to claim it!")
+				channel.sendMessage(String.format("You found the $%d,000,000 **JACKPOT**, "
+						+ "win the round to claim it!",boardSize))
 					.completeAfter(5,TimeUnit.SECONDS);
 				players.get(currentTurn).jackpot = true;
 			}
@@ -1305,8 +1306,8 @@ public class GameController
 			//Don't forget about the jackpot
 			if(players.get(currentTurn).jackpot)
 			{
-				channel.sendMessage("You won the $25,000,000 **JACKPOT**!").queue();
-				players.get(currentTurn).addMoney(25000000,MoneyMultipliersToUse.NOTHING);
+				channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",boardSize)).queue();
+				players.get(currentTurn).addMoney(1000000*boardSize,MoneyMultipliersToUse.NOTHING);
 			}
 		}
 		//Then, folded or not, play out any minigames they've won
