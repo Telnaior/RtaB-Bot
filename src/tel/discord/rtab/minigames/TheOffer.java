@@ -47,6 +47,7 @@ public class TheOffer implements MiniGame {
 		if(choice.equals("REFUSE") || choice.equals("NODEAL"))
 		{
 			output.add("Offer Refused!");
+			output.add("...");
 			int boomValue = (int) (Math.random()*100);
 				
 			if (chanceToBomb > boomValue){
@@ -69,17 +70,6 @@ public class TheOffer implements MiniGame {
 		}
 		//If it's neither of those it's just some random string we can safely ignore
 		return output;
-	}
-
-	boolean isNumber(String message)
-	{
-		try{
-			Integer.parseInt(message);
-			return true;
-		}
-		catch(NumberFormatException e1){
-			return false;
-		}
 	}
 
 
