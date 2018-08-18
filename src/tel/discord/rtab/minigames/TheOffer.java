@@ -7,22 +7,18 @@ public class TheOffer implements MiniGame {
 	static final boolean BONUS = false;
 	double chanceToBomb; 
 	int offer; 
-	int seconds; // Time passed with the Bomb
 	boolean alive; //Player still alive?
 	boolean accept; //Accepting the Offer
-	boolean refuse; //Refusing the Offer
 	/**
 	 * Initialises the variables used in the minigame and prints the starting messages.
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
 	public LinkedList<String> initialiseGame(){
-		seconds = 0;                      // Starting at 0 Seconds
 		offer = 1000 * (int)(Math.random()*76+25); // First Offer starts between 25,000 and 100,000
 		chanceToBomb = offer/5000;  // Start chance to Bomb 5-20% based on first offer
 		alive = true; 
-		accept = false; 
-		refuse = false; 
+		accept = false;
 
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
@@ -50,66 +46,29 @@ public class TheOffer implements MiniGame {
 		choice = choice.replaceAll("\\s","");
 		if(choice.equals("REFUSE") || choice.equals("NODEAL"))
 		{
-			refuse = true;
 			output.add("Offer Refused!");
-
-			int stopAt = seconds + 1;
-			
-			refuse = false;
-			boolean halfSecond = false;
-			int boomValue;
-			
-			while(seconds < stopAt){      
+			int boomValue = (int) (Math.random()*100);
 				
-				boomValue = (int) (Math.random()*100);
-				
-				if (chanceToBomb > boomValue){
-					output.add("**BOOM**");
-					alive = false;
-					break;
-				}
-				else
-				{
-					output.add("...");
-				}
-
-				if (!halfSecond){
-					halfSecond = true;
-				}
-				else {
-					halfSecond = false;
-					offer += (int)(offer * (1 + (Math.random()*0.5)));
-					offer -= offer%100;
-					chanceToBomb += 5 + (Math.random()*6);
-					seconds++;
-				}
+			if (chanceToBomb > boomValue){
+				output.add("**BOOM**");
+				alive = false;
 			}
-			
-			if (seconds == stopAt && alive){
+			else
+			{
+				offer += (int)(offer * (1 + (Math.random()*0.5)));
+				offer -= offer%100;
+				chanceToBomb += 5 + (Math.random()*6);
 				output.add("Your new offer is: " + String.format("**$%,d**", offer));
 				output.add("Do you 'ACCEPT' or 'REFUSE'?");
 			}
-			else if(seconds > stopAt){
-				output.add("You found a Bug! Tell a DEV! - Seconds > StopAT - Take this!");
-				offer = 100000;
-				alive = true;
-				accept = true;
-				return output;
-			}
-			
-			return output;
 		}
 		else if(choice.equals("ACCEPT") || choice.equals("DEAL"))
 		{
 			accept = true;
 			output.add("Offer Accepted!");
-			return output;
 		}
-		else
-		{
-			//Definitely don't say anything for random strings
-			return output;
-		}
+		//If it's neither of those it's just some random string we can safely ignore
+		return output;
 	}
 
 	boolean isNumber(String message)
@@ -129,9 +88,7 @@ public class TheOffer implements MiniGame {
 	 */
 	@Override
 	public boolean isGameOver(){
-		if (alive && accept) 
-			return true;
-		return !alive;
+		return accept || !alive;
 	}
 
 
@@ -141,10 +98,7 @@ public class TheOffer implements MiniGame {
 	 */
 	@Override
 	public int getMoneyWon(){
-		if (isGameOver() & alive)
-			return offer;
-		else
-			return 0;
+		return (isGameOver() & alive) ? offer : 0;
 	}
 	/**
 	 * Returns true if the game is a bonus game (and therefore shouldn't have boosters or winstreak applied)
@@ -159,12 +113,7 @@ public class TheOffer implements MiniGame {
 	public String getBotPick()
 	{
 		//Do a "trial run", quit if it fails
-		for(int i=0; i<2; i++)
-			if(Math.random() < chanceToBomb)
-			{
-				return "ACCEPT";
-			}
-		return "REFUSE";
+		return (Math.random() < chanceToBomb) ? "ACCEPT" : "REFUSE";
 	}
 	
 	@Override
