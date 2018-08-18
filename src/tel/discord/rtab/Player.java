@@ -30,6 +30,7 @@ public class Player implements Comparable<Player>
 	String uID;
 	boolean isBot;
 	int lives;
+	int oldLives;
 	Instant lifeRefillTime;
 	int money;
 	int oldMoney;
@@ -123,6 +124,7 @@ public class Player implements Comparable<Player>
 		}
 		oldMoney = money;
 		oldWinstreak = winstreak;
+		oldLives = lives;
 	}
 	StringBuilder addMoney(int amount, MoneyMultipliersToUse multipliers)
 	{
@@ -143,7 +145,7 @@ public class Player implements Comparable<Player>
 			}
 		}
 		//If they're out of lives and it's a positive, hit 'em hard
-		if(lives == 0 && adjustedPrize > 0)
+		if(oldLives == 0 && adjustedPrize > 0)
 			adjustedPrize /= 5;
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
