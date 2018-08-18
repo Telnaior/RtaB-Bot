@@ -12,7 +12,7 @@ public class TopCommand extends Command {
     public TopCommand()
     {
         this.name = "top";
-        this.help = "view the top ten players on the leaderboard";
+        this.help = "view ten players on the leaderboard (top ten by default, or give page number)";
     }
 	@Override
 	protected void execute(CommandEvent event) {
@@ -24,7 +24,7 @@ public class TopCommand extends Command {
 			try
 			{
 				//If this doesn't throw an exception we're good
-				offset = Integer.parseInt(event.getArgs()) - 1;
+				offset = Math.max(Integer.parseInt(event.getArgs()) - 1,0);
 			}
 			catch(NumberFormatException e1)
 			{
