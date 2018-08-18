@@ -486,13 +486,6 @@ public class GameController
 					{
 						warnPlayer.cancel();
 						int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
-						//If they just picked their own bomb, what do they think they're doing?
-						if(players.get(currentTurn).knownBombs.contains(location) 
-								&& spacesLeft > players.get(currentTurn).knownBombs.size())
-						{
-							System.out.println(Instant.now().toString() + " - " + players.get(currentTurn).name + 
-									": known bomb pick, " + spacesLeft + " spaces left.");
-						}
 						//Anyway go play out their turn
 						timer.schedule(new PickSpace(location),1000);
 					},
