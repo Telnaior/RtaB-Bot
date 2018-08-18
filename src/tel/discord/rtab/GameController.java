@@ -194,7 +194,8 @@ public class GameController
 		playersJoined = 0;
 		playersAlive = 0;
 		boardMultiplier = 1;
-		gameStatus = GameStatus.SIGNUPS_OPEN;
+		if(gameStatus != GameStatus.SEASON_OVER)
+			gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
 		repeatTurn = 0;
 		timer.cancel();
