@@ -1194,6 +1194,25 @@ public class GameController
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).boostCharge += 5;
 			break;
+		case BRIBE:
+			channel.sendMessage("You've been **Bribed** to leave the round!").completeAfter(5,TimeUnit.SECONDS);
+			//$10k per space left on the board before the pick
+			int bribe = 10000 * (spacesLeft+1);
+			channel.sendMessage(String.format("You receive **$,d**.",bribe)).queue();
+			StringBuilder extraResult = players.get(currentTurn).addMoney(bribe,MoneyMultipliersToUse.BOOSTER_ONLY);
+			if(extraResult != null)
+				channel.sendMessage(extraResult.toString()).queue();
+			//Fold if they have minigames, or qualified for a bonus game
+			if(players.get(currentTurn).oldWinstreak < 50 * (players.get(currentTurn).winstreak / 50)
+					|| players.get(currentTurn).games.size() > 0)
+			{
+				channel.sendMessage("You'll still get to play your minigames too.").queueAfter(1,TimeUnit.SECONDS);
+				players.get(currentTurn).status = PlayerStatus.FOLDED;
+			}
+			else players.get(currentTurn).status = PlayerStatus.OUT;
+			repeatTurn = 0;
+			playersAlive --;
+			break;
 		}
 	}
 	void runNextEndGamePlayer()

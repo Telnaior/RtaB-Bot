@@ -40,6 +40,7 @@ public enum Events implements WeightedSpace
 	STREAKP3		( 3),
 	COMMUNISM		( 2),
 	BLAMMO_FRENZY	( 2),
+	BRIBE			( 2),
 	SPLIT_SHARE		( 2),
 	SUPER_JOKER		( 1)
 	{
