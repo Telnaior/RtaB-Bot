@@ -649,11 +649,6 @@ public class GameController
 				players.get(currentTurn).jokers --;
 			gameboard.bombBoard.set(location,BombType.DUD);
 		}
-		else if(playersJoined == 2 && gameboard.bombBoard.get(location) == BombType.DUD)
-		{
-			//No duds in 2p, but jokers still override that
-			gameboard.bombBoard.set(location,BombType.NORMAL);
-		}
 		//But is it a special bomb?
 		StringBuilder extraResult = null;
 		int penalty = Player.BOMB_PENALTY;

@@ -45,7 +45,9 @@ public enum Games implements WeightedSpace {
 		return game;
 	}
 	@Override
-	public int getWeight() {
+	public int getWeight(int playerCount)
+	{
+		//Minigame types don't care about playercount
 		return weight;
 	}
 }

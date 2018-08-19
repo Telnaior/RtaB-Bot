@@ -48,7 +48,7 @@ class Board
 		int totalWeight = 0;
 		for(int i=0; i<values.length; i++)
 		{
-			totalWeight += values[i].getWeight();
+			totalWeight += values[i].getWeight(players);
 			cumulativeWeights[i] = totalWeight;
 		}
 		double random;

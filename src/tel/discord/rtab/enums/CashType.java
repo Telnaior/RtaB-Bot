@@ -42,8 +42,9 @@ public enum CashType implements WeightedSpace
 		weight = valueWeight;
 	}
 	@Override
-	public int getWeight()
+	public int getWeight(int playerCount)
 	{
+		//Cash types don't care about playercount
 		return weight;
 	}
 	public int getValue()

@@ -44,8 +44,9 @@ public enum BoostType implements WeightedSpace
 		weight = valueWeight;
 	}
 	@Override
-	public int getWeight()
+	public int getWeight(int playerCount)
 	{
+		//Booster values don't care about playercount
 		return weight;
 	}
 	public int getValue()
