@@ -15,6 +15,7 @@ public class StrikeItRich implements MiniGame {
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
 	int lastSpace;
 	int lastPicked;
+	int multiplier;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean pinchMode = false;
 	
@@ -31,6 +32,7 @@ public class StrikeItRich implements MiniGame {
 		numberPicked = new int[VALUES.length];
 		pickedSpaces = new boolean[BOARD_SIZE];
 		pinchMode = false;
+		multiplier = 1;
 		//Display instructions
 		output.add("In Strike it Rich, your objective is to match three of a kind.");
 		output.add("Simply keep choosing numbers until you have three the same, and that is what you will win.");
@@ -66,6 +68,20 @@ public class StrikeItRich implements MiniGame {
 			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
 			if(numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
 				pinchMode = true;
+			//Check for full count
+			if(multiplier == 1)
+			{
+				multiplier = 2;
+				for(int count : numberPicked)
+					if(count < (NEEDED_TO_WIN - 1))
+					{
+						multiplier = 1;
+						break;
+					}
+				//If we do have full count, mention it
+				if(multiplier == 2)
+					output.add("You got a full count, doubling all values!");
+			}
 			output.add(generateBoard());
 			return output;
 		}
@@ -113,7 +129,7 @@ public class StrikeItRich implements MiniGame {
 		//Next display how many of each we have
 		for(int i=0; i<VALUES.length; i++)
 		{
-			display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]));
+			display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]*multiplier));
 		}
 		display.append("```");
 		return display.toString();
@@ -132,7 +148,7 @@ public class StrikeItRich implements MiniGame {
 	public int getMoneyWon()
 	{
 		if(isGameOver())
-			return lastPicked;
+			return lastPicked*multiplier;
 		else
 			return 0;
 	}
