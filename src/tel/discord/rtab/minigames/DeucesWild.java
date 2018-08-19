@@ -179,7 +179,8 @@ public class DeucesWild implements MiniGame {
 				pickedSpaces[lastSpace] = true;
 				lastPicked = board.get(lastSpace);
 				cardsPicked[gameStage] = lastPicked;
-				if(redrawUsed)
+				//Autohold deuces, or any card once we've already redrawn
+				if(redrawUsed || lastPicked.getRank() == CardRank.DEUCE)
 					cardsHeld[gameStage] = true;
 				do {
 					gameStage++;
