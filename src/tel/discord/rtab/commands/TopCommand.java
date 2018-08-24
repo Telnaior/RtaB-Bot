@@ -53,7 +53,7 @@ public class TopCommand extends Command {
 				}
 				response.append("#" + String.format("%03d",(i+1)) + ": $"); 
 				response.append(String.format("%,"+moneyLength+"d",money));
-				response.append(" - " + record[1] + "\n");
+				response.append(" -" + (record[0].startsWith("-")?"*":" ") + record[1] + "\n");
 			}
 			response.append("```");
 			event.reply(response.toString());
