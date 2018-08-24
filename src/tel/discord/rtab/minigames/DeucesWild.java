@@ -264,7 +264,7 @@ public class DeucesWild implements MiniGame {
 			display.append("(" + hand.toString() + ")");
 			if (!redrawUsed && hand != PokerHand.NATURAL_ROYAL)
 			{
-				display.append("              ");
+				display.append("\n              ");
 				for (int i = 0; i < cardsPicked.length; i++)
 				{
 					display.append(i+1);
