@@ -49,6 +49,8 @@ public class GameController
 	public List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
 	int currentTurn = -1;
+	boolean finalCountdown = false;
+	int fcTurnsLeft;
 	int repeatTurn = 0;
 	public int playersJoined = 0;
 	int playersAlive = 0;
@@ -197,6 +199,7 @@ public class GameController
 		if(gameStatus != GameStatus.SEASON_OVER)
 			gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
+		finalCountdown = false;
 		repeatTurn = 0;
 		timer.cancel();
 		timer = new Timer();
@@ -427,6 +430,22 @@ public class GameController
 	}
 	void runTurn()
 	{
+		//Count down if necessary
+		if(finalCountdown)
+		{
+			//End the game if we're out of turns
+			if(fcTurnsLeft == 0)
+			{
+				gameStatus = GameStatus.END_GAME;
+				channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
+				timer.schedule(new WaitForEndGame(), 1000);
+				return;
+			}
+			//Otherwise subtract one
+			channel.sendMessage(String.format("The round will end in **%d turns**.",fcTurnsLeft)).queue();
+			fcTurnsLeft --;
+		}
+		//Figure out who to ping and what to tell them
 		if(repeatTurn > 0)
 		{
 			repeatTurn --;
@@ -439,6 +458,7 @@ public class GameController
 			channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
 				.completeAfter(3,TimeUnit.SECONDS);
 		}
+		//Display the board, then ready up the space picker
 		displayBoardAndStatus(true, false, false);
 		if(players.get(currentTurn).isBot)
 		{
@@ -1178,11 +1198,24 @@ public class GameController
 			Collections.shuffle(players);
 			break;
 		case END_ROUND:
-			channel.sendMessage("It's the **End** of the **Round**!")
-				.completeAfter(5,TimeUnit.SECONDS);
-			gameStatus = GameStatus.END_GAME;
-			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-			timer.schedule(new WaitForEndGame(), 1000);
+			if(finalCountdown)
+			{
+				channel.sendMessage("It's the **Final Countdown**! Turns remaining cut in half!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				fcTurnsLeft /= 2;
+			}
+			else
+			{
+				//Send message with appropriate
+				channel.sendMessage("It's the **Final Countdown**!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				finalCountdown = true;
+				//Figure out turns left: max 50% remaining spaces, min players alive (max overrides min)
+				if(spacesLeft/2 <= playersAlive)
+					fcTurnsLeft = spacesLeft/2;
+				else
+					fcTurnsLeft = (int) (Math.random() * ((spacesLeft/2) - playersAlive + 1) + playersAlive);
+			}
 			return;
 		case DOUBLE_DEAL:
 			channel.sendMessage("It's a **Double Deal**, all cash left on the board is doubled in value!")
