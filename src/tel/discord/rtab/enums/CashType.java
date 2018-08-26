@@ -31,7 +31,8 @@ public enum CashType implements WeightedSpace
 	P750K	(  750000,2),
 	P1000K	( 1000000,2),
 	//Meme
-	P50		(      50,1);
+	P50		(      50,1),
+	MYSTERY (       0,3);
 	
 	int value;
 	int weight;
@@ -41,8 +42,9 @@ public enum CashType implements WeightedSpace
 		weight = valueWeight;
 	}
 	@Override
-	public int getWeight()
+	public int getWeight(int playerCount)
 	{
+		//Cash types don't care about playercount
 		return weight;
 	}
 	public int getValue()

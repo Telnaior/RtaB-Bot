@@ -12,6 +12,7 @@ public enum Games implements WeightedSpace {
 	THE_OFFER		(2,"The Offer","Offer",new TheOffer()),
 	DEUCES_WILD		(2,"Deuces Wild","Deuces",new DeucesWild()),
 	DOUBLE_TROUBLE	(2,"Double Trouble","Double",new DoubleTrouble()),
+	DEAL_OR_NO_DEAL	(2,"Deal or No Deal","DoND", new DealOrNoDeal()),
 	//Don't have enough games in the pool to have a rotation yet
 	//Bonus games never appear in the pool
 	SUPERCASH		(0,"SUPERCASH","Super",new Supercash()),
@@ -44,7 +45,9 @@ public enum Games implements WeightedSpace {
 		return game;
 	}
 	@Override
-	public int getWeight() {
+	public int getWeight(int playerCount)
+	{
+		//Minigame types don't care about playercount
 		return weight;
 	}
 }

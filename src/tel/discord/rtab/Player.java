@@ -17,7 +17,7 @@ import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerStatus;
 
 
-class Player implements Comparable<Player>
+public class Player implements Comparable<Player>
 {
 	static final int BOMB_PENALTY = -250000;
 	static final int NEWBIE_BOMB_PENALTY = -100000;
@@ -39,7 +39,8 @@ class Player implements Comparable<Player>
 	int newbieProtection;
 	//Event fields
 	int jokers;
-	boolean splitAndShare;
+	int splitAndShare;
+	int boostCharge;
 	boolean minigameLock;
 	boolean jackpot;
 	boolean threshold;
@@ -77,7 +78,8 @@ class Player implements Comparable<Player>
 		booster = 100;
 		winstreak = 0;
 		jokers = 0;
-		splitAndShare = false;
+		splitAndShare = 0;
+		boostCharge = 0;
 		minigameLock = false;
 		threshold = false;
 		warned = false;
@@ -144,34 +146,23 @@ class Player implements Comparable<Player>
 		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
-		if(multipliers.useBonus)
-			adjustedPrize *= Math.max(1,winstreak/10);
+		if(multipliers.useBonus) adjustedPrize *= Math.max(1,winstreak/10);
 		money += adjustedPrize;
 		//Cap at +-$1,000,000,000
-		if(money > 1000000000)
-			money = 1000000000;
-		if(money <= -1000000000)
-		{
-			money = -1000000000;
-		}
+		if(money > 1000000000) money = 1000000000;
+		if(money <= -1000000000) money = -1000000000;
 		//Build the string if we need it
 		if(adjustedPrize != amount)
 		{
 			StringBuilder resultString = new StringBuilder();
 			resultString.append("...which gets ");
-			if(Math.abs(adjustedPrize) < Math.abs(amount))
-				resultString.append("drained");
-			else
-				resultString.append("boosted");
+			resultString.append(Math.abs(adjustedPrize) < Math.abs(amount) ? "drained" : "boosted");
 			resultString.append(" to **");
 			if(adjustedPrize<0)
 				resultString.append("-");
 			resultString.append("$");
 			resultString.append(String.format("%,d**",Math.abs(adjustedPrize)));
-			if(adjustedPrize<amount)
-				resultString.append(".");
-			else
-				resultString.append("!");
+			resultString.append(adjustedPrize<amount ? "." : "!");
 			return resultString;
 		}
 		return null;
@@ -179,10 +170,17 @@ class Player implements Comparable<Player>
 	void addBooster(int amount)
 	{
 		booster += amount;
+		//Convert excess boost to cash
 		if(booster > MAX_BOOSTER)
+		{
+			addMoney(10000*(booster - MAX_BOOSTER), MoneyMultipliersToUse.NOTHING);
 			booster = MAX_BOOSTER;
+		}
 		if(booster < MIN_BOOSTER)
+		{
+			addMoney(10000*(booster - MIN_BOOSTER), MoneyMultipliersToUse.NOTHING);
 			booster = MIN_BOOSTER;
+		}
 	}
 	int bankrupt()
 	{
@@ -190,7 +188,7 @@ class Player implements Comparable<Player>
 		money = oldMoney;
 		return lostMoney;
 	}
-	public StringBuilder blowUp(int multiplier, boolean holdBoost)
+	public StringBuilder blowUp(int multiplier, boolean holdBoost, int othersOut)
 	{
 		//Just fold if they've got a minigame lock so they still play their games
 		if(minigameLock && games.size() > 0)
@@ -203,18 +201,16 @@ class Player implements Comparable<Player>
 			status = PlayerStatus.OUT;
 		}
 		//Bomb penalty needs to happen before resetting their booster
-		if(threshold)
-			multiplier *= 4;
+		if(threshold) multiplier *= 4;
 		int penalty;
-		if(newbieProtection > 0)
-			penalty = NEWBIE_BOMB_PENALTY;
-		else
-			penalty = BOMB_PENALTY;
+		penalty = newbieProtection > 0 ? NEWBIE_BOMB_PENALTY : BOMB_PENALTY;
+		//Reduce penalty by 20% for each player already gone
+		penalty /= 5;
+		penalty *= (5 - Math.min(5,othersOut));
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
-			if(lives == MAX_LIVES)
-				lifeRefillTime = Instant.now().plusSeconds(72000);
+			if(lives == MAX_LIVES) lifeRefillTime = Instant.now().plusSeconds(72000);
 			if(lives > 0)
 			{
 				if(lives == 1)
@@ -227,15 +223,18 @@ class Player implements Comparable<Player>
 		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
-		if(splitAndShare)
+		if(splitAndShare > 0)
 		{
-			int moneyLost = money/10;
+			int moneyLost = (int)(money/(100.0/splitAndShare));
 			addMoney(-1*moneyLost,MoneyMultipliersToUse.NOTHING);
 			for(GameController game : RaceToABillionBot.game)
 			{
 				if(game.channel == channel)
 				{
-					game.splitAndShare(moneyLost);
+					channel.sendMessage("Because " + getSafeMention() + " had a split and share, "
+							+ String.format("%d%% of their total will be split between the other players.",splitAndShare))
+							.queueAfter(1,TimeUnit.SECONDS);
+					game.splitMoney(moneyLost,true);
 					//We found the right channel, so
 					break;
 				}
@@ -279,7 +278,8 @@ class Player implements Comparable<Player>
 		warned = false;
 		games.clear();
 		knownBombs.clear();
-		splitAndShare = false;
+		splitAndShare = 0;
+		boostCharge = 0;
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;
@@ -290,9 +290,19 @@ class Player implements Comparable<Player>
 	 */
 	public String getSafeMention()
 	{
-		if(isBot)
-			return name;
-		else
-			return user.getAsMention();
+		return isBot ? name : user.getAsMention();
+	}
+	
+	public String printBombs()
+	{
+		StringBuilder result = new StringBuilder();
+		result.append(name);
+		result.append(":");
+		for(int bomb : knownBombs)
+		{
+			result.append(" ");
+			result.append(String.format("%02d",bomb+1));
+		}
+		return result.toString();
 	}
 }
