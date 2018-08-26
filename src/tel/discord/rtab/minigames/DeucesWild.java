@@ -189,7 +189,7 @@ public class DeucesWild implements MiniGame {
 					if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
 						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
 								+ "of each card.");
-						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ".");
+						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ". It will be marked as held with an asterisk.");
 						output.add("If you change your mind or make a mistake, type RELEASE followed by the position number of the card " +
 								"you would rather redraw, e.g. 'RELEASE 2' to remove any hold on the " + cardsPicked[1] + ".");
 						output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
