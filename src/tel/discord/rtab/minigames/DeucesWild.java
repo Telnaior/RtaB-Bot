@@ -175,7 +175,8 @@ public class DeucesWild implements MiniGame {
 				pickedSpaces[lastSpace] = true;
 				lastPicked = board.get(lastSpace);
 				cardsPicked[gameStage] = lastPicked;
-				if(redrawUsed)
+				//Autohold deuces, or any card once we've already redrawn
+				if(redrawUsed || lastPicked.getRank() == CardRank.DEUCE)
 					cardsHeld[gameStage] = true;
 				do {
 					gameStage++;
@@ -258,9 +259,17 @@ public class DeucesWild implements MiniGame {
 		if (gameStage == 5) {
 			display.append("(" + hand.toString() + ")");
 			if (!redrawUsed && hand != PokerHand.NATURAL_ROYAL)
-				display.append("\n" + "              1  2  3  4  5");
+			{
+				display.append("\n              ");
+				for (int i = 0; i < cardsPicked.length; i++)
+				{
+					display.append(i+1);
+					display.append(cardsHeld[i] ? "*" : " ");
+					display.append(" ");
+				}
+			}
 		}
-		display.append("```");
+		display.append("\n```");
 		return display.toString();
 	}
 

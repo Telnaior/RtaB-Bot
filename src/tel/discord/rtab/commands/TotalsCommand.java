@@ -12,6 +12,7 @@ public class TotalsCommand extends Command
 	public TotalsCommand()
 	{
 		this.name = "totals";
+		this.aliases = new String[]{"total"};
 		this.help = "displays the total scores of the in-game players";
 	}
 	

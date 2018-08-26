@@ -70,7 +70,6 @@ public class StrikeItRich implements MiniGame {
 			return output;
 		}
 	}
-
 	boolean isNumber(String message)
 	{
 		try

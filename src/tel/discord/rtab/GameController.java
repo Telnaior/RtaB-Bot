@@ -45,7 +45,7 @@ public class GameController
 	public TextChannel channel;
 	TextChannel resultChannel;
 	int boardSize = 15;
-	List<Player> players = new ArrayList<>();
+	public List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
 	int currentTurn = -1;
 	int repeatTurn = 0;
@@ -59,6 +59,7 @@ public class GameController
 	Board gameboard;
 	public static EventWaiter waiter;
 	public Timer timer = new Timer();
+	public TimerTask demoMode;
 	Message waitingMessage;
 
 	private class StartGameTask extends TimerTask
@@ -158,10 +159,22 @@ public class GameController
 			runBlammo(location);
 		}
 	}
+	private class RunDemo extends TimerTask
+	{
+		@Override
+		public void run()
+		{
+			for(int i=0; i<4; i++)
+				addRandomBot();
+			startTheGameAlready();
+		}
+	}
 	
 	public GameController(TextChannel channelID)
 	{
 		channel = channelID;
+		demoMode = new RunDemo();
+		timer.schedule(demoMode, 3600000);
 	}
 	
 	void setResultChannel(TextChannel channelID)
@@ -178,11 +191,14 @@ public class GameController
 		currentTurn = -1;
 		playersJoined = 0;
 		playersAlive = 0;
-		gameStatus = GameStatus.SIGNUPS_OPEN;
+		if(gameStatus != GameStatus.SEASON_OVER)
+			gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
 		repeatTurn = 0;
 		timer.cancel();
 		timer = new Timer();
+		demoMode = new RunDemo();
+		timer.schedule(demoMode, 3600000);
 	}
 	/*
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -190,6 +206,14 @@ public class GameController
 	 * String playerID - ID of player to be added.
 	 * Returns an enum which gives the result of the join attempt.
 	 */
+	public int findPlayerInGame(String playerID)
+	{
+		for(int i=0; i < players.size(); i++)
+			if(players.get(i).uID.equals(playerID))
+				return i;
+		return -1;
+	}
+	
 	public PlayerJoinReturnValue addPlayer(Member playerID)
 	{
 		//Make sure game isn't already running
@@ -215,18 +239,16 @@ public class GameController
 					+ "Playing this round will incur an entry fee of $%,d.",entryFee)).queue();
 		}
 		//Look for match already in player list
-		for(int i=0; i<playersJoined; i++)
+		int playerLocation = findPlayerInGame(newPlayer.uID);
+		if(playerLocation != -1)
 		{
-			if(players.get(i).uID.equals(newPlayer.uID))
+			//Found them, check if we should update their name or just laugh at them
+			if(players.get(playerLocation).name == newPlayer.name)
+				return PlayerJoinReturnValue.ALREADYIN;
+			else
 			{
-				//Found them, check if we should update their name or just laugh at them
-				if(players.get(i).name == newPlayer.name)
-					return PlayerJoinReturnValue.ALREADYIN;
-				else
-				{
-					players.set(i,newPlayer);
-					return PlayerJoinReturnValue.UPDATED;
-				}
+				players.set(playerLocation,newPlayer);
+				return PlayerJoinReturnValue.UPDATED;
 			}
 		}
 		//Haven't found one, add them to the list
@@ -239,6 +261,7 @@ public class GameController
 		}
 		if(playersJoined == 1)
 		{
+			demoMode.cancel();
 			timer.schedule(new FinalCallTask(),  90000);
 			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
@@ -257,18 +280,15 @@ public class GameController
 		if(gameStatus != GameStatus.SIGNUPS_OPEN)
 			return PlayerQuitReturnValue.GAMEINPROGRESS;
 		//Search for player
-		for(int i=0; i<playersJoined; i++)
+		int playerLocation = findPlayerInGame(playerID.getId());
+		if(playerLocation != -1)
 		{
-			if(players.get(i).uID.equals(playerID.getId()))
-			{
-				//Found them, get rid of them and call it a success
-				players.remove(i);
-				playersJoined --;
-				//Abort the game if everyone left
-				if(playersJoined == 0)
-					reset();
-				return PlayerQuitReturnValue.SUCCESS;
-			}
+			players.remove(playerLocation);
+			playersJoined --;
+			//Abort the game if everyone left
+			if(playersJoined == 0)
+				reset();
+			return PlayerQuitReturnValue.SUCCESS;
 		}
 		//Didn't find them, why are they trying to quit in the first place?
 		return PlayerQuitReturnValue.NOTINGAME;
@@ -603,7 +623,7 @@ public class GameController
 		channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Mock them appropriately if they self-bombed
 		if(players.get(currentTurn).knownBombs.contains(location))
-				channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
 		else
 			channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
 		//If player has a joker, force it to not explode
@@ -860,7 +880,7 @@ public class GameController
 				bombs[(int)(Math.random()*boardSize)] = true;
 			break;
 		case LOCKDOWN:
-			channel.sendMessage("It's a **Lockdown**, all non-bomb spaces on the board are now becoming cash!")
+			channel.sendMessage("It's a **Lockdown**, all non-bomb non-blammo spaces on the board are now becoming cash!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			for(int i=0; i<boardSize; i++)
 			{
@@ -903,7 +923,7 @@ public class GameController
 				channel.sendMessage("It's a **Minigame Lock**, but you already have one.")
 					.completeAfter(5,TimeUnit.SECONDS);
 				Games gameFound = gameboard.gameBoard[location];
-				channel.sendMessage("Instead, let's give you a **" + gameFound + "** to use it with!")
+				channel.sendMessage("Instead, let's give you **" + gameFound + "** to use it with!")
 					.completeAfter(3,TimeUnit.SECONDS);
 				players.get(currentTurn).games.add(gameFound);
 				players.get(currentTurn).games.sort(null);
@@ -1007,8 +1027,14 @@ public class GameController
 			int cashWon = (int)Math.pow((Math.random()*39)+1,4);
 			StringBuilder resultString = new StringBuilder();
 			resultString.append(String.format("**$%,d**!",Math.abs(cashWon)));
-			StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			channel.sendMessage(resultString.toString()).completeAfter(2,TimeUnit.SECONDS);
+			//Dumb easter egg
+			if(cashWon == 1)
+			{
+				channel.sendMessage(":clap: HOLLA :clap: HOLLA :clap: "
+						+ "GET :money_with_wings: 1 :money_with_wings: DOLLA :clap:").queue();
+			}
+			StringBuilder extraResult = players.get(currentTurn).addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult.toString()).queue();
 			break;
@@ -1181,9 +1207,19 @@ public class GameController
 		if(players.get(currentTurn).isBot)
 		{
 			//Get their pick from the game and use it to play their next turn
-			currentGame.playNextTurn(currentGame.getBotPick());
-			
-			
+			final boolean DEBUG = false;
+			if(DEBUG)
+			{
+				LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
+				for(String output : result)
+				{
+					System.out.println(output);
+				}
+			}
+			else
+			{
+				currentGame.playNextTurn(currentGame.getBotPick());
+			}
 			//Check if the game's over
 			if(currentGame.isGameOver())
 			{

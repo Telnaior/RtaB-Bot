@@ -34,7 +34,6 @@ public class MathTime implements MiniGame {
 		output.add("If you pick well, you could win up to $2,000,000!");
 		output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
 		output.add("When you are ready, make your first pick from the money stage.");
-		equation += "( ";
 		stage = 1;
 		output.add(generateBoard());
 		return output;
@@ -71,11 +70,15 @@ public class MathTime implements MiniGame {
 				String result = String.format("$%,d",money.get(lastPick));
 				output.add(result + "!");
 				stage++;
+				if(stage == 2)
+					equation += "( ";
+				equation += result;
+				if(stage == 4)
+					equation += " )";
 				if(stage > 3 && total == 0)
 					output.add("That equals... nothing. Sorry.");
 				else
 					output.add("Next, pick an operation...");
-				equation += result;
 				break;
 			case 2:
 				result2 = ops1.get(lastPick);
@@ -90,7 +93,7 @@ public class MathTime implements MiniGame {
 				result4 = ops2.get(lastPick);
 				output.add("**"+result4+"**");
 				output.add("Finally, pick a multiplier...");
-				equation += (" ) "+result4+" ");
+				equation += (" "+result4+" ");
 				stage++;
 				break;
 			case 5:

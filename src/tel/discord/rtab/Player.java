@@ -17,7 +17,7 @@ import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerStatus;
 
 
-class Player implements Comparable<Player>
+public class Player implements Comparable<Player>
 {
 	static final int BOMB_PENALTY = -250000;
 	static final int NEWBIE_BOMB_PENALTY = -100000;
@@ -30,6 +30,7 @@ class Player implements Comparable<Player>
 	String uID;
 	boolean isBot;
 	int lives;
+	int oldLives;
 	Instant lifeRefillTime;
 	int money;
 	int oldMoney;
@@ -123,6 +124,7 @@ class Player implements Comparable<Player>
 		}
 		oldMoney = money;
 		oldWinstreak = winstreak;
+		oldLives = lives;
 	}
 	StringBuilder addMoney(int amount, MoneyMultipliersToUse multipliers)
 	{
@@ -142,6 +144,9 @@ class Player implements Comparable<Player>
 				adjustedPrize *= booster;
 			}
 		}
+		//If they're out of lives and it's a positive, hit 'em hard
+		if(oldLives == 0 && adjustedPrize > 0)
+			adjustedPrize /= 5;
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
 		if(multipliers.useBonus)
@@ -294,5 +299,17 @@ class Player implements Comparable<Player>
 			return name;
 		else
 			return user.getAsMention();
+	}
+	public String printBombs()
+	{
+		StringBuilder result = new StringBuilder();
+		result.append(name);
+		result.append(":");
+		for(int bomb : knownBombs)
+		{
+			result.append(" ");
+			result.append(String.format("%02d",bomb+1));
+		}
+		return result.toString();
 	}
 }
