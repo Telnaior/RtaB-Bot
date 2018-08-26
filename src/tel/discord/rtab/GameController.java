@@ -52,6 +52,7 @@ public class GameController
 	boolean finalCountdown = false;
 	int fcTurnsLeft;
 	int repeatTurn = 0;
+	boolean reverse = false;
 	public int playersJoined = 0;
 	int playersAlive = 0;
 	int boardMultiplier = 1;
@@ -186,7 +187,7 @@ public class GameController
 		resultChannel = channelID;
 	}
 	
-	/*
+	/**
 	 * reset - (re)initialises the game state by removing all players and clearing the board.
 	 */
 	public void reset()
@@ -201,12 +202,13 @@ public class GameController
 		gameboard = null;
 		finalCountdown = false;
 		repeatTurn = 0;
+		reverse = false;
 		timer.cancel();
 		timer = new Timer();
 		demoMode = new RunDemo();
 		timer.schedule(demoMode, 3600000);
 	}
-	/*
+	/**
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
 	 * MessageChannel channelID - channel the request took place in (only used to know where to send game details to)
 	 * String playerID - ID of player to be added.
@@ -275,7 +277,7 @@ public class GameController
 		else
 			return PlayerJoinReturnValue.JOINED;
 	}
-	/*
+	/**
 	 * removePlayer - removes a player from the game.
 	 * MessageChannel channelID - channel the request was registered in.
 	 * String playerID - ID of player to be removed.
@@ -299,7 +301,7 @@ public class GameController
 		//Didn't find them, why are they trying to quit in the first place?
 		return PlayerQuitReturnValue.NOTINGAME;
 	}
-	/*
+	/**
 	 * startTheGameAlready - prompts for players to choose bombs.
 	 */
 	public void startTheGameAlready()
@@ -915,7 +917,7 @@ public class GameController
 		}
 		runEndTurnLogic();
 	}
-	
+
 	private LinkedList<String> awardCash(int location)
 	{
 		LinkedList<String> output = new LinkedList<>();
@@ -1192,10 +1194,24 @@ public class GameController
 				next.addMoney(delta,MoneyMultipliersToUse.NOTHING);
 			}
 			break;
-		case SHUFFLE_ORDER:
-			channel.sendMessage("It's a **Scramble**, everybody get up and change position!")
+		case REVERSE_ORDER:
+			if(playersAlive > 2)
+			{
+				channel.sendMessage("It's a **Reverse**!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				reverse = reverse ? false : true;
+				break;
+			}
+			//If 2p, treat them as skips instead
+		case SKIP_TURN:
+			channel.sendMessage("It's a **Skip Turn**!")
 				.completeAfter(5,TimeUnit.SECONDS);
-			Collections.shuffle(players);
+			if(repeatTurn > 0)
+			{
+				repeatTurn = 0;
+				channel.sendMessage("(You also negated the repeat!)").queue();
+			}
+			advanceTurn(false);
 			break;
 		case END_ROUND:
 			if(finalCountdown)
@@ -1539,7 +1555,8 @@ public class GameController
 		boolean isPlayerGood = false;
 		do
 		{
-			currentTurn++;
+			//Subtract rather than add if we're reversed
+			currentTurn += reverse ? -1 : 1;
 			triesLeft --;
 			currentTurn = currentTurn % playersJoined;
 			//Is this player someone allowed to play now?

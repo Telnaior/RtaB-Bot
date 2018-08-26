@@ -6,7 +6,6 @@ public enum Events implements WeightedSpace
 	STREAKP1		( 6),
 	BOOST_CHARGER	( 6),
 	DOUBLE_DEAL		( 5),
-	SHUFFLE_ORDER	( 5),
 	STREAKP2		( 5),
 	GAME_LOCK		( 4)
 	{
@@ -19,6 +18,8 @@ public enum Events implements WeightedSpace
 	},
 	BOOST_DRAIN		( 4),
 	MINEFIELD		( 4),
+	SKIP_TURN		( 3),
+	REVERSE_ORDER	( 3),
 	JOKER			( 3)
 	{
 		@Override
