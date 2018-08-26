@@ -27,8 +27,10 @@ import tel.discord.rtab.commands.RankCommand;
 import tel.discord.rtab.commands.ResetCommand;
 import tel.discord.rtab.commands.ShutdownBotCommand;
 import tel.discord.rtab.commands.StartCommand;
+import tel.discord.rtab.commands.StatsCommand;
 import tel.discord.rtab.commands.TopCommand;
 import tel.discord.rtab.commands.TotalsCommand;
+import tel.discord.rtab.commands.ViewBombsCommand;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -50,7 +52,6 @@ public class RaceToABillionBot
 		utilities.setHelpWord("commands");
 		utilities.addCommand(new HelpCommand());
 		utilities.addCommand(new JoinCommand());
-		utilities.addCommand(new StartCommand());
 		utilities.addCommand(new QuitCommand());
 		utilities.addCommand(new PlayersCommand());
 		utilities.addCommand(new BoardCommand());
@@ -58,8 +59,11 @@ public class RaceToABillionBot
 		utilities.addCommand(new LivesCommand());
 		utilities.addCommand(new RankCommand());
 		utilities.addCommand(new TopCommand());
+		utilities.addCommand(new StatsCommand());
 		utilities.addCommand(new PingBotCommand());
+		utilities.addCommand(new StartCommand());
 		utilities.addCommand(new ResetCommand());
+		utilities.addCommand(new ViewBombsCommand());
 		utilities.addCommand(new ShutdownBotCommand());
 		utilities.addCommand(new AddBotCommand());
 		utilities.addCommand(new DemoCommand());
