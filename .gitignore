@@ -10,6 +10,10 @@ SBRItem.java
 .settings/
 bin/
 
+# IntelliJ Files
+.idea/
+*.iml
+
 # Compiled class file
 *.class
 
