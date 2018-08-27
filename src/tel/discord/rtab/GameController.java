@@ -1059,6 +1059,7 @@ public class GameController
 					for(int i=0; i<3; i++)
 						channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
 							.completeAfter(2,TimeUnit.SECONDS);
+					channel.sendMessage("@everyone").completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
 					if(!players.get(0).isBot)
 					{
