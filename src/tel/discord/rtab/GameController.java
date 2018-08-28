@@ -995,15 +995,13 @@ public class GameController
 			{
 				//Add their delta to the pile
 				delta += (next.money - next.oldMoney);
-				//And reset their delta to +$0
-				next.money = next.oldMoney;
 			}
 			//Divide the total by the number of players
 			delta /= playersJoined;
 			//And give it to each of them
 			for(Player next : players)
 			{
-				next.addMoney(delta,MoneyMultipliersToUse.NOTHING);
+				next.addMoney(delta-(next.money-next.oldMoney),MoneyMultipliersToUse.NOTHING);
 			}
 			break;
 		case SHUFFLE_ORDER:
