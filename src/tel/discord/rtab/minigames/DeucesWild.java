@@ -368,20 +368,25 @@ public class DeucesWild implements MiniGame {
 			}
 			else return PokerHand.STRAIGHT_FLUSH;
 		}
+
 		if (isFlush) return PokerHand.FLUSH;
-		if (highCardOfStraight != null) return PokerHand.STRAIGHT;
-
+		
 		byte modeOfRanks = modeOfRanks(rankCount); // That is, how many are there of the most common rank?
-
+		
 		switch (modeOfRanks) {
+			case 5: return PokerHand.FIVE_OF_A_KIND;
+			case 4: return PokerHand.FOUR_OF_A_KIND;
+			case 3: if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE; // we need to check for a straight before we pay for
+			default: break;                                                   // a three of a kind
+		}
+		
+		if (highCardOfStraight != null) return PokerHand.STRAIGHT;
+		
+		switch (modeOfRanks) {
+			case 3: return PokerHand.THREE_OF_A_KIND;
 			case 2: 
 				if (hasExtraPair(rankCount)) return PokerHand.TWO_PAIR;
 				else return PokerHand.ONE_PAIR;
-			case 3: 
-				if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE;
-				else return PokerHand.THREE_OF_A_KIND;
-			case 4: return PokerHand.FOUR_OF_A_KIND;
-			case 5: return PokerHand.FIVE_OF_A_KIND;
 			default: return PokerHand.NOTHING;
 		}
 	}

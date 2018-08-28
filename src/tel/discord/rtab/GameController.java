@@ -1183,15 +1183,13 @@ public class GameController
 			{
 				//Add their delta to the pile
 				delta += (next.money - next.oldMoney);
-				//And reset their delta to +$0
-				next.money = next.oldMoney;
 			}
 			//Divide the total by the number of players
 			delta /= playersJoined;
 			//And give it to each of them
 			for(Player next : players)
 			{
-				next.addMoney(delta,MoneyMultipliersToUse.NOTHING);
+				next.addMoney(delta-(next.money-next.oldMoney),MoneyMultipliersToUse.NOTHING);
 			}
 			break;
 		case REVERSE_ORDER:
@@ -1285,6 +1283,7 @@ public class GameController
 					for(int i=0; i<3; i++)
 						channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
 							.completeAfter(2,TimeUnit.SECONDS);
+					channel.sendMessage("@everyone").completeAfter(2,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
 					if(!players.get(0).isBot)
 					{
@@ -1736,8 +1735,9 @@ public class GameController
 			DescendingScoreSorter sorter = new DescendingScoreSorter();
 			list.sort(sorter);
 			Path file = Paths.get("scores"+channel.getId()+".csv");
-			Files.delete(file);
+			Path oldFile = Files.move(file, file.resolveSibling("scores"+channel.getId()+"old.csv"));
 			Files.write(file, list);
+			Files.delete(oldFile);
 		}
 		catch(IOException e)
 		{
