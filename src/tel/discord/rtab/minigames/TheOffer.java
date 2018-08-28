@@ -6,7 +6,8 @@ public class TheOffer implements MiniGame {
 	static final String NAME = "The Offer";
 	static final boolean BONUS = false;
 	double chanceToBomb; 
-	int offer; 
+	int offer;
+	int seconds;
 	boolean alive; //Player still alive?
 	boolean accept; //Accepting the Offer
 	/**
@@ -15,8 +16,9 @@ public class TheOffer implements MiniGame {
 	 */
 	@Override
 	public LinkedList<String> initialiseGame(){
-		offer = 1000 * (int)(Math.random()*76+25); // First Offer starts between 25,000 and 100,000
-		chanceToBomb = offer/5000;  // Start chance to Bomb 5-20% based on first offer
+		offer = 1000 * (int)(Math.random()*51+50); // First Offer starts between 50,000 and 100,000
+		chanceToBomb = offer/10000;  // Start chance to Bomb 5-10% based on first offer
+		seconds = 0;
 		alive = true; 
 		accept = false;
 
@@ -24,8 +26,8 @@ public class TheOffer implements MiniGame {
 		//Give instructions
 		output.add("In The Offer, you will be placed in a room with a live bomb.");
 		output.add("You will get offers while in the room to leave it.");
-		output.add("Every offer that passes increases the money you gain as an offer by at least 100%, " +
-				"but the chance of the bomb exploding will also increase by at least 5%.");
+		output.add("Every offer will be at least double the previous one, " +
+				"but the chance of the bomb exploding will also increase significantly.");
 		output.add("If the bomb explodes, you lose everything."); //~Duh
 		output.add("Be aware the Bomb can explode at any moment, so don't take too long!");
 		output.add("----------------------------------------"); 
@@ -47,18 +49,25 @@ public class TheOffer implements MiniGame {
 		if(choice.equals("REFUSE") || choice.equals("NODEAL"))
 		{
 			output.add("Offer Refused!");
+			seconds++;
 			output.add("...");
-			int boomValue = (int) (Math.random()*100);
-				
-			if (chanceToBomb > boomValue){
-				output.add("**BOOM**");
-				alive = false;
-			}
-			else
+			//Let's find out if we explode
+			for(int i=0; i<seconds; i++)
 			{
-				offer += (int)(offer * (1 + (Math.random()*0.5)));
+				if (chanceToBomb > Math.random()*100)
+				{
+					output.add("**BOOM**");
+					alive = false;
+					break;
+				}
+			}
+			//If still alive, let's run it
+			if(alive)
+			{
+				double increment = Math.random()*0.5;
+				offer += (int)(offer * (1 + increment));
 				offer -= offer%100;
-				chanceToBomb += 5 + (Math.random()*6);
+				chanceToBomb += 5 + (increment*10);
 				output.add("Your new offer is: " + String.format("**$%,d**", offer));
 				output.add("Do you 'ACCEPT' or 'REFUSE'?");
 			}
@@ -103,7 +112,15 @@ public class TheOffer implements MiniGame {
 	public String getBotPick()
 	{
 		//Do a "trial run", quit if it fails
-		return (Math.random() < chanceToBomb) ? "ACCEPT" : "REFUSE";
+		for(int i=0; i<=seconds; i++)
+		{
+			if (chanceToBomb > Math.random()*100)
+			{
+				return "ACCEPT";
+			}
+		}
+		//Trial run says we'll survive, so play on
+		return "REFUSE";
 	}
 	
 	@Override
