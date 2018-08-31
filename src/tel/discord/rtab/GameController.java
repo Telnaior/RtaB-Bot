@@ -17,6 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -367,6 +368,7 @@ public class GameController
 				waiter.waitForEvent(MessageReceivedEvent.class,
 						//Check if right player, and valid bomb pick
 						e -> (e.getAuthor().equals(players.get(iInner).user)
+								&& e.getChannel().getType() == ChannelType.PRIVATE
 								&& checkValidNumber(e.getMessage().getContentRaw())),
 						//Parse it and update the bomb board
 						e -> 
