@@ -10,6 +10,7 @@ public class LivesCommand extends Command {
 	public LivesCommand()
     {
         this.name = "lives";
+		this.aliases = new String[]{"refill"};
         this.help = "see how many lives you have left, and how long until they refill";
         this.guildOnly = false;
     }
