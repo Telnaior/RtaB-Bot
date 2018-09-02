@@ -17,7 +17,7 @@ public class ShutdownBotCommand extends ShutdownCommand
 	{
 		for(GameController game : RaceToABillionBot.game)
 		{
-			game.timer.cancel();
+			game.timer.shutdownNow();
 		}
 		super.execute(event);
 	}
