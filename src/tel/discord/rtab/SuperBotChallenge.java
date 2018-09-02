@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +15,7 @@ public class SuperBotChallenge
 {
 	GameController gameHandler;
 	TextChannel channel;
-	ScheduledExecutorService timer;
+	ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
 	
 	public SuperBotChallenge(TextChannel channelID)
 	{
