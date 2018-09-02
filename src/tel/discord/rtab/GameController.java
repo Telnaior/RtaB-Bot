@@ -1164,21 +1164,19 @@ public class GameController
 				players.get(currentTurn).addMoney(25000000,MoneyMultipliersToUse.NOTHING);
 			}
 			break;
-		case STREAKP1:
-			players.get(currentTurn).winstreak += 10;
-			channel.sendMessage(String.format("It's a **+1 Streak Bonus**, raising you to x%1$d.%2$d!",
+		case STREAKPSMALL:
+			int smallStreakAwarded = (int) ((Math.random() * 11) + 5);
+			players.get(currentTurn).winstreak += smallStreakAwarded;
+			channel.sendMessage(String.format("It's a **+%1$d.%2$d Streak Bonus**, raising you to x%3$d.%4$d!",
+					smallStreakAwarded/10,smallStreakAwarded%10,
 					players.get(currentTurn).winstreak/10,players.get(currentTurn).winstreak%10))
 				.completeAfter(5,TimeUnit.SECONDS);
 			break;
-		case STREAKP2:
-			players.get(currentTurn).winstreak += 20;
-			channel.sendMessage(String.format("It's a **+2 Streak Bonus**, raising you to x%1$d.%2$d!",
-					players.get(currentTurn).winstreak/10,players.get(currentTurn).winstreak%10))
-				.completeAfter(5,TimeUnit.SECONDS);
-			break;
-		case STREAKP3:
-			players.get(currentTurn).winstreak += 30;
-			channel.sendMessage(String.format("It's a **+3 Streak Bonus**, raising you to x%1$d.%2$d!",
+		case STREAKPLARGE:
+			int bigStreakAwarded = (int) ((Math.random() * 15) + 16);
+			players.get(currentTurn).winstreak += bigStreakAwarded;
+			channel.sendMessage(String.format("It's a **+%1$d.%2$d Streak Bonus**, raising you to x%3$d.%4$d!",
+					bigStreakAwarded/10,bigStreakAwarded%10,
 					players.get(currentTurn).winstreak/10,players.get(currentTurn).winstreak%10))
 				.completeAfter(5,TimeUnit.SECONDS);
 			break;
@@ -1277,6 +1275,31 @@ public class GameController
 			else players.get(currentTurn).status = PlayerStatus.OUT;
 			repeatTurn = 0;
 			playersAlive --;
+			break;
+		case BOOST_MAGNET:
+			//Get the total boost in play
+			int totalBoost = 0;
+			for(Player next : players)
+			{
+				//Add their boost to the pile
+				totalBoost += (next.booster - 100)/2;
+				next.booster -= (next.booster - 100)/2;
+			}
+			if(totalBoost != 0)
+			{
+				//And give it to the current player
+				channel.sendMessage("It's a **Boost Magnet**, you get half of everyone's boost!")
+					.completeAfter(5,TimeUnit.SECONDS);
+				players.get(currentTurn).addBooster(totalBoost);
+			}
+			else
+			{
+				//No boost in play? BACKUP PLAN
+				channel.sendMessage("It's a **Boost Magnet**, but there's no boost to give you...")
+					.completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage("So you can have this instead.").completeAfter(3,TimeUnit.SECONDS);
+				channel.sendMessage(awardBoost(location)).queue();
+			}
 			break;
 		}
 	}

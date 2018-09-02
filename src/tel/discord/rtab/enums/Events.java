@@ -2,16 +2,16 @@ package tel.discord.rtab.enums;
 
 public enum Events implements WeightedSpace
 {
-	STREAKP1		( 6),
-	BOOST_CHARGER	( 6),
-	DOUBLE_DEAL		( 6),
-	STREAKP2		( 4),
-	BOOST_DRAIN		( 4),
-	DRAW_TWO		( 4),
-	MINEFIELD		( 3),
-	SKIP_TURN		( 3),
-	REVERSE_ORDER	( 3),
-	JOKER			( 3)
+	STREAKPSMALL	( 7),
+	BOOST_CHARGER	( 7),
+	DOUBLE_DEAL		( 7),
+	BOOST_DRAIN		( 6),
+	DRAW_TWO		( 6),
+	SKIP_TURN		( 6),
+	MINEFIELD		( 5),
+	BOOST_MAGNET	( 5),
+	REVERSE_ORDER	( 5),
+	JOKER			( 4)
 	{
 		@Override
 		public int getWeight(int playerCount)
@@ -28,13 +28,14 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	LOCKDOWN		( 3),
-	STREAKP3		( 2),
-	COMMUNISM		( 2),
-	BLAMMO_FRENZY	( 2),
+	LOCKDOWN		( 4),
+	STREAKPLARGE	( 4),
+	COMMUNISM		( 3),
+	BLAMMO_FRENZY	( 3),
+	DRAW_FOUR		( 3),
 	BRIBE			( 2),
 	SPLIT_SHARE		( 2),
-	DRAW_FOUR		( 2),
+	END_ROUND		( 2),
 	SUPER_JOKER		( 1)
 	{
 		@Override
@@ -44,7 +45,6 @@ public enum Events implements WeightedSpace
 			return (playerCount < 4) ? 0 : weight;
 		}
 	},
-	END_ROUND		( 1),
 	STARMAN			( 1),
 	JACKPOT			( 1);
 
