@@ -717,13 +717,24 @@ public class GameController
 			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
 			break;
 		case BOOSTHOLD:
-			StringBuilder resultString = new StringBuilder().append("It ");
+			StringBuilder boostHoldResult = new StringBuilder().append("It ");
 			if(players.get(currentTurn).booster != 100)
-				resultString.append("holds your boost, then ");
-			resultString.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
-			channel.sendMessage(resultString)
+				boostHoldResult.append("holds your boost, then ");
+			boostHoldResult.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
+			channel.sendMessage(boostHoldResult)
 					.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = players.get(currentTurn).blowUp(1,true,(playersJoined-playersAlive));
+			break;
+		case GAMELOCK:
+			StringBuilder gameLockResult = new StringBuilder().append("It ");
+			if(players.get(currentTurn).games.size() > 0)
+				gameLockResult.append("locks in your minigame" +
+						(players.get(currentTurn).games.size() > 1 ? "s" : "") + ", then ");
+			gameLockResult.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
+			channel.sendMessage(gameLockResult)
+					.completeAfter(5,TimeUnit.SECONDS);
+			players.get(currentTurn).minigameLock = true;
+			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
 			break;
 		case CHAIN:
 			channel.sendMessage("It goes **BOOM**...")
@@ -1068,10 +1079,33 @@ public class GameController
 				.completeAfter(5,TimeUnit.SECONDS);
 			detonateBombs();
 			break;
-		case REPEAT:
-			channel.sendMessage("It's a **Repeat**, you need to pick two more spaces in a row!")
-				.completeAfter(5,TimeUnit.SECONDS);
+		case DRAW_TWO:
+			if(repeatTurn > 0)
+			{
+				channel.sendMessage("It's another **Draw Two**, and that means even more spaces for the next player!")
+					.completeAfter(5,TimeUnit.SECONDS);
+			}
+			else
+			{
+				channel.sendMessage("It's a **Draw Two**, the next player needs to pick two spaces in a row!")
+					.completeAfter(5,TimeUnit.SECONDS);
+			}
+			advanceTurn(false);
 			repeatTurn += 2;
+			break;
+		case DRAW_FOUR:
+			if(repeatTurn > 0)
+			{
+				channel.sendMessage("It's another **Draw Four**, and that means even more spaces for the next player!")
+					.completeAfter(5,TimeUnit.SECONDS);
+			}
+			else
+			{
+				channel.sendMessage("It's a **Draw Four**, the next player needs to pick FOUR spaces in a row!")
+					.completeAfter(5,TimeUnit.SECONDS);
+			}
+			advanceTurn(false);
+			repeatTurn += 4;
 			break;
 		case JOKER:
 			//This check shouldn't be needed right now, but in case we change things later
@@ -1094,29 +1128,11 @@ public class GameController
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).jokers = -1;
 			break;
-		case GAME_LOCK:
-			if(!players.get(currentTurn).minigameLock)
-			{
-				channel.sendMessage("It's a **Minigame Lock**, you'll get to play any minigames you have even if you bomb!")
-					.completeAfter(5,TimeUnit.SECONDS);
-				players.get(currentTurn).minigameLock = true;
-			}
-			else
-			{
-				channel.sendMessage("It's a **Minigame Lock**, but you already have one.")
-					.completeAfter(5,TimeUnit.SECONDS);
-				Games gameFound = gameboard.gameBoard.get(location);
-				channel.sendMessage("Instead, let's give you **" + gameFound + "** to use it with!")
-					.completeAfter(3,TimeUnit.SECONDS);
-				players.get(currentTurn).games.add(gameFound);
-				players.get(currentTurn).games.sort(null);
-			}
-			break;
 		case SPLIT_SHARE:
 			if(players.get(currentTurn).splitAndShare == 0)
 			{
 				int sasPercentage = 0;
-				for(int i=1; i<playersJoined; i++)
+				for(int i=1; i<playersAlive; i++)
 					sasPercentage += Math.max(1,6-i);
 				channel.sendMessage("It's a **Split & Share**, "
 						+ String.format("don't lose the round now or you'll lose %d%% of your total, ",sasPercentage)
@@ -1209,7 +1225,7 @@ public class GameController
 			if(repeatTurn > 0)
 			{
 				repeatTurn = 0;
-				channel.sendMessage("(You also negated the repeat!)").queue();
+				channel.sendMessage("(You also negated the extra draws!)").queue();
 			}
 			advanceTurn(false);
 			break;
