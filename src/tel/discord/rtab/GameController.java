@@ -65,6 +65,7 @@ public class GameController
 	Board gameboard;
 	public static EventWaiter waiter;
 	public Timer timer = new Timer();
+	boolean runDemo;
 	public TimerTask demoMode;
 	Message waitingMessage;
 
@@ -176,11 +177,15 @@ public class GameController
 		}
 	}
 	
-	public GameController(TextChannel channelID)
+	public GameController(TextChannel channelID, boolean useDemo)
 	{
 		channel = channelID;
-		demoMode = new RunDemo();
-		timer.schedule(demoMode, 3600000);
+		runDemo = useDemo;
+		if(runDemo)
+		{
+			demoMode = new RunDemo();
+			timer.schedule(demoMode, 3600000);
+		}
 	}
 	
 	void setResultChannel(TextChannel channelID)
@@ -206,8 +211,11 @@ public class GameController
 		reverse = false;
 		timer.cancel();
 		timer = new Timer();
-		demoMode = new RunDemo();
-		timer.schedule(demoMode, 3600000);
+		if(runDemo)
+		{
+			demoMode = new RunDemo();
+			timer.schedule(demoMode, 3600000);
+		}
 	}
 	/**
 	 * addPlayer - adds a player to the game, or updates their name if they're already in.
@@ -270,7 +278,8 @@ public class GameController
 		}
 		if(playersJoined == 1)
 		{
-			demoMode.cancel();
+			if(runDemo)
+				demoMode.cancel();
 			timer.schedule(new FinalCallTask(),  90000);
 			timer.schedule(new StartGameTask(), 120000);
 			return PlayerJoinReturnValue.CREATED;
