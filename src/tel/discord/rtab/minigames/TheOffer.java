@@ -46,7 +46,7 @@ public class TheOffer implements MiniGame {
 		choice = choice.replaceAll("\\s","");
 		if(choice.equals("REFUSE") || choice.equals("NODEAL") || choice.equals("DARE"))
 		{
-			output.add("Offer Refused!");
+			output.add("The Bomb goes live");
 			output.add("...");
 			//Let's find out if we explode
 			for(int i=0; i<seconds; i++)
@@ -72,7 +72,7 @@ public class TheOffer implements MiniGame {
 		else if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE"))
 		{
 			accept = true;
-			output.add("Offer Accepted!");
+			output.add("You take your Money!");
 		}
 		//If it's neither of those it's just some random string we can safely ignore
 		return output;
