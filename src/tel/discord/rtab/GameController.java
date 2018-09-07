@@ -44,6 +44,8 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 public class GameController
 {
 	final static int MAX_PLAYERS = 16;
+	final boolean runDemo;
+	final boolean verboseBotGames;
 	public TextChannel channel;
 	TextChannel resultChannel;
 	int boardSize = 15;
@@ -64,15 +66,15 @@ public class GameController
 	boolean[] bombs;
 	Board gameboard;
 	public static EventWaiter waiter;
-	boolean runDemo;
 	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 	public ScheduledFuture<?> demoMode;
 	Message waitingMessage;
 	
-	public GameController(TextChannel channelID, boolean useDemo)
+	public GameController(TextChannel channelID, boolean useDemo, boolean verbosity)
 	{
 		channel = channelID;
 		runDemo = useDemo;
+		verboseBotGames = verbosity;
 		if(runDemo)
 		{
 			demoMode = timer.schedule(() -> 
@@ -1389,19 +1391,13 @@ public class GameController
 	{
 		if(players.get(currentTurn).isBot)
 		{
-			//Get their pick from the game and use it to play their next turn
-			final boolean DEBUG = false;
-			if(DEBUG)
+			LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
+			if(verboseBotGames)
 			{
-				LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
 				for(String output : result)
 				{
-					System.out.println(output);
+					channel.sendMessage(output).completeAfter(2,TimeUnit.SECONDS);
 				}
-			}
-			else
-			{
-				currentGame.playNextTurn(currentGame.getBotPick());
 			}
 			//Check if the game's over
 			if(currentGame.isGameOver())
