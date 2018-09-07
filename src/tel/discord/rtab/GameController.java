@@ -683,10 +683,10 @@ public class GameController
 		case REVERSE:
 			channel.sendMessage("It goes **BOOM**...")
 				.completeAfter(5,TimeUnit.SECONDS);
-			channel.sendMessage(String.format("But it's a REVERSE bomb. $%,d penalty awarded to other players!",
+			channel.sendMessage(String.format("But it's a REVERSE bomb. $%,d penalty awarded to living players!",
 					Math.abs(penalty))).completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).blowUp(0,false,(playersJoined-playersAlive));
-			splitMoney(penalty,false);
+			splitMoney(penalty,MoneyMultipliersToUse.BOOSTER_ONLY);
 			break;
 		case DETONATION:
 			channel.sendMessage("It goes **KABLAM**! "
@@ -1046,16 +1046,13 @@ public class GameController
 			players.get(currentTurn).jokers = -1;
 			break;
 		case SPLIT_SHARE:
-			if(players.get(currentTurn).splitAndShare == 0)
+			if(!players.get(currentTurn).splitAndShare)
 			{
-				int sasPercentage = 0;
-				for(int i=1; i<playersAlive; i++)
-					sasPercentage += Math.max(1,6-i);
 				channel.sendMessage("It's a **Split & Share**, "
-						+ String.format("don't lose the round now or you'll lose %d%% of your total, ",sasPercentage)
+						+ "if you lose now you'll give 2% of your total to each living player, "
 						+ "approximately $" + String.format("%,d",(players.get(currentTurn).money/10)) + "!")
 					.completeAfter(5,TimeUnit.SECONDS);
-				players.get(currentTurn).splitAndShare = sasPercentage;
+				players.get(currentTurn).splitAndShare = true;
 			}
 			else
 			{
@@ -1750,19 +1747,13 @@ public class GameController
 		return resultString.toString();
 	}
 	
-	public void splitMoney(int totalToShare, boolean divide)
+	public void splitMoney(int totalToShare, MoneyMultipliersToUse multipliers)
 	{
-		//If needed, divide the amount given by how many players there are to receive it
-		if(divide)
-			totalToShare /= (playersJoined - 1);
 		for(int i=0; i<playersJoined; i++)
-			//Don't pass money back to the player that hit it
-			if(i != currentTurn)
+			//Don't pass money back to the player that hit it, and don't pass to dead players
+			if(i != currentTurn && players.get(i).status == PlayerStatus.ALIVE)
 			{
-				if(divide)
-					players.get(i).addMoney(totalToShare,MoneyMultipliersToUse.NOTHING);
-				else
-					players.get(i).addMoney(totalToShare,MoneyMultipliersToUse.BOOSTER_ONLY);
+				players.get(i).addMoney(totalToShare,multipliers);
 			}
 	}
 	
