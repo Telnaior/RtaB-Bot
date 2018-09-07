@@ -1,6 +1,6 @@
 package tel.discord.rtab.commands;
 
-import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import tel.discord.rtab.GameController;
 import tel.discord.rtab.RaceToABillionBot;
@@ -25,7 +25,7 @@ public class StartCommand extends Command
 			if(game.channel == event.getChannel())
 			{
 				game.timer.shutdownNow();
-				game.timer = Executors.newScheduledThreadPool(1);
+				game.timer = new ScheduledThreadPoolExecutor(1);
 				game.startTheGameAlready();
 				//We found the right channel, so
 				return;

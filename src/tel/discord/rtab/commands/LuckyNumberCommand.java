@@ -9,7 +9,6 @@ public class LuckyNumberCommand extends Command
 	{
 		this.name = "luckynumber";
 		this.help = "gives you a random number";
-		this.hidden = true;
 		this.guildOnly = false;
 	}
 	@Override
@@ -18,7 +17,7 @@ public class LuckyNumberCommand extends Command
 		//80% chance of getting the (officially designated) luckiest of all numbers
 		if(Math.random() < 0.8)
 		{
-			event.reply("Your lucky number is 9.");
+			event.reply("Your lucky number is "+(Math.random() < 0.05 ? ":nine:" : "9")+".");
 			//1% chance they get a comic
 			if(Math.random() < 0.0125)
 			{
@@ -70,7 +69,7 @@ public class LuckyNumberCommand extends Command
 				event.reply("Your lucky number is "+Math.random()+".");
 				break;
 			case 8:
-				event.reply("Why don't you ask someone who's never played before and steal their beginner's luck?");
+				event.reply("Come on, lucky seven! Oops, wrong game.");
 				break;
 			case 9:
 				event.reply("Bomb placement confirmed.");

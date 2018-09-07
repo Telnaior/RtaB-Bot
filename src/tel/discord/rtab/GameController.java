@@ -13,9 +13,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -60,7 +59,7 @@ public class GameController
 	boolean[] bombs;
 	Board gameboard;
 	public static EventWaiter waiter;
-	public ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
+	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 	public ScheduledFuture<?> demoMode;
 	Message waitingMessage;
 	
@@ -94,7 +93,7 @@ public class GameController
 		gameboard = null;
 		repeatTurn = 0;
 		timer.shutdownNow();
-		timer = Executors.newScheduledThreadPool(1);
+		timer = new ScheduledThreadPoolExecutor(1);
 		demoMode = timer.schedule(() -> 
 				{
 					for(int i=0; i<4; i++)
@@ -918,6 +917,7 @@ public class GameController
 		case SHUFFLE_ORDER:
 			channel.sendMessage("It's a **Scramble**, everybody get up and change position!")
 				.completeAfter(5,TimeUnit.SECONDS);
+			repeatTurn = 0;
 			Collections.shuffle(players);
 			break;
 		case END_ROUND:
