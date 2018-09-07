@@ -1350,8 +1350,8 @@ public class GameController
 			//Get the minigame
 			Games nextGame = gamesToPlay.next();
 			MiniGame currentGame = nextGame.getGame();
-			//Don't bother printing messages for bots
-			if(!players.get(currentTurn).isBot)
+			//Don't bother printing messages for bots, unless verbose
+			if(!players.get(currentTurn).isBot || verboseBotGames)
 			{
 				StringBuilder gameMessage = new StringBuilder();
 				gameMessage.append(players.get(currentTurn).getSafeMention());
