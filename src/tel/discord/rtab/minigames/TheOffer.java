@@ -86,7 +86,7 @@ public class TheOffer implements MiniGame {
 	**/
 	private String makeOffer(int offer, int times, double bomb)
 	{
-		StringBuilder output = new LinkedList<>();
+		StringBuilder output = new StringBuilder();
 		output.append("```\n");
 		output.append("  The Offer  \n\n;");
 		output.append("Next Room:\n");

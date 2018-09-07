@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.ChannelType;
@@ -64,118 +64,10 @@ public class GameController
 	boolean[] bombs;
 	Board gameboard;
 	public static EventWaiter waiter;
-	public Timer timer = new Timer();
 	boolean runDemo;
-	public TimerTask demoMode;
+	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
+	public ScheduledFuture<?> demoMode;
 	Message waitingMessage;
-
-	private class StartGameTask extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			startTheGameAlready();
-		}
-	}
-	private class FinalCallTask extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			channel.sendMessage("Thirty seconds before game starts!").queue();
-			channel.sendMessage(listPlayers(false)).queue();
-		}
-	}
-	private class ClearMinigameQueueTask extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			prepareNextMiniGame();
-		}
-	}
-	private class PickSpaceWarning extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
-					", thirty seconds left to choose a space!").queue();
-			displayBoardAndStatus(true,false,false);
-		}
-	}
-	private class MiniGameWarning extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
-					", are you still there? One minute left!").queue();
-		}
-	}
-	private class WaitForNextTurn extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			runTurn();
-		}
-	}
-	private class WaitForEndGame extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			runNextEndGamePlayer();
-		}
-	}
-	private class RevealTheSBR extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			channel.sendMessage(players.get(0).getSafeMention() + "...").complete();
-			channel.sendMessage("It is time to enter the Super Bonus Round.").completeAfter(5,TimeUnit.SECONDS);
-			channel.sendMessage("...").completeAfter(10,TimeUnit.SECONDS);
-			startMiniGame(new SuperBonusRound());
-		}
-	}
-	private class PickSpace extends TimerTask
-	{
-		final int location;
-		private PickSpace(int space)
-		{
-			location = space;
-		}
-		@Override
-		public void run()
-		{
-			resolveTurn(location);
-		}
-	}
-	private class BlammoHype extends TimerTask
-	{
-		final int location;
-		private BlammoHype(int space)
-		{
-			location = space;
-		}
-		@Override
-		public void run()
-		{
-			runBlammo(location);
-		}
-	}
-	private class RunDemo extends TimerTask
-	{
-		@Override
-		public void run()
-		{
-			for(int i=0; i<4; i++)
-				addRandomBot();
-			startTheGameAlready();
-		}
-	}
 	
 	public GameController(TextChannel channelID, boolean useDemo)
 	{
@@ -183,8 +75,12 @@ public class GameController
 		runDemo = useDemo;
 		if(runDemo)
 		{
-			demoMode = new RunDemo();
-			timer.schedule(demoMode, 3600000);
+			demoMode = timer.schedule(() -> 
+			{
+				for(int i=0; i<4; i++)
+					addRandomBot();
+				startTheGameAlready();
+			},60,TimeUnit.MINUTES);
 		}
 	}
 	
@@ -209,12 +105,16 @@ public class GameController
 		finalCountdown = false;
 		repeatTurn = 0;
 		reverse = false;
-		timer.cancel();
-		timer = new Timer();
+		timer.shutdownNow();
+		timer = new ScheduledThreadPoolExecutor(1);
 		if(runDemo)
 		{
-			demoMode = new RunDemo();
-			timer.schedule(demoMode, 3600000);
+			demoMode = timer.schedule(() -> 
+			{
+				for(int i=0; i<4; i++)
+					addRandomBot();
+				startTheGameAlready();
+			},60,TimeUnit.MINUTES);
 		}
 	}
 	/**
@@ -279,9 +179,13 @@ public class GameController
 		if(playersJoined == 1)
 		{
 			if(runDemo)
-				demoMode.cancel();
-			timer.schedule(new FinalCallTask(),  90000);
-			timer.schedule(new StartGameTask(), 120000);
+				demoMode.cancel(true);
+			timer.schedule(() -> 
+			{
+			channel.sendMessage("Thirty seconds before game starts!").queue();
+			channel.sendMessage(listPlayers(false)).queue();
+			}, 90, TimeUnit.SECONDS);
+			timer.schedule(() -> startTheGameAlready(), 120, TimeUnit.SECONDS);
 			return PlayerJoinReturnValue.CREATED;
 		}
 		else
@@ -451,7 +355,7 @@ public class GameController
 			{
 				gameStatus = GameStatus.END_GAME;
 				channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-				timer.schedule(new WaitForEndGame(), 1000);
+				timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
 				return;
 			}
 			//Otherwise subtract one
@@ -494,8 +398,12 @@ public class GameController
 		}
 		else
 		{
-			TimerTask warnPlayer = new PickSpaceWarning();
-			timer.schedule(warnPlayer, 60000);
+			ScheduledFuture<?> warnPlayer = timer.schedule(() -> 
+			{
+				channel.sendMessage(players.get(currentTurn).getSafeMention() + 
+						", thirty seconds left to choose a space!").queue();
+				displayBoardAndStatus(true,false,false);
+			}, 60, TimeUnit.SECONDS);
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Right player and channel
 					e ->
@@ -517,10 +425,10 @@ public class GameController
 					//Parse it and call the method that does stuff
 					e -> 
 					{
-						warnPlayer.cancel();
+						warnPlayer.cancel(false);
 						int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
 						//Anyway go play out their turn
-						timer.schedule(new PickSpace(location),1000);
+						timer.schedule(() -> resolveTurn(location), 1, TimeUnit.SECONDS);
 					},
 					90,TimeUnit.SECONDS, () ->
 					{
@@ -654,14 +562,14 @@ public class GameController
 				channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
 			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
 			detonateBombs();
-			timer.schedule(new WaitForEndGame(), 1000);
+			timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
 		}
 		else
 		{
 			//Advance turn to next player if there isn't a repeat going
 			if(repeatTurn == 0)
 				advanceTurn(false);
-			timer.schedule(new WaitForNextTurn(), 1000);
+			timer.schedule(() -> runTurn(), 1, TimeUnit.SECONDS);
 		}
 	}
 	void runBombLogic(int location)
@@ -926,7 +834,7 @@ public class GameController
 						e -> 
 						{
 							int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-							timer.schedule(new BlammoHype(button),1000);
+							timer.schedule(() -> runBlammo(button), 1, TimeUnit.SECONDS);
 						},
 						30,TimeUnit.SECONDS, () ->
 						{
@@ -1337,7 +1245,13 @@ public class GameController
 					gameStatus = GameStatus.SEASON_OVER;
 					if(!players.get(0).isBot)
 					{
-						timer.schedule(new RevealTheSBR(), 60000);
+						timer.schedule(() -> 
+						{
+							channel.sendMessage(players.get(0).getSafeMention() + "...").complete();
+							channel.sendMessage("It is time to enter the Super Bonus Round.").completeAfter(5,TimeUnit.SECONDS);
+							channel.sendMessage("...").completeAfter(10,TimeUnit.SECONDS);
+							startMiniGame(new SuperBonusRound());
+						}, 60, TimeUnit.SECONDS);
 					}
 				}
 				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
@@ -1428,7 +1342,7 @@ public class GameController
 		else
 			players.get(currentTurn).status = PlayerStatus.DONE;
 		gamesToPlay = players.get(currentTurn).games.listIterator(0);
-		timer.schedule(new ClearMinigameQueueTask(), 1000);
+		timer.schedule(() -> prepareNextMiniGame(), 1, TimeUnit.SECONDS);
 	}
 	void prepareNextMiniGame()
 	{
@@ -1505,8 +1419,11 @@ public class GameController
 		else
 		{
 			//Let's get more input to give it
-			TimerTask warnPlayer = new MiniGameWarning();
-			timer.schedule(warnPlayer,120000);
+			ScheduledFuture<?> warnPlayer = timer.schedule(() -> 
+			{
+				channel.sendMessage(players.get(currentTurn).getSafeMention() + 
+						", are you still there? One minute left!").queue();
+			}, 120, TimeUnit.SECONDS);
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Right player and channel
 					e ->
@@ -1516,7 +1433,7 @@ public class GameController
 					//Parse it and call the method that does stuff
 					e -> 
 					{
-						warnPlayer.cancel();
+						warnPlayer.cancel(false);
 						String miniPick = e.getMessage().getContentRaw();
 						//Keep printing output until it runs out of output
 						LinkedList<String> result = currentGame.playNextTurn(miniPick);
@@ -1595,7 +1512,7 @@ public class GameController
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
 		//Off to the next minigame! (After clearing the queue)
-		timer.schedule(new ClearMinigameQueueTask(), 1000);
+		timer.schedule(() -> prepareNextMiniGame(), 1, TimeUnit.SECONDS);
 	}
 	void advanceTurn(boolean endGame)
 	{
