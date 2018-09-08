@@ -926,16 +926,24 @@ public class GameController
 			break;
 		case ELIM_OPP:
 			channel.sendMessage("You ELIMINATED YOUR OPPONENT!").completeAfter(3,TimeUnit.SECONDS);
-			advanceTurn(false);
+			//Pick a random player
+			int playerToKill = (int) ((Math.random() * (playersAlive-2)) + 1);
+			for(int i=0; i<playerToKill; i++)
+				advanceTurn(false);
+			//Kill them dead
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY;
 			penalty /= 5;
-			penalty *= (5 - (playersJoined - playersAlive));
+			penalty *= (5 - Math.min(5,playersJoined-playersAlive));
 			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
 			if(repeatTurn > 0)
 				channel.sendMessage("(You also negated the repeat!)").queue();
-			extraResult = players.get(currentTurn).blowUp(4,false,(playersJoined-playersAlive));
+			players.get(currentTurn).threshold = true;
+			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			//Then shuffle back to current player
+			for(int i=playerToKill; i<=playersAlive; i++)
+				advanceTurn(false);
 			break;
 		case THRESHOLD:
 			if(players.get(currentTurn).threshold)
@@ -943,6 +951,7 @@ public class GameController
 				//You already have a threshold situation? Buh-bye.
 				channel.sendMessage("It's a THRESHOLD SITUATION, but you're already in one, so...")
 					.completeAfter(3,TimeUnit.SECONDS);
+				//No break, it just passes through to eliminating yourself
 			}
 			else
 			{
@@ -959,7 +968,8 @@ public class GameController
 			penalty /= 5;
 			penalty *= (5 - Math.min(5,playersJoined-playersAlive));
 			channel.sendMessage(String.format("$%,d penalty!",Math.abs(penalty*4))).queue();
-			extraResult = players.get(currentTurn).blowUp(4,false,(playersJoined-playersAlive));
+			players.get(currentTurn).threshold = true;
+			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
 			break;
 		}
 		if(extraResult != null)
@@ -984,8 +994,10 @@ public class GameController
 				bombs[(int)(Math.random()*boardSize)] = true;
 			break;
 		case LOCKDOWN:
-			channel.sendMessage("It's a **Lockdown**, all non-bomb non-blammo spaces on the board are now becoming cash!")
+			channel.sendMessage("It's the **Triple Deal Lockdown**, "
+					+ "it's just bombs, blammos, and tripled cash on the board now!")
 				.completeAfter(5,TimeUnit.SECONDS);
+			boardMultiplier *= 3;
 			for(int i=0; i<boardSize; i++)
 			{
 				//Blammos aren't affected
