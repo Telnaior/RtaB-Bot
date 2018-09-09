@@ -937,10 +937,10 @@ public class GameController
 			penalty *= (5 - Math.min(5,playersJoined-playersAlive));
 			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
-			if(repeatTurn > 0)
-				channel.sendMessage("(You also negated the repeat!)").queue();
 			players.get(currentTurn).threshold = true;
+			int tempRepeat = repeatTurn;
 			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			repeatTurn = tempRepeat;
 			//Then shuffle back to current player
 			for(int i=playerToKill; i<=playersAlive; i++)
 				advanceTurn(false);
