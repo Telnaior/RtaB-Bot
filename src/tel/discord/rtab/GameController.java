@@ -733,14 +733,21 @@ public class GameController
 			break;
 		case ELIM_OPP:
 			channel.sendMessage("You ELIMINATED YOUR OPPONENT!").completeAfter(3,TimeUnit.SECONDS);
-			advanceTurn(false);
+			//Pick player to kill
+			int playerToKill = (int) ((Math.random() * (playersAlive-2)) + 1);
+			for(int i=0; i<playerToKill; i++)
+				advanceTurn(false);
+			//Kill them
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY;
 			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
-			if(repeatTurn > 0)
-				channel.sendMessage("(You also negated the repeat!)").queue();
+			int tempRepeat = repeatTurn;
 			extraResult = players.get(currentTurn).blowUp(4,false);
+			repeatTurn = tempRepeat;
+			//Shuffle back to starting player
+			for(int i=playerToKill; i<=playersAlive; i++)
+				advanceTurn(false);
 			break;
 		case THRESHOLD:
 			if(players.get(currentTurn).threshold)
