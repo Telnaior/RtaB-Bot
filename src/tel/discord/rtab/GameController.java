@@ -734,7 +734,7 @@ public class GameController
 		case ELIM_OPP:
 			channel.sendMessage("You ELIMINATED YOUR OPPONENT!").completeAfter(3,TimeUnit.SECONDS);
 			//Pick player to kill
-			int playerToKill = (int) ((Math.random() * (playersAlive-2)) + 1);
+			int playerToKill = (int) ((Math.random() * (playersAlive-1)) + 1);
 			for(int i=0; i<playerToKill; i++)
 				advanceTurn(false);
 			//Kill them
