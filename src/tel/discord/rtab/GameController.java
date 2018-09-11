@@ -927,7 +927,7 @@ public class GameController
 		case ELIM_OPP:
 			channel.sendMessage("You ELIMINATED YOUR OPPONENT!").completeAfter(3,TimeUnit.SECONDS);
 			//Pick a random player
-			int playerToKill = (int) ((Math.random() * (playersAlive-2)) + 1);
+			int playerToKill = (int) ((Math.random() * (playersAlive-1)) + 1);
 			for(int i=0; i<playerToKill; i++)
 				advanceTurn(false);
 			//Kill them dead
@@ -941,7 +941,7 @@ public class GameController
 			int tempRepeat = repeatTurn;
 			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
 			repeatTurn = tempRepeat;
-			//Then shuffle back to current player
+			//Shuffle back to starting player
 			for(int i=playerToKill; i<=playersAlive; i++)
 				advanceTurn(false);
 			break;

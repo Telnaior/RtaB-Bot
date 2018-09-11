@@ -8,7 +8,7 @@ public class MemeCommand extends Command
 	public MemeCommand()
 	{
 		this.name = "meme";
-		this.aliases = new String[]{"jo","realluckynumber"};
+		this.aliases = new String[]{"jo","realluckynumber","om","ub"};
 		this.help = "https://niceme.me";
 		this.hidden = true;
 		this.guildOnly = false;
@@ -18,4 +18,24 @@ public class MemeCommand extends Command
 	{
 		event.reply("https://niceme.me");
 	}
+	
+	/* +----------------+
+	 * |CONGRATULATIONS!|
+	 * |   YOU  FOUND   |
+	 * | THE  TRIFORCE! |
+	 * +----------------+
+	 * 
+	 *         /\               
+	 *        /  \             
+	 *       /    \           
+	 *      /      \         
+	 *      --------         
+	 *     /\      /\       
+	 *    /  \    /  \     
+	 *   /    \  /    \   
+	 *  /      \/      \ 
+	 *  ---------------- 
+	 * 
+	 * Your reward is located here: https://www.youtube.com/watch?v=dQw4w9WgXcQ 
+	 */
 }
