@@ -21,9 +21,11 @@ import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.managers.GuildController;
 import tel.discord.rtab.enums.BlammoChoices;
 import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.CashType;
@@ -1702,6 +1704,28 @@ public class GameController
 					list.add(toPrint.toString());
 				else
 					list.set(location,toPrint.toString());
+				//Update a player's role if they're human and have earned a new one
+				if(players.get(i).money/100000000 != players.get(i).oldMoney/100000000 && !players.get(i).isBot)
+				{
+					//Get the mod controls
+					GuildController guild = channel.getGuild().getController();
+					List<Role> rolesToAdd = new LinkedList<>();
+					List<Role> rolesToRemove = new LinkedList<>();
+					//Remove their old score role if they had one
+					if(players.get(i).oldMoney/100000000 > 0)
+						rolesToRemove.addAll(guild.getGuild().getRolesByName(
+										String.format("$%d00M",players.get(i).oldMoney/100000000),false));
+					//Add their new score role if they deserve one
+					if(players.get(i).money/100000000 > 0 && players.get(i).money/100000000 < 10)
+						rolesToAdd.addAll(guild.getGuild().getRolesByName(
+										String.format("$%d00M",players.get(i).money/100000000),false));
+					//Or do fancy stuff for the Champion
+					else if(players.get(i).money/100000000 == 10)
+						rolesToAdd.addAll(guild.getGuild().getRolesByName("Champion",false));
+					//Then add/remove appropriately
+					guild.modifyMemberRoles(guild.getGuild().getMemberById(players.get(i).uID),
+							rolesToAdd,rolesToRemove).queue();
+				}
 			}
 			//Then sort and rewrite it
 			DescendingScoreSorter sorter = new DescendingScoreSorter();

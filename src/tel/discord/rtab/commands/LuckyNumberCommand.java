@@ -40,7 +40,7 @@ public class LuckyNumberCommand extends Command
 		//Here be spoilers!
 		else
 		{
-			int chosenText = (int) (Math.random() * 11);
+			int chosenText = (int) (Math.random() * 10);
 			switch(chosenText)
 			{
 			case 0:
@@ -72,10 +72,6 @@ public class LuckyNumberCommand extends Command
 				event.reply("Come on, lucky seven! Oops, wrong game.");
 				break;
 			case 9:
-				event.reply("Bomb placement confirmed.");
-				event.reply("(Just kidding)");
-				break;
-			case 10:
 				event.reply("Didn't you see the horoscope?");
 				break;
 			}
