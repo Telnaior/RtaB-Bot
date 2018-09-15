@@ -101,11 +101,11 @@ class BumperGrab extends MiniGame {
     */
   override def playNextTurn(pick: String): util.LinkedList[String] = {
     pick.toUpperCase match {
-      case "U" | "UP" => move(Up)
-      case "D" | "DOWN" => move(Down)
-      case "L" | "LEFT" => move(Left)
-      case "R" | "RIGHT" => move(Right)
-      case "E" | "EXIT" =>
+      case "U" | "UP" | "N" | "NORTH" => move(Up)
+      case "D" | "DOWN" | "S" | "SOUTH" => move(Down)
+      case "L" | "LEFT" | "W" | "WEST" => move(Left)
+      case "R" | "RIGHT" | "E" | "EAST" => move(Right)
+      case "QUIT" | "EXIT" | "STOP" =>
         if (getSpace(player_X, player_Y) == Exit) escape
         else new util.LinkedList(List("There's no exit there, you gotta pick a direction!").asJava)
       case _ => new util.LinkedList[String]()
