@@ -13,6 +13,7 @@ public enum Games implements WeightedSpace {
 	DEUCES_WILD		(2,"Deuces Wild","Deuces",new DeucesWild()),
 	DOUBLE_TROUBLE	(2,"Double Trouble","Double",new DoubleTrouble()),
 	DEAL_OR_NO_DEAL	(2,"Deal or No Deal","DoND", new DealOrNoDeal()),
+	BUMPER_CASH     (2,"Bumper Cash","Bumper", new BumperGrab()),
 	//Don't have enough games in the pool to have a rotation yet
 	//Bonus games never appear in the pool
 	SUPERCASH		(0,"SUPERCASH","Super",new Supercash()),
