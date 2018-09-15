@@ -5,6 +5,7 @@ SuperBonusRound.java
 SBRItem.java
 
 # Eclipse Files
+.cache-main
 .classpath
 .project
 .settings/
