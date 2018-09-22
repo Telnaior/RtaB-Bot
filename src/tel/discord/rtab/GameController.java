@@ -822,7 +822,7 @@ public class GameController
 			channel.sendMessage("```\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
 			if(players.get(currentTurn).isBot)
 			{
-				runBlammo((int) (Math.random() * 4));
+				runBlammo((int) (Math.random() * 4),false);
 			}
 			else
 			{
@@ -838,13 +838,13 @@ public class GameController
 						e -> 
 						{
 							int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-							timer.schedule(() -> runBlammo(button), 1, TimeUnit.SECONDS);
+							timer.schedule(() -> runBlammo(button,false), 1, TimeUnit.SECONDS);
 						},
 						30,TimeUnit.SECONDS, () ->
 						{
 							channel.sendMessage("Too slow, autopicking!").queue();
 							int button = (int) Math.random() * 4;
-							runBlammo(button);
+							runBlammo(button,false);
 						});
 			}
 			return;
@@ -904,7 +904,7 @@ public class GameController
 		return ("It's a minigame, **" + gameFound + "**!");
 	}
 
-	private void runBlammo(int buttonPressed)
+	private void runBlammo(int buttonPressed, boolean mega)
 	{
 		//Yes I know it's generating the result after they've already picked
 		//But that's the sort of thing a blammo would do so I'm fine with it
@@ -948,12 +948,57 @@ public class GameController
 				advanceTurn(false);
 			break;
 		case THRESHOLD:
-			if(players.get(currentTurn).threshold)
+			if(mega)
 			{
-				//You already have a threshold situation? Buh-bye.
-				channel.sendMessage("It's a THRESHOLD SITUATION, but you're already in one, so...")
-					.completeAfter(3,TimeUnit.SECONDS);
-				//No break, it just passes through to eliminating yourself
+				//They actually did it hahahahahahahaha
+				channel.sendMessage("You **ELIMINATED EVERYONE**!!").completeAfter(3,TimeUnit.SECONDS);
+				while(currentTurn != -1)
+				{
+					penalty = players.get(currentTurn).newbieProtection > 0 ? Player.NEWBIE_BOMB_PENALTY : Player.BOMB_PENALTY;
+					channel.sendMessage(String.format("$%1$,d penalty for %2$s!",
+							Math.abs(penalty*4),players.get(currentTurn).getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
+					players.get(currentTurn).threshold = true;
+					extraResult = players.get(currentTurn).blowUp(1,false,0);
+					channel.sendMessage(extraResult).queue();
+					advanceTurn(false);
+				}
+				//Re-null this so we don't get an extra quote of it
+				extraResult = null;
+				break;
+			}
+			else if(players.get(currentTurn).threshold)
+			{
+				//You already have a threshold situation? Time for some fun!
+				channel.sendMessage("You **UPGRADED the BLAMMO!** Don't panic, it can still be stopped...").completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage("```\n MEGA \nBLAMMO\n 1  2 \n 3  4 \n```").queue();
+				if(players.get(currentTurn).isBot)
+				{
+					runBlammo((int) (Math.random() * 4),true);
+				}
+				else
+				{
+					waiter.waitForEvent(MessageReceivedEvent.class,
+							//Right player and channel
+							e ->
+							{
+								return (e.getAuthor().equals(players.get(currentTurn).user) && e.getChannel().equals(channel)
+										&& checkValidNumber(e.getMessage().getContentRaw()) 
+												&& Integer.parseInt(e.getMessage().getContentRaw()) <= 4);
+							},
+							//Parse it and call the method that does stuff
+							e -> 
+							{
+								int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
+								timer.schedule(() -> runBlammo(button,true), 1, TimeUnit.SECONDS);
+							},
+							30,TimeUnit.SECONDS, () ->
+							{
+								channel.sendMessage("Too slow, autopicking!").queue();
+								int button = (int) Math.random() * 4;
+								runBlammo(button,true);
+							});
+				}
+				return;
 			}
 			else
 			{
