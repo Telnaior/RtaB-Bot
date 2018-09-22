@@ -8,6 +8,7 @@ public class LuckyNumberCommand extends Command
 	public LuckyNumberCommand()
 	{
 		this.name = "luckynumber";
+		this.aliases = new String[]{"lucky"};
 		this.help = "gives you a random number";
 		this.guildOnly = false;
 	}

@@ -183,7 +183,7 @@ public class GameController
 		if(playersJoined == 1)
 		{
 			if(runDemo)
-				demoMode.cancel(true);
+				demoMode.cancel(false);
 			timer.schedule(() -> 
 			{
 			channel.sendMessage("Thirty seconds before game starts!").queue();
@@ -1833,18 +1833,11 @@ public class GameController
 				players.get(i).addMoney(totalToShare,multipliers);
 			}
 	}
-	
-	public String checkLives(String userID) {
+	public String checkLives(int index) {
 		StringBuilder output = new StringBuilder();
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
-			int index = findUserInList(list,userID,false);
-			if(index < 0)
-			{
-				output.append("You have not played yet this season, so you have " + Player.MAX_LIVES + " lives.");
-				return output.toString();
-			}
 			String[] record = list.get(index).split("#");
 			output.append(record[1] + ": ");
 			if(Instant.parse(record[7]).isBefore(Instant.now()) && Integer.parseInt(record[6]) < Player.MAX_LIVES)
