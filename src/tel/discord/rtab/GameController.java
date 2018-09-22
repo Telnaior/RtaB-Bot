@@ -60,7 +60,8 @@ public class GameController
 	boolean reverse = false;
 	public int playersJoined = 0;
 	int playersAlive = 0;
-	int boardMultiplier = 1;
+	int boardMultiplier;
+	final int BASE_MULTIPLIER;
 	ListIterator<Games> gamesToPlay;
 	public GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
 	boolean[] pickedSpaces;
@@ -72,11 +73,13 @@ public class GameController
 	public ScheduledFuture<?> demoMode;
 	Message waitingMessage;
 	
-	public GameController(TextChannel channelID, boolean useDemo, boolean verbosity)
+	public GameController(TextChannel channelID, boolean useDemo, boolean verbosity, int globalMultiplier)
 	{
 		channel = channelID;
 		runDemo = useDemo;
 		verboseBotGames = verbosity;
+		BASE_MULTIPLIER = globalMultiplier;
+		boardMultiplier = BASE_MULTIPLIER;
 		if(runDemo)
 		{
 			demoMode = timer.schedule(() -> 
@@ -102,7 +105,7 @@ public class GameController
 		currentTurn = -1;
 		playersJoined = 0;
 		playersAlive = 0;
-		boardMultiplier = 1;
+		boardMultiplier = BASE_MULTIPLIER;
 		if(gameStatus != GameStatus.SEASON_OVER)
 			gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;

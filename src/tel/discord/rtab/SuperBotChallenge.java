@@ -17,11 +17,12 @@ public class SuperBotChallenge
 	TextChannel channel;
 	ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
 	
-	public SuperBotChallenge(TextChannel channelID)
+	public GameController initialise(TextChannel channelID, int multiplier)
 	{
 		channel = channelID;
-		gameHandler = new GameController(channel,false,true);
+		gameHandler = new GameController(channel,false,true,multiplier);
 		loadGames();
+		return gameHandler;
 	}
 	public void loadGames()
 	{
