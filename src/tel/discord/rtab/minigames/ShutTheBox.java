@@ -3,36 +3,45 @@ package tel.discord.rtab.minigames;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import tel.discord.rtab.objs.Dice;
 
 public class ShutTheBox implements MiniGame {
-    static final String NAME = "Shut the Box";
+	static final String NAME = "Shut the Box";
 	static final boolean BONUS = false;
 	static final int BOARD_SIZE = 12;
-
 	boolean[] closedSpaces = new boolean[BOARD_SIZE];
-	boolean isAlive;
-    boolean isClosing;
-    boolean bottomHalfClosed;
-    byte totalShut;
+	Dice dice; 
+	boolean isAlive;  
+	boolean isClosing;
+	boolean bottomHalfClosed;
+	byte totalShut;
 
 	@Override
 	public LinkedList<String> initialiseGame()
 	{
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise board
-        closedSpaces = new boolean[BOARD_SIZE];
-        isAlive = true;
-        isClosing = true;
-        bottomHalfClosed = false;
-        totalShut = 0;
+		closedSpaces = new boolean[BOARD_SIZE];
+		dice = new Dice();
+		isAlive = true;
+		isClosing = true;
+		bottomHalfClosed = false;
+		totalShut = 0;
+		
 		//Display instructions
-		output.add("In Shut the Box, you will be given a pair of six-sided dice and a box with the numbers 1 through 12 on it.");
+		output.add("In Shut the Box, you will be given a pair of six-sided dice"
+				+ " and a box with the numbers 1 through 12 on it.");
 		output.add("Your objective is to close all 12 numbers.");
-        output.add("Each time you roll the dice, you may close one or more numbers that total *exactly* the amount thrown.");
-        output.add("For each number you successfully close, you will earn $25,000 times that number. The top prize is $1,950,000.");
-        output.add("You are free to stop after any roll, but if you can't exactly close the number thrown, you lose everything.");
-        output.add("However, if you succeed in closing all numbers from 7 to 12 inclusive, you have to roll only one die for the rest of the game.");
-        output.add("Good luck!");
+		output.add("Each time you roll the dice, you may close one or more " +
+				"numbers that total *exactly* the amount thrown.");
+		output.add("For each number you successfully close, you will earn " +
+				"$25,000 times that number. The top prize is $1,950,000.");
+		output.add("You are free to stop after any roll, but if you can't " +
+				"exactly close the number thrown, you lose everything.");
+		output.add("However, if you succeed in closing all numbers from 7 to 12"
+				+ " inclusive, you have to roll only one die for the rest of " +
+				"the game.");
+		output.add("Good luck!");
 		output.add(generateBoard());
 		return output;
 	}
@@ -72,7 +81,7 @@ public class ShutTheBox implements MiniGame {
 	boolean checkValidNumber(String message)
 	{
 		int location = Integer.parseInt(message)-1;
-		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces[location]);
+		return (location >= 0 && location < BOARD_SIZE && !closedSpaces[location]);
 	}
 	
 	String generateBoard()
@@ -82,9 +91,9 @@ public class ShutTheBox implements MiniGame {
 		display.append("  SHUT THE BOX");
 		for(int i=0; i<BOARD_SIZE; i++)
 		{
-            if (i % 6 == 0) {
-                display.append("\n");
-            }
+			if (i % 6 == 0) {
+				display.append("\n");
+			}
 
 			if(closedSpaces[i])
 			{
@@ -99,6 +108,42 @@ public class ShutTheBox implements MiniGame {
 		return display.toString();
 	}
 
+	/**
+	 * 
+	 * @param roll the number to be checked
+	 * @return true if there are distinct open numbers that can be closed with
+	 *		 the roll, false otherwise
+	 */
+	boolean isGood(int roll) {
+		if (!closedSpaces[roll-1])
+			return true;
+		if (roll >= 3) {
+			for (int i = 1; i < roll/2; i++) {
+				if (closedSpaces[i-1])
+					continue;
+				if (!closedSpaces [roll-i-1])
+					return true;
+				if (roll >= 6) {
+					for (int j = 2; j < (roll-i) / 2 ; j++) {
+						if (closedSpaces[j-1])
+							continue;
+						if (!closedSpaces [roll-i-j-1])
+							return true;
+						if (roll >= 10) {
+							for (int k = 2; k < (roll-i-j)/2 ; k++) {
+								if (closedSpaces[j-1])
+									continue;
+								if (!closedSpaces [roll-i-j-k-1])
+									return true;
+							} // end for (int k = 2; k < (roll-i-j)/2 ; k++)
+						} // end if (roll >= 10)
+					} // end for (int j = 2; j < (roll-i) / 2 ; j++)
+				} // end if (roll >= 6)
+			} // end for (int i = 1; i < roll/2, i++)
+		} // end if (roll >= 3)
+		return false;
+	}
+		
 	@Override
 	public boolean isGameOver()
 	{
@@ -118,8 +163,8 @@ public class ShutTheBox implements MiniGame {
 
 	@Override
 	public String getBotPick() {
-        // TODO: Teach the bot how to play :P
-        return "";
+		// TODO: Teach the bot how to play :P
+		return "";
 	}
 	
 	@Override

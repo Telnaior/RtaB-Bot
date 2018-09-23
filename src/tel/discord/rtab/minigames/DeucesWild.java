@@ -115,7 +115,8 @@ public class DeucesWild implements MiniGame {
 				
 				// Make sure the player's choices correspond to actual cards
 				try {
-					boolean[] testCardsHeld = Arrays.copyOf(cardsHeld, cardsHeld.length);
+					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
+					boolean[] testCardsHeld = deepCopy(cardsHeld);
 
 					for (int i = 1; i < tokens.length; i++)
 					{
@@ -141,14 +142,17 @@ public class DeucesWild implements MiniGame {
 				
 				// Make sure the player's choices correspond to actual cards
 				try {
-					boolean[] testCardsHeld = Arrays.copyOf(cardsHeld, cardsHeld.length);
+					// The manual deep copy is intentional for safety. If we go into the catch block, we lose this array.
+					boolean[] testCardsHeld = deepCopy(cardsHeld);
 
 					for (int i = 1; i < tokens.length; i++)
 					{
 						testCardsHeld[Integer.parseInt(tokens[i])-1] = false;
 					}
 					cardsHeld = testCardsHeld;
+					output.add("Cards released.");
 					output.add(generateHand());
+					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
 					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
@@ -190,7 +194,7 @@ public class DeucesWild implements MiniGame {
 					if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
 						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
 								+ "of each card.");
-						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ". It will be marked as held with an asterisk.");
+						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ".");
 						output.add("If you change your mind or make a mistake, type RELEASE followed by the position number of the card " +
 								"you would rather redraw, e.g. 'RELEASE 2' to remove any hold on the " + cardsPicked[1] + ".");
 						output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
@@ -292,7 +296,7 @@ public class DeucesWild implements MiniGame {
 
 			display.append(" ");
 		}
-		display.append("(" + hand.toString() + ")```");
+		display.append("```");
 		return display.toString();
 	}
 
@@ -364,20 +368,25 @@ public class DeucesWild implements MiniGame {
 			}
 			else return PokerHand.STRAIGHT_FLUSH;
 		}
+
 		if (isFlush) return PokerHand.FLUSH;
-		if (highCardOfStraight != null) return PokerHand.STRAIGHT;
-
+		
 		byte modeOfRanks = modeOfRanks(rankCount); // That is, how many are there of the most common rank?
-
+		
 		switch (modeOfRanks) {
+			case 5: return PokerHand.FIVE_OF_A_KIND;
+			case 4: return PokerHand.FOUR_OF_A_KIND;
+			case 3: if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE; // we need to check for a straight before we pay for
+			default: break;                                                   // a three of a kind
+		}
+		
+		if (highCardOfStraight != null) return PokerHand.STRAIGHT;
+		
+		switch (modeOfRanks) {
+			case 3: return PokerHand.THREE_OF_A_KIND;
 			case 2: 
 				if (hasExtraPair(rankCount)) return PokerHand.TWO_PAIR;
 				else return PokerHand.ONE_PAIR;
-			case 3: 
-				if (hasExtraPair(rankCount)) return PokerHand.FULL_HOUSE;
-				else return PokerHand.THREE_OF_A_KIND;
-			case 4: return PokerHand.FOUR_OF_A_KIND;
-			case 5: return PokerHand.FIVE_OF_A_KIND;
 			default: return PokerHand.NOTHING;
 		}
 	}
@@ -446,6 +455,15 @@ public class DeucesWild implements MiniGame {
  		byte[] sortedRankCount = rankCount;
  		Arrays.sort(sortedRankCount);
  		return sortedRankCount[rankCount.length - 2] == 2;
+	}
+
+	private boolean[] deepCopy (boolean[] arr) { // Here for DRY purposes
+		boolean copiedArr[] = new boolean[arr.length];
+
+		for (int i = 0; i < arr.length; i++)
+			copiedArr[i] = arr[i];
+
+		return copiedArr;
 	}
 
 	@Override
