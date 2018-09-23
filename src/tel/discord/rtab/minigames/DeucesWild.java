@@ -41,17 +41,24 @@ public class DeucesWild implements MiniGame {
 		redrawUsed = false;
 		gameStage = 0;
 		//Display instructions
-		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
-		output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
+		output.add("In Deuces Wild, your objective is to obtain the best poker "
+				+ "hand possible.");
+		output.add("We have shuffled a standard deck of 52 playing cards, from "
+				+ "which you will pick five cards.");
 		output.add("As the name of the game suggests, deuces (twos) are wild. "
 				+ "Those are always treated as the best card possible.");
-		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
-		output.add("You must get at least a pair to win any money. That pays $10,000.");
-		output.add("Two pairs win $50,000, while a three of a kind pays $100,000.");
-		output.add("Straights pay $150,000, flushes pay $200,000, a full house pays $250,000, a four of a kind pays $500,000, "
-				+ "a straight flush pays $750,000, a five of a kind pays $1,000,000, a wild royal flush pays $2,000,000, "
-				+ "and four deuces pay $5,000,000.");
-		output.add("If you are lucky enough to get a natural royal flush, you will win $10,000,000!");
+		output.add("After you draw your five cards, you may redraw as many of" + 
+				" them as you wish, but only once.");
+		output.add("You must get at least a pair to win any money. That pays " +
+				"$10,000.");
+		output.add("Two pairs win $50,000, a three of a kind pays $100,000, a" + 
+				"straight pays $150,000, a flush pays $200,000, a full house " +
+				"pays $250,000, a four of a kind pays $500,000, a straight " + 
+				"flush pays $750,000, a five of a kind pays $1,000,000, a wild "
+				+ "royal flush pays $2,000,000, and four deuces pay " + 
+				"$5,000,000.");
+		output.add("If you are lucky enough to get a natural royal flush, you " 
+				+ "will win $10,000,000!");
 		output.add("Best of luck! Pick your first card when you're ready.");
 		output.add(generateBoard());
 		return output;
@@ -66,7 +73,9 @@ public class DeucesWild implements MiniGame {
 			if (pick.toUpperCase().equals("STOP")) {
 				redrawUsed = true;
 			}
-			else if (pick.toUpperCase().equals("DEAL")) {
+			else if (pick.toUpperCase().equals("REDRAW") |
+					pick.toUpperCase().equals("REDEAL") ||
+					pick.toUpperCase().equals("DEAL")) {
 				redrawUsed = true;
 				gameStage = 0;
 
@@ -75,14 +84,17 @@ public class DeucesWild implements MiniGame {
 
 				for (int i = 0; i < cardsHeld.length; i++) {
 					if (cardsHeld[i])
-						cardsHeldAsString += cardsPicked[i].toStringShort() + " ";
-					else cardsRedrawingAsString += cardsPicked[i].toStringShort() + " ";
+						cardsHeldAsString += cardsPicked[i].toStringShort() +
+								" ";
+					else cardsRedrawingAsString += cardsPicked[i]
+							.toStringShort() + " ";
 				}
 				
 				if (cardsHeldAsString.equals("Cards held: ")) { // i.e. we're redrawing everything
 						output.add("Redrawing all five cards.");
 				}
-				else if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
+				else if (cardsRedrawingAsString.equals("Cards being redrawn: ")) // i.e. there aren't any
+				{
 					output.add("All five cards held; ending game.");
 					gameStage = 5;
 					return output;
@@ -99,7 +111,8 @@ public class DeucesWild implements MiniGame {
 					else gameStage++;
 				}
 				output.add(generateBoard());
-				output.add("Select your first card of the redraw when you are ready.");
+				output.add("Select your first card of the redraw when you are" +
+						"ready.");
 			}
 
 			// The next two if-else blocks could *probably* be merged together since they do the same thing with two
@@ -124,7 +137,9 @@ public class DeucesWild implements MiniGame {
 					}
 					cardsHeld = testCardsHeld;
 					output.add(generateHand());
-					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
+					output.add("You may 'HOLD' other cards, 'RELEASE' cards you"
+							+ " no longer wish to hold, or type 'REDRAW' to "
+							+ " start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
 					output.add("Invalid card(s).");
@@ -152,8 +167,9 @@ public class DeucesWild implements MiniGame {
 					cardsHeld = testCardsHeld;
 					output.add("Cards released.");
 					output.add(generateHand());
-					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
-					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
+					output.add("You may 'HOLD' other cards, 'RELEASE' cards you"
+							+ " no longer wish to hold, or type 'REDRAW' to "
+							+ " start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
 					output.add("Invalid card(s).");
@@ -192,17 +208,32 @@ public class DeucesWild implements MiniGame {
 				output.add(generateBoard());
 				if (gameStage == 5) {
 					if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
-						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
-								+ "of each card.");
-						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ".");
-						output.add("If you change your mind or make a mistake, type RELEASE followed by the position number of the card " +
-								"you would rather redraw, e.g. 'RELEASE 2' to remove any hold on the " + cardsPicked[1] + ".");
-						output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
-								"hold the " + cardsPicked[2] + ", the " + cardsPicked[3]  + ", and the " + cardsPicked[4] + ".");
-						output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
-						output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
-								"prize of $%,d.", getMoneyWon()));
-						output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
+						output.add("You may now hold any or all of your five " +
+								"cards by typing HOLD followed by the numeric" +
+								" positions of each card.");
+						output.add("For example, type 'HOLD 1' to hold the " + 
+								cardsPicked[0] + ".");
+						output.add("If you change your mind or make a mistake," 
+								+ " type RELEASE followed by the position " +
+								"number of the card you would rather redraw, " +
+								"e.g. 'RELEASE 2' to remove any hold on the " +
+								cardsPicked[1] + ".");
+						output.add("You may also hold or release more than one "
+								+ "card at a time; for example, you may type " +
+								"'HOLD 3 4 5' to hold the " + cardsPicked[2] + 
+								", the " + cardsPicked[3]  + ", and the " + 
+								cardsPicked[4] + ".");
+						output.add("Held cards will be marked with an asterisk."
+								+ " If you have any deuces, you'll note they've"
+								+ " been held for you.");
+						output.add("The cards you do not hold will all be " + 
+								"redrawn in the hopes of a better hand.");
+						output.add("If you like your hand, you " +
+								"may also type 'STOP' to end the game and claim"
+								+ " your prize of " + String.format("$%,d.",
+								getMoneyWon()));
+						output.add("When you are ready, type 'REDRAW' to redraw"
+								+ " the unheld cards.");
 					}
 				}
 			}
@@ -226,7 +257,8 @@ public class DeucesWild implements MiniGame {
 	boolean checkValidNumber(String message)
 	{
 		int location = Integer.parseInt(message)-1;
-		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces[location]);
+		return (location >= 0 && location < BOARD_SIZE && !pickedSpaces
+				[location]);
 	}
 	
 	String generateBoard()
@@ -341,7 +373,9 @@ public class DeucesWild implements MiniGame {
 	// This is probably not the most efficient way to write the hand evaluator--some things are checked more than once. 
 	public PokerHand evaluateHand(Card[] cards) {
 		if (cards.length != 5)
-			throw new IllegalArgumentException("The hand evaluator function needs 5 cards to work; it was passed " + cards.length + ".");
+			throw new IllegalArgumentException("The hand evaluator function" + 
+					" needs 5 cards to work; it was passed " + cards.length +
+					".");
 
 		byte[] rankCount = new byte[CardRank.values().length];
 		byte[] suitCount = new byte[CardSuit.values().length];
@@ -401,16 +435,21 @@ public class DeucesWild implements MiniGame {
 		}
 
 		for (int i = 0; i < rankCount.length - 4; i++) {
-			if (rankCount[i] + rankCount[i+1] + rankCount[i+2] + rankCount[i+3] + rankCount[i+4] == 5)
+			if (rankCount[i] + rankCount[i+1] + rankCount[i+2] + rankCount[i+3] 
+					+ rankCount[i+4] == 5)
 				return CardRank.values()[i+4];
-			if (i > CardRank.DEUCE.ordinal() && rankCount[i] + rankCount[i+1] + rankCount[i+2] + 
-					rankCount[i+3] + rankCount[i+4] + rankCount[CardRank.DEUCE.ordinal()] == 5)
+			if (i > CardRank.DEUCE.ordinal() && rankCount[i] + rankCount[i+1] + 
+					rankCount[i+2] + rankCount[i+3] + rankCount[i+4] + rankCount
+					[CardRank.DEUCE.ordinal()] == 5)
 				return CardRank.values()[i+4];
 		}
 
 		// The above scan doesn't catch an ace-high straight; so that is our final check:
-		if (rankCount[CardRank.ACE.ordinal()] + rankCount[CardRank.DEUCE.ordinal()] + rankCount[CardRank.TEN.ordinal()]
-				+ rankCount[CardRank.JACK.ordinal()] + rankCount[CardRank.QUEEN.ordinal()] + rankCount[CardRank.KING.ordinal()] == 5)
+		if (rankCount[CardRank.ACE.ordinal()] + rankCount
+				[CardRank.DEUCE.ordinal()] + rankCount[CardRank.TEN.ordinal()] +
+				rankCount[CardRank.JACK.ordinal()] + rankCount
+				[CardRank.QUEEN.ordinal()] + rankCount[CardRank.KING.ordinal()]
+				== 5)
 			return CardRank.ACE;
 		
 		return null;
@@ -475,7 +514,8 @@ public class DeucesWild implements MiniGame {
 		for(int i=0; i<BOARD_SIZE; i++)
 			if(!pickedSpaces[i])
 				openSpaces.add(i+1);
-		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces
+				.size())));
 	}
 	
 	@Override
