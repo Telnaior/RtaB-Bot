@@ -19,6 +19,7 @@ import tel.discord.rtab.commands.DemoCommand;
 import tel.discord.rtab.commands.HelpCommand;
 import tel.discord.rtab.commands.JoinCommand;
 import tel.discord.rtab.commands.LivesCommand;
+import tel.discord.rtab.commands.LuckyNumberCommand;
 import tel.discord.rtab.commands.MemeCommand;
 import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
@@ -37,7 +38,8 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class RaceToABillionBot
 {
-	public static ArrayList<GameController> game = new ArrayList<>(1);
+	public static ArrayList<GameController> game = new ArrayList<>(3);
+	public static ArrayList<SuperBotChallenge> challenge = new ArrayList<>(1);
 	
 	public static void main(String[] args) throws LoginException, InterruptedException, IOException
 	{
@@ -68,6 +70,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new AddBotCommand());
 		utilities.addCommand(new DemoCommand());
 		utilities.addCommand(new MemeCommand());
+		utilities.addCommand(new LuckyNumberCommand());
 		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
 		prepareBot.setToken(token);
 		prepareBot.addEventListener(utilities.build());
@@ -85,8 +88,16 @@ public class RaceToABillionBot
 				//If it's a designated game channel, make a controller here!
 				if(channel.getTopic().startsWith("~ GAME CHANNEL ~"))
 				{
-					game.add(new GameController(channel));
+					game.add(new GameController(channel,true,false,1));
 					System.out.println("Game Channel: " + channel.getName() + " ("+ channel.getId() + ")");
+				}
+				else if(channel.getTopic().startsWith("~ CHALLENGE CHANNEL ~"))
+				{
+					int playersLeft = Integer.parseInt(channel.getTopic().substring(22,24));
+					int multiplier = 1 + (80 - playersLeft) / 8;
+					SuperBotChallenge challengeHandler = new SuperBotChallenge();
+					challenge.add(challengeHandler);
+					game.add(challengeHandler.initialise(channel,multiplier));
 				}
 				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))
 				{

@@ -39,8 +39,8 @@ public class Player implements Comparable<Player>
 	int newbieProtection;
 	//Event fields
 	int jokers;
-	int splitAndShare;
 	int boostCharge;
+	boolean splitAndShare;
 	boolean minigameLock;
 	boolean jackpot;
 	boolean threshold;
@@ -78,8 +78,8 @@ public class Player implements Comparable<Player>
 		booster = 100;
 		winstreak = 0;
 		jokers = 0;
-		splitAndShare = 0;
 		boostCharge = 0;
+		splitAndShare = false;
 		minigameLock = false;
 		threshold = false;
 		warned = false;
@@ -190,6 +190,17 @@ public class Player implements Comparable<Player>
 	}
 	public StringBuilder blowUp(int multiplier, boolean holdBoost, int othersOut)
 	{
+		//Start with modifiers the main controller needs
+		for(GameController game : RaceToABillionBot.game)
+		{
+			if(game.channel == channel)
+			{
+				game.repeatTurn = 0;
+				game.playersAlive --;
+				//We found the right channel, so
+				break;
+			}
+		}
 		//Just fold if they've got a minigame lock so they still play their games
 		if(minigameLock && games.size() > 0)
 		{
@@ -223,18 +234,18 @@ public class Player implements Comparable<Player>
 		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
-		if(splitAndShare > 0)
+		if(splitAndShare)
 		{
-			int moneyLost = (int)(money/(100.0/splitAndShare));
-			addMoney(-1*moneyLost,MoneyMultipliersToUse.NOTHING);
 			for(GameController game : RaceToABillionBot.game)
 			{
 				if(game.channel == channel)
 				{
 					channel.sendMessage("Because " + getSafeMention() + " had a split and share, "
-							+ String.format("%d%% of their total will be split between the other players.",splitAndShare))
+							+ "2%% of their total will be given to each living player.")
 							.queueAfter(1,TimeUnit.SECONDS);
-					game.splitMoney(moneyLost,true);
+					int moneyLost = (int)(money/50);
+					addMoney(-1*moneyLost*game.playersAlive,MoneyMultipliersToUse.NOTHING);
+					game.splitMoney(moneyLost*game.playersAlive,MoneyMultipliersToUse.NOTHING);
 					//We found the right channel, so
 					break;
 				}
@@ -245,16 +256,6 @@ public class Player implements Comparable<Player>
 			booster = 100;
 		//Wipe everything else too, and dock them a life
 		winstreak = 0;
-		for(GameController game : RaceToABillionBot.game)
-		{
-			if(game.channel == channel)
-			{
-				game.repeatTurn = 0;
-				game.playersAlive --;
-				//We found the right channel, so
-				break;
-			}
-		}
 		//Dumb easter egg
 		if(money <= -1000000000)
 		{
@@ -278,8 +279,8 @@ public class Player implements Comparable<Player>
 		warned = false;
 		games.clear();
 		knownBombs.clear();
-		splitAndShare = 0;
 		boostCharge = 0;
+		splitAndShare = false;
 		minigameLock = false;
 		threshold = false;
 		status = PlayerStatus.OUT;

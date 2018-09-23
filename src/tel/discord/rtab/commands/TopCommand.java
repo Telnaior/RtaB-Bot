@@ -42,9 +42,6 @@ public class TopCommand extends Command {
 				 */
 				record = list.get(i).split("#");
 				money = Integer.parseInt(record[2]);
-				//Need to actually have money to be listed
-				if(money <= 0)
-					break;
 				//Get the length to format all values to
 				if(i%10 == 0)
 				{

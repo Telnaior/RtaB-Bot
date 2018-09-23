@@ -14,6 +14,7 @@ public class RankCommand extends Command {
     public RankCommand()
     {
         this.name = "rank";
+		this.aliases = new String[]{"balance","money"};
         this.help = "view the rank of a player by name, or by rank with #[number]";
         this.guildOnly = false;
     }

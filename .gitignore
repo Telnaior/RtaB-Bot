@@ -5,10 +5,15 @@ SuperBonusRound.java
 SBRItem.java
 
 # Eclipse Files
+.cache-main
 .classpath
 .project
 .settings/
 bin/
+
+# IntelliJ Files
+.idea/
+*.iml
 
 # Compiled class file
 *.class

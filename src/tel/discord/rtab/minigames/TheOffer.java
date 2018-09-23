@@ -6,7 +6,8 @@ public class TheOffer implements MiniGame {
 	static final String NAME = "The Offer";
 	static final boolean BONUS = false;
 	double chanceToBomb; 
-	int offer; 
+	int offer;
+	int seconds;
 	boolean alive; //Player still alive?
 	boolean accept; //Accepting the Offer
 	/**
@@ -15,22 +16,21 @@ public class TheOffer implements MiniGame {
 	 */
 	@Override
 	public LinkedList<String> initialiseGame(){
-		offer = 1000 * (int)(Math.random()*76+25); // First Offer starts between 25,000 and 100,000
-		chanceToBomb = offer/5000;  // Start chance to Bomb 5-20% based on first offer
+		offer = 1000 * (int)(Math.random()*51+50); // First Offer starts between 50,000 and 100,000
+		chanceToBomb = offer/10000;  // Start chance to Bomb 5-10% based on first offer
+		seconds = 1;
 		alive = true; 
 		accept = false;
 
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
-		output.add("In The Offer, you will be placed in a room with a live bomb.");
-		output.add("You will get offers while in the room to leave it.");
-		output.add("Every offer that passes increases the money you gain as an offer by at least 100%, " +
-				"but the chance of the bomb exploding will also increase by at least 5%.");
+		output.add("In The Offer, you can enter a room with a live bomb.");
+		output.add("Every Room you survive will earn you more money!");
+		output.add("Each Room will at least double your actual earned money, " +
+				"but the chance of the bomb exploding will also increase significantly.");
+		output.add("Every Room will also increase the amount of chances to Explode!");
 		output.add("If the bomb explodes, you lose everything."); //~Duh
-		output.add("Be aware the Bomb can explode at any moment, so don't take too long!");
-		output.add("----------------------------------------"); 
-		output.add("Your first Offer is: " + String.format("**$%,d**", offer));
-		output.add("Do you 'ACCEPT' or 'REFUSE'?");
+		output.add(makeOffer(offer, seconds, chanceToBomb)); 
 		return output;  
 	}
 
@@ -44,34 +44,60 @@ public class TheOffer implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		String choice = pick.toUpperCase();
 		choice = choice.replaceAll("\\s","");
-		if(choice.equals("REFUSE") || choice.equals("NODEAL"))
+		if(choice.equals("REFUSE") || choice.equals("NODEAL") || choice.equals("DARE"))
 		{
-			output.add("Offer Refused!");
+			output.add("The Bomb goes live");
 			output.add("...");
-			int boomValue = (int) (Math.random()*100);
-				
-			if (chanceToBomb > boomValue){
-				output.add("**BOOM**");
-				alive = false;
-			}
-			else
+			//Let's find out if we explode
+			for(int i=0; i<seconds; i++)
 			{
-				offer += (int)(offer * (1 + (Math.random()*0.5)));
+				if (chanceToBomb > Math.random()*100)
+				{
+					output.add("**BOOM**");
+					alive = false;
+					break;
+				}
+			}
+			//If still alive, let's run it
+			if(alive)
+			{
+				double increment = Math.random()*0.5;
+				offer += (int)(offer * (1 + increment));
 				offer -= offer%100;
-				chanceToBomb += 5 + (Math.random()*6);
-				output.add("Your new offer is: " + String.format("**$%,d**", offer));
-				output.add("Do you 'ACCEPT' or 'REFUSE'?");
+				seconds++;
+				chanceToBomb += 5 + (increment*10);
+				output.add(makeOffer(offer, seconds, chanceToBomb));
 			}
 		}
-		else if(choice.equals("ACCEPT") || choice.equals("DEAL"))
+		else if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE"))
 		{
 			accept = true;
-			output.add("Offer Accepted!");
+			output.add("You take your Money!");
 		}
 		//If it's neither of those it's just some random string we can safely ignore
 		return output;
 	}
 
+	/**
+	* @param offer The amount that gets offered to the Player
+	* @param times The amount of times the Bomb will Tick
+	* @param bomb The Chance of the Bomb going Boom per Tick
+	* @return Will Return a nice looking output with all Infos
+	**/
+	private String makeOffer(int offer, int times, double bomb)
+	{
+		StringBuilder output = new StringBuilder();
+		output.append("```\n");
+		output.append("  The Offer  \n\n;");
+		output.append("Next Room:\n");
+		output.append("Bomb: " + String.format ("%.2f%%\n", bomb));
+		output.append("Ticks: " + String.format("$%,d Times\n\n", times));
+		output.append("Current Money: " + String.format("$%,d\n\n", offer));
+
+		output.append(" 'Take' the Money  or  'Dare' the Bomb \n");
+		output.append("```");
+		return output.toString();
+	}
 
 	/**
 	 * Returns true if the minigame has ended
@@ -103,7 +129,15 @@ public class TheOffer implements MiniGame {
 	public String getBotPick()
 	{
 		//Do a "trial run", quit if it fails
-		return (Math.random() < chanceToBomb) ? "ACCEPT" : "REFUSE";
+		for(int i=0; i<=seconds; i++)
+		{
+			if (chanceToBomb > Math.random()*100)
+			{
+				return "ACCEPT";
+			}
+		}
+		//Trial run says we'll survive, so play on
+		return "REFUSE";
 	}
 	
 	@Override

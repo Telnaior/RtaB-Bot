@@ -2,25 +2,16 @@ package tel.discord.rtab.enums;
 
 public enum Events implements WeightedSpace
 {
-	REPEAT			( 6),
-	STREAKP1		( 6),
-	BOOST_CHARGER	( 6),
-	DOUBLE_DEAL		( 5),
-	STREAKP2		( 5),
-	GAME_LOCK		( 4)
-	{
-		@Override
-		public int getWeight(int playerCount)
-		{
-			//Minigames are less common in large games, so the minigame lock doesn't really belong there either
-			return (playerCount > 4) ? Math.max(0,weight-(playerCount-4)) : weight;
-		}
-	},
-	BOOST_DRAIN		( 4),
-	MINEFIELD		( 4),
-	SKIP_TURN		( 3),
-	REVERSE_ORDER	( 3),
-	JOKER			( 3)
+	STREAKPSMALL	( 7),
+	BOOST_CHARGER	( 7),
+	DOUBLE_DEAL		( 7),
+	BOOST_DRAIN		( 6),
+	DRAW_TWO		( 6),
+	SKIP_TURN		( 6),
+	MINEFIELD		( 5),
+	BOOST_MAGNET	( 5),
+	REVERSE_ORDER	( 5),
+	JOKER			( 4)
 	{
 		@Override
 		public int getWeight(int playerCount)
@@ -37,12 +28,14 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	LOCKDOWN		( 3),
-	STREAKP3		( 3),
-	COMMUNISM		( 2),
-	BLAMMO_FRENZY	( 2),
+	LOCKDOWN		( 4),
+	STREAKPLARGE	( 4),
+	COMMUNISM		( 3),
+	BLAMMO_FRENZY	( 3),
+	DRAW_FOUR		( 3),
 	BRIBE			( 2),
 	SPLIT_SHARE		( 2),
+	END_ROUND		( 2),
 	SUPER_JOKER		( 1)
 	{
 		@Override
@@ -52,7 +45,6 @@ public enum Events implements WeightedSpace
 			return (playerCount < 4) ? 0 : weight;
 		}
 	},
-	END_ROUND		( 1),
 	STARMAN			( 1),
 	JACKPOT			( 1);
 

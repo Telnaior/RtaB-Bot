@@ -85,8 +85,6 @@ public class DoubleTrouble implements MiniGame {
 			lastPick = money.get(lastSpace);
 			//Start printing output
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			if(total != lastPick)
-				output.add("...");
 			if(money.get(lastSpace) == 0)
 			{
 				alive = false; // BOMB, tough cookies
