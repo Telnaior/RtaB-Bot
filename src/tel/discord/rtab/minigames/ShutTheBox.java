@@ -139,6 +139,8 @@ public class ShutTheBox implements MiniGame {
 						closedSpaces[Integer.parseInt(tokens[i])] = true;
 					totalShut += dice.getDiceTotal();
 					isGood = refreshGood();
+					for (int i = 0; i < botStrategy.length; i++)
+						botStrategy[i] = getBotStrategy(i+2, false);
 					isClosing = false;
 					output.add("Numbers closed.");
 					output.add(generateBoard());
