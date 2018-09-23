@@ -11,6 +11,14 @@ SBRItem.java
 .settings/
 bin/
 
+# NetBeans Files
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
 # IntelliJ Files
 .idea/
 *.iml
