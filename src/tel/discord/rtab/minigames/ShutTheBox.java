@@ -38,12 +38,13 @@ public class ShutTheBox implements MiniGame {
 		output.add("Each time you roll the dice, you may close one or more " +
 				"numbers that total *exactly* the amount thrown.");
 		output.add("For each number you successfully close, you will earn " +
-				"$25,000 times that number. The top prize is $1,950,000.");
+				"as many points as the amount thrown. The first point is " +
+				"worth $1,000, with each additional point worth $1,000 more " +
+				"than the previous.");
+		output.add("If you shut the box completely, we'll augment your " +
+				   "winnings to $2,000,000!");
 		output.add("You are free to stop after any roll, but if you can't " +
 				"exactly close the number thrown, you lose everything.");
-		output.add("However, if you succeed in closing all numbers from 7 to 9"
-				+ " inclusive, you have to roll only one die for the rest of " +
-				"the game.");
 		output.add("Good luck!");
 		output.add(generateBoard());
 		return output;
