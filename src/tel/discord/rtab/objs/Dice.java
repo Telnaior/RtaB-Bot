@@ -21,6 +21,10 @@ public class Dice {
         return dice;
     }
 
+	public int getNumFaces() {
+        return numFaces;
+    }
+	
     public int getDiceTotal() {
         int sum = 0;
         
