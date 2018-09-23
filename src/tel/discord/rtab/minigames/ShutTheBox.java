@@ -11,6 +11,7 @@ public class ShutTheBox implements MiniGame {
 	boolean[] closedSpaces;
 	Dice dice;
 	boolean[] isGood;
+	String[] botStrategy;
 	boolean isAlive;  
 	boolean isClosing;
 	boolean upperThirdClosed;
@@ -25,8 +26,12 @@ public class ShutTheBox implements MiniGame {
 		dice = new Dice();
 		isGood = new boolean[dice.getDice().length * dice.getNumFaces() -
 				(dice.getDice().length - 1)];
-		for (int i = 0; i < isGood.length; i++)
+		botStrategy = new String[isGood.length];
+		for (int i = 0; i < isGood.length; i++) {
 			isGood[i] = true;
+			botStrategy[i] = getBotStrategy(i+2, false);
+		}
+		botStrategy = new String[11]; 
 		isAlive = true;
 		isClosing = true;
 		totalShut = 0;
@@ -238,6 +243,36 @@ public class ShutTheBox implements MiniGame {
 		return (totalShut + roll) * 1000;
 	}
 	
+	public String getBotStrategy(int roll, boolean dbl) {
+		if (roll == 1) {
+			if (closedSpaces[0])
+				return " 1";
+			else return null;
+		}
+		if (!isGood[roll-1])
+			return null;
+		
+		/* The reason for the dbl parameter is so the bot doesn't get something
+		 * like, say, 5 5 for a strategy for 10; the first condition prevents
+		 * that.
+		 */
+		if (!dbl && roll < 10 && !closedSpaces[roll - 1])
+			return " " + roll;
+			
+		for (int i = Math.min(roll-1, 9); i > 0; i--) {
+			if (i < roll-i)
+				break; // and throw our error
+			if (!isGood[i-2])
+				continue;
+			if (i == roll-i)
+				return " " + (roll - i) + getBotStrategy(i, true);
+			if (isGood[roll - i - 2])
+				return " " + i + getBotStrategy(roll-i, false);
+		}
+		throw new IllegalArgumentException("Uh-oh--something's wrong with the" +
+				" Shut the Box combination generator! Tell StrangerCoug.");
+	}
+	
 	@Override
 	public boolean isGameOver()
 	{
@@ -259,8 +294,16 @@ public class ShutTheBox implements MiniGame {
 
 	@Override
 	public String getBotPick() {
-		// TODO: Teach the bot how to play :P
-		return "";
+		if (isClosing) {
+			return "SHUT" + botStrategy[dice.getDiceTotal() - 1];
+		}
+		else {
+			Dice testDice = new Dice();
+			testDice.rollDice();
+			if (isGood[testDice.getDiceTotal()-1])
+				return "ROLL";
+			else return "STOP";
+		}
 	}
 	
 	@Override
