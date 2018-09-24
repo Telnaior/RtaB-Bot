@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DoubleTrouble implements MiniGame {
+public class DoubleZeroes implements MiniGame {
 	static final String NAME = "Double Zeroes";
 	static final boolean BONUS = false;
 	int total;
