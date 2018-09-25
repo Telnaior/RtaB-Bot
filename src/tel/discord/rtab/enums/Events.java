@@ -8,9 +8,9 @@ public enum Events implements WeightedSpace
 	BOOST_DRAIN		( 6),
 	DRAW_TWO		( 6),
 	SKIP_TURN		( 6),
-	MINEFIELD		( 5),
 	BOOST_MAGNET	( 5),
 	REVERSE_ORDER	( 5),
+	STREAKPLARGE	( 5),
 	JOKER			( 4)
 	{
 		@Override
@@ -28,11 +28,27 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	LOCKDOWN		( 4),
-	STREAKPLARGE	( 4),
+	DRAW_FOUR		( 4)
+	{
+		@Override
+		public int getWeight(int playerCount)
+		{
+			//This space would be a little too painful in a small game.
+			switch(playerCount)
+			{
+			case 2:
+				return 1;
+			case 3:
+				return 2;
+			default:
+				return weight;
+			}
+		}
+	},
+	MINEFIELD		( 4),
+	LOCKDOWN		( 3),
 	COMMUNISM		( 3),
 	BLAMMO_FRENZY	( 3),
-	DRAW_FOUR		( 3),
 	BRIBE			( 2),
 	SPLIT_SHARE		( 2),
 	END_ROUND		( 2),
