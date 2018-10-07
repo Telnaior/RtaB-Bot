@@ -59,13 +59,13 @@ public class DoubleZeroes implements MiniGame {
 				// Player stops at the decision point? Tell 'em what they've won and end the game!
 			alive = false;
 			total = total * zeroesLeft;
-				output.add("Very well! Your bank is multiplied by " + String.format("$%,d!",zeroesLeft))
+				output.add("Very well! Your bank is multiplied by " + String.format("$%,d!",zeroesLeft)
 				+ ", which means it's...");
 			return output;
 			}
 			else // Don't stop 'til you get enough, keep on!
 			{
-				output.add("Can't stop yet, you must pick two non-zero values first!")
+				output.add("Can't stop yet, you must pick two non-zero values first!");
 				return output;
 			}
 		}
@@ -115,7 +115,7 @@ public class DoubleZeroes implements MiniGame {
 					output.add("It's a **BOMB**.");
 					output.add("Sorry, you lose.");
 				}
-				elseif(total == 0) // ...and it's the first phase with no prior numbers...
+				else if(total == 0) // ...and it's the first phase with no prior numbers...
 				{
 					if (numbers.get(lastSpace) == 80) // ... and it's an 80, use an 'an'
 					{
@@ -147,7 +147,7 @@ public class DoubleZeroes implements MiniGame {
 				if(total>100) // If we just hit the second number, tell 'em about the DECISION~!
 				{
 				output.add("You can now choose to continue by picking a number, "
-						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total))
+						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
 						+ ", times the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft));
 				output.add(generateBoard());
 				}
@@ -239,7 +239,7 @@ public class DoubleZeroes implements MiniGame {
 			//There should be (8 + zeroesLeft) spaces left here
 			if(total > 100)
 			{
-				int goChance = 100 * (zeroesLeft / (8 + zeroesLeft)));
+				int goChance = 100 * (zeroesLeft / (8 + zeroesLeft));
 				if(Math.random()*100>goChance)
 					return "STOP";
 			}

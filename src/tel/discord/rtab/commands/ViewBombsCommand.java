@@ -22,7 +22,7 @@ public class ViewBombsCommand extends Command {
 			if(game.channel == event.getChannel())
 			{
 				if(game.findPlayerInGame(event.getAuthor().getId()) != -1)
-					event.replyInDm("No.");
+					event.reply("You can't view bombs for a game you're in!");
 				else
 					for(Player nextPlayer : game.players)
 					{

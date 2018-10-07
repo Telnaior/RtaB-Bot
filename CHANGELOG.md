@@ -1,3 +1,17 @@
+1.3.2
+ - Season 1 codebase at end of season, after bugfixes + QoLs
+ - Bot announces self-bombs
+ - Demo mode feat. four bots playing if no humans play for an hour
+ - Blammo's "eliminate opponent" actually picks a random opponent
+ - Bot automatically updates score-based roles for the "main" game channel
+ - !viewbombs command for mods
+ - !top command can be used with page numbers (and bots get a * before their name to distinguish them)
+ - !lives command now lets you look up other players
+ - !stats command to give an idea of the cash distribution
+ - !luckynumber command for when you can't decide what space to pick
+ - Double Trouble gives a little more info
+ - Deuces automatically hold in Deuces Wild
+
 1.3.1
  - Final update for Season 1
  - Bugfixes, obv
