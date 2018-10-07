@@ -247,7 +247,7 @@ public class ShutTheBox implements MiniGame {
 	
 	public String getBotStrategy(int roll, boolean dbl) {
 		if (roll == 1) {
-			if (closedSpaces[0])
+			if (!closedSpaces[0])
 				return " 1";
 			else return null;
 		}
