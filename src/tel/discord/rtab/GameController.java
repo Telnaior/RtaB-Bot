@@ -45,6 +45,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 public class GameController
 {
 	final static int MAX_PLAYERS = 16;
+	final boolean rankChannel;
 	public TextChannel channel;
 	TextChannel resultChannel;
 	int boardSize = 15;
@@ -65,9 +66,10 @@ public class GameController
 	public ScheduledFuture<?> demoMode;
 	Message waitingMessage;
 	
-	public GameController(TextChannel channelID)
+	public GameController(TextChannel channelID, boolean mainGame)
 	{
 		channel = channelID;
+		rankChannel = mainGame;
 		demoMode = timer.schedule(() -> 
 		{
 			for(int i=0; i<4; i++)
@@ -157,7 +159,7 @@ public class GameController
 		if(newPlayer.money > 900000000)
 		{
 			channel.sendMessage(String.format("%1$s needs only $%2$,d more to reach the goal!",
-					newPlayer.name,(1000000000-newPlayer.money)));
+					newPlayer.name,(1000000000-newPlayer.money))).queue();
 		}
 		if(playersJoined == 1)
 		{
@@ -202,6 +204,16 @@ public class GameController
 	 */
 	public void startTheGameAlready()
 	{
+		/*
+		//If the first player already has a billion, skip to the end
+		if(players.get(0).money == 1000000000)
+		{
+			currentTurn = -1;
+			winners.add(players.get(0));
+			runNextEndGamePlayer();
+			return;
+		}
+		*/
 		//If the game's already running or no one's in it, just don't
 		if((gameStatus != GameStatus.SIGNUPS_OPEN && gameStatus != GameStatus.ADD_BOT_QUESTION) || playersJoined < 1)
 		{
@@ -970,16 +982,20 @@ public class GameController
 			if(winners.size() > 0)
 			{
 				//Got a single winner, crown them!
-				if(winners.size() == 1)
+				if(winners.size() <= 1)
 				{
 					players.addAll(winners);
 					currentTurn = 0;
 					for(int i=0; i<3; i++)
+					{
+						System.out.println("Let's go #"+i);
 						channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
-							.completeAfter(2,TimeUnit.SECONDS);
-					channel.sendMessage("@everyone").completeAfter(2,TimeUnit.SECONDS);
+							.queueAfter(5+(5*i),TimeUnit.SECONDS);
+					}
+					channel.sendMessage("@everyone").queueAfter(20,TimeUnit.SECONDS);
 					gameStatus = GameStatus.SEASON_OVER;
-					if(!players.get(0).isBot)
+					System.out.println(gameStatus);
+					if(!players.get(0).isBot && rankChannel)
 					{
 						timer.schedule(() -> 
 						{
@@ -987,7 +1003,7 @@ public class GameController
 							channel.sendMessage("It is time to enter the Super Bonus Round.").completeAfter(5,TimeUnit.SECONDS);
 							channel.sendMessage("...").completeAfter(10,TimeUnit.SECONDS);
 							startMiniGame(new SuperBonusRound());
-						}, 60, TimeUnit.SECONDS);
+						}, 90, TimeUnit.SECONDS);
 					}
 				}
 				//Hold on, we have *multiple* winners? ULTIMATE SHOWDOWN HYPE
@@ -1458,8 +1474,8 @@ public class GameController
 					list.add(toPrint.toString());
 				else
 					list.set(location,toPrint.toString());
-				//Update a player's role if they're human and have earned a new one
-				if(players.get(i).money/100000000 != players.get(i).oldMoney/100000000 && !players.get(i).isBot)
+				//Update a player's role if it's the role channel, they're human, and have earned a new one
+				if(players.get(i).money/100000000 != players.get(i).oldMoney/100000000 && !players.get(i).isBot && rankChannel)
 				{
 					//Get the mod controls
 					GuildController guild = channel.getGuild().getController();
