@@ -56,6 +56,7 @@ public class GameController
 	List<Player> winners = new ArrayList<>();
 	int currentTurn = -1;
 	boolean finalCountdown = false;
+	boolean firstPick = true;
 	int fcTurnsLeft;
 	int repeatTurn = 0;
 	boolean reverse = false;
@@ -382,17 +383,19 @@ public class GameController
 			fcTurnsLeft --;
 		}
 		//Figure out who to ping and what to tell them
-		if(repeatTurn > 0)
+		if(repeatTurn > 0 && !firstPick)
 		{
 			repeatTurn --;
 			if(!(players.get(currentTurn).isBot))
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", pick again.")
 					.completeAfter(3,TimeUnit.SECONDS);
 		}
-		else if(repeatTurn == 0 && !players.get(currentTurn).isBot)
+		else
 		{
-			channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
-				.completeAfter(3,TimeUnit.SECONDS);
+			firstPick = false;
+			if(!players.get(currentTurn).isBot)
+				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
+					.completeAfter(3,TimeUnit.SECONDS);
 		}
 		//Display the board, then ready up the space picker
 		displayBoardAndStatus(true, false, false);
@@ -615,8 +618,8 @@ public class GameController
 		if(players.get(currentTurn).newbieProtection > 0)
 			penalty = Player.NEWBIE_BOMB_PENALTY;
 		//Reduce penalty for others out
-		penalty /= 5;
-		penalty *= (5 - Math.min(5,playersJoined-playersAlive));
+		penalty /= 10;
+		penalty *= (10 - Math.min(10,playersJoined-playersAlive));
 		switch(gameboard.bombBoard.get(location))
 		{
 		case NORMAL:
@@ -806,7 +809,7 @@ public class GameController
 			channel.sendMessage(outputIterator.next()).completeAfter(5,TimeUnit.SECONDS);
 			while(outputIterator.hasNext())
 			{
-				channel.sendMessage(outputIterator.next()).queueAfter(2,TimeUnit.SECONDS);
+				channel.sendMessage(outputIterator.next()).queueAfter(1,TimeUnit.SECONDS);
 			}
 			break;
 		case BOOSTER:
@@ -888,6 +891,14 @@ public class GameController
 		cashWon *= boardMultiplier;
 		//On cash, update the player's score and tell them how much they won
 		StringBuilder resultString = new StringBuilder();
+		if(gameboard.cashBoard.get(location).getPrize() != null)
+		{
+			resultString.append("It's **");
+			if(boardMultiplier > 1)
+				resultString.append(String.format("%dx ",boardMultiplier));
+			resultString.append(gameboard.cashBoard.get(location).getPrize());
+			resultString.append("**, worth ");
+		}
 		resultString.append("**");
 		if(cashWon<0)
 			resultString.append("-");
@@ -950,8 +961,8 @@ public class GameController
 			//Kill them dead
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY;
-			penalty /= 5;
-			penalty *= (5 - Math.min(5,playersJoined-playersAlive));
+			penalty /= 10;
+			penalty *= (10 - Math.min(10,playersJoined-playersAlive));
 			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
 			players.get(currentTurn).threshold = true;
@@ -1027,8 +1038,8 @@ public class GameController
 			channel.sendMessage("You ELIMINATED YOURSELF!").completeAfter(3,TimeUnit.SECONDS);
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY;
-			penalty /= 5;
-			penalty *= (5 - Math.min(5,playersJoined-playersAlive));
+			penalty /= 10;
+			penalty *= (10 - Math.min(10,playersJoined-playersAlive));
 			channel.sendMessage(String.format("$%,d penalty!",Math.abs(penalty*4))).queue();
 			players.get(currentTurn).threshold = true;
 			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
@@ -1084,6 +1095,7 @@ public class GameController
 					.completeAfter(5,TimeUnit.SECONDS);
 			}
 			advanceTurn(false);
+			firstPick = true;
 			repeatTurn += 2;
 			break;
 		case DRAW_FOUR:
@@ -1098,6 +1110,7 @@ public class GameController
 					.completeAfter(5,TimeUnit.SECONDS);
 			}
 			advanceTurn(false);
+			firstPick = true;
 			repeatTurn += 4;
 			break;
 		case JOKER:
@@ -1251,7 +1264,7 @@ public class GameController
 			channel.sendMessage("You've been **Bribed** to leave the round!").completeAfter(5,TimeUnit.SECONDS);
 			//$10k per space left on the board before the pick
 			int bribe = 10000 * (spacesLeft+1);
-			channel.sendMessage(String.format("You receive **$,d**.",bribe)).queue();
+			channel.sendMessage(String.format("You receive **$%,d**.",bribe)).queue();
 			StringBuilder extraResult = players.get(currentTurn).addMoney(bribe,MoneyMultipliersToUse.BOOSTER_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult.toString()).queue();
