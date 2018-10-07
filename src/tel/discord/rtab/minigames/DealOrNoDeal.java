@@ -10,7 +10,7 @@ public class DealOrNoDeal implements MiniGame {
 	static final boolean BONUS = false;
 	final List<Integer> VALUE_LIST = Arrays.asList(1,2,5,10,50,100,500,1000,2500,5000,7500, //Blues
 			10000,30000,50000,100000,150000,200000,350000,500000,750000,1000000,2500000); //Reds
-	LinkedList<Integer> values;
+	LinkedList<Integer> values = new LinkedList<>();
 	int offer;
 	int casesLeft;
 	boolean accept; //Accepting the Offer

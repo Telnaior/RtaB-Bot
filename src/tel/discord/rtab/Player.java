@@ -242,11 +242,11 @@ public class Player implements Comparable<Player>
 				if(game.channel == channel)
 				{
 					channel.sendMessage("Because " + getSafeMention() + " had a split and share, "
-							+ "2%% of their total will be given to each living player.")
+							+ "2% of their total will be given to each living player.")
 							.queueAfter(1,TimeUnit.SECONDS);
 					int moneyLost = (int)(money/50);
 					addMoney(-1*moneyLost*game.playersAlive,MoneyMultipliersToUse.NOTHING);
-					game.splitMoney(moneyLost*game.playersAlive,MoneyMultipliersToUse.NOTHING);
+					game.splitMoney(moneyLost*game.playersAlive, MoneyMultipliersToUse.NOTHING, true);
 					//We found the right channel, so
 					break;
 				}

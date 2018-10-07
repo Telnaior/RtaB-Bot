@@ -378,14 +378,16 @@ public class GameController
 				timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
 				return;
 			}
+			else if(fcTurnsLeft == 1)
+				channel.sendMessage("The round will end **after this pick!**").queue();
+			else
+				channel.sendMessage(String.format("The round will end in **%d picks**.",fcTurnsLeft)).queue();
 			//Otherwise subtract one
-			channel.sendMessage(String.format("The round will end in **%d turns**.",fcTurnsLeft)).queue();
 			fcTurnsLeft --;
 		}
 		//Figure out who to ping and what to tell them
 		if(repeatTurn > 0 && !firstPick)
 		{
-			repeatTurn --;
 			if(!(players.get(currentTurn).isBot))
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", pick again.")
 					.completeAfter(3,TimeUnit.SECONDS);
@@ -397,6 +399,8 @@ public class GameController
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
 					.completeAfter(3,TimeUnit.SECONDS);
 		}
+		if(repeatTurn > 0)
+			repeatTurn --;
 		//Display the board, then ready up the space picker
 		displayBoardAndStatus(true, false, false);
 		if(players.get(currentTurn).isBot)
@@ -708,7 +712,7 @@ public class GameController
 			channel.sendMessage(String.format("But it's a REVERSE bomb. $%,d penalty awarded to living players!",
 					Math.abs(penalty))).completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).blowUp(0,false,(playersJoined-playersAlive));
-			splitMoney(-penalty,MoneyMultipliersToUse.BOOSTER_ONLY);
+			splitMoney(-penalty,MoneyMultipliersToUse.BOOSTER_ONLY, false);
 			break;
 		case DETONATION:
 			channel.sendMessage("It goes **KABLAM**! "
@@ -1139,7 +1143,7 @@ public class GameController
 			{
 				channel.sendMessage("It's a **Split & Share**, "
 						+ "if you lose now you'll give 2% of your total to each living player, "
-						+ "approximately $" + String.format("%,d",(players.get(currentTurn).money/10)) + "!")
+						+ "approximately $" + String.format("%,d",(players.get(currentTurn).money/50)) + "!")
 					.completeAfter(5,TimeUnit.SECONDS);
 				players.get(currentTurn).splitAndShare = true;
 			}
@@ -1223,12 +1227,17 @@ public class GameController
 		case SKIP_TURN:
 			channel.sendMessage("It's a **Skip Turn**!")
 				.completeAfter(5,TimeUnit.SECONDS);
-			if(repeatTurn > 0)
+			if(playersAlive == 2)
+				repeatTurn++;
+			else
 			{
-				repeatTurn = 0;
-				channel.sendMessage("(You also negated the extra draws!)").queue();
+				if(repeatTurn > 0)
+				{
+					repeatTurn = 0;
+					channel.sendMessage("(You also negated the extra draws!)").queue();
+				}
+				advanceTurn(false);
 			}
-			advanceTurn(false);
 			break;
 		case END_ROUND:
 			if(finalCountdown)
@@ -1859,8 +1868,10 @@ public class GameController
 		return resultString.toString();
 	}
 	
-	public void splitMoney(int totalToShare, MoneyMultipliersToUse multipliers)
+	public void splitMoney(int totalToShare, MoneyMultipliersToUse multipliers, boolean divide)
 	{
+		if(divide)
+			totalToShare /= playersAlive;
 		for(int i=0; i<playersJoined; i++)
 			//Don't pass money back to the player that hit it, and don't pass to dead players
 			if(i != currentTurn && players.get(i).status == PlayerStatus.ALIVE)
@@ -1875,37 +1886,48 @@ public class GameController
 			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
 			String[] record = list.get(index).split("#");
 			output.append(record[1] + ": ");
-			if(Instant.parse(record[7]).isBefore(Instant.now()) && Integer.parseInt(record[6]) < Player.MAX_LIVES)
-				output.append(Player.MAX_LIVES + " lives left.");
+			if(Integer.parseInt(record[5]) > 0)
+			{
+				output.append(record[5]);
+				output.append(" game");
+				if(Integer.parseInt(record[5]) != 1)
+					output.append("s");
+				output.append(" of newbie protection left.");
+			}
 			else
 			{
-				output.append(record[6]);
-				if(Integer.parseInt(record[6]) == 1)
-					output.append(" life left.");
+				if(Instant.parse(record[7]).isBefore(Instant.now()) && Integer.parseInt(record[6]) < Player.MAX_LIVES)
+					output.append(Player.MAX_LIVES + " lives left.");
 				else
-					output.append(" lives left.");
-				if(Integer.parseInt(record[6]) < Player.MAX_LIVES)
 				{
-					output.append(" Lives refill in ");
-					//Check hours, then minutes, then seconds
-					OffsetDateTime lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond())
-							.atOffset(ZoneOffset.UTC);
-					int hours = lifeRefillTime.getHour();
-					if(hours>0)
+					output.append(record[6]);
+					if(Integer.parseInt(record[6]) == 1)
+						output.append(" life left.");
+					else
+						output.append(" lives left.");
+					if(Integer.parseInt(record[6]) < Player.MAX_LIVES)
 					{
-						output.append(hours + " hours, ");
+						output.append(" Lives refill in ");
+						//Check hours, then minutes, then seconds
+						OffsetDateTime lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond())
+								.atOffset(ZoneOffset.UTC);
+						int hours = lifeRefillTime.getHour();
+						if(hours>0)
+						{
+							output.append(hours + " hours, ");
+						}
+						int minutes = lifeRefillTime.getMinute();
+						if(hours>0 || minutes>0)
+						{
+							output.append(minutes + " minutes, ");
+						}
+						int seconds = lifeRefillTime.getSecond();
+						if(hours>0 || minutes>0 || seconds>0)
+						{
+							output.append(seconds + " seconds");
+						}
+						output.append(".");
 					}
-					int minutes = lifeRefillTime.getMinute();
-					if(hours>0 || minutes>0)
-					{
-						output.append(minutes + " minutes, ");
-					}
-					int seconds = lifeRefillTime.getSecond();
-					if(hours>0 || minutes>0 || seconds>0)
-					{
-						output.append(seconds + " seconds");
-					}
-					output.append(".");
 				}
 			}
 		}
