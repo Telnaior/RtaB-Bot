@@ -47,7 +47,7 @@ public class GameController
 {
 	final static int MAX_PLAYERS = 16;
 	final boolean rankChannel;
-	final boolean runDemo;
+	public final boolean runDemo;
 	final boolean verboseBotGames;
 	public TextChannel channel;
 	TextChannel resultChannel;
@@ -705,7 +705,7 @@ public class GameController
 			channel.sendMessage(String.format("But it's a REVERSE bomb. $%,d penalty awarded to living players!",
 					Math.abs(penalty))).completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).blowUp(0,false,(playersJoined-playersAlive));
-			splitMoney(penalty,MoneyMultipliersToUse.BOOSTER_ONLY);
+			splitMoney(-penalty,MoneyMultipliersToUse.BOOSTER_ONLY);
 			break;
 		case DETONATION:
 			channel.sendMessage("It goes **KABLAM**! "
@@ -767,9 +767,9 @@ public class GameController
 					spacesLeft --;
 				}
 				//Down-right
-				if(canBelow && canRight && !pickedSpaces[(location-1)+boardWidth])
+				if(canBelow && canRight && !pickedSpaces[(location+1)+boardWidth])
 				{
-					pickedSpaces[(location-1)+boardWidth] = true;
+					pickedSpaces[(location+1)+boardWidth] = true;
 					spacesLeft --;
 				}
 			}
@@ -1368,28 +1368,6 @@ public class GameController
 		}
 		//Now the winstreak is right, we can display the board
 		displayBoardAndStatus(false, false, false);
-		//Check to see if any bonus games have been unlocked - folded players get this too
-		//Search every multiple of 5 to see if we've got it
-		for(int i=50; i<=players.get(currentTurn).winstreak;i+=50)
-		{
-			if(players.get(currentTurn).oldWinstreak < i)
-				switch(i)
-				{
-				case 50:
-					players.get(currentTurn).games.add(Games.SUPERCASH);
-					break;
-				case 100:
-					players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
-					break;
-				case 150:
-					players.get(currentTurn).games.add(Games.SPECTRUM);
-					break;
-				case 200:
-				default:
-					players.get(currentTurn).games.add(Games.HYPERCUBE);
-					break;
-				}
-		}
 		//If they're a winner and they weren't running diamond armour, give them a win bonus (folded players don't get this)
 		if(players.get(currentTurn).status == PlayerStatus.ALIVE && players.get(currentTurn).jokers >= 0)
 		{
@@ -1411,6 +1389,31 @@ public class GameController
 			{
 				channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",boardSize)).queue();
 				players.get(currentTurn).addMoney(1000000*boardSize,MoneyMultipliersToUse.NOTHING);
+			}
+		}
+		//Check to see if any bonus games have been unlocked - folded players get this too
+		//Search every multiple of 5 to see if we've got it
+		for(int i=50; i<=players.get(currentTurn).winstreak;i+=50)
+		{
+			if(players.get(currentTurn).oldWinstreak < i)
+			{
+				channel.sendMessage(String.format("Streak Bonus: +%d%% Boost!",i)).queue();
+				players.get(currentTurn).addBooster(i);
+				switch(i)
+				{
+				case 50:
+					players.get(currentTurn).games.add(Games.SUPERCASH);
+					break;
+				case 100:
+					players.get(currentTurn).games.add(Games.DIGITAL_FORTRESS);
+					break;
+				case 150:
+					players.get(currentTurn).games.add(Games.SPECTRUM);
+					break;
+				case 200:
+					players.get(currentTurn).games.add(Games.HYPERCUBE);
+					break;
+				}
 			}
 		}
 		//Then, folded or not, play out any minigames they've won
@@ -1456,7 +1459,7 @@ public class GameController
 	{
 		LinkedList<String> result = currentGame.initialiseGame();
 		//Don't print minigame messages for bots
-		if(!players.get(currentTurn).isBot)
+		if(!players.get(currentTurn).isBot || verboseBotGames)
 		{
 			for(String output : result)
 			{

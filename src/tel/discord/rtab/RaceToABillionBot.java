@@ -93,7 +93,7 @@ public class RaceToABillionBot
 				}
 				else if(channel.getTopic().startsWith("~ GAME CHANNEL ~"))
 				{
-					game.add(new GameController(channel,false,true,false,1));
+					game.add(new GameController(channel,false,false,true,1));
 					System.out.println("Game Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ CHALLENGE CHANNEL ~"))

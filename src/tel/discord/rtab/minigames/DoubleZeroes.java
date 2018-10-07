@@ -146,14 +146,15 @@ public class DoubleZeroes implements MiniGame {
 
 				if(total>100) // If we just hit the second number, tell 'em about the DECISION~!
 				{
-				output.add("You can now choose to continue by picking a number, "
-						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
-						+ ", times the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft));
-				output.add(generateBoard());
+					output.add("You can now choose to continue by picking a number, "
+							+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
+							+ ", times the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft));
+					output.add(generateBoard());
 				}
 				else if(zeroesLeft>0) // Otherwise let 'em pick another space.
 				{
 					output.add("Please pick another space.");
+					output.add(generateBoard());
 				}
 				else // Oops, All Digits! (tm) Better end it quick!
 				{
