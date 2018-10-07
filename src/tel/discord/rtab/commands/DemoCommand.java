@@ -25,7 +25,8 @@ public class DemoCommand extends Command {
 		{
 			if(game.channel == event.getChannel())
 			{
-				game.demoMode.cancel(true);
+				if(game.runDemo)
+					game.demoMode.cancel(true);
 				for(int i=0; i<playerCount; i++)
 				{
 					game.addRandomBot();

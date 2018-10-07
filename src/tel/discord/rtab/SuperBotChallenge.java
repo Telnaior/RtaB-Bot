@@ -20,7 +20,7 @@ public class SuperBotChallenge
 	public GameController initialise(TextChannel channelID, int multiplier)
 	{
 		channel = channelID;
-		gameHandler = new GameController(channel,false,true,multiplier);
+		gameHandler = new GameController(channel,false,false,true,multiplier);
 		loadGames();
 		return gameHandler;
 	}
