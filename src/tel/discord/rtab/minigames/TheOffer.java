@@ -61,6 +61,7 @@ public class TheOffer implements MiniGame {
 			//If still alive, let's run it
 			if(alive)
 			{
+				output.add("You survived!");
 				double increment = Math.random()*0.5;
 				offer += (int)(offer * (1 + increment));
 				offer -= offer%100;
