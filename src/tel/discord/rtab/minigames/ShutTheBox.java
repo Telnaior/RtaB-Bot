@@ -92,9 +92,9 @@ public class ShutTheBox implements MiniGame {
 					isAlive = false;
 				}
 			}
-			return output;
 		}
 		else {
+			String[] tokens = pick.split("\\s");
 			for (int i = 0; i < tokens.length; i++) {
 				if (!isNumber(tokens[i]))
 					return output;
@@ -135,11 +135,9 @@ public class ShutTheBox implements MiniGame {
 				output.add(generateBoard());
 				output.add("ROLL again if you dare, or type STOP to stop " +
 						"with your total.");
-				return output;
 			}
 			else {
 				output.add("That does not total the amount thrown.");
-				return output;
 			}
 		}
 		return output;
