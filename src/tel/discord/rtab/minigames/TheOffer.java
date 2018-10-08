@@ -61,6 +61,7 @@ public class TheOffer implements MiniGame {
 			//If still alive, let's run it
 			if(alive)
 			{
+				output.add("You survived!");
 				double increment = Math.random()*0.5;
 				offer += (int)(offer * (1 + increment));
 				offer -= offer%100;
@@ -88,10 +89,10 @@ public class TheOffer implements MiniGame {
 	{
 		StringBuilder output = new StringBuilder();
 		output.append("```\n");
-		output.append("  The Offer  \n\n;");
+		output.append("  The Offer  \n\n");
 		output.append("Next Room:\n");
 		output.append("Bomb: " + String.format ("%.2f%%\n", bomb));
-		output.append("Ticks: " + String.format("$%,d Times\n\n", times));
+		output.append("Ticks: " + String.format("%,d Times\n\n", times));
 		output.append("Current Money: " + String.format("$%,d\n\n", offer));
 
 		output.append(" 'Take' the Money  or  'Dare' the Bomb \n");

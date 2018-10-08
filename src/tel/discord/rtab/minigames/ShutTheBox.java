@@ -11,10 +11,10 @@ public class ShutTheBox implements MiniGame {
 	boolean[] closedSpaces;
 	Dice dice;
 	boolean[] isGood;
-	String[] botStrategy;
+//	String[] botStrategy; // temporary comment-out; the function that generates this is not working
 	boolean isAlive;  
 	boolean isClosing;
-	int totalShut;
+	byte totalShut;
 
 	@Override
 	public LinkedList<String> initialiseGame()
@@ -23,14 +23,16 @@ public class ShutTheBox implements MiniGame {
 		//Initialise board
 		closedSpaces = new boolean[BOARD_SIZE];
 		dice = new Dice();
-		isGood = new boolean[dice.getDice().length * dice.getNumFaces() - (dice.getDice().length - 1)];
-		botStrategy = new String[isGood.length];
+		isGood = new boolean[dice.getDice().length * dice.getNumFaces() -
+				(dice.getDice().length - 1)];
+//		botStrategy = new String[isGood.length]; // temporary comment-out; the function that generates this is not working
 		for (int i = 0; i < isGood.length; i++) {
 			isGood[i] = true;
-			botStrategy[i] = getBotStrategy(i+2, false);
+//			botStrategy[i] = getBotStrategy(i+2, false); // temporary comment-out; the generator function is not working
 		}
+//		botStrategy = new String[11]; // temporary comment-out; the function that populates this is not working
 		isAlive = true;
-		isClosing = false;
+		isClosing = true;
 		totalShut = 0;
 		
 		//Display instructions
@@ -58,11 +60,7 @@ public class ShutTheBox implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		
 		if (!isClosing) {
-			if (pick.toUpperCase().equals("STOP"))
-			{
-				// Prevent accidentally stopping with nothing if the player hasn't rolled yet
-				if (totalShut == 0)
-					return output;
+			if (pick.toUpperCase().equals("STOP")) {
 				isAlive = false;
 			}
 			else if (pick.toUpperCase().equals("ROLL")) {
@@ -80,11 +78,10 @@ public class ShutTheBox implements MiniGame {
 						totalShut = MAX_SCORE - 1; // essentially closes the remaining numbers except 1 automatically
 						isAlive = false;
 					}
-					else
-					{
+					else {
 						isClosing = true;
 						output.add("You may now close one or more numbers that "
-								+ "total " + dice.getDiceTotal() + " by typing "
+								+ "total " + dice.getDiceTotal() + "by typing "
 								+ "'SHUT' followed by all numbers you would " +
 								"like to close.");
 					}
@@ -99,8 +96,12 @@ public class ShutTheBox implements MiniGame {
 		}
 		else {
 			if (pick.toUpperCase().startsWith("SHUT ") ||
-					pick.toUpperCase().startsWith("CLOSE "))
-			{
+					pick.toUpperCase().startsWith("CLOSE ")) {
+				
+				// Prevent accidentally stopping with nothing if the player hasn't rolled yet
+				if (totalShut == 0)
+					return output;
+				
 				String[] tokens = pick.split("\\s");
 				
 				// If there are any non-numeric tokens after "SHUT" or "CLOSE", assume it's just the player talking
@@ -120,7 +121,7 @@ public class ShutTheBox implements MiniGame {
 				}
 				
 				// Duplicates are not allowed, so check for those
-				for (int i = 1; i < tokens.length; i++)
+				for (int i = 1; i < tokens.length - 1; i++)
 					for (int j = i + 1; i < tokens.length - 1; i++)
 						if (tokens[i].equals(tokens[j])) {
 							output.add("You can't duplicate a number.");
@@ -129,17 +130,16 @@ public class ShutTheBox implements MiniGame {
 				
 				// Now we can sum everything and make sure it actually matches the roll
 				int totalTryingToClose = 0;
-				for (int i = 1; i < tokens.length; i++)
+				for (int i = 1; i < tokens.length - 1; i++)
 					totalTryingToClose += Integer.parseInt(tokens[i]);
 				
-				if (totalTryingToClose == dice.getDiceTotal())
-				{
-					for (int i = 1; i < tokens.length; i++)
-						closedSpaces[Integer.parseInt(tokens[i])-1] = true;
+				if (totalTryingToClose == dice.getDiceTotal()) {
+					for (int i = 1; i < tokens.length - 1; i++)
+						closedSpaces[Integer.parseInt(tokens[i])] = true;
 					totalShut += dice.getDiceTotal();
 					isGood = refreshGood();
-					for (int i = 0; i < botStrategy.length; i++)
-						botStrategy[i] = getBotStrategy(i+2, false);
+//					for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
+//						botStrategy[i] = getBotStrategy(i+2, false); // function is not working
 					isClosing = false;
 					output.add("Numbers closed.");
 					output.add(generateBoard());
@@ -147,8 +147,7 @@ public class ShutTheBox implements MiniGame {
 							"with your total.");
 					return output;
 				}
-				else
-				{
+				else {
 					output.add("That does not total the amount thrown.");
 					return output;
 				}
@@ -181,7 +180,7 @@ public class ShutTheBox implements MiniGame {
 	{
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
-		display.append("  SHUT THE BOX\n");
+		display.append("  SHUT THE BOX");
 		for(int i=0; i<BOARD_SIZE; i++)
 		{
 			if(closedSpaces[i])
@@ -193,15 +192,15 @@ public class ShutTheBox implements MiniGame {
 				display.append((i+1) + " ");
 			}
 		}
-		display.append("\n Points:      " + String.format("%2d", totalShut));
-		display.append("\n Total: $" + String.format("%,6d", getMoneyWon()));
+		display.append("\n Points:      " + String.format("% 2d", totalShut));
+		display.append("\n Total: $" + String.format("% 6,d", getMoneyWon()));
 		display.append("\n\n   Good rolls:");
 		for (int i = 0; i < isGood.length; i++) {
 			if (isGood[i])
-				display.append("\n " + String.format("%2d", i+2) + ": +$" +
-						String.format("%,7d", rollValue(i+2)));
+				display.append("\n " + String.format("% 2d", i+2) + ": +$" +
+						String.format("% 7,d", rollValue(i+2)));
 		}
-		display.append("\n```");
+		display.append("```");
 		return display.toString();
 	}
 
@@ -216,7 +215,7 @@ public class ShutTheBox implements MiniGame {
 			// If the corresponding space is closed, don't bother with it
 			if (closedSpaces[i-1])
 				continue;
-			for (int j = i+1; i+j < isStillGood.length + 2 && j <= closedSpaces.length; j++) {
+			for (int j = i+1; i+j < isStillGood.length + 2; j++) {
 				if (closedSpaces[j-1])
 					continue;
 				// i-1 and j-1 must both be open; otherwise we wouldn't reach this point in the code
@@ -238,30 +237,31 @@ public class ShutTheBox implements MiniGame {
 	}
 		
 	public int rollValue(int roll) {
-		if (!isGood[roll-2])
+		if (isGood[roll-2])
 			return getMoneyWon() * -1;
 		if (totalShut + roll == MAX_SCORE)
 			return 2000000 - getMoneyWon();
-		return ((totalShut+roll)*((totalShut+roll)+1)/2) * 1000 - getMoneyWon();
+		return (totalShut + roll) * 1000;
 	}
 	
+	/* FIXME: Function is not working. It is known to break with 2, one of {4 6}, and 9 shut.
 	public String getBotStrategy(int roll, boolean dbl) {
 		if (roll == 1) {
 			if (closedSpaces[0])
 				return " 1";
 			else return null;
 		}
-		if (!isGood[roll-2])
+		if (!isGood[roll-1])
 			return null;
 		
 		/* The reason for the dbl parameter is so the bot doesn't get something
 		 * like, say, 5 5 for a strategy for 10; the first condition prevents
 		 * that.
 		 */
-		if (!dbl && roll < 10 && !closedSpaces[roll - 1])
+/*		if (!dbl && roll < 10 && !closedSpaces[roll - 1])
 			return " " + roll;
 			
-		for (int i = Math.min(roll-2, 9); i > 0; i--) {
+		for (int i = Math.min(roll-1, 9); i > 0; i--) {
 			if (i < roll-i)
 				break; // and throw our error
 			if (!isGood[i-2])
@@ -274,7 +274,7 @@ public class ShutTheBox implements MiniGame {
 		throw new IllegalArgumentException("Uh-oh--something's wrong with the" +
 				" Shut the Box combination generator! Tell StrangerCoug.");
 	}
-	
+*/	
 	@Override
 	public boolean isGameOver()
 	{
@@ -297,7 +297,91 @@ public class ShutTheBox implements MiniGame {
 	@Override
 	public String getBotPick() {
 		if (isClosing) {
-			return "SHUT" + botStrategy[dice.getDiceTotal() - 1];
+//			return "SHUT" + botStrategy[dice.getDiceTotal() - 1]; // temporary comment out; generator function is not working
+// Temporary switch statement to hardcode desired strategy; will be removed when the
+// getBotStrategy() function is fixed.
+			switch (getDiceTotal()) {
+				case 2: return "SHUT 2";
+				case 3: if (!closedSpaces[2]) return "SHUT 3";
+					else return "SHUT 2 1";
+				case 4: if (!closedSpaces[3]) return "SHUT 4";
+					else return "SHUT 3 1";
+				case 5: if (!closedSpaces[4]) return "SHUT 5";
+					else if (!closedSoaces[3])
+						return "SHUT 4 1";
+					else return "SHUT 3 2";
+				case 6: if (!closedSpaces[5]) return "SHUT 6";
+					else if (!closedSpaces[4]) return "SHUT 5 1";
+					else if (!closedSpaces[3]) return "SHUT 4 2";
+					else return "SHUT 3 2 1";
+				case 7: if (!closedSpaces[6]) return "SHUT 7";
+					else if (!closedSpaces[5]) return "SHUT 6 1";
+					else if (!closedSpaces[4]) return "SHUT 5 2";
+					else {
+						if (!closedSpaces[2]) return "SHUT 4 3";
+						else return "SHUT 4 2 1";
+					}
+				case 8: if (!closedSpaces[7]) return "SHUT 8";
+					else if (!closedSpaces[6]) return "SHUT 7 1";
+					else if (!closedSpaces[5]) return "SHUT 6 2";
+					else {
+						if (!closedSpaces[2]) return "SHUT 5 3";
+						else return "SHUT 5 2 1";
+					}
+				case 9: if (!closedSpaces[8]) return "SHUT 9";
+					else if (!closedSpaces[7]) return "SHUT 8 1";
+					else if (!closedSpaces[6]) return "SHUT 7 2";
+					else if (!closedSpaces[5]) {
+						if (!closedSpaces[2]) return "SHUT 6 3";
+						else return "SHUT 6 2 1";
+					}
+					else {
+						if (!closedSpaces[3]) return "SHUT 5 4";
+						else return "SHUT 5 3 1";
+					}
+				case 10: if (!closedSpaces[8]) return "SHUT 9 1";
+					else if (!closedSpaces[7]) return "SHUT 8 2";
+					else if (!closedSpaces[6]) {
+						if (!closedSpaces[2]) return "SHUT 7 3";
+						else return "SHUT 7 2 1";
+					}
+					else if (!closedSpaces[5]) {
+						if (!closedSpaces[3]) return "SHUT 6 4";
+						else return "SHUT 6 3 1";
+					}
+					else if (!closedSpaces[4]) return "SHUT 5 3 2";
+					else return "SHUT 4 3 2 1";
+				case 11: if (!closedSpaces[8]) return "SHUT 9 2";
+					else if (!closedSpaces[7]) {
+						if (!closedSpaces[2]) return "SHUT 8 3";
+						else return "SHUT 8 2 1";
+					}
+					else if (!closedSpaces[6]) {
+						if (!closedSpaces[3]) return "SHUT 7 4";
+						else return "SHUT 7 3 1";
+					}
+					else if (!closedSpaces[5]) {
+						if (!closedSpaces[4]) return "SHUT 6 5";
+						else return "SHUT 6 3 2";
+					}
+					else return "SHUT 5 3 2 1";
+				case 12: if (!closedSpaces[8]) {
+						if (!closedSpaces[2]) return "SHUT 9 3";
+						else return "SHUT 9 2 1";
+					}
+					else if (!closedSpaces[7]) {
+						if (!closedSpaces[3]) return "SHUT 8 4";
+						else return "SHUT 8 3 1";
+					}
+					else if (!closedSpaces[6]) {
+						if (!closedSpaces[4]) return "SHUT 7 5";
+						else return "SHUT 7 3 2";
+					}
+					else return "SHUT 6 3 2 1";
+				default: throw new IndexOutOfBoundsException("Not even your " +
+						"hardcoded tempfix works, StrangerCoug? You're fired!");
+			}
+// End temporary switch statement
 		}
 		else {
 			Dice testDice = new Dice();

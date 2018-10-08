@@ -10,7 +10,7 @@ public class DealOrNoDeal implements MiniGame {
 	static final boolean BONUS = false;
 	final List<Integer> VALUE_LIST = Arrays.asList(1,2,5,10,50,100,500,1000,2500,5000,7500, //Blues
 			10000,30000,50000,100000,150000,200000,350000,500000,750000,1000000,2500000); //Reds
-	LinkedList<Integer> values;
+	LinkedList<Integer> values = new LinkedList<>();
 	int offer;
 	int casesLeft;
 	boolean accept; //Accepting the Offer
@@ -91,6 +91,10 @@ public class DealOrNoDeal implements MiniGame {
 		}
 		totalSqrts /= casesLeft;
 		offer = (int)Math.pow(totalSqrts,2);
+		//Add random factor - .85-1.15
+		int multiplier = (int)((Math.random()*31) + 85);
+		offer *= multiplier;
+		offer /= 100;
 		//Round it off
 		if(offer > 250000)
 			offer -= (offer%10000);

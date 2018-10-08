@@ -216,9 +216,9 @@ public class Player implements Comparable<Player>
 		if(threshold) multiplier *= 4;
 		int penalty;
 		penalty = newbieProtection > 0 ? NEWBIE_BOMB_PENALTY : BOMB_PENALTY;
-		//Reduce penalty by 20% for each player already gone
-		penalty /= 5;
-		penalty *= (5 - Math.min(5,othersOut));
+		//Reduce penalty by 10% for each player already gone
+		penalty /= 10;
+		penalty *= (10 - Math.min(10,othersOut));
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
@@ -242,11 +242,11 @@ public class Player implements Comparable<Player>
 				if(game.channel == channel)
 				{
 					channel.sendMessage("Because " + getSafeMention() + " had a split and share, "
-							+ "2%% of their total will be given to each living player.")
+							+ "2% of their total will be given to each living player.")
 							.queueAfter(1,TimeUnit.SECONDS);
 					int moneyLost = (int)(money/50);
 					addMoney(-1*moneyLost*game.playersAlive,MoneyMultipliersToUse.NOTHING);
-					game.splitMoney(moneyLost*game.playersAlive,MoneyMultipliersToUse.NOTHING);
+					game.splitMoney(moneyLost*game.playersAlive, MoneyMultipliersToUse.NOTHING, true);
 					//We found the right channel, so
 					break;
 				}

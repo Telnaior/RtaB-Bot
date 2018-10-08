@@ -6,7 +6,8 @@ object MinigameTest {
   private val games = Map[String, MiniGame] (
     "double" -> new DoubleTrouble(),
     "bumper" -> new BumperGrab(),
-    "shut"   -> new ShutTheBox()
+    "shut"   -> new ShutTheBox(),
+    "deal"   -> new DealOrNoDeal()
   )
 
   def main(args: Array[String]): Unit = {
