@@ -82,10 +82,8 @@ public class ShutTheBox implements MiniGame {
 					}
 					else {
 						isClosing = true;
-						output.add("You may now close one or more numbers that "
-								+ "total " + dice.getDiceTotal() + " by typing "
-								+ "'SHUT' followed by all numbers you would " +
-								"like to close.");
+						output.add("What number(s) totaling " + dice.getDiceTotal()
+								+ " would you like to close?");
 					}
 				}
 				else {
@@ -97,61 +95,54 @@ public class ShutTheBox implements MiniGame {
 			return output;
 		}
 		else {
-			if (pick.toUpperCase().startsWith("SHUT ") ||
-					pick.toUpperCase().startsWith("CLOSE ")) {
-				
-				String[] tokens = pick.split("\\s");
-				
-				// If there are any non-numeric tokens after "SHUT" or "CLOSE", assume it's just the player talking
-				for (int i = 1; i < tokens.length; i++) {
-					if (!isNumber(tokens[i]))
-						return output;
-				}
-				
-				// Make sure the numbers are actually in range and open
-				for (int i = 1; i < tokens.length; i++) {
-					if (Integer.parseInt(tokens[i]) < 1 ||
-							Integer.parseInt(tokens[i]) > 9 ||
-							closedSpaces[Integer.parseInt(tokens[i])-1]) {
-						output.add("Invalid number(s).");
-						return output;
-					}
-				}
-				
-				// Duplicates are not allowed, so check for those
-				for (int i = 1; i < tokens.length; i++)
-					for (int j = i + 1; j < tokens.length; j++)
-						if (tokens[i].equals(tokens[j])) {
-							output.add("You can't duplicate a number.");
-							return output;
-						}
-				
-				// Now we can sum everything and make sure it actually matches the roll
-				int totalTryingToClose = 0;
-				for (int i = 1; i < tokens.length; i++)
-					totalTryingToClose += Integer.parseInt(tokens[i]);
-				
-				if (totalTryingToClose == dice.getDiceTotal()) {
-					for (int i = 1; i < tokens.length; i++)
-						closedSpaces[Integer.parseInt(tokens[i])-1] = true;
-					totalShut += dice.getDiceTotal();
-					isGood = refreshGood();
-//					for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
-//						botStrategy[i] = getBotStrategy(i+2, false); // function is not working
-					isClosing = false;
-					output.add("Numbers closed.");
-					output.add(generateBoard());
-					output.add("ROLL again if you dare, or type STOP to stop " +
-							"with your total.");
+			for (int i = 0; i < tokens.length; i++) {
+				if (!isNumber(tokens[i]))
 					return output;
-				}
-				else {
-					output.add("That does not total the amount thrown.");
+			}
+				
+			// Make sure the numbers are actually in range and open
+			for (int i = 0; i < tokens.length; i++) {
+				if (Integer.parseInt(tokens[i]) < 1 ||
+						Integer.parseInt(tokens[i]) > 9 ||
+						closedSpaces[Integer.parseInt(tokens[i])-1]) {
+					output.add("Invalid number(s).");
 					return output;
 				}
 			}
-			return output;
+				
+			// Duplicates are not allowed, so check for those
+			for (int i = 0; i < tokens.length; i++)
+				for (int j = i + 1; j < tokens.length; j++)
+					if (tokens[i].equals(tokens[j])) {
+						output.add("You can't duplicate a number.");
+						return output;
+					}
+				
+			// Now we can sum everything and make sure it actually matches the roll
+			int totalTryingToClose = 0;
+			for (int i = 1; i < tokens.length; i++)
+				totalTryingToClose += Integer.parseInt(tokens[i]);
+			
+			if (totalTryingToClose == dice.getDiceTotal()) {
+				for (int i = 1; i < tokens.length; i++)
+					closedSpaces[Integer.parseInt(tokens[i])-1] = true;
+				totalShut += dice.getDiceTotal();
+				isGood = refreshGood();
+//				for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
+//					botStrategy[i] = getBotStrategy(i+2, false); // function is not working
+				isClosing = false;
+				output.add("Numbers closed.");
+				output.add(generateBoard());
+				output.add("ROLL again if you dare, or type STOP to stop " +
+						"with your total.");
+				return output;
+			}
+			else {
+				output.add("That does not total the amount thrown.");
+				return output;
+			}
 		}
+		return output;
 	}
 
 	boolean isNumber(String message)
