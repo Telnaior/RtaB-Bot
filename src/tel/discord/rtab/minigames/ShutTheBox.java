@@ -48,7 +48,7 @@ public class ShutTheBox implements MiniGame {
 				   "winnings to $2,000,000!");
 		output.add("You are free to stop after any roll, but if you can't " +
 				"exactly close the number thrown, you lose everything.");
-		output.add("Good luck!");
+		output.add("Good luck! Type ROLL when you're ready.");
 		output.add(generateBoard());
 		return output;
 	}
