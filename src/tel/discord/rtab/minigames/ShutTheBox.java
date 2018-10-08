@@ -288,87 +288,87 @@ public class ShutTheBox implements MiniGame {
 	@Override
 	public String getBotPick() {
 		if (isClosing) {
-//			return "SHUT" + botStrategy[dice.getDiceTotal() - 1]; // temporary comment out; generator function is not working
+//			return botStrategy[dice.getDiceTotal() - 1]; // temporary comment out; generator function is not working
 // Temporary switch statement to hardcode desired strategy; will be removed when the
 // getBotStrategy() function is fixed.
 			switch (dice.getDiceTotal()) {
-				case 2: return "SHUT 2";
-				case 3: if (!closedSpaces[2]) return "SHUT 3";
-					else return "SHUT 2 1";
-				case 4: if (!closedSpaces[3]) return "SHUT 4";
-					else return "SHUT 3 1";
-				case 5: if (!closedSpaces[4]) return "SHUT 5";
+				case 2: return "2";
+				case 3: if (!closedSpaces[2]) return "3";
+					else return "2 1";
+				case 4: if (!closedSpaces[3]) return "4";
+					else return "3 1";
+				case 5: if (!closedSpaces[4]) return "5";
 					else if (!closedSpaces[3])
-						return "SHUT 4 1";
-					else return "SHUT 3 2";
-				case 6: if (!closedSpaces[5]) return "SHUT 6";
-					else if (!closedSpaces[4]) return "SHUT 5 1";
-					else if (!closedSpaces[3]) return "SHUT 4 2";
-					else return "SHUT 3 2 1";
-				case 7: if (!closedSpaces[6]) return "SHUT 7";
-					else if (!closedSpaces[5]) return "SHUT 6 1";
-					else if (!closedSpaces[4]) return "SHUT 5 2";
+						return "4 1";
+					else return "3 2";
+				case 6: if (!closedSpaces[5]) return "6";
+					else if (!closedSpaces[4]) return "5 1";
+					else if (!closedSpaces[3]) return "4 2";
+					else return "3 2 1";
+				case 7: if (!closedSpaces[6]) return "7";
+					else if (!closedSpaces[5]) return "6 1";
+					else if (!closedSpaces[4]) return "5 2";
 					else {
-						if (!closedSpaces[2]) return "SHUT 4 3";
-						else return "SHUT 4 2 1";
+						if (!closedSpaces[2]) return "4 3";
+						else return "4 2 1";
 					}
-				case 8: if (!closedSpaces[7]) return "SHUT 8";
-					else if (!closedSpaces[6]) return "SHUT 7 1";
-					else if (!closedSpaces[5]) return "SHUT 6 2";
+				case 8: if (!closedSpaces[7]) return "8";
+					else if (!closedSpaces[6]) return "7 1";
+					else if (!closedSpaces[5]) return "6 2";
 					else {
-						if (!closedSpaces[2]) return "SHUT 5 3";
-						else return "SHUT 5 2 1";
+						if (!closedSpaces[2]) return "5 3";
+						else return "5 2 1";
 					}
-				case 9: if (!closedSpaces[8]) return "SHUT 9";
-					else if (!closedSpaces[7]) return "SHUT 8 1";
-					else if (!closedSpaces[6]) return "SHUT 7 2";
+				case 9: if (!closedSpaces[8]) return "9";
+					else if (!closedSpaces[7]) return "8 1";
+					else if (!closedSpaces[6]) return "7 2";
 					else if (!closedSpaces[5]) {
-						if (!closedSpaces[2]) return "SHUT 6 3";
-						else return "SHUT 6 2 1";
+						if (!closedSpaces[2]) return "6 3";
+						else return "6 2 1";
 					}
 					else {
-						if (!closedSpaces[3]) return "SHUT 5 4";
-						else return "SHUT 5 3 1";
+						if (!closedSpaces[3]) return "5 4";
+						else return "5 3 1";
 					}
-				case 10: if (!closedSpaces[8]) return "SHUT 9 1";
-					else if (!closedSpaces[7]) return "SHUT 8 2";
+				case 10: if (!closedSpaces[8]) return "9 1";
+					else if (!closedSpaces[7]) return "8 2";
 					else if (!closedSpaces[6]) {
-						if (!closedSpaces[2]) return "SHUT 7 3";
-						else return "SHUT 7 2 1";
+						if (!closedSpaces[2]) return "7 3";
+						else return "7 2 1";
 					}
 					else if (!closedSpaces[5]) {
-						if (!closedSpaces[3]) return "SHUT 6 4";
-						else return "SHUT 6 3 1";
+						if (!closedSpaces[3]) return "6 4";
+						else return "6 3 1";
 					}
-					else if (!closedSpaces[4]) return "SHUT 5 3 2";
-					else return "SHUT 4 3 2 1";
-				case 11: if (!closedSpaces[8]) return "SHUT 9 2";
+					else if (!closedSpaces[4]) return "5 3 2";
+					else return "4 3 2 1";
+				case 11: if (!closedSpaces[8]) return "9 2";
 					else if (!closedSpaces[7]) {
-						if (!closedSpaces[2]) return "SHUT 8 3";
-						else return "SHUT 8 2 1";
+						if (!closedSpaces[2]) return "8 3";
+						else return "8 2 1";
 					}
 					else if (!closedSpaces[6]) {
-						if (!closedSpaces[3]) return "SHUT 7 4";
-						else return "SHUT 7 3 1";
+						if (!closedSpaces[3]) return "7 4";
+						else return "7 3 1";
 					}
 					else if (!closedSpaces[5]) {
-						if (!closedSpaces[4]) return "SHUT 6 5";
-						else return "SHUT 6 3 2";
+						if (!closedSpaces[4]) return "6 5";
+						else return "6 3 2";
 					}
-					else return "SHUT 5 3 2 1";
+					else return "5 3 2 1";
 				case 12: if (!closedSpaces[8]) {
-						if (!closedSpaces[2]) return "SHUT 9 3";
-						else return "SHUT 9 2 1";
+						if (!closedSpaces[2]) return "9 3";
+						else return "9 2 1";
 					}
 					else if (!closedSpaces[7]) {
-						if (!closedSpaces[3]) return "SHUT 8 4";
-						else return "SHUT 8 3 1";
+						if (!closedSpaces[3]) return "8 4";
+						else return "8 3 1";
 					}
 					else if (!closedSpaces[6]) {
-						if (!closedSpaces[4]) return "SHUT 7 5";
-						else return "SHUT 7 3 2";
+						if (!closedSpaces[4]) return "7 5";
+						else return "7 3 2";
 					}
-					else return "SHUT 6 3 2 1";
+					else return "6 3 2 1";
 				default: throw new IndexOutOfBoundsException("Not even your " +
 						"hardcoded tempfix works, StrangerCoug? You're fired!");
 			}
