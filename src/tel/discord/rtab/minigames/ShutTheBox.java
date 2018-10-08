@@ -48,7 +48,7 @@ public class ShutTheBox implements MiniGame {
 				   "winnings to $2,000,000!");
 		output.add("You are free to stop after any roll, but if you can't " +
 				"exactly close the number thrown, you lose everything.");
-		output.add("Good luck!");
+		output.add("Good luck! Type ROLL when you're ready.");
 		output.add(generateBoard());
 		return output;
 	}
@@ -82,10 +82,8 @@ public class ShutTheBox implements MiniGame {
 					}
 					else {
 						isClosing = true;
-						output.add("You may now close one or more numbers that "
-								+ "total " + dice.getDiceTotal() + " by typing "
-								+ "'SHUT' followed by all numbers you would " +
-								"like to close.");
+						output.add("What number(s) totaling " + dice.getDiceTotal()
+								+ " would you like to close?");
 					}
 				}
 				else {
@@ -97,61 +95,54 @@ public class ShutTheBox implements MiniGame {
 			return output;
 		}
 		else {
-			if (pick.toUpperCase().startsWith("SHUT ") ||
-					pick.toUpperCase().startsWith("CLOSE ")) {
-				
-				String[] tokens = pick.split("\\s");
-				
-				// If there are any non-numeric tokens after "SHUT" or "CLOSE", assume it's just the player talking
-				for (int i = 1; i < tokens.length; i++) {
-					if (!isNumber(tokens[i]))
-						return output;
-				}
-				
-				// Make sure the numbers are actually in range and open
-				for (int i = 1; i < tokens.length; i++) {
-					if (Integer.parseInt(tokens[i]) < 1 ||
-							Integer.parseInt(tokens[i]) > 9 ||
-							closedSpaces[Integer.parseInt(tokens[i])-1]) {
-						output.add("Invalid number(s).");
-						return output;
-					}
-				}
-				
-				// Duplicates are not allowed, so check for those
-				for (int i = 1; i < tokens.length; i++)
-					for (int j = i + 1; j < tokens.length; j++)
-						if (tokens[i].equals(tokens[j])) {
-							output.add("You can't duplicate a number.");
-							return output;
-						}
-				
-				// Now we can sum everything and make sure it actually matches the roll
-				int totalTryingToClose = 0;
-				for (int i = 1; i < tokens.length; i++)
-					totalTryingToClose += Integer.parseInt(tokens[i]);
-				
-				if (totalTryingToClose == dice.getDiceTotal()) {
-					for (int i = 1; i < tokens.length; i++)
-						closedSpaces[Integer.parseInt(tokens[i])-1] = true;
-					totalShut += dice.getDiceTotal();
-					isGood = refreshGood();
-//					for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
-//						botStrategy[i] = getBotStrategy(i+2, false); // function is not working
-					isClosing = false;
-					output.add("Numbers closed.");
-					output.add(generateBoard());
-					output.add("ROLL again if you dare, or type STOP to stop " +
-							"with your total.");
+			for (int i = 0; i < tokens.length; i++) {
+				if (!isNumber(tokens[i]))
 					return output;
-				}
-				else {
-					output.add("That does not total the amount thrown.");
+			}
+				
+			// Make sure the numbers are actually in range and open
+			for (int i = 0; i < tokens.length; i++) {
+				if (Integer.parseInt(tokens[i]) < 1 ||
+						Integer.parseInt(tokens[i]) > 9 ||
+						closedSpaces[Integer.parseInt(tokens[i])-1]) {
+					output.add("Invalid number(s).");
 					return output;
 				}
 			}
-			return output;
+				
+			// Duplicates are not allowed, so check for those
+			for (int i = 0; i < tokens.length; i++)
+				for (int j = i + 1; j < tokens.length; j++)
+					if (tokens[i].equals(tokens[j])) {
+						output.add("You can't duplicate a number.");
+						return output;
+					}
+				
+			// Now we can sum everything and make sure it actually matches the roll
+			int totalTryingToClose = 0;
+			for (int i = 1; i < tokens.length; i++)
+				totalTryingToClose += Integer.parseInt(tokens[i]);
+			
+			if (totalTryingToClose == dice.getDiceTotal()) {
+				for (int i = 1; i < tokens.length; i++)
+					closedSpaces[Integer.parseInt(tokens[i])-1] = true;
+				totalShut += dice.getDiceTotal();
+				isGood = refreshGood();
+//				for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
+//					botStrategy[i] = getBotStrategy(i+2, false); // function is not working
+				isClosing = false;
+				output.add("Numbers closed.");
+				output.add(generateBoard());
+				output.add("ROLL again if you dare, or type STOP to stop " +
+						"with your total.");
+				return output;
+			}
+			else {
+				output.add("That does not total the amount thrown.");
+				return output;
+			}
 		}
+		return output;
 	}
 
 	boolean isNumber(String message)
@@ -191,7 +182,7 @@ public class ShutTheBox implements MiniGame {
 			}
 		}
 		display.append("\n Points:      " + String.format("%2d", totalShut));
-		display.append("\n Total: $" + String.format("%,6d", getMoneyWon()));
+		display.append("\n Total: $" + String.format("%,7d", getMoneyWon()));
 		display.append("\n\n Possible Rolls:");
 		for (int i = 0; i < isGood.length; i++) {
 			if (isGood[i])
@@ -297,87 +288,87 @@ public class ShutTheBox implements MiniGame {
 	@Override
 	public String getBotPick() {
 		if (isClosing) {
-//			return "SHUT" + botStrategy[dice.getDiceTotal() - 1]; // temporary comment out; generator function is not working
+//			return botStrategy[dice.getDiceTotal() - 1]; // temporary comment out; generator function is not working
 // Temporary switch statement to hardcode desired strategy; will be removed when the
 // getBotStrategy() function is fixed.
 			switch (dice.getDiceTotal()) {
-				case 2: return "SHUT 2";
-				case 3: if (!closedSpaces[2]) return "SHUT 3";
-					else return "SHUT 2 1";
-				case 4: if (!closedSpaces[3]) return "SHUT 4";
-					else return "SHUT 3 1";
-				case 5: if (!closedSpaces[4]) return "SHUT 5";
+				case 2: return "2";
+				case 3: if (!closedSpaces[2]) return "3";
+					else return "2 1";
+				case 4: if (!closedSpaces[3]) return "4";
+					else return "3 1";
+				case 5: if (!closedSpaces[4]) return "5";
 					else if (!closedSpaces[3])
-						return "SHUT 4 1";
-					else return "SHUT 3 2";
-				case 6: if (!closedSpaces[5]) return "SHUT 6";
-					else if (!closedSpaces[4]) return "SHUT 5 1";
-					else if (!closedSpaces[3]) return "SHUT 4 2";
-					else return "SHUT 3 2 1";
-				case 7: if (!closedSpaces[6]) return "SHUT 7";
-					else if (!closedSpaces[5]) return "SHUT 6 1";
-					else if (!closedSpaces[4]) return "SHUT 5 2";
+						return "4 1";
+					else return "3 2";
+				case 6: if (!closedSpaces[5]) return "6";
+					else if (!closedSpaces[4]) return "5 1";
+					else if (!closedSpaces[3]) return "4 2";
+					else return "3 2 1";
+				case 7: if (!closedSpaces[6]) return "7";
+					else if (!closedSpaces[5]) return "6 1";
+					else if (!closedSpaces[4]) return "5 2";
 					else {
-						if (!closedSpaces[2]) return "SHUT 4 3";
-						else return "SHUT 4 2 1";
+						if (!closedSpaces[2]) return "4 3";
+						else return "4 2 1";
 					}
-				case 8: if (!closedSpaces[7]) return "SHUT 8";
-					else if (!closedSpaces[6]) return "SHUT 7 1";
-					else if (!closedSpaces[5]) return "SHUT 6 2";
+				case 8: if (!closedSpaces[7]) return "8";
+					else if (!closedSpaces[6]) return "7 1";
+					else if (!closedSpaces[5]) return "6 2";
 					else {
-						if (!closedSpaces[2]) return "SHUT 5 3";
-						else return "SHUT 5 2 1";
+						if (!closedSpaces[2]) return "5 3";
+						else return "5 2 1";
 					}
-				case 9: if (!closedSpaces[8]) return "SHUT 9";
-					else if (!closedSpaces[7]) return "SHUT 8 1";
-					else if (!closedSpaces[6]) return "SHUT 7 2";
+				case 9: if (!closedSpaces[8]) return "9";
+					else if (!closedSpaces[7]) return "8 1";
+					else if (!closedSpaces[6]) return "7 2";
 					else if (!closedSpaces[5]) {
-						if (!closedSpaces[2]) return "SHUT 6 3";
-						else return "SHUT 6 2 1";
+						if (!closedSpaces[2]) return "6 3";
+						else return "6 2 1";
 					}
 					else {
-						if (!closedSpaces[3]) return "SHUT 5 4";
-						else return "SHUT 5 3 1";
+						if (!closedSpaces[3]) return "5 4";
+						else return "5 3 1";
 					}
-				case 10: if (!closedSpaces[8]) return "SHUT 9 1";
-					else if (!closedSpaces[7]) return "SHUT 8 2";
+				case 10: if (!closedSpaces[8]) return "9 1";
+					else if (!closedSpaces[7]) return "8 2";
 					else if (!closedSpaces[6]) {
-						if (!closedSpaces[2]) return "SHUT 7 3";
-						else return "SHUT 7 2 1";
+						if (!closedSpaces[2]) return "7 3";
+						else return "7 2 1";
 					}
 					else if (!closedSpaces[5]) {
-						if (!closedSpaces[3]) return "SHUT 6 4";
-						else return "SHUT 6 3 1";
+						if (!closedSpaces[3]) return "6 4";
+						else return "6 3 1";
 					}
-					else if (!closedSpaces[4]) return "SHUT 5 3 2";
-					else return "SHUT 4 3 2 1";
-				case 11: if (!closedSpaces[8]) return "SHUT 9 2";
+					else if (!closedSpaces[4]) return "5 3 2";
+					else return "4 3 2 1";
+				case 11: if (!closedSpaces[8]) return "9 2";
 					else if (!closedSpaces[7]) {
-						if (!closedSpaces[2]) return "SHUT 8 3";
-						else return "SHUT 8 2 1";
+						if (!closedSpaces[2]) return "8 3";
+						else return "8 2 1";
 					}
 					else if (!closedSpaces[6]) {
-						if (!closedSpaces[3]) return "SHUT 7 4";
-						else return "SHUT 7 3 1";
+						if (!closedSpaces[3]) return "7 4";
+						else return "7 3 1";
 					}
 					else if (!closedSpaces[5]) {
-						if (!closedSpaces[4]) return "SHUT 6 5";
-						else return "SHUT 6 3 2";
+						if (!closedSpaces[4]) return "6 5";
+						else return "6 3 2";
 					}
-					else return "SHUT 5 3 2 1";
+					else return "5 3 2 1";
 				case 12: if (!closedSpaces[8]) {
-						if (!closedSpaces[2]) return "SHUT 9 3";
-						else return "SHUT 9 2 1";
+						if (!closedSpaces[2]) return "9 3";
+						else return "9 2 1";
 					}
 					else if (!closedSpaces[7]) {
-						if (!closedSpaces[3]) return "SHUT 8 4";
-						else return "SHUT 8 3 1";
+						if (!closedSpaces[3]) return "8 4";
+						else return "8 3 1";
 					}
 					else if (!closedSpaces[6]) {
-						if (!closedSpaces[4]) return "SHUT 7 5";
-						else return "SHUT 7 3 2";
+						if (!closedSpaces[4]) return "7 5";
+						else return "7 3 2";
 					}
-					else return "SHUT 6 3 2 1";
+					else return "6 3 2 1";
 				default: throw new IndexOutOfBoundsException("Not even your " +
 						"hardcoded tempfix works, StrangerCoug? You're fired!");
 			}
