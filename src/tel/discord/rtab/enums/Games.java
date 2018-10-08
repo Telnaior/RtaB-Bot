@@ -15,7 +15,7 @@ public enum Games implements WeightedSpace {
 	DEAL_OR_NO_DEAL	(2,"Deal or No Deal","DoND", new DealOrNoDeal()),
 	BUMPER_CASH     (2,"Bumper Grab","Bumper", new BumperGrab()),
 	DOUBLE_ZERO     (2,"Double Zero","00", new DoubleZeroes()),
-	SHUT_THE_BOX	(0,"Shut the Box","Shut",new ShutTheBox()),
+	SHUT_THE_BOX	(2,"Shut the Box","Shut",new ShutTheBox()),
 	//Don't have enough games in the pool to have a rotation yet
 	//Bonus games never appear in the pool
 	SUPERCASH		(0,"SUPERCASH","Super",new Supercash()),

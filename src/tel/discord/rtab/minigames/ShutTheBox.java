@@ -30,9 +30,8 @@ public class ShutTheBox implements MiniGame {
 			isGood[i] = true;
 //			botStrategy[i] = getBotStrategy(i+2, false); // temporary comment-out; the generator function is not working
 		}
-//		botStrategy = new String[11]; // temporary comment-out; the function that populates this is not working
 		isAlive = true;
-		isClosing = true;
+		isClosing = false;
 		totalShut = 0;
 		
 		//Display instructions
@@ -61,6 +60,9 @@ public class ShutTheBox implements MiniGame {
 		
 		if (!isClosing) {
 			if (pick.toUpperCase().equals("STOP")) {
+				// Prevent accidentally stopping with nothing if the player hasn't rolled yet
+				if (totalShut == 0)
+					return output;
 				isAlive = false;
 			}
 			else if (pick.toUpperCase().equals("ROLL")) {
@@ -81,7 +83,7 @@ public class ShutTheBox implements MiniGame {
 					else {
 						isClosing = true;
 						output.add("You may now close one or more numbers that "
-								+ "total " + dice.getDiceTotal() + "by typing "
+								+ "total " + dice.getDiceTotal() + " by typing "
 								+ "'SHUT' followed by all numbers you would " +
 								"like to close.");
 					}
@@ -97,10 +99,6 @@ public class ShutTheBox implements MiniGame {
 		else {
 			if (pick.toUpperCase().startsWith("SHUT ") ||
 					pick.toUpperCase().startsWith("CLOSE ")) {
-				
-				// Prevent accidentally stopping with nothing if the player hasn't rolled yet
-				if (totalShut == 0)
-					return output;
 				
 				String[] tokens = pick.split("\\s");
 				
@@ -121,8 +119,8 @@ public class ShutTheBox implements MiniGame {
 				}
 				
 				// Duplicates are not allowed, so check for those
-				for (int i = 1; i < tokens.length - 1; i++)
-					for (int j = i + 1; i < tokens.length - 1; i++)
+				for (int i = 1; i < tokens.length; i++)
+					for (int j = i + 1; j < tokens.length; j++)
 						if (tokens[i].equals(tokens[j])) {
 							output.add("You can't duplicate a number.");
 							return output;
@@ -130,12 +128,12 @@ public class ShutTheBox implements MiniGame {
 				
 				// Now we can sum everything and make sure it actually matches the roll
 				int totalTryingToClose = 0;
-				for (int i = 1; i < tokens.length - 1; i++)
+				for (int i = 1; i < tokens.length; i++)
 					totalTryingToClose += Integer.parseInt(tokens[i]);
 				
 				if (totalTryingToClose == dice.getDiceTotal()) {
-					for (int i = 1; i < tokens.length - 1; i++)
-						closedSpaces[Integer.parseInt(tokens[i])] = true;
+					for (int i = 1; i < tokens.length; i++)
+						closedSpaces[Integer.parseInt(tokens[i])-1] = true;
 					totalShut += dice.getDiceTotal();
 					isGood = refreshGood();
 //					for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
@@ -180,7 +178,7 @@ public class ShutTheBox implements MiniGame {
 	{
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
-		display.append("  SHUT THE BOX");
+		display.append("  SHUT THE BOX\n");
 		for(int i=0; i<BOARD_SIZE; i++)
 		{
 			if(closedSpaces[i])
@@ -192,15 +190,17 @@ public class ShutTheBox implements MiniGame {
 				display.append((i+1) + " ");
 			}
 		}
-		display.append("\n Points:      " + String.format("% 2d", totalShut));
-		display.append("\n Total: $" + String.format("% 6,d", getMoneyWon()));
-		display.append("\n\n   Good rolls:");
+		display.append("\n Points:      " + String.format("%2d", totalShut));
+		display.append("\n Total: $" + String.format("%,6d", getMoneyWon()));
+		display.append("\n\n Possible Rolls:");
 		for (int i = 0; i < isGood.length; i++) {
 			if (isGood[i])
-				display.append("\n " + String.format("% 2d", i+2) + ": +$" +
-						String.format("% 7,d", rollValue(i+2)));
+				display.append("\n " + String.format("%2d", i+2) + ": +$" +
+						String.format("%,9d", rollValue(i+2)));
+			else
+				display.append("\n " + String.format("%2d", i+2) + ":   BAD ROLL");
 		}
-		display.append("```");
+		display.append("\n```");
 		return display.toString();
 	}
 
@@ -215,7 +215,7 @@ public class ShutTheBox implements MiniGame {
 			// If the corresponding space is closed, don't bother with it
 			if (closedSpaces[i-1])
 				continue;
-			for (int j = i+1; i+j < isStillGood.length + 2; j++) {
+			for (int j = i+1; i+j < isStillGood.length + 2 && j <= closedSpaces.length; j++) {
 				if (closedSpaces[j-1])
 					continue;
 				// i-1 and j-1 must both be open; otherwise we wouldn't reach this point in the code
@@ -237,21 +237,21 @@ public class ShutTheBox implements MiniGame {
 	}
 		
 	public int rollValue(int roll) {
-		if (isGood[roll-2])
+		if (!isGood[roll-2])
 			return getMoneyWon() * -1;
 		if (totalShut + roll == MAX_SCORE)
 			return 2000000 - getMoneyWon();
-		return (totalShut + roll) * 1000;
+		return ((totalShut+roll)*((totalShut+roll)+1)/2) * 1000 - getMoneyWon();
 	}
 	
 	/* FIXME: Function is not working. It is known to break with 2, one of {4 6}, and 9 shut.
 	public String getBotStrategy(int roll, boolean dbl) {
 		if (roll == 1) {
-			if (closedSpaces[0])
+			if (!closedSpaces[0])
 				return " 1";
 			else return null;
 		}
-		if (!isGood[roll-1])
+		if (!isGood[roll-2])
 			return null;
 		
 		/* The reason for the dbl parameter is so the bot doesn't get something
@@ -300,14 +300,14 @@ public class ShutTheBox implements MiniGame {
 //			return "SHUT" + botStrategy[dice.getDiceTotal() - 1]; // temporary comment out; generator function is not working
 // Temporary switch statement to hardcode desired strategy; will be removed when the
 // getBotStrategy() function is fixed.
-			switch (getDiceTotal()) {
+			switch (dice.getDiceTotal()) {
 				case 2: return "SHUT 2";
 				case 3: if (!closedSpaces[2]) return "SHUT 3";
 					else return "SHUT 2 1";
 				case 4: if (!closedSpaces[3]) return "SHUT 4";
 					else return "SHUT 3 1";
 				case 5: if (!closedSpaces[4]) return "SHUT 5";
-					else if (!closedSoaces[3])
+					else if (!closedSpaces[3])
 						return "SHUT 4 1";
 					else return "SHUT 3 2";
 				case 6: if (!closedSpaces[5]) return "SHUT 6";
