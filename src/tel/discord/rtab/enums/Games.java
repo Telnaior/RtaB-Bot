@@ -3,8 +3,6 @@ package tel.discord.rtab.enums;
 import tel.discord.rtab.minigames.*;
 
 public enum Games implements WeightedSpace {
-	//Test game please ignore
-	TEST_GAME		(0,"Test Game","Test",new TestGame()),
 	//Minigame Pool
 	MATH_TIME		(2,"Math Time","Math",new MathTime()),
 	STRIKE_IT_RICH	(2,"Strike it Rich","Strike",new StrikeItRich()),
