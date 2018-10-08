@@ -182,7 +182,7 @@ public class ShutTheBox implements MiniGame {
 			}
 		}
 		display.append("\n Points:      " + String.format("%2d", totalShut));
-		display.append("\n Total: $" + String.format("%,6d", getMoneyWon()));
+		display.append("\n Total: $" + String.format("%,7d", getMoneyWon()));
 		display.append("\n\n Possible Rolls:");
 		for (int i = 0; i < isGood.length; i++) {
 			if (isGood[i])
