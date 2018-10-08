@@ -218,7 +218,7 @@ public class Player implements Comparable<Player>
 		penalty = newbieProtection > 0 ? NEWBIE_BOMB_PENALTY : BOMB_PENALTY;
 		//Reduce penalty by 10% for each player already gone
 		penalty /= 10;
-		penalty *= (10 - Math.min(10,othersOut));
+		penalty *= (10 - Math.min(9,othersOut));
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
@@ -280,6 +280,7 @@ public class Player implements Comparable<Player>
 		warned = false;
 		games.clear();
 		knownBombs.clear();
+		jokers = 0;
 		boostCharge = 0;
 		splitAndShare = false;
 		minigameLock = false;

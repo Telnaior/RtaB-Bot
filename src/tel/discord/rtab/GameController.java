@@ -625,7 +625,7 @@ public class GameController
 			penalty = Player.NEWBIE_BOMB_PENALTY*BASE_MULTIPLIER;
 		//Reduce penalty for others out
 		penalty /= 10;
-		penalty *= (10 - Math.min(10,playersJoined-playersAlive));
+		penalty *= (10 - Math.min(9,playersJoined-playersAlive));
 		switch(gameboard.bombBoard.get(location))
 		{
 		case NORMAL:
@@ -968,7 +968,7 @@ public class GameController
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY*BASE_MULTIPLIER;
 			penalty /= 10;
-			penalty *= (10 - Math.min(10,playersJoined-playersAlive));
+			penalty *= (10 - Math.min(9,playersJoined-playersAlive));
 			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
 			players.get(currentTurn).threshold = true;
@@ -1045,7 +1045,7 @@ public class GameController
 			if(players.get(currentTurn).newbieProtection > 0)
 				penalty = Player.NEWBIE_BOMB_PENALTY*BASE_MULTIPLIER;
 			penalty /= 10;
-			penalty *= (10 - Math.min(10,playersJoined-playersAlive));
+			penalty *= (10 - Math.min(9,playersJoined-playersAlive));
 			channel.sendMessage(String.format("$%,d penalty!",Math.abs(penalty*4))).queue();
 			players.get(currentTurn).threshold = true;
 			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
@@ -1369,7 +1369,7 @@ public class GameController
 					announcementText.append("you have reached the goal together.");
 					channel.sendMessage(announcementText.toString()).completeAfter(5,TimeUnit.SECONDS);
 					channel.sendMessage("BUT THERE CAN BE ONLY ONE.").completeAfter(5,TimeUnit.SECONDS);
-					channel.sendMessage("PREPARE FOR THE FINAL SHOWDOWN!").completeAfter(5,TimeUnit.SECONDS);
+					channel.sendMessage("**PREPARE FOR THE FINAL SHOWDOWN!**").completeAfter(5,TimeUnit.SECONDS);
 					//Prepare the game
 					players.addAll(winners);
 					winners.clear();
@@ -1779,9 +1779,19 @@ public class GameController
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
-			//Replace the records of the players if they're there, otherwise add them
+			//Go through each player in the game to update their stats
 			for(int i=0; i<playersJoined; i++)
 			{
+				/*
+				 * Special case - if you lose the round with $1B you get bumped to $999,999,999
+				 * so that an elimination without penalty (eg bribe) doesn't get you declared champion
+				 * This is since you haven't won yet, after all
+				 * Note that in the instance of a final showdown, both players are temporarily labelled champion
+				 * But after the tie is resolved, one will be bumped back to $900M
+				 */
+				if(players.get(i).money == 1000000000 && players.get(i).status != PlayerStatus.DONE)
+					players.get(i).money --;
+				//Replace the records of the players if they're there, otherwise add them
 				if(players.get(i).newbieProtection == 1)
 					channel.sendMessage(players.get(i).getSafeMention() + ", your newbie protection has expired. "
 							+ "From now on, bomb penalties will be $250,000.").queue();
@@ -1807,9 +1817,12 @@ public class GameController
 					List<Role> rolesToAdd = new LinkedList<>();
 					List<Role> rolesToRemove = new LinkedList<>();
 					//Remove their old score role if they had one
-					if(players.get(i).oldMoney/100000000 > 0)
+					if(players.get(i).oldMoney/100000000 > 0 && players.get(i).oldMoney/100000000 < 10)
 						rolesToRemove.addAll(guild.getGuild().getRolesByName(
 										String.format("$%d00M",players.get(i).oldMoney/100000000),false));
+					//Special case for removing Champion role in case of final showdown
+					else if(players.get(i).oldMoney/100000000 == 10)
+						rolesToRemove.addAll(guild.getGuild().getRolesByName("Champion",false));
 					//Add their new score role if they deserve one
 					if(players.get(i).money/100000000 > 0 && players.get(i).money/100000000 < 10)
 						rolesToAdd.addAll(guild.getGuild().getRolesByName(
