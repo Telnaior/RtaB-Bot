@@ -146,7 +146,7 @@ class BumperGrab extends MiniGame {
             drawVerticalLine(mapDrawing, currentSegment :+ (player_X, player_Y), '$')
 
         bumperMessages(pathDrawings) :+
-          ("```" +: cashDrawing :+ ("**$" + amount + "**")).mkString("\n") :+
+          ("```" +: cashDrawing :+ "```" :+ ("**$" + amount + "**")).mkString("\n") :+
             drawScoreboard
 
       case Exit =>
