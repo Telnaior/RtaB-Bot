@@ -120,11 +120,11 @@ public class ShutTheBox implements MiniGame {
 				
 			// Now we can sum everything and make sure it actually matches the roll
 			int totalTryingToClose = 0;
-			for (int i = 1; i < tokens.length; i++)
+			for (int i = 0; i < tokens.length; i++)
 				totalTryingToClose += Integer.parseInt(tokens[i]);
 			
 			if (totalTryingToClose == dice.getDiceTotal()) {
-				for (int i = 1; i < tokens.length; i++)
+				for (int i = 0; i < tokens.length; i++)
 					closedSpaces[Integer.parseInt(tokens[i])-1] = true;
 				totalShut += dice.getDiceTotal();
 				isGood = refreshGood();

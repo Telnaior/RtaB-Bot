@@ -466,9 +466,9 @@ public class DeucesWild implements MiniGame {
 
 	@Override
 	public String getBotPick() {
-		//Bot will never redraw, unless someone wants to teach it poker strategy (lol)
+		//Bot will redraw automatically in order to get as many deuces as possible (which hold automatically)
 		if(gameStage == 5)
-			return "STOP";
+			return "DEAL";
 		ArrayList<Integer> openSpaces = new ArrayList<>(BOARD_SIZE);
 		for(int i=0; i<BOARD_SIZE; i++)
 			if(!pickedSpaces[i])
