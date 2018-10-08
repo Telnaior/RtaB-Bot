@@ -37,7 +37,7 @@ public class DoubleZeroes implements MiniGame {
 		output.add("You'll pick spaces, one at a time, until you uncover two 20-99 spaces.");
 		output.add("These numbers will be put on the board as your bank.");
 		output.add("At this point, everything but the Double Zeroes turn into BOMBs!");
-		output.add("You can then choose to 'STOP' and multiply your bank by the number of Double Zeroes remaining...");
+		output.add("You can then choose to 'STOP' and multiply your bank by thrice the number of Double Zeroes remaining...");
 		output.add("...or try to hit a Double Zero to stick that Double Zero at the end of your bank, multiplying it by 100! Good luck!");
 		output.add(generateBoard());
 		return output;
@@ -58,8 +58,8 @@ public class DoubleZeroes implements MiniGame {
 			{
 				// Player stops at the decision point? Tell 'em what they've won and end the game!
 			alive = false;
-			total = total * zeroesLeft;
-				output.add("Very well! Your bank is multiplied by " + String.format("$%,d!",zeroesLeft)
+			total = total * zeroesLeft * 3;
+				output.add("Very well! Your bank is multiplied by " + String.format("%,d",zeroesLeft*3)
 				+ ", which means it's...");
 			return output;
 			}
@@ -148,7 +148,8 @@ public class DoubleZeroes implements MiniGame {
 				{
 					output.add("You can now choose to continue by picking a number, "
 							+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
-							+ ", times the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft));
+							+ ", times thrice the number of Double Zeroes left, which would give you "
+							+ String.format("**$%,d!**",total*3*zeroesLeft));
 					output.add(generateBoard());
 				}
 				else if(zeroesLeft>0) // Otherwise let 'em pick another space.

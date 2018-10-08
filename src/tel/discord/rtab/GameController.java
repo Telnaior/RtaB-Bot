@@ -10,6 +10,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -54,7 +55,7 @@ public class GameController
 	int boardSize = 15;
 	public List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
-	LinkedList<String> pingList = new LinkedList<>();
+	HashSet<String> pingList = new HashSet<>();
 	int currentTurn = -1;
 	boolean finalCountdown = false;
 	boolean firstPick = true;
@@ -2022,13 +2023,12 @@ public class GameController
 			return;
 		StringBuilder output = new StringBuilder();
 		output.append("The game is finished");
-		String nextName = pingList.poll();
-		while(nextName != null)
+		for(String nextName : pingList)
 		{
 			output.append(" - ");
 			output.append(nextName);
-			nextName = pingList.poll();
 		}
+		pingList.clear();
 		channel.sendMessage(output.toString()).queue();
 	}
 }
