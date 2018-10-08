@@ -21,6 +21,7 @@ import tel.discord.rtab.commands.JoinCommand;
 import tel.discord.rtab.commands.LivesCommand;
 import tel.discord.rtab.commands.LuckyNumberCommand;
 import tel.discord.rtab.commands.MemeCommand;
+import tel.discord.rtab.commands.NextCommand;
 import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
 import tel.discord.rtab.commands.QuitCommand;
@@ -58,6 +59,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new PlayersCommand());
 		utilities.addCommand(new BoardCommand());
 		utilities.addCommand(new TotalsCommand());
+		utilities.addCommand(new NextCommand());
 		utilities.addCommand(new LivesCommand());
 		utilities.addCommand(new RankCommand());
 		utilities.addCommand(new TopCommand());

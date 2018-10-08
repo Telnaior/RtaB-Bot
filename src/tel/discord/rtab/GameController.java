@@ -54,6 +54,7 @@ public class GameController
 	int boardSize = 15;
 	public List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
+	LinkedList<String> pingList = new LinkedList<>();
 	int currentTurn = -1;
 	boolean finalCountdown = false;
 	boolean firstPick = true;
@@ -1326,6 +1327,7 @@ public class GameController
 			players.sort(null);
 			displayBoardAndStatus(false, true, true);
 			reset();
+			runPingList();
 			if(winners.size() > 0)
 			{
 				//Got a single winner, crown them!
@@ -2005,5 +2007,25 @@ public class GameController
 				pickedSpaces[i] = true;
 				spacesLeft --;
 			}
+	}
+	public void addToPingList(User playerToAdd)
+	{
+		pingList.add(playerToAdd.getAsMention());
+	}
+	void runPingList()
+	{
+		//Don't do this if no one's actually there to ping
+		if(pingList.size() == 0)
+			return;
+		StringBuilder output = new StringBuilder();
+		output.append("The game is finished");
+		String nextName = pingList.poll();
+		while(nextName != null)
+		{
+			output.append(" - ");
+			output.append(nextName);
+			nextName = pingList.poll();
+		}
+		channel.sendMessage(output.toString()).queue();
 	}
 }
