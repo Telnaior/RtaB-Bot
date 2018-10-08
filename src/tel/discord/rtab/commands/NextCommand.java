@@ -13,6 +13,7 @@ public class NextCommand extends Command {
 		this.name = "next";
 		this.aliases = new String[]{"nextgame"};
 		this.help = "asks the bot to ping you when the current game finishes";
+		this.cooldown = 120;
 	}
 	@Override
 	protected void execute(CommandEvent event) {

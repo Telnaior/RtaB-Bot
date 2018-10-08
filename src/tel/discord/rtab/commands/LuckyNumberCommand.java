@@ -11,6 +11,7 @@ public class LuckyNumberCommand extends Command
 		this.aliases = new String[]{"lucky"};
 		this.help = "gives you a random number";
 		this.guildOnly = false;
+		this.cooldown = 15;
 	}
 	@Override
 	protected void execute(CommandEvent event)
