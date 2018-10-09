@@ -10,6 +10,7 @@ class BumperGrab extends MiniGame {
 
   import tel.discord.rtab.minigames.BumperGrab._
 
+  private val NAME: String = "Bumper Grab"
   private var boardWidth: Int = 0
   private var boardHeight: Int = 0
   private var board: Array[Array[Space]] = Array.empty
@@ -297,6 +298,7 @@ class BumperGrab extends MiniGame {
     if (board(player_X)(player_Y) == Exit) "Exit"
     else Vector("LEFT", "RIGHT", "UP", "DOWN")(Random.nextInt(4))
   }
+  override def toString: String = NAME
 }
 
 object BumperGrab {

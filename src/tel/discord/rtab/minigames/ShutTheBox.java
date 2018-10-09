@@ -318,8 +318,8 @@ public class ShutTheBox implements MiniGame {
 						else return "5 2 1";
 					}
 				case 9: if (!closedSpaces[8]) return "9";
-					else if (!closedSpaces[7] && closedSpaces[0]) return "8 1";
-					else if (!closedSpaces[6] && closedSpaces[1]) return "7 2";
+					else if (!closedSpaces[7] && !closedSpaces[0]) return "8 1";
+					else if (!closedSpaces[6] && !closedSpaces[1]) return "7 2";
 					else if (!closedSpaces[5]) {
 						if (!closedSpaces[2]) return "6 3";
 						else if (!closedSpaces[1] && !closedSpaces[0]) return "6 2 1";

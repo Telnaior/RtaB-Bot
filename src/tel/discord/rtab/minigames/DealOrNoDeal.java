@@ -161,9 +161,14 @@ public class DealOrNoDeal implements MiniGame {
 		int totalValue = 0;
 		for(int i : values)
 			totalValue += i;
-		int average = totalValue / casesLeft;
+		double average = totalValue / casesLeft;
 		double dealChance = offer / average;
 		return (Math.random() < dealChance) ? "DEAL" : "NO DEAL";
 	}
-
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
+	}
 }

@@ -20,7 +20,7 @@ public class SuperBotChallenge
 	public GameController initialise(TextChannel channelID, int multiplier)
 	{
 		channel = channelID;
-		gameHandler = new GameController(channel,false,false,true,multiplier);
+		gameHandler = new GameController(channel,false,false,false,true,multiplier);
 		loadGames();
 		return gameHandler;
 	}
@@ -29,7 +29,7 @@ public class SuperBotChallenge
 		List<String> list = null;
 		try
 		{
-			list = Files.readAllLines(Paths.get("schedule"+channel+".csv"));
+			list = Files.readAllLines(Paths.get("schedule"+channel.getId()+".csv"));
 		}
 		catch (IOException e)
 		{
@@ -48,6 +48,8 @@ public class SuperBotChallenge
 				for(String next : players)
 					gameHandler.addBot(Integer.parseInt(next));
 				channel.sendMessage("Next game starting in five minutes.").queue();
+				if(record.length > 2)
+					channel.sendMessage(record[2]).queue();
 				channel.sendMessage(gameHandler.listPlayers(false)).queue();
 			},totalDelay-5,TimeUnit.MINUTES);
 			timer.schedule(() -> gameHandler.startTheGameAlready(),totalDelay,TimeUnit.MINUTES);

@@ -50,6 +50,7 @@ public class GameController
 	final boolean rankChannel;
 	public final boolean runDemo;
 	final boolean verboseBotGames;
+	final boolean playersCanJoin;
 	public TextChannel channel;
 	TextChannel resultChannel;
 	int boardSize = 15;
@@ -77,9 +78,11 @@ public class GameController
 	public ScheduledFuture<?> demoMode;
 	Message waitingMessage;
 	
-	public GameController(TextChannel channelID, boolean mainGame, boolean useDemo, boolean verbosity, int globalMultiplier)
+	public GameController(TextChannel channelID, boolean allowJoining, boolean mainGame, 
+			boolean useDemo, boolean verbosity, int globalMultiplier)
 	{
 		channel = channelID;
+		playersCanJoin = allowJoining;
 		rankChannel = mainGame;
 		runDemo = useDemo;
 		verboseBotGames = verbosity;
@@ -145,6 +148,9 @@ public class GameController
 	
 	public PlayerJoinReturnValue addPlayer(Member playerID)
 	{
+		//Are player joins even *allowed* here?
+		if(!playersCanJoin)
+			return PlayerJoinReturnValue.NOTALLOWEDHERE;
 		//Make sure game isn't already running
 		if(gameStatus != GameStatus.SIGNUPS_OPEN)
 			return PlayerJoinReturnValue.INPROGRESS;
@@ -232,16 +238,6 @@ public class GameController
 	 */
 	public void startTheGameAlready()
 	{
-		/*
-		//If the first player already has a billion, skip to the end
-		if(players.get(0).money == 1000000000)
-		{
-			currentTurn = -1;
-			winners.add(players.get(0));
-			runNextEndGamePlayer();
-			return;
-		}
-		*/
 		//If the game's already running or no one's in it, just don't
 		if((gameStatus != GameStatus.SIGNUPS_OPEN && gameStatus != GameStatus.ADD_BOT_QUESTION) || playersJoined < 1)
 		{
@@ -813,9 +809,11 @@ public class GameController
 			outputIterator = cashOutput.listIterator();
 			//Will always have at least one
 			channel.sendMessage(outputIterator.next()).completeAfter(5,TimeUnit.SECONDS);
+			int i = 0;
 			while(outputIterator.hasNext())
 			{
-				channel.sendMessage(outputIterator.next()).queueAfter(1,TimeUnit.SECONDS);
+				i++;
+				channel.sendMessage(outputIterator.next()).queueAfter(750*i,TimeUnit.MILLISECONDS);
 			}
 			break;
 		case BOOSTER:
@@ -1423,10 +1421,6 @@ public class GameController
 		{
 			if(players.get(currentTurn).oldWinstreak < i)
 			{
-				/*
-				channel.sendMessage(String.format("Streak Bonus: +%d%% Boost!",i)).queue();
-				players.get(currentTurn).addBooster(i);
-				*/
 				switch(i)
 				{
 				case 50:
@@ -1441,6 +1435,9 @@ public class GameController
 				case 200:
 					players.get(currentTurn).games.add(Games.HYPERCUBE);
 					break;
+				default:
+					channel.sendMessage(String.format("You're still going? Then have a +%d%% Boost!",i)).queue();
+					players.get(currentTurn).addBooster(i);
 				}
 			}
 		}
@@ -1591,7 +1588,7 @@ public class GameController
 		StringBuilder resultString = new StringBuilder();
 		if(players.get(currentTurn).isBot)
 		{
-			resultString.append(players.get(currentTurn).name + String.format(" won **$%,d** from ",moneyWon*BASE_MULTIPLIER));
+			resultString.append(players.get(currentTurn).name + String.format(" won **$%,d** from ",moneyWon*multiplier*BASE_MULTIPLIER));
 			if(multiplier > 1)
 				resultString.append(String.format("%d copies of ",multiplier));
 			resultString.append(currentGame.toString() + ".");
