@@ -1132,7 +1132,7 @@ public class GameController
 			}
 			break;
 		case SUPER_JOKER:
-			channel.sendMessage("You found the **MIDAS TOUCH**!"
+			channel.sendMessage("You found the **MIDAS TOUCH**! "
 					+ "Every space you pick for the rest of the round (even bombs) will be converted to cash, "
 					+ "but you won't receive a win bonus at the end.")
 				.completeAfter(5,TimeUnit.SECONDS);
