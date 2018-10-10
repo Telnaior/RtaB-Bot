@@ -59,7 +59,7 @@ public class DoubleZeroes implements MiniGame {
 				// Player stops at the decision point? Tell 'em what they've won and end the game!
 			alive = false;
 			total = total * zeroesLeft * 3;
-				output.add("Very well! Your bank is multiplied by " + String.format("%,d",zeroesLeft*3))
+				output.add("Very well! Your bank is multiplied by " + String.format("%,d",zeroesLeft*3)
 				+ ", which means...");
 			return output;
 			}
@@ -147,7 +147,7 @@ public class DoubleZeroes implements MiniGame {
 				if(total>1000) // If we just hit the 4th number, tell 'em about the DECISION~!
 				{
 				output.add("You can now choose to continue by picking a number, "
-						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total))
+						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
 						+ ", times treble the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft*3));
 				output.add(generateBoard());
 				}
