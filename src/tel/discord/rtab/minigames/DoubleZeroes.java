@@ -239,7 +239,7 @@ public class DoubleTrouble implements MiniGame {
 			//There should be (6 + zeroesLeft) spaces left here
 			if(total > 1000)
 			{
-				int goChance = 100 * (zeroesLeft / (6 + zeroesLeft));
+				int goChance = (100 * zeroesLeft) / (6 + zeroesLeft);
 				if(Math.random()*100>goChance)
 					return "STOP";
 			}
