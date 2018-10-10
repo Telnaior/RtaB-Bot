@@ -36,7 +36,7 @@ class BumperGrab extends MiniGame {
     }.sum
 
     new util.LinkedList(List(
-      "In Bumper Cash, your objective is to navigate an icy floating platform.",
+      "In Bumper Grab, your objective is to navigate an icy floating platform.",
       "Slide around, bounce off bumpers, and grab as much cash as you can!",
       "You're represented as an 'X', and exits are represented as 'O's.",
       "Other spaces are either cash or bumpers, but you won't know which until you hit them.",

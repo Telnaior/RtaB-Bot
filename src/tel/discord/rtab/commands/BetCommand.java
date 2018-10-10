@@ -22,29 +22,29 @@ public class BetCommand extends Command
 	{
 		//Start by parsing the bet
 		Member bettor = event.getMember();
-		String[] args = event.getArgs().split(" ");
+		String[] args = event.getArgs().split("/");
 		int amount;
 		String player;
 		//Make sure there's actually two arguments here
 		if(args.length < 2)
 		{
-			event.reply("Bet format: !bet [amount] [player]");
+			event.reply("Bet format: !bet [amount]/[player]");
 			return;
 		}
 		//Now let's figure out which one's the amount
 		if(checkValidNumber(args[0]))
 		{
 			amount = Integer.parseInt(args[0]);
-			player = args[1];
+			player = args[1].toUpperCase();
 		}
 		else if(checkValidNumber(args[1]))
 		{
 			amount = Integer.parseInt(args[1]);
-			player = args[0];
+			player = args[0].toUpperCase();
 		}
 		else
 		{
-			event.reply("Bet format: !bet [amount] [player]");
+			event.reply("Bet format: !bet [amount]/[player]");
 			return;
 		}
 		//Limit the max bet
@@ -62,7 +62,7 @@ public class BetCommand extends Command
 				boolean playerExists = false;
 				for(Player target : game.players)
 				{
-					if(player.equals(target.getName()))
+					if(player.equals(target.getName().toUpperCase()))
 					{
 						playerExists = true;
 						break;
@@ -72,6 +72,7 @@ public class BetCommand extends Command
 				{
 					event.reply("That player is not in the game.");
 					event.reply(game.listPlayers(false));
+					return;
 				}
 				//Make sure bets are open, then send it across
 				if(game.gameStatus == GameStatus.SIGNUPS_OPEN)

@@ -34,6 +34,7 @@ import tel.discord.rtab.commands.StartCommand;
 import tel.discord.rtab.commands.StatsCommand;
 import tel.discord.rtab.commands.TopCommand;
 import tel.discord.rtab.commands.TotalsCommand;
+import tel.discord.rtab.commands.ViewBetsCommand;
 import tel.discord.rtab.commands.ViewBombsCommand;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -67,6 +68,7 @@ public class RaceToABillionBot
 		utilities.addCommand(new TopCommand());
 		utilities.addCommand(new StatsCommand());
 		utilities.addCommand(new BetCommand());
+		utilities.addCommand(new ViewBetsCommand());
 		utilities.addCommand(new BetRankCommand());
 		utilities.addCommand(new PingBotCommand());
 		utilities.addCommand(new StartCommand());

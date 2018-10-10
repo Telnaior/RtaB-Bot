@@ -52,6 +52,7 @@ public class Bettor {
 	}
 	
 	public void setBet(int amount, String betTarget) {
+		champion = betTarget;
 		betAmount = amount;
 		funds -= amount;
 		//Add on overdraft penalty if they've done it

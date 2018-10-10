@@ -21,6 +21,7 @@ public class BettingHandler {
 	static final int HOUSE_BET = 100;
 	TextChannel channel;
 	List<Bettor> bettors;
+	public int betsPlaced;
 	
 	BettingHandler(TextChannel channelID)
 	{
@@ -35,7 +36,7 @@ public class BettingHandler {
 		for(int i=0; i < bettors.size(); i++)
 			if(bettors.get(i).uID.equals(newBettor.uID))
 			{
-				channel.sendMessage("Cannot place bet: You already have a bet.");
+				channel.sendMessage("Cannot place bet: You already have a bet.").queue();
 				return;
 			}
 		//Check the name
@@ -47,14 +48,16 @@ public class BettingHandler {
 		//Check they've got the money
 		if(newBettor.funds < amount && amount > MAX_OVERDRAFT)
 		{
-			channel.sendMessage("Cannot place bet: You don't have enough funds.");
+			channel.sendMessage("Cannot place bet: You don't have enough funds.").queue();
 			return;
 		}
 		//Cool, they're clear, pass it on
 		newBettor.setBet(amount, champion);
 		bettors.add(newBettor);
+		channel.sendMessage("Bet placed.").queue();
+		betsPlaced ++;
 	}
-	Pair<String,List<Integer>> listBets(List<String> playerNames)
+	public Pair<String,List<Integer>> listBets(List<String> playerNames)
 	{
 		//Get our list started
 		List<StringBuilder> bets = new ArrayList<>(4);
@@ -70,11 +73,11 @@ public class BettingHandler {
 			//Look for the player that matches their bet
 			for(int i=0; i<playerNames.size(); i++)
 			{
-				if(nextBet.champion.equals(playerNames.get(i)))
+				if(nextBet.champion.equals(playerNames.get(i).toUpperCase()))
 				{
 					//Add their string to the list, and their amount to the total for that player
 					//Something about this code feels really rough but I can't think of a better way to do it right now
-					bets.get(i).append(String.format("%1$,11d - %2$s\n",nextBet.betAmount,nextBet.name));
+					bets.get(i).append(String.format("%1$,10d - %2$s\n",nextBet.betAmount,nextBet.name));
 					betTotals.set(i,betTotals.get(i)+nextBet.betAmount);
 					break;
 				}
@@ -83,12 +86,12 @@ public class BettingHandler {
 		//Add house bets if necessary
 		for(int i=0; i<playerNames.size(); i++)
 			if(betTotals.get(i) < HOUSE_BET)
+			{
 				bets.get(i).append(String.format("%,11d - RtaB\n", HOUSE_BET - betTotals.get(i)));
+				betTotals.set(i,HOUSE_BET);
+			}
 		//Now stitch them up together in the proper format
 		StringBuilder output = new StringBuilder();
-		if(bettors.size() == 0)
-			output = null;
-		else
 		{
 			output.append("```\n");
 			for(StringBuilder nextList : bets)
@@ -104,30 +107,21 @@ public class BettingHandler {
 	{
 		//List bets and get our totals
 		Pair<String,List<Integer>> betsAndTotals = listBets(playerNames);
-		if(betsAndTotals.getLeft() != null)
+		if(betsPlaced > 0)
 			channel.sendMessage(betsAndTotals.getLeft()).completeAfter(5,TimeUnit.SECONDS);
 		List<Integer> totalBets = betsAndTotals.getRight();
-		//Figure out which ID the winner is
-		int winner = -1;
-		for(int i=0; i<playerNames.size(); i++)
-			if(playerNames.get(i).equals(winnerName))
-			{
-				winner = i;
-				break;
-			}
 		//Gather up all the lost bets
 		int totalWrongBets = 0;
-		for(int i=0; i<totalBets.size(); i++)
-			if(i != winner)
+		for(int i=1; i<totalBets.size(); i++)
 				totalWrongBets += totalBets.get(i);
 		//Now loop through all the bettors and reward the winners
 		for(Bettor nextBettor : bettors)
-			if(nextBettor.champion.equals(winnerName))
+			if(nextBettor.champion.equals(winnerName.toUpperCase()))
 			{
 				//This guy won, reward them accordingly
 				int baseWin = nextBettor.betAmount * 4;
 				double bonusPortion = nextBettor.betAmount;
-				bonusPortion /= totalBets.get(winner);
+				bonusPortion /= totalBets.get(0);
 				int bonusWin = (int) (totalWrongBets * bonusPortion);
 				channel.sendMessage(String.format("%1$s wins %2$,d + %3$,d!",nextBettor.name, baseWin, bonusWin))
 					.completeAfter(2,TimeUnit.SECONDS);
@@ -174,6 +168,7 @@ public class BettingHandler {
 			Files.write(file, list);
 			Files.delete(oldFile);
 			bettors.clear();
+			betsPlaced = 0;
 		}
 		catch(IOException e)
 		{
