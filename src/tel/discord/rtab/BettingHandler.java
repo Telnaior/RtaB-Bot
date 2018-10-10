@@ -86,20 +86,26 @@ public class BettingHandler {
 				bets.get(i).append(String.format("%,11d - RtaB\n", HOUSE_BET - betTotals.get(i)));
 		//Now stitch them up together in the proper format
 		StringBuilder output = new StringBuilder();
-		output.append("```\n");
-		for(StringBuilder nextList : bets)
+		if(bettors.size() == 0)
+			output = null;
+		else
 		{
-			output.append(nextList);
-			output.append("\n");
+			output.append("```\n");
+			for(StringBuilder nextList : bets)
+			{
+				output.append(nextList);
+				output.append("\n");
+			}
+			output.append("```");
 		}
-		output.append("```");
 		return ImmutablePair.of(output.toString(),betTotals);
 	}
 	void resolveBets(String winnerName, List<String> playerNames)
 	{
 		//List bets and get our totals
 		Pair<String,List<Integer>> betsAndTotals = listBets(playerNames);
-		channel.sendMessage(betsAndTotals.getLeft()).completeAfter(5,TimeUnit.SECONDS);
+		if(betsAndTotals.getLeft() != null)
+			channel.sendMessage(betsAndTotals.getLeft()).completeAfter(5,TimeUnit.SECONDS);
 		List<Integer> totalBets = betsAndTotals.getRight();
 		//Figure out which ID the winner is
 		int winner = -1;
@@ -167,6 +173,7 @@ public class BettingHandler {
 			Path oldFile = Files.move(file, file.resolveSibling("bettors"+channel.getId()+"old.csv"));
 			Files.write(file, list);
 			Files.delete(oldFile);
+			bettors.clear();
 		}
 		catch(IOException e)
 		{
