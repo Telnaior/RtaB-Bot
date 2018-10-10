@@ -53,7 +53,7 @@ public class RankCommand extends Command {
 				response.append(record[1] + ": ");
 				if(money<0)
 					response.append("-");
-				response.append(String.format("$%1$,d [%2$d%%x%3$d]",Math.abs(money),booster,winstreak));
+				response.append(String.format("$%1$,d [%2$d%%x%3$d.%4$d]",Math.abs(money),booster,winstreak/10,winstreak%10));
 				response.append(" - Rank #" + (index+1) + "/" + list.size());
 				event.reply(response.toString());
 			}

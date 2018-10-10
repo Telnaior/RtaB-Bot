@@ -46,6 +46,9 @@ public class JoinCommand extends Command
 				case TOOMANYPLAYERS:
 					event.reply("Cannot join game: Too many players.");
 					break;
+				case NOTALLOWEDHERE:
+					event.reply("Cannot join game: Joining is not permitted in this channel.");
+					break;
 				}
 				//We found the right channel, so 
 				return;

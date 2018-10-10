@@ -16,7 +16,7 @@ public class DigitalFortress implements MiniGame {
 	String[] guesses = new String[ATTEMPTS_ALLOWED];
 	boolean[] lockedIn;
 	int digitsCorrect;
-	int attemptsLeft = ATTEMPTS_ALLOWED;
+	int attemptsLeft;
 	
 	@Override
 	public LinkedList<String> initialiseGame()

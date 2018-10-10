@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DoubleTrouble implements MiniGame {
+public class DoubleZeroes implements MiniGame {
 	static final String NAME = "Double Zeroes";
 	static final boolean BONUS = false;
 	int total;
@@ -54,18 +54,18 @@ public class DoubleTrouble implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		if(pick.toUpperCase().equals("STOP"))
 		{
-			if(total > 1000) // 'total > 1000' doesn't happen until there are two 20-99's picked
+			if(total > 1000) // 'total > 1000' doesn't happen until there are four digits picked
 			{
 				// Player stops at the decision point? Tell 'em what they've won and end the game!
 			alive = false;
 			total = total * zeroesLeft * 3;
-				output.add("Very well! Your bank is multiplied by " + String.format("$%,d!",zeroesLeft*3))
+				output.add("Very well! Your bank is multiplied by " + String.format("%,d",zeroesLeft*3))
 				+ ", which means...");
 			return output;
 			}
 			else // Don't stop 'til you get enough, keep on!
 			{
-				output.add("Can't stop yet, you must pick two non-zero values first!")
+				output.add("Can't stop yet, you must pick four non-zero values first!");
 				return output;
 			}
 		}
@@ -115,11 +115,11 @@ public class DoubleTrouble implements MiniGame {
 					output.add("It's a **BOMB**.");
 					output.add("Sorry, you lose.");
 				}
-				elseif(total == 0) // ...and it's the first phase with no prior numbers...
+				else if(total == 0) // ...and it's the first phase with no prior numbers...
 				{
-					if (numbers.get(lastSpace) == 8) // ... and it's an 80, use an 'an'
+					if (numbers.get(lastSpace) == 8) // ... and it's an 8, use an 'an'
 					{
-					output.add("It's an " + String.format("**%,d!**",numbers.get(lastSpace)));
+					  output.add("It's an " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
 					else // ... and it's not an 8, use an 'a'
 					{
@@ -129,7 +129,7 @@ public class DoubleTrouble implements MiniGame {
 				}
 				else // ...and it's the first phase with a prior number...
 				{
-					if (numbers.get(lastSpace) == 8) // ... and it's an 80, use an 'an'
+					if (numbers.get(lastSpace) == 8) // ... and it's an 8, use an 'an'
 					{
 					output.add("It's an " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
@@ -137,7 +137,7 @@ public class DoubleTrouble implements MiniGame {
 					{
 					output.add("It's a " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
-					total = (total * 10) + numbers.get(lastSpace); // Either way, put the total on the board by multiplying the previous total by 100 and adding this number.
+					total = (total * 10) + numbers.get(lastSpace); // Either way, put the total on the board by multiplying the previous total by 10 and adding this number.
 				}
 			
 			}
@@ -154,6 +154,7 @@ public class DoubleTrouble implements MiniGame {
 				else if(zeroesLeft>0) // Otherwise let 'em pick another space.
 				{
 					output.add("Please pick another space.");
+					output.add(generateBoard());
 				}
 				else // Oops, All Digits! (tm) Better end it quick!
 				{

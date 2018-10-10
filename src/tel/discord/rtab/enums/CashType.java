@@ -3,50 +3,58 @@ package tel.discord.rtab.enums;
 public enum CashType implements WeightedSpace
 {
 	//Negative
-	N25K	(-  25000,3),
-	N20K	(-  20000,3),
-	N15K	(-  15000,3),
-	N10K	(-  10000,3),
-	N05K	(-   5000,3),
+	N25K	(-  25000,3,null),
+	N20K	(-  20000,3,null),
+	N15K	(-  15000,3,null),
+	N10K	(-  10000,3,null),
+	N05K	(-   5000,3,null),
 	//Small
-	P10K	(   10000,5),
-	P20K	(   20000,5),
-	P30K	(   30000,5),
-	P40K	(   40000,5),
-	P50K	(   50000,5),
-	P60K	(   60000,5),
-	P70K	(   70000,5),
-	P80K	(   80000,5),
-	P90K	(   90000,5),
-	P100K	(  100000,5),
+	P10K	(   10000,5,null),
+	P20K	(   20000,5,null),
+	P30K	(   30000,5,null),
+	P40K	(   40000,5,null),
+	P50K	(   50000,5,null),
+	P60K	(   60000,5,null),
+	P70K	(   70000,5,null),
+	P80K	(   80000,5,null),
+	P90K	(   90000,5,null),
+	P100K	(  100000,5,null),
 	//Big
-	P125K	(  125000,2),
-	P150K	(  150000,2),
-	P175K	(  175000,2),
-	P200K	(  200000,2),
-	P250K	(  250000,2),
-	P300K	(  300000,2),
-	P400K	(  400000,2),
-	P500K	(  500000,2),
-	P750K	(  750000,2),
-	P1000K	( 1000000,2),
+	P125K	(  125000,2,null),
+	P150K	(  150000,2,null),
+	P175K	(  175000,2,null),
+	P200K	(  200000,2,null),
+	P250K	(  250000,2,null),
+	P300K	(  300000,2,null),
+	P400K	(  400000,2,null),
+	P500K	(  500000,2,null),
+	P750K	(  750000,2,null),
+	P1000K	( 1000000,2,null),
 	//Meme
-	P50		(      50,1);
+	P50		(      50,1,null),
+	MYSTERY (       0,3,null);
 	
 	int value;
 	int weight;
-	CashType(int cashValue, int valueWeight)
+	String prize;
+	CashType(int cashValue, int valueWeight, String prizeText)
 	{
 		value = cashValue;
 		weight = valueWeight;
+		prize = prizeText;
 	}
 	@Override
-	public int getWeight()
+	public int getWeight(int playerCount)
 	{
+		//Cash types don't care about playercount
 		return weight;
 	}
 	public int getValue()
 	{
 		return value;
+	}
+	public String getPrize()
+	{
+		return prize;
 	}
 }

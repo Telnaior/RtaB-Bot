@@ -28,7 +28,7 @@ public class MathTime implements MiniGame {
 		Collections.shuffle(money);
 		Collections.shuffle(ops1);
 		Collections.shuffle(ops2);
-		Collections.shuffle(money);
+		Collections.shuffle(multis);
 		//Give instructions
 		output.add("In Math Time, you will pick five spaces that will, together, form an equation.");
 		output.add("If you pick well, you could win up to $2,000,000!");

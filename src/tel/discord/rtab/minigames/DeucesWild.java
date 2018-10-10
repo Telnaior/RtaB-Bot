@@ -46,7 +46,7 @@ public class DeucesWild implements MiniGame {
 		output.add("As the name of the game suggests, deuces (twos) are wild. "
 				+ "Those are always treated as the best card possible.");
 		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
-		output.add("You must get at least a pair to win any money. That pays $10,000.");
+		output.add("You must get at least a pair to win any money. That pays $20,000.");
 		output.add("Two pairs win $50,000, while a three of a kind pays $100,000.");
 		output.add("Straights pay $150,000, flushes pay $200,000, a full house pays $250,000, a four of a kind pays $500,000, "
 				+ "a straight flush pays $750,000, a five of a kind pays $1,000,000, a wild royal flush pays $2,000,000, "
@@ -150,9 +150,7 @@ public class DeucesWild implements MiniGame {
 						testCardsHeld[Integer.parseInt(tokens[i])-1] = false;
 					}
 					cardsHeld = testCardsHeld;
-					output.add("Cards released.");
 					output.add(generateHand());
-					output.add("The cards with asterisks next to their position numbers are the ones currently being held.");
 					output.add("You may 'HOLD' other cards, 'RELEASE' cards you no longer wish to hold, or type 'DEAL' to start the redraw.");
 				}
 				catch (IndexOutOfBoundsException e) {
@@ -317,7 +315,7 @@ public class DeucesWild implements MiniGame {
 	{
 		switch(hand) {
 			case NOTHING: return 0;
-			case ONE_PAIR: return 10000;
+			case ONE_PAIR: return 20000;
 			case TWO_PAIR: return 50000;
 			case THREE_OF_A_KIND: return 100000;
 			case STRAIGHT: return 150000;
@@ -468,9 +466,9 @@ public class DeucesWild implements MiniGame {
 
 	@Override
 	public String getBotPick() {
-		//Bot will never redraw, unless someone wants to teach it poker strategy (lol)
+		//Bot will redraw automatically in order to get as many deuces as possible (which hold automatically)
 		if(gameStage == 5)
-			return "STOP";
+			return "DEAL";
 		ArrayList<Integer> openSpaces = new ArrayList<>(BOARD_SIZE);
 		for(int i=0; i<BOARD_SIZE; i++)
 			if(!pickedSpaces[i])
