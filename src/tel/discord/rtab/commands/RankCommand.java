@@ -42,7 +42,12 @@ public class RankCommand extends Command {
 			else
 				index = GameController.findUserInList(list,name,true);
 			if(index < 0 || index >= list.size())
-				event.reply("User not found.");
+			{
+				if(name.equals(""))
+					event.reply("You haven't played the game yet.");
+				else
+					event.reply("User not found.");
+			}
 			else
 			{
 				String[] record = list.get(index).split("#");

@@ -43,11 +43,10 @@ class BumperGrab extends MiniGame {
       "Each move, you'll pick a direction (UP, LEFT, RIGHT, or DOWN), and " +
         "you'll slide in that direction until you hit a space you haven't been to.",
       "If it's cash, you grab it, and choose a new direction.",
-      "If it's a bumper, you'll be pushed in a new direction",
+      "If it's a bumper, you'll be pushed in a new direction.",
       "And if it's an exit, you're allowed to EXIT and escape with your loot!",
       "Or you can move again, but you won't be able to use that same exit later",
-      "Oh, and...",
-      "If you slide off the edge, you fall to your doom and lose everything!",
+      "Oh, and if you slide off the edge, you fall to your doom and lose everything!",
       "Good luck!",
       drawScoreboard
     ).asJava)

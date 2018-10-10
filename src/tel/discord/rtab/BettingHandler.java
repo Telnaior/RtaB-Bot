@@ -87,7 +87,7 @@ public class BettingHandler {
 		for(int i=0; i<playerNames.size(); i++)
 			if(betTotals.get(i) < HOUSE_BET)
 			{
-				bets.get(i).append(String.format("%,11d - RtaB\n", HOUSE_BET - betTotals.get(i)));
+				bets.get(i).append(String.format("%,10d - RtaB\n", HOUSE_BET - betTotals.get(i)));
 				betTotals.set(i,HOUSE_BET);
 			}
 		//Now stitch them up together in the proper format

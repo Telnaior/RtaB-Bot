@@ -13,7 +13,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class SuperBotChallenge
 {
 	GameController gameHandler;
-	TextChannel channel;
+	public TextChannel channel;
 	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 	
 	public GameController initialise(TextChannel channelID, int multiplier)
@@ -25,6 +25,7 @@ public class SuperBotChallenge
 	}
 	public void loadGames()
 	{
+		timer.purge();
 		List<String> list = null;
 		try
 		{

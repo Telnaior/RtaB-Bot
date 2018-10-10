@@ -22,13 +22,13 @@ public class BetCommand extends Command
 	{
 		//Start by parsing the bet
 		Member bettor = event.getMember();
-		String[] args = event.getArgs().split("/");
+		String[] args = event.getArgs().split(", ");
 		int amount;
 		String player;
 		//Make sure there's actually two arguments here
 		if(args.length < 2)
 		{
-			event.reply("Bet format: !bet [amount]/[player]");
+			event.reply("Bet format: !bet [amount], [player]");
 			return;
 		}
 		//Now let's figure out which one's the amount
@@ -44,7 +44,7 @@ public class BetCommand extends Command
 		}
 		else
 		{
-			event.reply("Bet format: !bet [amount]/[player]");
+			event.reply("Bet format: !bet [amount], [player]");
 			return;
 		}
 		//Limit the max bet

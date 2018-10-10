@@ -42,7 +42,12 @@ public class BetRankCommand extends Command {
 			else
 				index = GameController.findUserInList(list,name,true);
 			if(index < 0 || index >= list.size())
-				event.reply("User not found.");
+			{
+				if(name.equals(""))
+					event.reply("You haven't made any bets yet - your starting balance is 10,000.");
+				else
+					event.reply("User not found.");
+			}
 			else
 			{
 				String[] record = list.get(index).split("#");

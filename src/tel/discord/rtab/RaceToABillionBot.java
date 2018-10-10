@@ -16,6 +16,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import tel.discord.rtab.commands.AddBotCommand;
 import tel.discord.rtab.commands.BetCommand;
 import tel.discord.rtab.commands.BetRankCommand;
+import tel.discord.rtab.commands.BetTopCommand;
 import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.DemoCommand;
 import tel.discord.rtab.commands.HelpCommand;
@@ -28,6 +29,7 @@ import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
 import tel.discord.rtab.commands.QuitCommand;
 import tel.discord.rtab.commands.RankCommand;
+import tel.discord.rtab.commands.ReloadCommand;
 import tel.discord.rtab.commands.ResetCommand;
 import tel.discord.rtab.commands.ShutdownBotCommand;
 import tel.discord.rtab.commands.StartCommand;
@@ -56,29 +58,31 @@ public class RaceToABillionBot
 		utilities.setOwnerId(owner);
 		utilities.setPrefix("!");
 		utilities.setHelpWord("commands");
-		utilities.addCommand(new HelpCommand());
-		utilities.addCommand(new JoinCommand());
-		utilities.addCommand(new QuitCommand());
-		utilities.addCommand(new PlayersCommand());
-		utilities.addCommand(new BoardCommand());
-		utilities.addCommand(new TotalsCommand());
-		utilities.addCommand(new NextCommand());
-		utilities.addCommand(new LivesCommand());
-		utilities.addCommand(new RankCommand());
-		utilities.addCommand(new TopCommand());
-		utilities.addCommand(new StatsCommand());
-		utilities.addCommand(new BetCommand());
-		utilities.addCommand(new ViewBetsCommand());
-		utilities.addCommand(new BetRankCommand());
-		utilities.addCommand(new PingBotCommand());
-		utilities.addCommand(new StartCommand());
-		utilities.addCommand(new ResetCommand());
-		utilities.addCommand(new ViewBombsCommand());
-		utilities.addCommand(new ShutdownBotCommand());
-		utilities.addCommand(new AddBotCommand());
-		utilities.addCommand(new DemoCommand());
-		utilities.addCommand(new MemeCommand());
-		utilities.addCommand(new LuckyNumberCommand());
+		utilities.addCommands(new HelpCommand(),
+							new JoinCommand(),
+							new QuitCommand(),
+							new PlayersCommand(),
+							new BoardCommand(),
+							new TotalsCommand(),
+							new NextCommand(),
+							new LivesCommand(),
+							new RankCommand(),
+							new TopCommand(),
+							new StatsCommand(),
+							new BetCommand(),
+							new ViewBetsCommand(),
+							new BetRankCommand(),
+							new BetTopCommand(),
+							new PingBotCommand(),
+							new StartCommand(),
+							new ResetCommand(),
+							new ReloadCommand(),
+							new ViewBombsCommand(),
+							new ShutdownBotCommand(),
+							new AddBotCommand(),
+							new DemoCommand(),
+							new MemeCommand(),
+							new LuckyNumberCommand());
 		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
 		prepareBot.setToken(token);
 		prepareBot.addEventListener(utilities.build());
