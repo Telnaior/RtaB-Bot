@@ -65,11 +65,11 @@ public class StatsCommand extends Command {
 				response.append("\n");
 			}
 			if(totalCount != 0)
-				response.append(String.format("Average Money: $%,11d\n",totalMoney/totalCount));
+				response.append(String.format("Average Money:  $%,11d\n",totalMoney/totalCount));
 			if(humanCount != 0 && botCount != 0)
 			{
-				response.append(String.format("Human Average: $%,11d\n",humanMoney/humanCount));
-				response.append(String.format("  Bot Average: $%,11d\n",botMoney/botCount));
+				response.append(String.format("Human Average:  $%,11d\n",humanMoney/humanCount));
+				response.append(String.format("  Bot Average:  $%,11d\n",botMoney/botCount));
 			}
 			//New line to split apart the club amounts
 			response.append("\n");

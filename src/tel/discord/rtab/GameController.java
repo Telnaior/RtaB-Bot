@@ -53,6 +53,7 @@ public class GameController
 	final boolean playersCanJoin;
 	public TextChannel channel;
 	TextChannel resultChannel;
+	public BettingHandler betManager;
 	int boardSize = 15;
 	public List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
@@ -97,6 +98,11 @@ public class GameController
 				startTheGameAlready();
 			},60,TimeUnit.MINUTES);
 		}
+		//If they can't join, let them bet!
+		if(!playersCanJoin)
+			betManager = new BettingHandler(channel);
+		else
+			betManager = null;
 	}
 	
 	void setResultChannel(TextChannel channelID)
@@ -1325,6 +1331,14 @@ public class GameController
 			saveData();
 			players.sort(null);
 			displayBoardAndStatus(false, true, true);
+			//Handle the bets if this a betting channel
+			if(betManager != null)
+			{
+				List<String> playerNames = new ArrayList<>(4);
+				for(Player nextPlayer : players)
+					playerNames.add(nextPlayer.name);
+				betManager.resolveBets(players.get(0).name,playerNames);
+			}
 			reset();
 			runPingList();
 			if(winners.size() > 0)

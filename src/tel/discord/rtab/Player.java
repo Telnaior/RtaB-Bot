@@ -147,7 +147,10 @@ public class Player implements Comparable<Player>
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
 		if(multipliers.useBonus)
-			adjustedPrize *= Math.max(1,winstreak/10.);
+		{
+			adjustedPrize *= Math.max(10,winstreak);
+			adjustedPrize /= 10;
+		}
 		money += adjustedPrize;
 		//Cap at +-$1,000,000,000
 		if(money > 1000000000) money = 1000000000;
@@ -307,5 +310,10 @@ public class Player implements Comparable<Player>
 			result.append(String.format("%02d",bomb+1));
 		}
 		return result.toString();
+	}
+	
+	public String getName()
+	{
+		return name;
 	}
 }

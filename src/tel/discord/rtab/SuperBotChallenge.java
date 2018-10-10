@@ -46,7 +46,7 @@ public class SuperBotChallenge
 			{
 				for(String next : players)
 					gameHandler.addBot(Integer.parseInt(next));
-				channel.sendMessage("Next game starting in five minutes.").queue();
+				channel.sendMessage("Next game starting in five minutes:").queue();
 				if(record.length > 2)
 					channel.sendMessage(record[2]).queue();
 				channel.sendMessage(gameHandler.listPlayers(false)).queue();
