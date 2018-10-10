@@ -371,7 +371,10 @@ public class ShutTheBox implements MiniGame {
 						else if (!closedSpaces[3] && !closedSpaces[0]) return "7 4 1";
 						else return "7 3 2";
 					}
-					else if (!closedSpaces[5]) return "6 3 2 1";
+					else if (!closedSpaces[5]) {
+						if (!closedSpaces[3]) return "6 4 2";
+						else return "6 3 2 1";
+					}
 					else return "5 4 2 1";
 				default: throw new IndexOutOfBoundsException("Not even your " +
 						"hardcoded tempfix works, StrangerCoug? You're fired!");
