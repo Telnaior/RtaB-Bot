@@ -115,6 +115,7 @@ public class RaceToABillionBot
 					SuperBotChallenge challengeHandler = new SuperBotChallenge();
 					challenge.add(challengeHandler);
 					game.add(challengeHandler.initialise(channel,multiplier));
+					System.out.println("Challenge Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))
 				{

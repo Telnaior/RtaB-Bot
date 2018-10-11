@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.Member;
 
 public class Bettor {
 	static final int STARTING_MONEY = 10000;
+	static final int BASE_BAILOUT = STARTING_MONEY / 10 * -1;
 	String uID;
 	String name;
 	int funds;
@@ -59,8 +60,8 @@ public class Bettor {
 		if(funds < 0)
 			funds -= Math.min(amount, Math.abs(funds));
 		//SURELY this will never happen (but we're prepared if it does)
-		if(funds < -1000000000)
-			funds = -1000000000;
+		if(funds < BASE_BAILOUT * (prestige + 1))
+			funds = BASE_BAILOUT * (prestige + 1);
 	}
 	
 }
