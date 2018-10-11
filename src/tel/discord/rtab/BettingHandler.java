@@ -132,9 +132,12 @@ public class BettingHandler {
 					//Reset them and add a prestige
 					nextBettor.prestige ++;
 					RuleBasedNumberFormat nf = new RuleBasedNumberFormat(Locale.UK, RuleBasedNumberFormat.SPELLOUT);
-					channel.sendMessage(nextBettor.name + " has earned their " +
+					channel.sendMessage(nextBettor.name + ", you have earned your " +
 					nf.format(nextBettor.prestige, "%spellout-ordinal") +" billion!").queue();
-					channel.sendMessage("We'll just bank that so you can start over.").queueAfter(1,TimeUnit.SECONDS);
+					if(nextBettor.prestige == 1)
+						channel.sendMessage("We'll just bank that so you can start over.").queueAfter(1,TimeUnit.SECONDS);
+					else
+						channel.sendMessage("You know what happens now, good luck with your next run.").queueAfter(1,TimeUnit.SECONDS);
 					nextBettor.funds = 0;
 				}
 			}

@@ -1276,10 +1276,10 @@ public class GameController
 			players.get(currentTurn).boostCharge += 5;
 			break;
 		case BRIBE:
-			channel.sendMessage("You've been **Bribed** to leave the round!").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("You've been launched out of the round by the **Ejector Seat**!").completeAfter(5,TimeUnit.SECONDS);
 			//$10k per space left on the board before the pick
 			int bribe = 10000 * (spacesLeft+1) * BASE_MULTIPLIER;
-			channel.sendMessage(String.format("You receive **$%,d**.",bribe)).queue();
+			channel.sendMessage(String.format("You receive **$%,d** as compensation.",bribe)).queue();
 			StringBuilder extraResult = players.get(currentTurn).addMoney(bribe,MoneyMultipliersToUse.BOOSTER_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult.toString()).queue();

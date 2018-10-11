@@ -290,92 +290,109 @@ public class ShutTheBox implements MiniGame {
 // Temporary switch statement to hardcode desired strategy; will be removed when the
 // getBotStrategy() function is fixed.
 			switch (dice.getDiceTotal()) {
-				case 2: return "2";
-				case 3: if (!closedSpaces[2]) return "3";
-					else return "2 1";
-				case 4: if (!closedSpaces[3]) return "4";
-					else return "3 1";
-				case 5: if (!closedSpaces[4]) return "5";
-					else if (!closedSpaces[3] && !closedSpaces[0])
+				case 2:
+					return "2";
+				case 3:
+					if (!closedSpaces[2]) return "3";
+					return "2 1";
+				case 4:
+					if (!closedSpaces[3]) return "4";
+					return "3 1";
+				case 5:
+					if (!closedSpaces[4]) return "5";
+					if (!closedSpaces[3] && !closedSpaces[0])
 						return "4 1";
-					else return "3 2";
-				case 6: if (!closedSpaces[5]) return "6";
-					else if (!closedSpaces[4] && !closedSpaces[0]) return "5 1";
-					else if (!closedSpaces[3]) return "4 2";
-					else return "3 2 1";
-				case 7: if (!closedSpaces[6]) return "7";
-					else if (!closedSpaces[5] && !closedSpaces[0]) return "6 1";
-					else if (!closedSpaces[4] && !closedSpaces[1]) return "5 2";
-					else {
-						if (!closedSpaces[2]) return "4 3";
-						else return "4 2 1";
-					}
-				case 8: if (!closedSpaces[7]) return "8";
-					else if (!closedSpaces[6] && !closedSpaces[0]) return "7 1";
-					else if (!closedSpaces[5] && !closedSpaces[1]) return "6 2";
-					else {
-						if (!closedSpaces[2]) return "5 3";
-						else return "5 2 1";
-					}
-				case 9: if (!closedSpaces[8]) return "9";
-					else if (!closedSpaces[7] && !closedSpaces[0]) return "8 1";
-					else if (!closedSpaces[6] && !closedSpaces[1]) return "7 2";
-					else if (!closedSpaces[5]) {
+					return "3 2";
+				case 6:
+					if (!closedSpaces[5]) return "6";
+					if (!closedSpaces[4] && !closedSpaces[0]) return "5 1";
+					if (!closedSpaces[3]) return "4 2";
+					return "3 2 1";
+				case 7:
+					if (!closedSpaces[6]) return "7";
+					if (!closedSpaces[5] && !closedSpaces[0]) return "6 1";
+					if (!closedSpaces[4] && !closedSpaces[1]) return "5 2";
+					if (!closedSpaces[2]) return "4 3";
+					return "4 2 1";
+				case 8:
+					if (!closedSpaces[7]) return "8";
+					if (!closedSpaces[6] && !closedSpaces[0]) return "7 1";
+					if (!closedSpaces[5] && !closedSpaces[1]) return "6 2";
+					if (!closedSpaces[2]) return "5 3";
+					return "5 2 1";
+				case 9:
+					if (!closedSpaces[8]) return "9";
+					if (!closedSpaces[7] && !closedSpaces[0]) return "8 1";
+					if (!closedSpaces[6] && !closedSpaces[1]) return "7 2";
+					if (!closedSpaces[5])
+					{
 						if (!closedSpaces[2]) return "6 3";
-						else if (!closedSpaces[1] && !closedSpaces[0]) return "6 2 1";
+						if (!closedSpaces[1] && !closedSpaces[0]) return "6 2 1";
 					}
-					else {
-						if (!closedSpaces[3]) return "5 4";
-						else return "5 3 1";
-					}
-				case 10: if (!closedSpaces[8] && !closedSpaces[0]) return "9 1";
-					else if (!closedSpaces[7] && !closedSpaces[1]) return "8 2";
-					else if (!closedSpaces[6]) {
+					if (!closedSpaces[3]) return "5 4";
+					return "5 3 1";
+				case 10:
+					if (!closedSpaces[8] && !closedSpaces[0]) return "9 1";
+					if (!closedSpaces[7] && !closedSpaces[1]) return "8 2";
+					if (!closedSpaces[6])
+					{
 						if (!closedSpaces[2]) return "7 3";
-						else if (!closedSpaces[1] && !closedSpaces[0])  return "7 2 1";
+						if (!closedSpaces[1] && !closedSpaces[0])  return "7 2 1";
 					}
-					else if (!closedSpaces[5]) {
+					if (!closedSpaces[5])
+					{
 						if (!closedSpaces[3]) return "6 4";
-						else if (!closedSpaces[2] && !closedSpaces[0]) return "6 3 1";
+						if (!closedSpaces[2] && !closedSpaces[0]) return "6 3 1";
 					}
-					else if (!closedSpaces[4]) {
+					if (!closedSpaces[4])
+					{
 						if (!closedSpaces[3] && !closedSpaces[0]) return "5 4 1";
-						else return "5 3 2";
+						return "5 3 2";
 					}
-					else return "4 3 2 1";
-				case 11: if (!closedSpaces[8] && !closedSpaces[1]) return "9 2";
-					else if (!closedSpaces[7]) {
+					return "4 3 2 1";
+				case 11:
+					if (!closedSpaces[8] && !closedSpaces[1]) return "9 2";
+					if (!closedSpaces[7])
+					{
 						if (!closedSpaces[2]) return "8 3";
-						else if (!closedSpaces[1] && !closedSpaces[0]) return "8 2 1";
+						if (!closedSpaces[1] && !closedSpaces[0]) return "8 2 1";
 					}
-					else if (!closedSpaces[6]) {
+					if (!closedSpaces[6])
+					{
 						if (!closedSpaces[3]) return "7 4";
-						else if (!closedSpaces[2] && !closedSpaces[0]) return "7 3 1";
+						if (!closedSpaces[2] && !closedSpaces[0]) return "7 3 1";
 					}
-					else if (!closedSpaces[5]) {
+					if (!closedSpaces[5])
+					{
 						if (!closedSpaces[4]) return "6 5";
-						else if (!closedSpaces[3] && !closedSpaces[0]) return "6 4 1";
-						else return "6 3 2";
+						if (!closedSpaces[3] && !closedSpaces[0]) return "6 4 1";
+						return "6 3 2";
 					}
-					else return "5 3 2 1";
-				case 12: if (!closedSpaces[8]) {
+					if (!closedSpaces[3]) return "5 4 2";
+					return "5 3 2 1";
+				case 12:
+					if (!closedSpaces[8])
+					{
 						if (!closedSpaces[2]) return "9 3";
-						else if (!closedSpaces[1] && !closedSpaces[0])  return "9 2 1";
+						if (!closedSpaces[1] && !closedSpaces[0])  return "9 2 1";
 					}
-					else if (!closedSpaces[7]) {
+					if (!closedSpaces[7])
+					{
 						if (!closedSpaces[3]) return "8 4";
-						else if (!closedSpaces[2] && !closedSpaces[0])  return "8 3 1";
+						if (!closedSpaces[2] && !closedSpaces[0])  return "8 3 1";
 					}
-					else if (!closedSpaces[6]) {
+					if (!closedSpaces[6])
+					{
 						if (!closedSpaces[4]) return "7 5";
-						else if (!closedSpaces[3] && !closedSpaces[0]) return "7 4 1";
-						else return "7 3 2";
+						if (!closedSpaces[3] && !closedSpaces[0]) return "7 4 1";
+						return "7 3 2";
 					}
-					else if (!closedSpaces[5]) {
+					if (!closedSpaces[5])
+					{
 						if (!closedSpaces[3]) return "6 4 2";
-						else return "6 3 2 1";
+						return "6 3 2 1";
 					}
-					else return "5 4 2 1";
+					return "5 4 2 1";
 				default: throw new IndexOutOfBoundsException("Not even your " +
 						"hardcoded tempfix works, StrangerCoug? You're fired!");
 			}
