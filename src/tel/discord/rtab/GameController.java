@@ -846,7 +846,8 @@ public class GameController
 			activateEvent(gameboard.eventBoard.get(location),location);
 			break;
 		case BLAMMO:
-			channel.sendMessage("It's a **BLAMMO!** Quick, press a button!").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("It's a **BLAMMO!** Quick " +
+					players.get(currentTurn).getSafeMention() + ", press a button!").completeAfter(5,TimeUnit.SECONDS);
 			channel.sendMessage("```\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
 			if(players.get(currentTurn).isBot)
 			{

@@ -41,7 +41,7 @@ public class SuperBotChallenge
 		while(schedule.hasNext())
 		{
 			String[] record = schedule.next().split(":");
-			String[] players = record[0].split("  ");
+			String[] players = record[0].split("	");
 			totalDelay += Integer.parseInt(record[1]);
 			timer.schedule(() -> 
 			{

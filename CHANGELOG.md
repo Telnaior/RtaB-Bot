@@ -1,3 +1,35 @@
+2.0.0
+ - First release of Season 2! As such this will be the largest changelog yet...
+ - Streak Bonus rebalanced so you can't get more than 6.0 gain from even the largest of games
+ - Streak Bonus is now decimal too (it works in a 1.0 + 0.9 + 0.8 + etc format, down to 0.1 for the 10th and additional opponents)
+ - Excess Boost past the cap (in either direction) now (silently) converts into cash
+ - Life System now takes an entry fee ($100k or 1% of your score, whichever is greater) rather than crushing all your gains by 80%
+ - The turn marker now always starts from the top of the list
+ - Board distribution adjusted - more minigames, fewer events, and no jokers in small games, while more cash and fewer minigames in large games
+ - Super Bot Challenge created - now the bots can TRULY have their 80p elimination deathmatch (and we can bet on them)
+ - Heaps of backend refactoring to support the SBC
+ - !next command added to ping you after the game
+ - !bet, !balance, and !richlist added to support betting system
+ - Bomb Penalty decreases by 10% for each player out in a round, down to a minimum of 10% (so only the first one out pays full penalty)
+ - New Specialty Bombs added: Reverse, Detonation, Minigame Lock
+ - Bombs now detonate automatically at the end of the game (both showing you where they were, and adding them to the win bonus)
+ - Event Weights adjusted (unsurprisingly)
+ - Grab Bag added, awarding you with a minigame, a booster, cash, and an event (in that order)
+ - Blammos can potentially be upgraded to Mega Blammos in certain circumstances (don't spoil yourself on this one)
+ - New Events: Double Deal, Boost Charger, Boost Magnet Midas Touch, Ejector Seat, Skip Turn, Reverse, Draw Two, Draw Four
+ - Removed Events: Scramble, Repeat, Minigame Lock
+ - +Streak events adjusted for the decimal system (instead of +1/+2/+3, is now anywhere from +0.5 to +3.0)
+ - Lockdown now acts as Triple Deal as well
+ - Split & Share now hands out 2% per living player at the time you explode, rather than a flat 10% shared between everyone
+ - Mystery Money is rarer, has a 10% chance to give you negative cash, and shows up in Lockdown now
+ - Jackpot scales to the playercount, awarding $1m for each space originally on the board
+ - End Round renamed to Final Countdown and put on a delay
+ - New Minigames: Deal or No Deal, Bumper Grab
+ - Strike it Rich lets you DOUBLE YOUR MILLION (or any other prize won) if you achieve a full count
+ - Deuces Wild buffed slightly (payout for one pair doubled)
+ - The Offer completely reworked (now it has a cool display!)
+ - Removed ~~Herobrine~~ Test Game.
+
 1.3.2
  - Season 1 codebase at end of season, after bugfixes + QoLs
  - Bot announces self-bombs
