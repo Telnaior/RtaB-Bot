@@ -39,6 +39,7 @@ import tel.discord.rtab.commands.TopCommand;
 import tel.discord.rtab.commands.TotalsCommand;
 import tel.discord.rtab.commands.ViewBetsCommand;
 import tel.discord.rtab.commands.ViewBombsCommand;
+import tel.discord.rtab.commands.ViewConnectionsCommand;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -81,6 +82,7 @@ public class RaceToABillionBot
 							new ReconnectCommand(),
 							new ReloadCommand(),
 							new ViewBombsCommand(),
+							new ViewConnectionsCommand(),
 							new ShutdownBotCommand(),
 							new AddBotCommand(),
 							new DemoCommand(),
