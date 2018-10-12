@@ -394,14 +394,14 @@ public class GameController
 		{
 			if(!(players.get(currentTurn).isBot))
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", pick again.")
-					.completeAfter(3,TimeUnit.SECONDS);
+					.completeAfter(4,TimeUnit.SECONDS);
 		}
 		else
 		{
 			firstPick = false;
 			if(!players.get(currentTurn).isBot)
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
-					.completeAfter(3,TimeUnit.SECONDS);
+					.completeAfter(4,TimeUnit.SECONDS);
 		}
 		if(repeatTurn > 0)
 			repeatTurn --;
@@ -1797,7 +1797,7 @@ public class GameController
 				/*
 				 * Special case - if you lose the round with $1B you get bumped to $999,999,999
 				 * so that an elimination without penalty (eg bribe) doesn't get you declared champion
-				 * This is since you haven't won yet, after all
+				 * This is since you haven't won yet, after all (and it's *extremely* rare to win a round without turning a profit)
 				 * Note that in the instance of a final showdown, both players are temporarily labelled champion
 				 * But after the tie is resolved, one will be bumped back to $900M
 				 */
@@ -1806,7 +1806,7 @@ public class GameController
 				//Replace the records of the players if they're there, otherwise add them
 				if(players.get(i).newbieProtection == 1)
 					channel.sendMessage(players.get(i).getSafeMention() + ", your newbie protection has expired. "
-							+ "From now on, bomb penalties will be $250,000.").queue();
+							+ "From now on, your base bomb penalty will be $250,000.").queue();
 				int location = findUserInList(list,players.get(i).uID,false);
 				StringBuilder toPrint = new StringBuilder();
 				toPrint.append(players.get(i).uID+"#");
