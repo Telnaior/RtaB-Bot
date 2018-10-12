@@ -11,8 +11,8 @@ public class DoubleZeroes implements MiniGame {
 	static final boolean BONUS = false;
 	int total;
 	int zeroesLeft;
-	List<Integer> numbers = Arrays.asList(0,0,0,0,0,0,0,0,0,0,3,4,5,6,7,8,9,9,9,9);
-	// 0 = Double Zero
+	List<Integer> numbers = Arrays.asList(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,2,3,4,5,6,7,8,9);
+	// -1 = Double Zero
 	boolean alive;
 	boolean[] pickedSpaces;
 	int lastSpace;
@@ -89,7 +89,7 @@ public class DoubleZeroes implements MiniGame {
 			lastPick = numbers.get(lastSpace);
 			//Start printing output
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			if(numbers.get(lastSpace) == 0) // If it's a Double Zero...
+			if(numbers.get(lastSpace) == -1) // If it's a Double Zero...
 			{
 				if(total > 1000) // ...and you decided to go on, you win!
 				{

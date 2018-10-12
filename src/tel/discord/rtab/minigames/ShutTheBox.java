@@ -180,7 +180,7 @@ public class ShutTheBox implements MiniGame {
 		display.append("\n\n Possible Rolls:");
 		for (int i = 0; i < isGood.length; i++) {
 			if (isGood[i] != null)
-				display.append("\n " + String.format("%2d", i+2) + ": $" +
+				display.append("\n " + String.format("%2d", i+2) + ": +$" +
 						String.format("%,9d", rollValue(i+2)));
 			else
 				display.append("\n " + String.format("%2d", i+2) + ":   BAD ROLL");
