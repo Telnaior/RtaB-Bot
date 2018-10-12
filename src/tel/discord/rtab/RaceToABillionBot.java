@@ -29,6 +29,7 @@ import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
 import tel.discord.rtab.commands.QuitCommand;
 import tel.discord.rtab.commands.RankCommand;
+import tel.discord.rtab.commands.ReconnectCommand;
 import tel.discord.rtab.commands.ReloadCommand;
 import tel.discord.rtab.commands.ResetCommand;
 import tel.discord.rtab.commands.ShutdownBotCommand;
@@ -44,6 +45,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class RaceToABillionBot
 {
+	public static JDA yayBot;
 	public static ArrayList<GameController> game = new ArrayList<>(3);
 	public static ArrayList<SuperBotChallenge> challenge = new ArrayList<>(1);
 	
@@ -76,6 +78,7 @@ public class RaceToABillionBot
 							new PingBotCommand(),
 							new StartCommand(),
 							new ResetCommand(),
+							new ReconnectCommand(),
 							new ReloadCommand(),
 							new ViewBombsCommand(),
 							new ShutdownBotCommand(),
@@ -87,7 +90,12 @@ public class RaceToABillionBot
 		prepareBot.setToken(token);
 		prepareBot.addEventListener(utilities.build());
 		prepareBot.addEventListener(waiter);
-		JDA yayBot = prepareBot.buildBlocking();
+		yayBot = prepareBot.buildBlocking();
+		connectToChannels(true);
+	}
+	
+	public static void connectToChannels(boolean autoSchedule)
+	{
 		//Get all the guilds we're in
 		List<Guild> guildList = yayBot.getGuilds();
 		//And for each guild, get the list of channels in it
@@ -114,7 +122,7 @@ public class RaceToABillionBot
 					int multiplier = 1 + (80 - playersLeft) / 8;
 					SuperBotChallenge challengeHandler = new SuperBotChallenge();
 					challenge.add(challengeHandler);
-					game.add(challengeHandler.initialise(channel,multiplier));
+					game.add(challengeHandler.initialise(channel,multiplier,autoSchedule));
 					System.out.println("Challenge Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))

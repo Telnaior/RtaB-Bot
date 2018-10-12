@@ -16,11 +16,12 @@ public class SuperBotChallenge
 	public TextChannel channel;
 	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 	
-	public GameController initialise(TextChannel channelID, int multiplier)
+	public GameController initialise(TextChannel channelID, int multiplier, boolean autoSchedule)
 	{
 		channel = channelID;
 		gameHandler = new GameController(channel,false,false,false,true,multiplier);
-		loadGames();
+		if(autoSchedule)
+			loadGames();
 		return gameHandler;
 	}
 	public void loadGames()

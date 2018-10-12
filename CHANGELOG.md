@@ -1,6 +1,7 @@
 2.0.1
  - CRITICAL bugfix to allow the same minigame to be played in multiple channels simultaneously without breaking things.
  - All previous multi-channel releases can be considered broken if the multi-channel functionality is used.
+ - Added mod-use !reconnect command as a workaround for "This is not a game channel" until that can be fixed
  - Also nerfed Double Zero.
 
 2.0.0
