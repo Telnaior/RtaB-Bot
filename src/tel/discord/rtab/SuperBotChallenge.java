@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.TextChannel;
+import tel.discord.rtab.enums.GameStatus;
 
 public class SuperBotChallenge
 {
@@ -46,12 +47,20 @@ public class SuperBotChallenge
 			totalDelay += Integer.parseInt(record[1]);
 			timer.schedule(() -> 
 			{
-				for(String next : players)
-					gameHandler.addBot(Integer.parseInt(next));
-				channel.sendMessage("Next game starting in five minutes:").queue();
-				if(record.length > 2)
-					channel.sendMessage(record[2]).queue();
-				channel.sendMessage(gameHandler.listPlayers(false)).queue();
+				if(gameHandler.gameStatus != GameStatus.SEASON_OVER)
+				{
+					for(String next : players)
+						gameHandler.addBot(Integer.parseInt(next));
+					channel.sendMessage("Next game starting in five minutes:").queue();
+					if(record.length > 2)
+						channel.sendMessage(record[2]).queue();
+					channel.sendMessage(gameHandler.listPlayers(false)).queue();
+				}
+				else
+				{
+					timer.purge();
+					timer.shutdownNow();
+				}
 			},totalDelay-5,TimeUnit.MINUTES);
 			timer.schedule(() -> gameHandler.startTheGameAlready(),totalDelay,TimeUnit.MINUTES);
 			totalGames ++;

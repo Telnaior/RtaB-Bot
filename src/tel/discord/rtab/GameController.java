@@ -633,7 +633,7 @@ public class GameController
 		case NORMAL:
 			channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
 				.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			break;
 		case BANKRUPT:
 			int amountLost = players.get(currentTurn).bankrupt();
@@ -661,7 +661,7 @@ public class GameController
 							.completeAfter(3,TimeUnit.SECONDS);
 				}
 			}
-			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			break;
 		case BOOSTHOLD:
 			StringBuilder boostHoldResult = new StringBuilder().append("It ");
@@ -670,7 +670,7 @@ public class GameController
 			boostHoldResult.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
 			channel.sendMessage(boostHoldResult)
 					.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).blowUp(1,true,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,true,(playersJoined-playersAlive));
 			break;
 		case GAMELOCK:
 			StringBuilder gameLockResult = new StringBuilder().append("It ");
@@ -681,7 +681,7 @@ public class GameController
 			channel.sendMessage(gameLockResult)
 					.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).minigameLock = true;
-			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			break;
 		case CHAIN:
 			channel.sendMessage("It goes **BOOM**...")
@@ -708,7 +708,7 @@ public class GameController
 			while(Math.random() * chain < 1);
 			channel.sendMessage(String.format("**$%,d** penalty!",Math.abs(chain*penalty)))
 					.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).blowUp(chain,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER*chain,false,(playersJoined-playersAlive));
 			break;
 		case REVERSE:
 			channel.sendMessage("It goes **BOOM**...")
@@ -722,7 +722,7 @@ public class GameController
 			channel.sendMessage("It goes **KABLAM**! "
 					+ String.format("$%,d lost as penalty, plus board damage.",Math.abs(penalty)))
 				.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			//Wipe out adjacent spaces
 			int boardWidth = Math.max(5,playersJoined+1);
 			boolean canAbove = (location >= boardWidth);
@@ -978,7 +978,7 @@ public class GameController
 					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
 			players.get(currentTurn).threshold = true;
 			int tempRepeat = repeatTurn;
-			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			repeatTurn = tempRepeat;
 			//Shuffle back to starting player
 			for(int i=playerToKill; i<=playersAlive; i++)
@@ -995,7 +995,7 @@ public class GameController
 					channel.sendMessage(String.format("$%1$,d penalty for %2$s!",
 							Math.abs(penalty*4),players.get(currentTurn).getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
 					players.get(currentTurn).threshold = true;
-					extraResult = players.get(currentTurn).blowUp(1,false,0);
+					extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,0);
 					channel.sendMessage(extraResult).queue();
 					advanceTurn(false);
 				}
@@ -1053,7 +1053,7 @@ public class GameController
 			penalty *= (10 - Math.min(9,playersJoined-playersAlive));
 			channel.sendMessage(String.format("$%,d penalty!",Math.abs(penalty*4))).queue();
 			players.get(currentTurn).threshold = true;
-			extraResult = players.get(currentTurn).blowUp(1,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			break;
 		}
 		if(extraResult != null)
