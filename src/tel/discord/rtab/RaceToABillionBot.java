@@ -33,6 +33,7 @@ import tel.discord.rtab.commands.RankCommand;
 import tel.discord.rtab.commands.ReconnectCommand;
 import tel.discord.rtab.commands.ReloadCommand;
 import tel.discord.rtab.commands.ResetCommand;
+import tel.discord.rtab.commands.ShopCommand;
 import tel.discord.rtab.commands.ShutdownBotCommand;
 import tel.discord.rtab.commands.StartCommand;
 import tel.discord.rtab.commands.StatsCommand;
@@ -89,6 +90,7 @@ public class RaceToABillionBot
 							new AddBotCommand(),
 							new DemoCommand(),
 							new MemeCommand(),
+							new ShopCommand(),
 							new LuckyNumberCommand());
 		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
 		prepareBot.setToken(token);

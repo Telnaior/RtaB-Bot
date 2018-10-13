@@ -723,7 +723,7 @@ public class GameController
 		case REVERSE:
 			channel.sendMessage("It goes **BOOM**...")
 				.completeAfter(5,TimeUnit.SECONDS);
-			channel.sendMessage(String.format("But it's a REVERSE bomb. $%,d penalty awarded to living players!",
+			channel.sendMessage(String.format("But it's a REVERSE bomb. $%,d awarded to living players!",
 					Math.abs(penalty))).completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).blowUp(0,false,(playersJoined-playersAlive));
 			splitMoney(-penalty,MoneyMultipliersToUse.BOOSTER_ONLY, false);
