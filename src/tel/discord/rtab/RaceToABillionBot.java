@@ -20,6 +20,7 @@ import tel.discord.rtab.commands.BetTopCommand;
 import tel.discord.rtab.commands.BoardCommand;
 import tel.discord.rtab.commands.DemoCommand;
 import tel.discord.rtab.commands.HelpCommand;
+import tel.discord.rtab.commands.HistoryCommand;
 import tel.discord.rtab.commands.JoinCommand;
 import tel.discord.rtab.commands.LivesCommand;
 import tel.discord.rtab.commands.LuckyNumberCommand;
@@ -72,6 +73,7 @@ public class RaceToABillionBot
 							new RankCommand(),
 							new TopCommand(),
 							new StatsCommand(),
+							new HistoryCommand(),
 							new BetCommand(),
 							new ViewBetsCommand(),
 							new BetRankCommand(),

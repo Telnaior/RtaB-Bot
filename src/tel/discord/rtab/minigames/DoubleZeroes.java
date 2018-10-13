@@ -191,7 +191,7 @@ public class DoubleZeroes implements MiniGame {
 	{
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
-		display.append("DOUBLE ZEROES\n");
+		display.append(" DOUBLE ZERO \n");
 		for(int i=0; i<numbers.size(); i++)
 		{
 			if(pickedSpaces[i])
