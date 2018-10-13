@@ -294,7 +294,7 @@ class BumperGrab extends MiniGame {
     */
   override def getBotPick: String = {
     //Exit if we can, otherwise just pick a direction at random lol
-    if (board(player_X)(player_Y) == Exit) "Exit"
+    if (board(player_X)(player_Y) == Exit && winnings > 0) "Exit"
     else Vector("LEFT", "RIGHT", "UP", "DOWN")(Random.nextInt(4))
   }
   override def toString: String = NAME

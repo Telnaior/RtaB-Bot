@@ -1298,11 +1298,14 @@ public class GameController
 		case BOOST_MAGNET:
 			//Get the total boost in play
 			int totalBoost = 0;
-			for(Player next : players)
+			for(int i=0; i < players.size(); i++)
 			{
-				//Add their boost to the pile
-				totalBoost += (next.booster - 100)/2;
-				next.booster -= (next.booster - 100)/2;
+				//If they aren't the current player, add their boost to the pile
+				if(i != currentTurn)
+				{
+					totalBoost += (players.get(i).booster - 100)/2;
+					players.get(i).booster -= (players.get(i).booster - 100)/2;
+				}
 			}
 			if(totalBoost != 0)
 			{
