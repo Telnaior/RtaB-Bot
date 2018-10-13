@@ -394,21 +394,21 @@ public class GameController
 		{
 			if(!(players.get(currentTurn).isBot))
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", pick again.")
-					.completeAfter(4,TimeUnit.SECONDS);
+					.completeAfter(2,TimeUnit.SECONDS);
 		}
 		else
 		{
 			firstPick = false;
 			if(!players.get(currentTurn).isBot)
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + ", your turn. Choose a space on the board.")
-					.completeAfter(4,TimeUnit.SECONDS);
+					.completeAfter(2,TimeUnit.SECONDS);
 		}
 		if(repeatTurn > 0)
 			repeatTurn --;
-		//Display the board, then ready up the space picker
-		displayBoardAndStatus(true, false, false);
+		//Display the board, then ready up the space picker depending on if it's a bot up next
 		if(players.get(currentTurn).isBot)
 		{
+			displayBoardAndStatus(true, false, false, 2);
 			//Get safe spaces, starting with all unpicked spaces
 			ArrayList<Integer> openSpaces = new ArrayList<>(boardSize);
 			for(int i=0; i<boardSize; i++)
@@ -428,6 +428,7 @@ public class GameController
 		}
 		else
 		{
+			displayBoardAndStatus(true, false, false);
 			ScheduledFuture<?> warnPlayer = timer.schedule(() -> 
 			{
 				channel.sendMessage(players.get(currentTurn).getSafeMention() + 
@@ -819,7 +820,7 @@ public class GameController
 			while(outputIterator.hasNext())
 			{
 				i++;
-				channel.sendMessage(outputIterator.next()).queueAfter(750*i,TimeUnit.MILLISECONDS);
+				channel.sendMessage(outputIterator.next()).queueAfter(i,TimeUnit.SECONDS);
 			}
 			break;
 		case BOOSTER:
@@ -1676,6 +1677,10 @@ public class GameController
 	}
 	public void displayBoardAndStatus(boolean printBoard, boolean totals, boolean copyToResultChannel)
 	{
+		displayBoardAndStatus(printBoard, totals, copyToResultChannel, 0);
+	}
+	public void displayBoardAndStatus(boolean printBoard, boolean totals, boolean copyToResultChannel, int delay)
+	{
 		if(gameStatus == GameStatus.SIGNUPS_OPEN)
 		{
 			//No board to display if the game isn't running!
@@ -1786,7 +1791,10 @@ public class GameController
 		}
 		//Close it off and print it out
 		board.append("```");
-		channel.sendMessage(board.toString()).queue();
+		if(delay > 0)
+			channel.sendMessage(board.toString()).completeAfter(delay, TimeUnit.SECONDS);
+		else
+			channel.sendMessage(board.toString()).queue();
 		if(copyToResultChannel && resultChannel != null)
 			resultChannel.sendMessage(board.toString()).queue();
 	}
