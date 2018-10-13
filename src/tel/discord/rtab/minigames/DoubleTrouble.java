@@ -13,10 +13,11 @@ public class DoubleTrouble implements MiniGame {
 	int mystery;
 	int total;
 	int bombsLeft;
+	int crashLeft;
 	int cashLeft;
 	int doublesLeft;
-	List<Integer> money = Arrays.asList(0,0,1,10000,5000,5000,2500,2500,2500,2500,2500,2,2,2,2,2,2,2,2,2);
-	// 0 = Bomb, 1 = Mystery, 2 = Double
+	List<Integer> money = Arrays.asList(-1,0,1,10000,5000,5000,2500,2500,2500,2500,2500,2,2,2,2,2,2,2,2,2);
+	// -1 = Crash, 0 = Bomb, 1 = Mystery, 2 = Double
 	boolean alive;
 	boolean[] pickedSpaces;
 	int lastSpace;
@@ -35,7 +36,8 @@ public class DoubleTrouble implements MiniGame {
 		mystery = 100*(int)((Math.random()*100+1)); // Generates a random number from 100 - 10,000 in $100 increments
 		if(Math.random() < 0.25) //With 25% chance, give it another random number with the same distribution
 			mystery += 100*(int)((Math.random()*100+1));
-		bombsLeft = 2;
+		bombsLeft = 1;
+		crashLeft = 1;
 		cashLeft = 9;
 		doublesLeft = 9;
 		pickedSpaces = new boolean[money.size()];
@@ -85,35 +87,37 @@ public class DoubleTrouble implements MiniGame {
 			lastPick = money.get(lastSpace);
 			//Start printing output
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			if(money.get(lastSpace) == 0)
+			switch(money.get(lastSpace))
 			{
-				alive = false; // BOMB, tough cookies
+			case 0: //Bomb
+				alive = false;
 				total = 0;
 				bombsLeft --;
 				output.add("It's a **BOMB**.");
 				output.add("Sorry, you lose.");
-			}
-			else if(money.get(lastSpace) == 1)
-			{
-				// Mystery picked!
+				break;
+			case -1: //Crash
+				total /= 10;
+				crashLeft --;
+				output.add("It's a CRASH...");
+				output.add("You lose 90% of your cash.");
+				break;
+			case 1: //Mystery
 				output.add("It's the MYSTERY!");
 				output.add(String.format("This time, it's worth $%,d!",mystery));
 				total += mystery;
 				cashLeft --;
-			}			
-			else if(money.get(lastSpace) == 2)
-			{
-				// Double picked!
+				break;
+			case 2: //Double
 				output.add("It's a DOUBLE!");
 				total *= 2;
 				doublesLeft --;
-			}
-			else
-			{
-				// Money picked!
+				break;
+			default: //Regular cash
 				output.add(String.format("It's $%,d!",lastPick));
 				total += money.get(lastSpace);
 				cashLeft --;
+				break;
 			}
 			if(alive)
 			{
@@ -177,6 +181,7 @@ public class DoubleTrouble implements MiniGame {
 		display.append(String.format("Total: $%,d\n",total));
 		display.append(String.format("%dx DOUBLE\n",doublesLeft));
 		display.append(String.format("%dx CASH\n",cashLeft));
+		display.append(String.format("%dx CRASH\n",crashLeft));
 		display.append(String.format("%dx BOMB\n",bombsLeft));
 		display.append("```");
 		return display.toString();
