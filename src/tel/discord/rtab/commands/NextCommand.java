@@ -21,12 +21,20 @@ public class NextCommand extends Command {
 		{
 			if(game.channel == event.getChannel())
 			{
-				if(game.gameStatus == GameStatus.SIGNUPS_OPEN)
-					event.reply("You can join already!");
-				else
+				if(game.gameStatus != GameStatus.SIGNUPS_OPEN || (!game.playersCanJoin && game.playersJoined == 0))
 				{
 					game.addToPingList(event.getAuthor());
-					event.reply("Noted - will ping you after this game.");
+					event.reply(String.format("Noted - will ping you when you can %s.",game.playersCanJoin?"join":"bet"));
+				}
+				else
+				{
+					if(game.playersCanJoin)
+						event.reply("You can join already!");
+					else
+					{
+						event.reply("You can bet already!");
+						game.listPlayers(false);
+					}
 				}
 				//We found the right channel, so
 				return;

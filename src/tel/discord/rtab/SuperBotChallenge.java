@@ -55,6 +55,7 @@ public class SuperBotChallenge
 					if(record.length > 2)
 						channel.sendMessage(record[2]).queue();
 					channel.sendMessage(gameHandler.listPlayers(false)).queue();
+					gameHandler.runPingList();
 				}
 				else
 				{

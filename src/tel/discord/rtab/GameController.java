@@ -50,7 +50,7 @@ public class GameController
 	final boolean rankChannel;
 	public final boolean runDemo;
 	final boolean verboseBotGames;
-	final boolean playersCanJoin;
+	public final boolean playersCanJoin;
 	public TextChannel channel;
 	TextChannel resultChannel;
 	public BettingHandler betManager;
@@ -1341,7 +1341,8 @@ public class GameController
 				betManager.resolveBets(players.get(0).name,playerNames);
 			}
 			reset();
-			runPingList();
+			if(playersCanJoin)
+				runPingList();
 			if(winners.size() > 0)
 			{
 				//Got a single winner, crown them!
@@ -2047,7 +2048,10 @@ public class GameController
 		if(pingList.size() == 0)
 			return;
 		StringBuilder output = new StringBuilder();
-		output.append("The game is finished");
+		if(playersCanJoin)
+			output.append("The game is finished");
+		else
+			output.append("Betting is now open");
 		for(String nextName : pingList)
 		{
 			output.append(" - ");
