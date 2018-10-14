@@ -37,11 +37,12 @@ public class ShutTheBox implements MiniGame {
 		output.add("Each time you roll the dice, you may close one or more " +
 				"numbers that total *exactly* the amount thrown.");
 		output.add("For each number you successfully close, you will earn " +
-				"as many points as the amount thrown. The first point is " +
-				"worth $1,000, with each additional point worth $1,000 more " +
-				"than the previous.");
+				"as many points as the amount thrown. Higher rolls are more " +
+				"valuable, and all rolls become more valuable as the game " +
+				"progresses. How much each roll adds to your winnings is " +
+			  	"displayed below the board.");
 		output.add("If you shut the box completely, we'll augment your " +
-				   "winnings to $2,000,000!");
+				   "winnings to $1,500,000!");
 		output.add("You are free to stop after any roll, but if you can't " +
 				"exactly close the number thrown, you lose everything.");
 		output.add("Good luck! Type ROLL when you're ready.");
@@ -230,8 +231,12 @@ public class ShutTheBox implements MiniGame {
 		if (isGood[roll-2] == null)
 			return getMoneyWon() * -1;
 		if (totalShut + roll == MAX_SCORE)
-			return 2000000 - getMoneyWon();
-		return ((totalShut+roll)*((totalShut+roll)+1)/2) * 1000 - getMoneyWon();
+			return 1500000 - getMoneyWon();
+		return findNthTetrahedralNumber(totalShut+roll) * 50 - getMoneyWon();
+	}
+	
+	public int findNthTetrahedralNumber(int n) {
+		return n*(n+1)*(n+2)/6;
 	}
 	
 	@Override
@@ -244,8 +249,8 @@ public class ShutTheBox implements MiniGame {
 	public int getMoneyWon()
 	{
 		if (totalShut == MAX_SCORE)
-			return 2000000;
-		else return (totalShut*(totalShut+1)/2) * 1000;
+			return 1500000;
+		else return findNthTetraHedralNumber(totalShut) * 50;
 	}
 
 	@Override
