@@ -5,31 +5,33 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.TextChannel;
+import tel.discord.rtab.enums.GameStatus;
 
 public class SuperBotChallenge
 {
 	GameController gameHandler;
-	TextChannel channel;
-	ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
+	public TextChannel channel;
+	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 	
-	public GameController initialise(TextChannel channelID, int multiplier)
+	public GameController initialise(TextChannel channelID, int multiplier, boolean autoSchedule)
 	{
 		channel = channelID;
-		gameHandler = new GameController(channel,false,false,true,multiplier);
-		loadGames();
+		gameHandler = new GameController(channel,false,false,false,true,multiplier);
+		if(autoSchedule)
+			loadGames();
 		return gameHandler;
 	}
 	public void loadGames()
 	{
+		timer.purge();
 		List<String> list = null;
 		try
 		{
-			list = Files.readAllLines(Paths.get("schedule"+channel+".csv"));
+			list = Files.readAllLines(Paths.get("schedule"+channel.getId()+".csv"));
 		}
 		catch (IOException e)
 		{
@@ -41,14 +43,25 @@ public class SuperBotChallenge
 		while(schedule.hasNext())
 		{
 			String[] record = schedule.next().split(":");
-			String[] players = record[0].split("  ");
+			String[] players = record[0].split("	");
 			totalDelay += Integer.parseInt(record[1]);
 			timer.schedule(() -> 
 			{
-				for(String next : players)
-					gameHandler.addBot(Integer.parseInt(next));
-				channel.sendMessage("Next game starting in five minutes.").queue();
-				channel.sendMessage(gameHandler.listPlayers(false)).queue();
+				if(gameHandler.gameStatus != GameStatus.SEASON_OVER)
+				{
+					for(String next : players)
+						gameHandler.addBot(Integer.parseInt(next));
+					channel.sendMessage("Next game starting in five minutes:").queue();
+					if(record.length > 2)
+						channel.sendMessage(record[2]).queue();
+					channel.sendMessage(gameHandler.listPlayers(false)).queue();
+					gameHandler.runPingList();
+				}
+				else
+				{
+					timer.purge();
+					timer.shutdownNow();
+				}
 			},totalDelay-5,TimeUnit.MINUTES);
 			timer.schedule(() -> gameHandler.startTheGameAlready(),totalDelay,TimeUnit.MINUTES);
 			totalGames ++;

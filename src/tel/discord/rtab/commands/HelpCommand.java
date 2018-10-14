@@ -28,7 +28,7 @@ public class HelpCommand extends Command
 			helpList.append("Your opponents will do the same, and then you'll take turns choosing spaces.\n");
 			helpList.append("All actions have a time limit, so don't go AFK or bad things may happen!\n");
 			helpList.append("If you pick a space with a bomb hidden behind it, "
-					+ "you'll blow up, lose $250,000, your booster, and your streak bonus, and be ejected from the game.\n");
+					+ "you'll blow up and lose cash, your booster, and your streak bonus, then be ejected from the game.\n");
 			helpList.append("Your total cash bank builds up from round to round, "
 					+ "and the objective is to reach one billion dollars.\n");
 			helpList.append("To see a list of help files, type '!help list'.\n");
@@ -48,7 +48,8 @@ public class HelpCommand extends Command
 			helpList.append("Some spaces on the board can add or subtract from this booster.\n");
 			helpList.append("Most of the money you earn and lose will be multiplied by your current booster.\n");
 			helpList.append("This includes the bomb penalty, so watch out!\n");
-			helpList.append("The maximum booster possible is 999%, and the minimum is 10%.\n");
+			helpList.append("The maximum booster possible is 999%, and the minimum is 10%. "
+					+ "If your booster goes past the cap in either direction, the excess is converted into cash.\n");
 			helpList.append("Boosters carry over between games, but will (usually) be reset when you hit a bomb.\n");
 			break;
 		case "streak":
@@ -58,7 +59,7 @@ public class HelpCommand extends Command
 			helpList.append("For example, if you win alone in a four-player game, "
 					+ "you will gain (1.0 + 0.9 + 0.8 =) +2.7 to your streak bonus.\n");
 			helpList.append("You also receive a win bonus. "
-					+ "The base win bonus is $20,000 for every space picked during the game.\n");
+					+ "The base win bonus is $20,000 for every space picked during the game, plus any remaining bombs.\n");
 			helpList.append("If the board was cleared entirely, the win bonus is doubled.\n");
 			helpList.append("Finally, if there are multiple winners, the win bonus is shared between them.\n");
 			helpList.append("Each player's share of the win bonus is then multiplied by their booster and streak bonus.\n");
@@ -70,8 +71,7 @@ public class HelpCommand extends Command
 			break;
 		case "newbie":
 			helpList.append("For your first ten games in the season, you are considered to be under newbie protection.\n");
-			helpList.append("During this time, the standard bomb penalty is reduced from $250,000 to $100,000.\n");
-			helpList.append("Specialty bombs and blammos can still multiply this value, of course.\n");
+			helpList.append("During this time, your bomb penalties are reduced to 40% of what they would otherwise be.\n");
 			helpList.append("In addition, you do not lose lives while under newbie protection, "
 					+ "so you can play freely while learning about the game.");
 			break;
@@ -84,23 +84,35 @@ public class HelpCommand extends Command
 			helpList.append("But never fear! They'll all come back tomorrow. "
 					+ "20 hours after you lose your first life, you'll be restocked to 5.");
 			break;
-			/*
-		case "bombs":
-			helpList.append("The standard bomb will simply dock you $250,000, "
-					+ "reset your booster, and eject you from the round.\n");
-			helpList.append("However, you can sometimes run into 'specialty' bombs that can do more (or less) harm.\n");
-			helpList.append("The first kind is the 'boost hold' bomb, which doesn't reset your booster.\n");
-			helpList.append("This means you'll still get to carry it through to the next round!\n");
-			helpList.append("The second kind is the 'bankrupt' bomb. "
-					+ "This bomb removes all the money you gained (or lost) during the round, "
-					+ "and then applies the standard penalty.\n");
-			helpList.append("The third kind is the 'cluster' (or 'chain') bomb. "
-					+ "This bomb explodes multiple times (2, 4, 8, or even more!), "
-					+ "multiplying the bomb penalty by the explosions.\n");
-			helpList.append("Finally, although it's very rare, some bombs fail to explode at all. "
-					+ "If this happens to you, count yourself lucky!");
+		case "bet":
+		case "betting":
+			helpList.append("The Super Bot Challenge is (generally) just for the bots to play, "
+					+ "but that doesn't mean there's nothing to do but watch.\n");
+			helpList.append("The bot announces the players for each game five minutes before the game starts, "
+					+ "and during that time you can place a bet on the player you think will win.\n");
+			helpList.append("You start with 10,000 betting chips, "
+					+ "and if you win you get 4x your bet plus any losing bets (shared between everyone who bet on the winner).\n");
+			helpList.append("This means that on average you can win more than you lose, "
+					+ "especially if more people bet on a single match!\n");
+			helpList.append("If you run out of betting chips, you are limited to maximum bets of 1,000 until you win your way back in.\n");
+			helpList.append("Good luck with your betting, and enjoy this side mode!");
 			break;
-			*/
+		case "shop":
+		case "support":
+		case "donate":
+			helpList.append("It is of course possible to play RtaB entirely free (and most people do), "
+					+ "but if you wish to support the server there are a few perks you can gain for this.\n");
+			helpList.append("The simple choices are that you can purchase some extra lives or betting chips - "
+					+ "there are several price points available for this.\n");
+			helpList.append("It's also worth noting that you can purchase unlimited lives for an entire season.\n");
+			helpList.append("You can also rent custom roles if you wish to give yourself (or another player) a special title.\n");
+			helpList.append("Finally, there are a couple of 'special' perks you can buy.\n");
+			helpList.append("Firstly, you can buy the right to participate in a Super Bot Challenge. "
+					+ "If you manage to win, you earn a permanent custom role!\n");
+			helpList.append("Secondly, you can rent the RtaB bot if you wish to run the game in your own server "
+					+ "without the burden of having to host it yourself.\n");
+			helpList.append("The full price list can be seen at https://i.imgur.com/gcsGHev.png and all prices are in AUD.");
+			break;
 		case "list":
 		default:
 			helpList.append("```\n");
@@ -111,7 +123,8 @@ public class HelpCommand extends Command
 			helpList.append("!help streak - Explains the streak bonus multiplier\n");
 			helpList.append("!help newbie - Explains newbie protection\n");
 			helpList.append("!help lives  - Explains the life system\n");
-			//helpList.append("!help bombs  - Explains the various specialty bombs\n");
+			helpList.append("!help bet    - Explains the betting system in the Super Bot Challenge\n");
+			helpList.append("!help shop   - Explains what you can buy should you choose to support RtaB\n");
 			helpList.append("```");
 			break;
 		}

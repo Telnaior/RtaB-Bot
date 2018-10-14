@@ -14,9 +14,9 @@ public class DeucesWild implements MiniGame {
 	static final String NAME = "Deuces Wild";
 	static final boolean BONUS = false;
 	static final int BOARD_SIZE = 52;
-	static Deck deck;
-	static Card[] cardsPicked = new Card[5];
-	static boolean[] cardsHeld = new boolean[5];
+	Deck deck;
+	Card[] cardsPicked = new Card[5];
+	boolean[] cardsHeld = new boolean[5];
 	ArrayList<Card> board = new ArrayList<Card>(BOARD_SIZE);
 	int lastSpace;
 	Card lastPicked;

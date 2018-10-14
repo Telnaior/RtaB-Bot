@@ -8,9 +8,10 @@ public class ShutTheBox implements MiniGame {
 	static final boolean BONUS = false;
 	static final int BOARD_SIZE = 9;
 	static final int MAX_SCORE = BOARD_SIZE * (BOARD_SIZE+1) / 2;
+	int possibleRolls;
 	boolean[] closedSpaces;
 	Dice dice;
-	boolean[] isGood;
+	String[] isGood;
 //	String[] botStrategy; // temporary comment-out; the function that generates this is not working
 	boolean isAlive;  
 	boolean isClosing;
@@ -23,13 +24,8 @@ public class ShutTheBox implements MiniGame {
 		//Initialise board
 		closedSpaces = new boolean[BOARD_SIZE];
 		dice = new Dice();
-		isGood = new boolean[dice.getDice().length * dice.getNumFaces() -
-				(dice.getDice().length - 1)];
-//		botStrategy = new String[isGood.length]; // temporary comment-out; the function that generates this is not working
-		for (int i = 0; i < isGood.length; i++) {
-			isGood[i] = true;
-//			botStrategy[i] = getBotStrategy(i+2, false); // temporary comment-out; the generator function is not working
-		}
+		possibleRolls = dice.getDice().length * dice.getNumFaces() - (dice.getDice().length - 1);
+		refreshGood();
 		isAlive = true;
 		isClosing = false;
 		totalShut = 0;
@@ -41,11 +37,12 @@ public class ShutTheBox implements MiniGame {
 		output.add("Each time you roll the dice, you may close one or more " +
 				"numbers that total *exactly* the amount thrown.");
 		output.add("For each number you successfully close, you will earn " +
-				"as many points as the amount thrown. The first point is " +
-				"worth $1,000, with each additional point worth $1,000 more " +
-				"than the previous.");
+				"as many points as the amount thrown. Higher rolls are more " +
+				"valuable, and all rolls become more valuable as the game " +
+				"progresses. How much each roll adds to your winnings is " +
+			  	"displayed below the board.");
 		output.add("If you shut the box completely, we'll augment your " +
-				   "winnings to $2,000,000!");
+				   "winnings to $1,500,000!");
 		output.add("You are free to stop after any roll, but if you can't " +
 				"exactly close the number thrown, you lose everything.");
 		output.add("Good luck! Type ROLL when you're ready.");
@@ -68,7 +65,7 @@ public class ShutTheBox implements MiniGame {
 			else if (pick.toUpperCase().equals("ROLL")) {
 				dice.rollDice();
 				output.add("You rolled: " + dice.toString());
-				if (isGood[dice.getDiceTotal() - 2]) {
+				if (isGood[dice.getDiceTotal() - 2] != null) {
 					if (totalShut + dice.getDiceTotal() == MAX_SCORE) {
 						output.add("Congratulations, you shut the box!");
 						totalShut = MAX_SCORE; // essentially closes the remaining numbers automatically
@@ -127,7 +124,7 @@ public class ShutTheBox implements MiniGame {
 				for (int i = 0; i < tokens.length; i++)
 					closedSpaces[Integer.parseInt(tokens[i])-1] = true;
 				totalShut += dice.getDiceTotal();
-				isGood = refreshGood();
+				refreshGood();
 //				for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
 //					botStrategy[i] = getBotStrategy(i+2, false); // function is not working
 				isClosing = false;
@@ -183,7 +180,7 @@ public class ShutTheBox implements MiniGame {
 		display.append("\n Total: $" + String.format("%,7d", getMoneyWon()));
 		display.append("\n\n Possible Rolls:");
 		for (int i = 0; i < isGood.length; i++) {
-			if (isGood[i])
+			if (isGood[i] != null)
 				display.append("\n " + String.format("%2d", i+2) + ": +$" +
 						String.format("%,9d", rollValue(i+2)));
 			else
@@ -193,77 +190,55 @@ public class ShutTheBox implements MiniGame {
 		return display.toString();
 	}
 
-	boolean[] refreshGood() {
-		boolean[] isStillGood = new boolean[isGood.length];
+	void refreshGood() {
+		isGood = new String[possibleRolls];
 		
 		// The numbers that are still open besides 1 are obviously still good, so start there.
 		for (int i = 1; i < closedSpaces.length; i++)
-			isStillGood[i-1] = !closedSpaces[i];
+			if(!closedSpaces[i])
+				isGood[i-1] = Integer.toString(i+1);
 		
 		for (int i = 1; i <= closedSpaces.length; i++) {
 			// If the corresponding space is closed, don't bother with it
 			if (closedSpaces[i-1])
 				continue;
-			for (int j = i+1; i+j < isStillGood.length + 2 && j <= closedSpaces.length; j++) {
+			for (int j = i+1; i+j < possibleRolls + 2 && j <= closedSpaces.length; j++) {
 				if (closedSpaces[j-1])
 					continue;
 				// i-1 and j-1 must both be open; otherwise we wouldn't reach this point in the code
-				isStillGood[i+j-2] = true;
-				for (int k = j+1; i+j+k < isStillGood.length + 2; k++) {
+				if(isGood[i+j-2] == null || isGood[i+j-2].length() > 3)
+					isGood[i+j-2] = Integer.toString(i) + " " + Integer.toString(j);
+				for (int k = j+1; i+j+k < possibleRolls + 2; k++) {
 					if (closedSpaces[k-1])
 						continue;
-					isStillGood[i+j+k-2] = true;
-					for (int l = k+1; i+j+k+l < isStillGood.length + 2; l++) {
+					if(isGood[i+j+k-2] == null || isGood[i+j+k-2].length() > 5)
+						isGood[i+j+k-2] = Integer.toString(i) + " " + Integer.toString(j) + " " + Integer.toString(k);
+					for (int l = k+1; i+j+k+l < possibleRolls + 2; l++) {
 						if (closedSpaces[l-1])
 							continue;
-						isStillGood[i+j+k+l-2] = true;
+						if(isGood[i+j+k+l-2] == null || isGood[i+j+k+l-2].length() > 7)
+							isGood[i+j+k+l-2] = Integer.toString(i) + " " + Integer.toString(j) + " " 
+								+ Integer.toString(k) + " " + Integer.toString(l);
 					}
 				}
 			}
 		}
 		
-		return isStillGood;
+		return;
 	}
 		
 	public int rollValue(int roll) {
-		if (!isGood[roll-2])
+		if (isGood[roll-2] == null)
 			return getMoneyWon() * -1;
 		if (totalShut + roll == MAX_SCORE)
-			return 2000000 - getMoneyWon();
-		return ((totalShut+roll)*((totalShut+roll)+1)/2) * 1000 - getMoneyWon();
+			return 1500000 - getMoneyWon();
+		return findNthTetrahedralNumber(totalShut+roll) * 50 - getMoneyWon();
 	}
 	
-	/* FIXME: Function is not working. It is known to break with 2, one of {4 6}, and 9 shut.
-	public String getBotStrategy(int roll, boolean dbl) {
-		if (roll == 1) {
-			if (!closedSpaces[0])
-				return " 1";
-			else return null;
-		}
-		if (!isGood[roll-2])
-			return null;
-		
-		/* The reason for the dbl parameter is so the bot doesn't get something
-		 * like, say, 5 5 for a strategy for 10; the first condition prevents
-		 * that.
-		 */
-/*		if (!dbl && roll < 10 && !closedSpaces[roll - 1])
-			return " " + roll;
-			
-		for (int i = Math.min(roll-1, 9); i > 0; i--) {
-			if (i < roll-i)
-				break; // and throw our error
-			if (!isGood[i-2])
-				continue;
-			if (i == roll-i)
-				return " " + (roll - i) + getBotStrategy(i, true);
-			if (isGood[roll - i - 2])
-				return " " + i + getBotStrategy(roll-i, false);
-		}
-		throw new IllegalArgumentException("Uh-oh--something's wrong with the" +
-				" Shut the Box combination generator! Tell StrangerCoug.");
+	public int findNthTetrahedralNumber(int n) {
+		return n*(n+1)*(n+2)/6;
 	}
-*/	
+	
 	@Override
 	public boolean isGameOver()
 	{
@@ -274,8 +249,8 @@ public class ShutTheBox implements MiniGame {
 	public int getMoneyWon()
 	{
 		if (totalShut == MAX_SCORE)
-			return 2000000;
-		else return (totalShut*(totalShut+1)/2) * 1000;
+			return 1500000;
+		else return findNthTetraHedralNumber(totalShut) * 50;
 	}
 
 	@Override
@@ -286,101 +261,12 @@ public class ShutTheBox implements MiniGame {
 	@Override
 	public String getBotPick() {
 		if (isClosing) {
-//			return botStrategy[dice.getDiceTotal() - 1]; // temporary comment out; generator function is not working
-// Temporary switch statement to hardcode desired strategy; will be removed when the
-// getBotStrategy() function is fixed.
-			switch (dice.getDiceTotal()) {
-				case 2: return "2";
-				case 3: if (!closedSpaces[2]) return "3";
-					else return "2 1";
-				case 4: if (!closedSpaces[3]) return "4";
-					else return "3 1";
-				case 5: if (!closedSpaces[4]) return "5";
-					else if (!closedSpaces[3] && !closedSpaces[0])
-						return "4 1";
-					else return "3 2";
-				case 6: if (!closedSpaces[5]) return "6";
-					else if (!closedSpaces[4] && !closedSpaces[0]) return "5 1";
-					else if (!closedSpaces[3]) return "4 2";
-					else return "3 2 1";
-				case 7: if (!closedSpaces[6]) return "7";
-					else if (!closedSpaces[5] && !closedSpaces[0]) return "6 1";
-					else if (!closedSpaces[4] && !closedSpaces[1]) return "5 2";
-					else {
-						if (!closedSpaces[2]) return "4 3";
-						else return "4 2 1";
-					}
-				case 8: if (!closedSpaces[7]) return "8";
-					else if (!closedSpaces[6] && !closedSpaces[0]) return "7 1";
-					else if (!closedSpaces[5] && !closedSpaces[1]) return "6 2";
-					else {
-						if (!closedSpaces[2]) return "5 3";
-						else return "5 2 1";
-					}
-				case 9: if (!closedSpaces[8]) return "9";
-					else if (!closedSpaces[7] && closedSpaces[0]) return "8 1";
-					else if (!closedSpaces[6] && closedSpaces[1]) return "7 2";
-					else if (!closedSpaces[5]) {
-						if (!closedSpaces[2]) return "6 3";
-						else if (!closedSpaces[1] && !closedSpaces[0]) return "6 2 1";
-					}
-					else {
-						if (!closedSpaces[3]) return "5 4";
-						else return "5 3 1";
-					}
-				case 10: if (!closedSpaces[8] && !closedSpaces[0]) return "9 1";
-					else if (!closedSpaces[7] && !closedSpaces[1]) return "8 2";
-					else if (!closedSpaces[6]) {
-						if (!closedSpaces[2]) return "7 3";
-						else if (!closedSpaces[1] && !closedSpaces[0])  return "7 2 1";
-					}
-					else if (!closedSpaces[5]) {
-						if (!closedSpaces[3]) return "6 4";
-						else if (!closedSpaces[2] && !closedSpaces[0]) return "6 3 1";
-					}
-					else if (!closedSpaces[4]) {
-						if (!closedSpaces[3] && !closedSpaces[0]) return "5 4 1";
-						else return "5 3 2";
-					}
-					else return "4 3 2 1";
-				case 11: if (!closedSpaces[8] && !closedSpaces[1]) return "9 2";
-					else if (!closedSpaces[7]) {
-						if (!closedSpaces[2]) return "8 3";
-						else if (!closedSpaces[1] && !closedSpaces[0]) return "8 2 1";
-					}
-					else if (!closedSpaces[6]) {
-						if (!closedSpaces[3]) return "7 4";
-						else if (!closedSpaces[2] && !closedSpaces[0]) return "7 3 1";
-					}
-					else if (!closedSpaces[5]) {
-						if (!closedSpaces[4]) return "6 5";
-						else if (!closedSpaces[3] && !closedSpaces[0]) return "6 4 1";
-						else return "6 3 2";
-					}
-					else return "5 3 2 1";
-				case 12: if (!closedSpaces[8]) {
-						if (!closedSpaces[2]) return "9 3";
-						else if (!closedSpaces[1] && !closedSpaces[0])  return "9 2 1";
-					}
-					else if (!closedSpaces[7]) {
-						if (!closedSpaces[3]) return "8 4";
-						else if (!closedSpaces[2] && !closedSpaces[0])  return "8 3 1";
-					}
-					else if (!closedSpaces[6]) {
-						if (!closedSpaces[4]) return "7 5";
-						else if (!closedSpaces[3] && !closedSpaces[0]) return "7 4 1";
-						else return "7 3 2";
-					}
-					else return "6 3 2 1";
-				default: throw new IndexOutOfBoundsException("Not even your " +
-						"hardcoded tempfix works, StrangerCoug? You're fired!");
-			}
-// End temporary switch statement
+			return isGood[dice.getDiceTotal() - 2];
 		}
 		else {
 			Dice testDice = new Dice();
 			testDice.rollDice();
-			if (isGood[testDice.getDiceTotal()-1])
+			if (isGood[testDice.getDiceTotal()-2] != null)
 				return "ROLL";
 			else return "STOP";
 		}

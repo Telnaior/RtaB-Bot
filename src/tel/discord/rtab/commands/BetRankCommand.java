@@ -10,11 +10,11 @@ import tel.discord.rtab.GameController;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
-public class RankCommand extends Command {
-    public RankCommand()
+public class BetRankCommand extends Command {
+    public BetRankCommand()
     {
-        this.name = "rank";
-		this.aliases = new String[]{"money"};
+        this.name = "betrank";
+		this.aliases = new String[]{"balance","funds","credits"};
         this.help = "view the rank of a player by name, or by rank with #[number]";
         this.guildOnly = false;
     }
@@ -22,7 +22,7 @@ public class RankCommand extends Command {
 	protected void execute(CommandEvent event) {
 		try
 		{
-			List<String> list = Files.readAllLines(Paths.get("scores"+event.getChannel().getId()+".csv"));
+			List<String> list = Files.readAllLines(Paths.get("bettors"+event.getChannel().getId()+".csv"));
 			String name = event.getArgs();
 			int index;
 			//Search for own ID if no name given (to ensure match even if name changed)
@@ -44,22 +44,21 @@ public class RankCommand extends Command {
 			if(index < 0 || index >= list.size())
 			{
 				if(name.equals(""))
-					event.reply("You haven't played the game yet.");
+					event.reply("You haven't made any bets yet - your starting balance is 10,000.");
 				else
 					event.reply("User not found.");
 			}
 			else
 			{
 				String[] record = list.get(index).split("#");
-				int money = Integer.parseInt(record[2]);
-				int booster = Integer.parseInt(record[3]);
-				int winstreak = Integer.parseInt(record[4]);
+				int funds = Integer.parseInt(record[2]);
+				int prestige = Integer.parseInt(record[3]);
 				StringBuilder response = new StringBuilder();
 				response.append(record[1] + ": ");
-				if(money<0)
-					response.append("-");
-				response.append(String.format("$%1$,d [%2$d%%x%3$d.%4$d]",Math.abs(money),booster,winstreak/10,winstreak%10));
-				response.append(" - Rank #" + (index+1) + "/" + list.size());
+				if(prestige > 0)
+					response.append(String.format("%,d BILLION + ",prestige));
+				response.append(String.format("%,d",funds));
+				response.append(" (Rank #" + (index+1) + "/" + list.size() + ")");
 				event.reply(response.toString());
 			}
 		} catch (IOException e)
