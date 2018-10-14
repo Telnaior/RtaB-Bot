@@ -49,7 +49,8 @@ public class DoubleTrouble implements MiniGame {
 		output.add("You'll start with $5,000 and will pick spaces one at a time.");
 		output.add("Nine of them are Double spaces, and will double your winnings for the round.");
 		output.add("Nine of them have dollar amounts, which could range from $100 to $20,000.");
-		output.add("Two are bombs. If you hit a bomb, you lose everything.");
+		output.add("One space is a crash, which will reduce your winnings by 90% should you find it.");
+		output.add("Finally, there is a bomb. If you hit it, the game is over and you lose everything.");
 		output.add("You may STOP at any time or pick a number to go on. Good luck!");
 		output.add(generateBoard());
 		return output;

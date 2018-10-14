@@ -250,7 +250,7 @@ public class ShutTheBox implements MiniGame {
 	{
 		if (totalShut == MAX_SCORE)
 			return 1500000;
-		else return findNthTetraHedralNumber(totalShut) * 50;
+		else return findNthTetrahedralNumber(totalShut) * 50;
 	}
 
 	@Override
