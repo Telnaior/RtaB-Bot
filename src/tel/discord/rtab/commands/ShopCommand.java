@@ -15,6 +15,6 @@ public class ShopCommand extends Command
 	protected void execute(CommandEvent event)
 	{
 		event.reply("Support Race to a Billion and earn rewards!");
-		event.reply("https://i.imgur.com/BHoxgcw.png");
+		event.reply("https://i.imgur.com/gcsGHev.png");
 	}
 }
