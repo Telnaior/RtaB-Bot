@@ -1570,12 +1570,11 @@ public class GameController
 			else
 				resultString.append(".");
 		}
+		//Toss the base multiplier into the mix too so it doesn't get left out
+		multiplier *= BASE_MULTIPLIER;
 		StringBuilder extraResult = null;
-		//Bypass the usual method if it's a bonus game so we don't have booster or winstreak applied
-		if(currentGame.isBonusGame())
-			players.get(currentTurn).addMoney(moneyWon*multiplier*BASE_MULTIPLIER,MoneyMultipliersToUse.NOTHING);
-		else
-			extraResult = players.get(currentTurn).addMoney((moneyWon*multiplier),MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+		extraResult = players.get(currentTurn).addMoney(moneyWon*multiplier,
+				currentGame.isBonusGame() ? MoneyMultipliersToUse.NOTHING : MoneyMultipliersToUse.BOOSTER_AND_BONUS);
 		channel.sendMessage(resultString).queue();
 		if(extraResult != null)
 			channel.sendMessage(extraResult).queue();
