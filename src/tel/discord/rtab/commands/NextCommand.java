@@ -24,7 +24,7 @@ public class NextCommand extends Command {
 				if(game.gameStatus != GameStatus.SIGNUPS_OPEN || (!game.playersCanJoin && game.playersJoined == 0))
 				{
 					game.addToPingList(event.getAuthor());
-					event.reply(String.format("Noted - will ping you when you can %s.",game.playersCanJoin?"join":"bet"));
+					event.reply(String.format("Noted - will ping you when you can %s.",game.playersCanJoin?"play":"bet"));
 				}
 				else
 				{

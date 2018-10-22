@@ -70,7 +70,7 @@ public class ShutTheBox implements MiniGame {
 						output.add("Congratulations, you shut the box!");
 						totalShut = MAX_SCORE; // essentially closes the remaining numbers automatically
 					}
-					if (totalShut + dice.getDiceTotal() == MAX_SCORE - 1) { // ARGH!!!
+					else if (totalShut + dice.getDiceTotal() == MAX_SCORE - 1) { // ARGH!!!
 						output.add("Oh, so close, yet you couldn't shut the " + 
 								"1 :frowning2: We'll close that for you, then "
 								+ "we'll give you your consolation prize.");

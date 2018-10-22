@@ -17,7 +17,7 @@ public class DoubleTrouble implements MiniGame {
 	int cashLeft;
 	int doublesLeft;
 	List<Integer> money = Arrays.asList(-1,0,1,10000,5000,5000,2500,2500,2500,2500,2500,2,2,2,2,2,2,2,2,2);
-	// -1 = Crash, 0 = Bomb, 1 = Mystery, 2 = Double
+	// -1 = Trouble, 0 = Bomb, 1 = Mystery, 2 = Double
 	boolean alive;
 	boolean[] pickedSpaces;
 	int lastSpace;
@@ -49,7 +49,7 @@ public class DoubleTrouble implements MiniGame {
 		output.add("You'll start with $5,000 and will pick spaces one at a time.");
 		output.add("Nine of them are Double spaces, and will double your winnings for the round.");
 		output.add("Nine of them have dollar amounts, which could range from $100 to $20,000.");
-		output.add("One space is a crash, which will reduce your winnings by 90% should you find it.");
+		output.add("One space is Trouble, which will reduce your winnings by 90% should you find it.");
 		output.add("Finally, there is a bomb. If you hit it, the game is over and you lose everything.");
 		output.add("You may STOP at any time or pick a number to go on. Good luck!");
 		output.add(generateBoard());
@@ -100,7 +100,7 @@ public class DoubleTrouble implements MiniGame {
 			case -1: //Crash
 				total /= 10;
 				crashLeft --;
-				output.add("It's a CRASH...");
+				output.add("Uh oh, it's TROUBLE...");
 				output.add("You lose 90% of your cash.");
 				break;
 			case 1: //Mystery
@@ -182,7 +182,7 @@ public class DoubleTrouble implements MiniGame {
 		display.append(String.format("Total: $%,d\n",total));
 		display.append(String.format("%dx DOUBLE\n",doublesLeft));
 		display.append(String.format("%dx CASH\n",cashLeft));
-		display.append(String.format("%dx CRASH\n",crashLeft));
+		display.append(String.format("%dx TROUBLE\n",crashLeft));
 		display.append(String.format("%dx BOMB\n",bombsLeft));
 		display.append("```");
 		return display.toString();

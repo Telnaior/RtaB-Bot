@@ -129,20 +129,12 @@ public class Player implements Comparable<Player>
 	StringBuilder addMoney(int amount, MoneyMultipliersToUse multipliers)
 	{
 		//Start with the base amount
-		int adjustedPrize = amount;
+		long adjustedPrize = amount;
 		if(multipliers.useBoost)
 		{
 			//Multiply by the booster (then divide by 100 since it's a percentage)
-			if(amount%100 != 0)
-			{
-				adjustedPrize *= booster;
-				adjustedPrize /= 100;
-			}
-			else
-			{
-				adjustedPrize /= 100;
-				adjustedPrize *= booster;
-			}
+			adjustedPrize *= booster;
+			adjustedPrize /= 100;
 		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
@@ -151,10 +143,10 @@ public class Player implements Comparable<Player>
 			adjustedPrize *= Math.max(10,winstreak);
 			adjustedPrize /= 10;
 		}
-		money += adjustedPrize;
-		//Cap at +-$1,000,000,000
-		if(money > 1000000000) money = 1000000000;
-		if(money <= -1000000000) money = -1000000000;
+		//Dodge overflow by capping at +-$1,000,000,000 while adding the money
+		if(adjustedPrize + money > 1_000_000_000) money = 1_000_000_000;
+		else if(adjustedPrize + money < -1_000_000_000) money = -1_000_000_000;
+		else money += adjustedPrize;
 		//Build the string if we need it
 		if(adjustedPrize != amount)
 		{
