@@ -11,6 +11,7 @@ public class LuckyNumberCommand extends Command
 		this.aliases = new String[]{"lucky"};
 		this.help = "gives you a random number";
 		this.guildOnly = false;
+		this.cooldown = 15;
 	}
 	@Override
 	protected void execute(CommandEvent event)
@@ -18,14 +19,22 @@ public class LuckyNumberCommand extends Command
 		//80% chance of getting the (officially designated) luckiest of all numbers
 		if(Math.random() < 0.8)
 		{
-			event.reply("Your lucky number is "+(Math.random() < 0.05 ? ":nine:" : "9")+".");
-			//1% chance they get a comic
-			if(Math.random() < 0.0125)
+			//10% chance of giving it as a reaction instead of a message
+			if(Math.random() < 0.1)
 			{
-				if(Math.random() < 0.5)
-					event.reply("http://dilbert.com/strip/2001-10-25");
-				else
-					event.reply("https://xkcd.com/221");
+				event.getMessage().addReaction("9⃣").queue();
+			}
+			else
+			{
+				event.reply("Your lucky number is "+(Math.random() < 0.055 ? ":nine:" : "9")+".");
+				//1% chance they get a comic
+				if(Math.random() < 0.0132)
+				{
+					if(Math.random() < 0.5)
+						event.reply("http://dilbert.com/strip/2001-10-25");
+					else
+						event.reply("https://xkcd.com/221");
+				}
 			}
 		}
 		//0.1% chance you "win"

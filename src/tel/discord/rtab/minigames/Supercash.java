@@ -8,12 +8,12 @@ import java.util.LinkedList;
 public class Supercash implements MiniGame {
 	static final String NAME = "Supercash";
 	static final boolean BONUS = true;
-	final static int BOARD_SIZE = 24;
-	final static int MAX_VALUE = 10000000;
-	final static int[] VALUES = {0,500000,1000000,2000000,3000000,4000000,5000000,
+	static final int BOARD_SIZE = 24;
+	static final int MAX_VALUE = 10000000;
+	static final int[] VALUES = {0,500000,1000000,2000000,3000000,4000000,5000000,
 		6000000,7000000,8000000,9000000,MAX_VALUE}; //Bad things happen if this isn't sorted
-	final static int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
-	static int[] numberPicked = new int[VALUES.length];
+	static final int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
+	int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
 	int lastSpace;
 	int lastPicked;

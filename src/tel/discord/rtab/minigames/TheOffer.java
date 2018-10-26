@@ -25,10 +25,9 @@ public class TheOffer implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("In The Offer, you can enter a room with a live bomb.");
-		output.add("Every Room you survive will earn you more money!");
-		output.add("Each Room will at least double your actual earned money, " +
+		output.add("Every room you survive will earn you more money," +
 				"but the chance of the bomb exploding will also increase significantly.");
-		output.add("Every Room will also increase the amount of chances to Explode!");
+		output.add("Every room will also increase the amount of chances to explode!");
 		output.add("If the bomb explodes, you lose everything."); //~Duh
 		output.add(makeOffer(offer, seconds, chanceToBomb)); 
 		return output;  
@@ -46,7 +45,7 @@ public class TheOffer implements MiniGame {
 		choice = choice.replaceAll("\\s","");
 		if(choice.equals("REFUSE") || choice.equals("NODEAL") || choice.equals("DARE"))
 		{
-			output.add("The Bomb goes live");
+			output.add("The Bomb goes live!");
 			output.add("...");
 			//Let's find out if we explode
 			for(int i=0; i<seconds; i++)
@@ -57,6 +56,8 @@ public class TheOffer implements MiniGame {
 					alive = false;
 					break;
 				}
+				else
+					output.add(String.format("You survived Tick %d!",i+1));
 			}
 			//If still alive, let's run it
 			if(alive)
@@ -72,7 +73,7 @@ public class TheOffer implements MiniGame {
 		else if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE"))
 		{
 			accept = true;
-			output.add("You take your Money!");
+			output.add("You took the money!");
 		}
 		//If it's neither of those it's just some random string we can safely ignore
 		return output;

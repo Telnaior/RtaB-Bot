@@ -8,11 +8,11 @@ import java.util.LinkedList;
 public class Spectrum implements MiniGame {
 	static final String NAME = "Spectrum";
 	static final boolean BONUS = true;
-	final static int BOARD_SIZE = 25;
-	final static int[] VALUES = {0,1000000,2000000,3000000,4000000,5000000,6000000,
+	static final int BOARD_SIZE = 25;
+	static final int[] VALUES = {0,1000000,2000000,3000000,4000000,5000000,6000000,
 		8000000,11000000,15000000,20000000,25000000}; //Bad things happen if this isn't sorted
-	final static int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length); //Integer division lol, 25/12 = 2
-	static int[] numberPicked = new int[VALUES.length];
+	static final int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length); //Integer division lol, 25/12 = 2
+	int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
 	int lastSpace;
 	int lastPicked;

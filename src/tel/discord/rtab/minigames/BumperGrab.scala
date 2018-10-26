@@ -10,6 +10,7 @@ class BumperGrab extends MiniGame {
 
   import tel.discord.rtab.minigames.BumperGrab._
 
+  private val NAME: String = "Bumper Grab"
   private var boardWidth: Int = 0
   private var boardHeight: Int = 0
   private var board: Array[Array[Space]] = Array.empty
@@ -35,18 +36,17 @@ class BumperGrab extends MiniGame {
     }.sum
 
     new util.LinkedList(List(
-      "In Bumper Cash, your objective is to navigate an icy floating platform.",
+      "In Bumper Grab, your objective is to navigate an icy floating platform.",
       "Slide around, bounce off bumpers, and grab as much cash as you can!",
       "You're represented as an 'X', and exits are represented as 'O's.",
       "Other spaces are either cash or bumpers, but you won't know which until you hit them.",
       "Each move, you'll pick a direction (UP, LEFT, RIGHT, or DOWN), and " +
         "you'll slide in that direction until you hit a space you haven't been to.",
       "If it's cash, you grab it, and choose a new direction.",
-      "If it's a bumper, you'll be pushed in a new direction",
+      "If it's a bumper, you'll be pushed in a new direction.",
       "And if it's an exit, you're allowed to EXIT and escape with your loot!",
       "Or you can move again, but you won't be able to use that same exit later",
-      "Oh, and...",
-      "If you slide off the edge, you fall to your doom and lose everything!",
+      "Oh, and if you slide off the edge, you fall to your doom and lose everything!",
       "Good luck!",
       drawScoreboard
     ).asJava)
@@ -294,9 +294,10 @@ class BumperGrab extends MiniGame {
     */
   override def getBotPick: String = {
     //Exit if we can, otherwise just pick a direction at random lol
-    if (board(player_X)(player_Y) == Exit) "Exit"
+    if (board(player_X)(player_Y) == Exit && winnings > 0) "Exit"
     else Vector("LEFT", "RIGHT", "UP", "DOWN")(Random.nextInt(4))
   }
+  override def toString: String = NAME
 }
 
 object BumperGrab {

@@ -5,6 +5,7 @@ import scala.io.StdIn._
 object MinigameTest {
   private val games = Map[String, MiniGame] (
     "double" -> new DoubleTrouble(),
+    "00"     -> new DoubleZeroes(),
     "bumper" -> new BumperGrab(),
     "shut"   -> new ShutTheBox(),
     "deal"   -> new DealOrNoDeal()

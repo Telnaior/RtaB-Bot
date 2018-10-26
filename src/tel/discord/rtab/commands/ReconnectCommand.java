@@ -4,14 +4,17 @@ import tel.discord.rtab.GameController;
 import tel.discord.rtab.RaceToABillionBot;
 import tel.discord.rtab.SuperBotChallenge;
 
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.examples.command.ShutdownCommand;
 
-public class ShutdownBotCommand extends ShutdownCommand
+public class ReconnectCommand extends Command
 {
-	public ShutdownBotCommand()
+	public ReconnectCommand()
 	{
+		this.name = "reconnect";
+		this.help = "reconnects the bot to its game channels";
 		this.hidden = true;
+		this.requiredRole = "Mod";
 	}
 	@Override
 	protected void execute(CommandEvent event)
@@ -21,11 +24,15 @@ public class ShutdownBotCommand extends ShutdownCommand
 			game.timer.purge();
 			game.timer.shutdownNow();
 		}
+		RaceToABillionBot.game.clear();
+		
 		for(SuperBotChallenge challenge : RaceToABillionBot.challenge)
 		{
 			challenge.timer.purge();
 			challenge.timer.shutdownNow();
 		}
-		super.execute(event);
+		RaceToABillionBot.challenge.clear();
+		
+		RaceToABillionBot.connectToChannels(false);
 	}
 }

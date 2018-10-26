@@ -91,6 +91,10 @@ public class DealOrNoDeal implements MiniGame {
 		}
 		totalSqrts /= casesLeft;
 		offer = (int)Math.pow(totalSqrts,2);
+		//Add random factor - .85-1.15
+		int multiplier = (int)((Math.random()*31) + 85);
+		offer *= multiplier;
+		offer /= 100;
 		//Round it off
 		if(offer > 250000)
 			offer -= (offer%10000);
@@ -157,9 +161,14 @@ public class DealOrNoDeal implements MiniGame {
 		int totalValue = 0;
 		for(int i : values)
 			totalValue += i;
-		int average = totalValue / casesLeft;
+		double average = totalValue / casesLeft;
 		double dealChance = offer / average;
 		return (Math.random() < dealChance) ? "DEAL" : "NO DEAL";
 	}
-
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
+	}
 }

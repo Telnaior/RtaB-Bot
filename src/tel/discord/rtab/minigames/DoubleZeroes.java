@@ -11,8 +11,8 @@ public class DoubleZeroes implements MiniGame {
 	static final boolean BONUS = false;
 	int total;
 	int zeroesLeft;
-	List<Integer> numbers = Arrays.asList(0,0,0,0,0,0,0,0,0,0,20,30,40,50,55,60,70,80,90,99);
-	// 0 = Double Zero
+	List<Integer> numbers = Arrays.asList(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,2,3,4,5,6,7,8,9);
+	// -1 = Double Zero
 	boolean alive;
 	boolean[] pickedSpaces;
 	int lastSpace;
@@ -33,11 +33,11 @@ public class DoubleZeroes implements MiniGame {
 		// Give 'em the run down
 		LinkedList<String> output = new LinkedList<>();
 		output.add("In Double Zeroes, you will see twenty spaces.");
-		output.add("Ten of these are Double Zeroes, and ten are numbers from 20-99.");
-		output.add("You'll pick spaces, one at a time, until you uncover two 20-99 spaces.");
-		output.add("These numbers will be put on the board as your bank.");
+		output.add("Ten of these are Double Zeroes, and ten are digits from 0 to 9.");
+		output.add("You'll pick spaces, one at a time, until you uncover four single digits.");
+		output.add("These digits will be put on the board as your bank.");
 		output.add("At this point, everything but the Double Zeroes turn into BOMBs!");
-		output.add("You can then choose to 'STOP' and multiply your bank by the number of Double Zeroes remaining...");
+		output.add("You can then choose to 'STOP' and multiply your bank treble by the number of Double Zeroes remaining...");
 		output.add("...or try to hit a Double Zero to stick that Double Zero at the end of your bank, multiplying it by 100! Good luck!");
 		output.add(generateBoard());
 		return output;
@@ -54,18 +54,18 @@ public class DoubleZeroes implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		if(pick.toUpperCase().equals("STOP"))
 		{
-			if(total > 100) // 'total > 100' doesn't happen until there are two 20-99's picked
+			if(total > 1000) // 'total > 1000' doesn't happen until there are four digits picked
 			{
 				// Player stops at the decision point? Tell 'em what they've won and end the game!
 			alive = false;
-			total = total * zeroesLeft;
-				output.add("Very well! Your bank is multiplied by " + String.format("$%,d!",zeroesLeft)
-				+ ", which means it's...");
+			total = total * zeroesLeft * 3;
+				output.add("Very well! Your bank is multiplied by " + String.format("%,d",zeroesLeft*3)
+				+ ", which means...");
 			return output;
 			}
 			else // Don't stop 'til you get enough, keep on!
 			{
-				output.add("Can't stop yet, you must pick two non-zero values first!");
+				output.add("Can't stop yet, you must pick four non-zero values first!");
 				return output;
 			}
 		}
@@ -89,9 +89,9 @@ public class DoubleZeroes implements MiniGame {
 			lastPick = numbers.get(lastSpace);
 			//Start printing output
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			if(numbers.get(lastSpace) == 0) // If it's a Double Zero...
+			if(numbers.get(lastSpace) == -1) // If it's a Double Zero...
 			{
-				if(total > 100) // ...and you decided to go on, you win!
+				if(total > 1000) // ...and you decided to go on, you win!
 				{
 					alive = false;
 					total = total*100;
@@ -108,7 +108,7 @@ public class DoubleZeroes implements MiniGame {
 			}
 			else // If it's NOT a Double Zero...
 			{
-				if(total > 100) // ...and you decided to go...
+				if(total > 1000) // ...and you decided to go...
 				{
 					alive = false; // BOMB, shoulda taken the bribe!
 					total = 0;
@@ -117,11 +117,11 @@ public class DoubleZeroes implements MiniGame {
 				}
 				else if(total == 0) // ...and it's the first phase with no prior numbers...
 				{
-					if (numbers.get(lastSpace) == 80) // ... and it's an 80, use an 'an'
+					if (numbers.get(lastSpace) == 8) // ... and it's an 8, use an 'an'
 					{
-					output.add("It's an " + String.format("**%,d!**",numbers.get(lastSpace)));
+					  output.add("It's an " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
-					else // ... and it's not an 80, use an 'a'
+					else // ... and it's not an 8, use an 'a'
 					{
 					output.add("It's a " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
@@ -129,27 +129,27 @@ public class DoubleZeroes implements MiniGame {
 				}
 				else // ...and it's the first phase with a prior number...
 				{
-					if (numbers.get(lastSpace) == 80) // ... and it's an 80, use an 'an'
+					if (numbers.get(lastSpace) == 8) // ... and it's an 8, use an 'an'
 					{
 					output.add("It's an " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
-					else // ... and it's not an 80, use an 'a'
+					else // ... and it's not an 8, use an 'a'
 					{
 					output.add("It's a " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
-					total = (total * 100) + numbers.get(lastSpace); // Either way, put the total on the board by multiplying the previous total by 100 and adding this number.
+					total = (total * 10) + numbers.get(lastSpace); // Either way, put the total on the board by multiplying the previous total by 10 and adding this number.
 				}
 			
 			}
 			if(alive)
 			{
 
-				if(total>100) // If we just hit the second number, tell 'em about the DECISION~!
+				if(total>1000) // If we just hit the 4th number, tell 'em about the DECISION~!
 				{
-					output.add("You can now choose to continue by picking a number, "
-							+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
-							+ ", times the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft));
-					output.add(generateBoard());
+				output.add("You can now choose to continue by picking a number, "
+						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
+						+ ", times treble the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft*3));
+				output.add(generateBoard());
 				}
 				else if(zeroesLeft>0) // Otherwise let 'em pick another space.
 				{
@@ -191,7 +191,7 @@ public class DoubleZeroes implements MiniGame {
 	{
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
-		display.append("DOUBLE ZEROES\n");
+		display.append(" DOUBLE ZERO \n");
 		for(int i=0; i<numbers.size(); i++)
 		{
 			if(pickedSpaces[i])
@@ -237,10 +237,10 @@ public class DoubleZeroes implements MiniGame {
 	public String getBotPick()
 		{
 			//If the game's at its decision point, make the decision
-			//There should be (8 + zeroesLeft) spaces left here
-			if(total > 100)
+			//There should be (6 + zeroesLeft) spaces left here
+			if(total > 1000)
 			{
-				int goChance = 100 * (zeroesLeft / (8 + zeroesLeft));
+				int goChance = (100 * zeroesLeft) / (6 + zeroesLeft);
 				if(Math.random()*100>goChance)
 					return "STOP";
 			}

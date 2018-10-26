@@ -14,9 +14,9 @@ public class DeucesWild implements MiniGame {
 	static final String NAME = "Deuces Wild";
 	static final boolean BONUS = false;
 	static final int BOARD_SIZE = 52;
-	static Deck deck;
-	static Card[] cardsPicked = new Card[5];
-	static boolean[] cardsHeld = new boolean[5];
+	Deck deck;
+	Card[] cardsPicked = new Card[5];
+	boolean[] cardsHeld = new boolean[5];
 	ArrayList<Card> board = new ArrayList<Card>(BOARD_SIZE);
 	int lastSpace;
 	Card lastPicked;
@@ -466,9 +466,9 @@ public class DeucesWild implements MiniGame {
 
 	@Override
 	public String getBotPick() {
-		//Bot will never redraw, unless someone wants to teach it poker strategy (lol)
+		//Bot will redraw automatically in order to get as many deuces as possible (which hold automatically)
 		if(gameStage == 5)
-			return "STOP";
+			return "DEAL";
 		ArrayList<Integer> openSpaces = new ArrayList<>(BOARD_SIZE);
 		for(int i=0; i<BOARD_SIZE; i++)
 			if(!pickedSpaces[i])

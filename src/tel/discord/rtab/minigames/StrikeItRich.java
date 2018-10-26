@@ -8,10 +8,10 @@ import java.util.LinkedList;
 public class StrikeItRich implements MiniGame {
 	static final String NAME = "Strike it Rich";
 	static final boolean BONUS = false;
-	final static int BOARD_SIZE = 15;
-	final static int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
-	final static int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
-	static int[] numberPicked = new int[VALUES.length];
+	static final int BOARD_SIZE = 15;
+	static final int[] VALUES = {0,1000,10000,100000,1000000}; //Bad things happen if this isn't sorted
+	static final int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length);
+	int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
 	int lastSpace;
 	int lastPicked;

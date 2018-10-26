@@ -129,29 +129,24 @@ public class Player implements Comparable<Player>
 	StringBuilder addMoney(int amount, MoneyMultipliersToUse multipliers)
 	{
 		//Start with the base amount
-		int adjustedPrize = amount;
+		long adjustedPrize = amount;
 		if(multipliers.useBoost)
 		{
 			//Multiply by the booster (then divide by 100 since it's a percentage)
-			if(amount%100 != 0)
-			{
-				adjustedPrize *= booster;
-				adjustedPrize /= 100;
-			}
-			else
-			{
-				adjustedPrize /= 100;
-				adjustedPrize *= booster;
-			}
+			adjustedPrize *= booster;
+			adjustedPrize /= 100;
 		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
 		if(multipliers.useBonus)
-			adjustedPrize *= Math.max(1,winstreak/10.);
-		money += adjustedPrize;
-		//Cap at +-$1,000,000,000
-		if(money > 1000000000) money = 1000000000;
-		if(money <= -1000000000) money = -1000000000;
+		{
+			adjustedPrize *= Math.max(10,winstreak);
+			adjustedPrize /= 10;
+		}
+		//Dodge overflow by capping at +-$1,000,000,000 while adding the money
+		if(adjustedPrize + money > 1_000_000_000) money = 1_000_000_000;
+		else if(adjustedPrize + money < -1_000_000_000) money = -1_000_000_000;
+		else money += adjustedPrize;
 		//Build the string if we need it
 		if(adjustedPrize != amount)
 		{
@@ -218,7 +213,7 @@ public class Player implements Comparable<Player>
 		penalty = newbieProtection > 0 ? NEWBIE_BOMB_PENALTY : BOMB_PENALTY;
 		//Reduce penalty by 10% for each player already gone
 		penalty /= 10;
-		penalty *= (10 - Math.min(10,othersOut));
+		penalty *= (10 - Math.min(9,othersOut));
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
@@ -280,6 +275,7 @@ public class Player implements Comparable<Player>
 		warned = false;
 		games.clear();
 		knownBombs.clear();
+		jokers = 0;
 		boostCharge = 0;
 		splitAndShare = false;
 		minigameLock = false;
@@ -306,5 +302,10 @@ public class Player implements Comparable<Player>
 			result.append(String.format("%02d",bomb+1));
 		}
 		return result.toString();
+	}
+	
+	public String getName()
+	{
+		return name;
 	}
 }
