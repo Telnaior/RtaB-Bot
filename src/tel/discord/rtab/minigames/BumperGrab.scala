@@ -2,6 +2,8 @@ package tel.discord.rtab.minigames
 
 import java.util
 
+import tel.discord.rtab.Player
+
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 import scala.util.Random
@@ -20,6 +22,8 @@ class BumperGrab extends MiniGame {
   private var gameOver: Boolean = false
   private var winnings = 0
   private var maxWinnings = 0
+  //Amount of winnings after which a bot will try to escape rather than going for more
+  private val botWinningsTarget = 500000
 
   /**
     * Initialises the variables used in the minigame and prints the starting messages.
@@ -293,10 +297,49 @@ class BumperGrab extends MiniGame {
     * @return The next input the bot should send to the minigame.
     */
   override def getBotPick: String = {
-    //Exit if we can, otherwise just pick a direction at random lol
-    if (board(player_X)(player_Y) == Exit && winnings > 0) "Exit"
-    else Vector("LEFT", "RIGHT", "UP", "DOWN")(Random.nextInt(4))
+
+    def firstNonIceTile(direction: Direction, fromX: Int = player_X, fromY: Int = player_Y): (Int, Int) = {
+      val nextX = fromX + direction.deltaX
+      val nextY = fromY + direction.deltaY
+      val nextSpace = getSpace(nextX, nextY)
+      if(nextSpace == Ice) firstNonIceTile(direction, nextX, nextY)
+      else (nextX, nextY)
+    }
+
+    case class CandidateMove(direction: Direction, x: Int, y: Int)
+
+    //All moves that don't go off the edge immediately
+    lazy val candidateMoves: Seq[CandidateMove] =
+      Seq(Left, Right, Up, Down).map { dir =>
+        val (toX, toY) = firstNonIceTile(dir)
+        CandidateMove(dir, toX, toY)
+      }.filter(move => getSpace(move.x, move.y) != Hole)
+
+    //Exit if we're on an exit and either the bot has won enough, this is the only exit remaining, or all
+    //moves would go off the edge
+    if (getSpace(player_X, player_Y) == Exit &&
+      (winnings >= botWinningsTarget ||
+        board.flatten.count(_ == Exit) == 1 ||
+        candidateMoves.isEmpty)
+    ) "Exit"
+    else {
+      val (exitMoves, nonExitMoves) = candidateMoves.partition(move => getSpace(move.x, move.y) == Exit)
+      //Pick a candidate move at random. If we've won enough, prioritize moves that go to exits.
+      //Otherwise, prioritize moves that don't
+      if(winnings >= botWinningsTarget) {
+        if(exitMoves.isEmpty)
+          nonExitMoves(Random.nextInt(nonExitMoves.size)).direction.toString
+        else
+          exitMoves(Random.nextInt(exitMoves.size)).direction.toString
+      } else {
+        if(nonExitMoves.isEmpty)
+          exitMoves(Random.nextInt(exitMoves.size)).direction.toString
+        else
+          nonExitMoves(Random.nextInt(nonExitMoves.size)).direction.toString
+      }
+    }
   }
+
   override def toString: String = NAME
 }
 
@@ -312,24 +355,28 @@ object BumperGrab {
     override def char: Char = '<'
     override def deltaX: Int = -1
     override def deltaY: Int = 0
+    override def toString: String = "LEFT"
   }
 
   case object Right extends Direction {
     override def char: Char = '>'
     override def deltaX: Int = 1
     override def deltaY: Int = 0
+    override def toString: String = "RIGHT"
   }
 
   case object Up extends Direction {
     override def char: Char = '^'
     override def deltaX: Int = 0
     override def deltaY: Int = -1
+    override def toString: String = "UP"
   }
 
   case object Down extends Direction {
     override def char: Char = 'v'
     override def deltaX: Int = 0
     override def deltaY: Int = 1
+    override def toString: String = "DOWN"
   }
 
   sealed abstract class Space

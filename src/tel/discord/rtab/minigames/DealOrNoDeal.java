@@ -45,8 +45,7 @@ public class DealOrNoDeal implements MiniGame {
 
 	private String openBox() {
 		casesLeft --;
-		offer = values.remove();
-		return String.format("$%,d!",offer);
+		return String.format("$%,d!",values.pollFirst());
 	}
 
 	@Override
@@ -59,8 +58,11 @@ public class DealOrNoDeal implements MiniGame {
 			output.add("NO DEAL!");
 			if(casesLeft == 2)
 			{
-				output.add("Your case contains...");
-				output.add(openBox());
+				output.add("Your box contains...");
+				//Update offer here so that it gets picked up as the amount won
+				offer = values.pollLast();
+				output.add(String.format("$%,d!",offer));
+				accept = true;
 			}
 			else
 			{
@@ -77,6 +79,8 @@ public class DealOrNoDeal implements MiniGame {
 		{
 			accept = true;
 			output.add("It's a DONE DEAL!");
+			output.add("Your box contained...");
+			output.add(String.format("$%,d!",values.pollLast()));
 		}
 		//If it's neither of those it's just some random string we can safely ignore
 		return output;
@@ -141,7 +145,7 @@ public class DealOrNoDeal implements MiniGame {
 
 	@Override
 	public boolean isGameOver() {
-		return (accept || casesLeft == 1);
+		return (accept);
 	}
 
 	@Override

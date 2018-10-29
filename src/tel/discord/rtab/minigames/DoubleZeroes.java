@@ -33,7 +33,7 @@ public class DoubleZeroes implements MiniGame {
 		// Give 'em the run down
 		LinkedList<String> output = new LinkedList<>();
 		output.add("In Double Zeroes, you will see twenty spaces.");
-		output.add("Ten of these are Double Zeroes, and ten are digits from 3 to 9.");
+		output.add("Ten of these are Double Zeroes, and ten are digits from 0 to 9.");
 		output.add("You'll pick spaces, one at a time, until you uncover four single digits.");
 		output.add("These digits will be put on the board as your bank.");
 		output.add("At this point, everything but the Double Zeroes turn into BOMBs!");
