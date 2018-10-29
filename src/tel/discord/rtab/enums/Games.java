@@ -6,7 +6,8 @@ public enum Games implements WeightedSpace {
 	//Minigame Pool
 	MATH_TIME		(2,"Math Time","Math") { public MiniGame getGame() { return new MathTime(); } },			//Author: Atia
 	STRIKE_IT_RICH	(2,"Strike it Rich","Strike") { public MiniGame getGame() { return new StrikeItRich(); } },	//Author: Atia
-	GAMBLE			(2,"The Gamble","Gamble") { public MiniGame getGame() { return new Gamble(); } },			//Author: Atia
+	GAMBLE			(1,"The Gamble","Gamble") { public MiniGame getGame() { return new Gamble(); } },			//Author: Atia
+	TRIPLE_PLAY		(1,"Triple Play","Triple") { public MiniGame getGame() { return new TriplePlay(); } },		//Author: Atia
 	THE_OFFER		(2,"The Offer","Offer") { public MiniGame getGame() { return new TheOffer(); } },			//Author: Amy
 	DEUCES_WILD		(2,"Deuces Wild","Deuces") { public MiniGame getGame() { return new DeucesWild(); } },		//Author: StrangerCoug
 	DOUBLE_TROUBLE	(2,"Double Trouble","Double") { public MiniGame getGame() { return new DoubleTrouble(); } },//Author: JerryEris
@@ -40,6 +41,7 @@ public enum Games implements WeightedSpace {
 		return shortName;
 	}
 	
+	//Returns a new instance of the requested minigame
 	public abstract MiniGame getGame();
 	
 	@Override

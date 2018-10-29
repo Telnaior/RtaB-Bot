@@ -8,7 +8,8 @@ object MinigameTest {
     "00"     -> new DoubleZeroes(),
     "bumper" -> new BumperGrab(),
     "shut"   -> new ShutTheBox(),
-    "deal"   -> new DealOrNoDeal()
+    "deal"   -> new DealOrNoDeal(),
+    "triple" -> new TriplePlay()
   )
 
   def main(args: Array[String]): Unit = {
