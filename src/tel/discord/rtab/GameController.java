@@ -595,7 +595,7 @@ public class GameController
 	void runEndTurnLogic()
 	{
 		//Test if game over
-		if(spacesLeft <= 0 || playersAlive == 1)
+		if(spacesLeft <= 0 || playersAlive <= 1)
 		{
 			gameStatus = GameStatus.END_GAME;
 			if(spacesLeft < 0)
@@ -985,10 +985,10 @@ public class GameController
 			penalty /= 10;
 			penalty *= (10 - Math.min(9,playersJoined-playersAlive));
 			channel.sendMessage("Goodbye, " + players.get(currentTurn).getSafeMention()
-					+ String.format("! $%,d penalty!",Math.abs(penalty*4))).queue();
+					+ String.format("! $%,d"+(mega?" MEGA":"")+" penalty!",Math.abs(penalty*4*(mega?4:1)))).queue();
 			players.get(currentTurn).threshold = true;
 			int tempRepeat = repeatTurn;
-			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp((mega?4:1)*BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			repeatTurn = tempRepeat;
 			//Shuffle back to starting player
 			for(int i=playerToKill; i<=playersAlive; i++)
@@ -1002,10 +1002,10 @@ public class GameController
 				while(currentTurn != -1)
 				{
 					penalty = players.get(currentTurn).newbieProtection > 0 ? Player.NEWBIE_BOMB_PENALTY : Player.BOMB_PENALTY;
-					channel.sendMessage(String.format("$%1$,d penalty for %2$s!",
-							Math.abs(penalty*4),players.get(currentTurn).getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
+					channel.sendMessage(String.format("$%1$,d MEGA penalty for %2$s!",
+							Math.abs(penalty*16),players.get(currentTurn).getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
 					players.get(currentTurn).threshold = true;
-					extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,0);
+					extraResult = players.get(currentTurn).blowUp(4*BASE_MULTIPLIER,false,0);
 					channel.sendMessage(extraResult).queue();
 					advanceTurn(false);
 				}
@@ -1061,9 +1061,9 @@ public class GameController
 				penalty = Player.NEWBIE_BOMB_PENALTY*BASE_MULTIPLIER;
 			penalty /= 10;
 			penalty *= (10 - Math.min(9,playersJoined-playersAlive));
-			channel.sendMessage(String.format("$%,d penalty!",Math.abs(penalty*4))).queue();
+			channel.sendMessage(String.format("$%,d"+(mega?" MEGA":"")+" penalty!",Math.abs(penalty*4*(mega?4:1)))).queue();
 			players.get(currentTurn).threshold = true;
-			extraResult = players.get(currentTurn).blowUp(BASE_MULTIPLIER,false,(playersJoined-playersAlive));
+			extraResult = players.get(currentTurn).blowUp((mega?4:1)*BASE_MULTIPLIER,false,(playersJoined-playersAlive));
 			break;
 		}
 		if(extraResult != null)
@@ -1521,7 +1521,7 @@ public class GameController
 					},
 					180,TimeUnit.SECONDS, () ->
 					{
-						channel.sendMessage(players.get(currentTurn).getSafeMention() + 
+						channel.sendMessage(players.get(currentTurn).name + 
 								" has gone missing. Cancelling their minigames.").queue();
 						players.get(currentTurn).games.clear();
 						completeMiniGame(currentGame);
@@ -1607,13 +1607,12 @@ public class GameController
 				currentTurn = 0;
 				for(int i=0; i<3; i++)
 				{
-					System.out.println("Let's go #"+i);
 					channel.sendMessage("**" + players.get(0).name.toUpperCase() + " WINS RACE TO A BILLION!**")
 						.queueAfter(5+(5*i),TimeUnit.SECONDS);
 				}
-				channel.sendMessage("@everyone").queueAfter(20,TimeUnit.SECONDS);
+				if(rankChannel)
+					channel.sendMessage("@everyone").queueAfter(20,TimeUnit.SECONDS);
 				gameStatus = GameStatus.SEASON_OVER;
-				System.out.println(gameStatus);
 				if(!players.get(0).isBot && rankChannel)
 				{
 					timer.schedule(() -> 
