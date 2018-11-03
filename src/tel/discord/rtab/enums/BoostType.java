@@ -34,7 +34,19 @@ public enum BoostType implements WeightedSpace
 	P150( 150,2),
 	P200( 200,2),
 	P300( 300,1),
-	P500( 500,1);
+	P500( 500,1),
+	//Other
+	MYSTERY(0,3)
+	{
+		@Override
+		public int getValue()
+		{
+			if(Math.random() < 0.1)
+				return -1*(int)Math.pow((Math.random()*7)+1,2);
+			else
+				return (int)Math.pow((Math.random()*7)+1,3);
+		}
+	};
 	
 	int value;
 	int weight;
