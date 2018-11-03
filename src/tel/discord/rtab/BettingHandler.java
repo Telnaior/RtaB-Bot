@@ -115,10 +115,12 @@ public class BettingHandler {
 		for(int i=1; i<totalBets.size(); i++)
 				totalWrongBets += totalBets.get(i);
 		//Now loop through all the bettors and reward the winners
+		boolean noWinners = true;
 		for(Bettor nextBettor : bettors)
 			if(nextBettor.champion.equals(winnerName.toUpperCase()))
 			{
 				//This guy won, reward them accordingly
+				noWinners = false;
 				int baseWin = nextBettor.betAmount * 4;
 				double bonusPortion = nextBettor.betAmount;
 				bonusPortion /= totalBets.get(0);
@@ -141,6 +143,8 @@ public class BettingHandler {
 					nextBettor.funds = 0;
 				}
 			}
+		if(noWinners && betsPlaced > 0)
+			channel.sendMessage("The house wins again! Mwahaha~").queueAfter(2,TimeUnit.SECONDS);
 		saveData();
 	}
 	
