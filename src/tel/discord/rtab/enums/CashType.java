@@ -20,9 +20,9 @@ public enum CashType implements WeightedSpace
 	P90K	(   90000,5,null),
 	P100K	(  100000,5,null),
 	//Big
+	P111K	(  111111,2,null),
 	P125K	(  125000,2,null),
 	P150K	(  150000,2,null),
-	P175K	(  175000,2,null),
 	P200K	(  200000,2,null),
 	P250K	(  250000,2,null),
 	P300K	(  300000,2,null),
@@ -31,8 +31,9 @@ public enum CashType implements WeightedSpace
 	P750K	(  750000,2,null),
 	P1000K	( 1000000,2,null),
 	//Meme
-	P50		(      50,1,null),
-	MYSTERY (       0,3,null);
+	P10		(      10,1,null),
+	MYSTERY (       0,3,null),
+	DB1		(   22805,1,"a DesertBuck");
 	
 	int value;
 	int weight;
