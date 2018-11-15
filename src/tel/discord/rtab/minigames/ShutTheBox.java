@@ -12,7 +12,7 @@ public class ShutTheBox implements MiniGame {
 	boolean[] closedSpaces;
 	Dice dice;
 	String[] isGood;
-//	String[] botStrategy; // temporary comment-out; the function that generates this is not working
+	int[] waysToClose;
 	boolean isAlive;  
 	boolean isClosing;
 	byte totalShut;
@@ -77,6 +77,14 @@ public class ShutTheBox implements MiniGame {
 						totalShut = MAX_SCORE - 1; // essentially closes the remaining numbers except 1 automatically
 						isAlive = false;
 					}
+                                        else if (waysToClose[dice.getDiceTotal() - 2] == 1) {
+                                                output.add("There is only one way to close that number, so " +
+                                                        "we'll do it automatically for you.");
+                                                closeNumbers(isGood[dice.getDiceTotal() - 2].split("\\s"));
+                                            	output.add(generateBoard());
+                                                output.add("ROLL again if you dare, or type STOP to stop " +
+                                                    "with your total.");
+                                        }
 					else {
 						isClosing = true;
 						output.add("What number(s) totaling " + dice.getDiceTotal()
@@ -121,14 +129,9 @@ public class ShutTheBox implements MiniGame {
 				totalTryingToClose += Integer.parseInt(tokens[i]);
 			
 			if (totalTryingToClose == dice.getDiceTotal()) {
-				for (int i = 0; i < tokens.length; i++)
-					closedSpaces[Integer.parseInt(tokens[i])-1] = true;
-				totalShut += dice.getDiceTotal();
-				refreshGood();
-//				for (int i = 0; i < botStrategy.length; i++)     // temporary comment-out; the generator
-//					botStrategy[i] = getBotStrategy(i+2, false); // function is not working
+				closeNumbers(tokens);
 				isClosing = false;
-				output.add("Numbers closed.");
+                                output.add("Numbers closed.");
 				output.add(generateBoard());
 				output.add("ROLL again if you dare, or type STOP to stop " +
 						"with your total.");
@@ -190,13 +193,23 @@ public class ShutTheBox implements MiniGame {
 		return display.toString();
 	}
 
+        void closeNumbers(String[] numbers) {
+            for (int i = 0; i < numbers.length; i++)
+                    closedSpaces[Integer.parseInt(numbers[i])-1] = true;
+            totalShut += dice.getDiceTotal();
+            refreshGood();
+        }
+        
 	void refreshGood() {
 		isGood = new String[possibleRolls];
+                waysToClose = new int[possibleRolls];
 		
 		// The numbers that are still open besides 1 are obviously still good, so start there.
 		for (int i = 1; i < closedSpaces.length; i++)
-			if(!closedSpaces[i])
+			if(!closedSpaces[i]) {
 				isGood[i-1] = Integer.toString(i+1);
+                                waysToClose[i-1]++;
+                        }
 		
 		for (int i = 1; i <= closedSpaces.length; i++) {
 			// If the corresponding space is closed, don't bother with it
@@ -206,16 +219,19 @@ public class ShutTheBox implements MiniGame {
 				if (closedSpaces[j-1])
 					continue;
 				// i-1 and j-1 must both be open; otherwise we wouldn't reach this point in the code
+                                waysToClose[i+j-2]++;
 				if(isGood[i+j-2] == null || isGood[i+j-2].length() > 3)
 					isGood[i+j-2] = Integer.toString(i) + " " + Integer.toString(j);
 				for (int k = j+1; i+j+k < possibleRolls + 2; k++) {
 					if (closedSpaces[k-1])
 						continue;
+                                        waysToClose[i+j+k-2]++;
 					if(isGood[i+j+k-2] == null || isGood[i+j+k-2].length() > 5)
 						isGood[i+j+k-2] = Integer.toString(i) + " " + Integer.toString(j) + " " + Integer.toString(k);
 					for (int l = k+1; i+j+k+l < possibleRolls + 2; l++) {
 						if (closedSpaces[l-1])
 							continue;
+                                                waysToClose[i+j+k+l-2]++;
 						if(isGood[i+j+k+l-2] == null || isGood[i+j+k+l-2].length() > 7)
 							isGood[i+j+k+l-2] = Integer.toString(i) + " " + Integer.toString(j) + " " 
 								+ Integer.toString(k) + " " + Integer.toString(l);
