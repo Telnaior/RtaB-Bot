@@ -3,10 +3,9 @@ package tel.discord.rtab.minigames;
 
 import java.util.LinkedList;
 
-public class TheOffer implements MiniGame {
+public class CoinFlip implements MiniGame {
 	static final String NAME = "CoinFlip";
-	static final boolean BONUS = false;
-	double chanceToBomb; 
+	static final boolean BONUS = false; 
 	int stage;
 	int coins;
 	boolean alive; //Player still alive?
