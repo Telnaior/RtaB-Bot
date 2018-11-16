@@ -64,6 +64,7 @@ public class CoinFlip implements MiniGame {
 		else if(choice.equals("!PAYTABLE"))
 		{
 			output.add(ShowPaytable(stage));
+			output.add(makeOverview(coins, stage));
 		}
 		//If it's neither of those it's just some random string we can safely ignore
 		
@@ -88,7 +89,7 @@ public class CoinFlip implements MiniGame {
 			}
 			else {
 				stage++;
-				output.add("You won " + String.format("%d and ", stage) + String.format("%,d! \n", payTable(stage)));
+				output.add("You won Stage " + String.format("%d and ", stage) + String.format("$%,d! \n", payTable(stage)));
 				if (stage == 13) accept = true;
 				else output.add(makeOverview(coins, stage));
 			}
