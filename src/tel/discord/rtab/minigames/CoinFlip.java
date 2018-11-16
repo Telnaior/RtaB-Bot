@@ -48,15 +48,15 @@ public class CoinFlip implements MiniGame {
 
 		String choice = pick.toUpperCase();
 		choice = choice.replaceAll("\\s","");
-		if(choice.equals("HEADS"))
+		if(choice.equals("HEADS") || choice.equals("H"))
 		{
 			heads = true;
 		}
-		else if (choice.equals("TAILS"))
+		else if (choice.equals("TAILS") || choice.equals("T"))
 		{
 			tails = true;
 		}
-		else if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE") || choice.equals("STOP"))
+		else if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE") || choice.equals("STOP") || choice.equals("S"))
 		{
 			accept = true;
 			output.add("You took the money!");
@@ -88,8 +88,9 @@ public class CoinFlip implements MiniGame {
 			}
 			else {
 				stage++;
-				output.add("You won " + String.format("%d and ", stage) String.format("%,d!", payTable(stage)));
+				output.add("You won " + String.format("%d and ", stage) + String.format("%,d! \n", payTable(stage)));
 				if (stage == 13) accept = true;
+				else output.add(makeOverview(coins, stage));
 			}
 		}
 		
@@ -185,8 +186,10 @@ public class CoinFlip implements MiniGame {
 			case 13: value = 1000000;
 				break;
 			default: value = 0;
-			return(value);
+
+
 		}
+		return(value);
 	}
 
 	/**
@@ -220,14 +223,14 @@ public class CoinFlip implements MiniGame {
 	{
 		//As long as we have more coins than 0-30, GO ON
 	
-		if (coins > Math.random()*30)
+		if (coins > Math.random()*5)
 		{
 			// Throw a single coin and decide from there.
 			if (50 < (Math.random()*100)){
-					return "TAILS"
+					return "TAILS";
 				}
 				else{
-					return "HEADS"
+					return "HEADS";
 				}
 		}
 	
