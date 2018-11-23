@@ -9,7 +9,9 @@ object MinigameTest {
     "bumper" -> new BumperGrab(),
     "shut"   -> new ShutTheBox(),
     "deal"   -> new DealOrNoDeal(),
-    "triple" -> new TriplePlay()
+    "triple" -> new TriplePlay(),
+    "coin"   -> new CoinFlip(),
+    "sbr"    -> new SuperBonusRound()
   )
 
   def main(args: Array[String]): Unit = {

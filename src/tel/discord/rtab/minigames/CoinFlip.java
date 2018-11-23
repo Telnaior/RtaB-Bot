@@ -25,10 +25,11 @@ public class CoinFlip implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to CoinFlip!");
-		output.add("You have 100 Coins and have to choose Heads or Tails, " +
-				"as long as atleast 1 Coin shows your choice you win the Stage.");
-		output.add("We have 13 Stages with inreasing values to Win!");
-		output.add("You lose everything, if **NO** Coin lands on your chosen side."); //~Duh
+		output.add("We have 13 stages with inreasing values to Win!");
+		output.add("You start with 100 Coins. Each stage you choose Heads or Tails, " +
+				"and as long as at least 1 Coin shows your choice you clear the stage.");
+		output.add("Any coins that land on the wrong side are removed from your collection, however.");
+		output.add("You can stop at any time, but if you run out of coins, you lose everything."); //~Duh
 		output.add(ShowPaytable(stage));
 		output.add(makeOverview(coins, stage)); 
 		return output;  
@@ -66,7 +67,7 @@ public class CoinFlip implements MiniGame {
 			output.add(ShowPaytable(stage));
 			output.add(makeOverview(coins, stage));
 		}
-		//If it's neither of those it's just some random string we can safely ignore
+		//If it's none of those it's just some random string we can safely ignore
 		
 		if(heads || tails)
 		{	
@@ -81,15 +82,15 @@ public class CoinFlip implements MiniGame {
 					if (heads) newcoins++;
 				}
 			}
-			if (heads) output.add("We flipped " + String.format("%d", coins) + " Coins and we got " + String.format("%d HEADS\n\n", newcoins));
-			else if (tails) output.add("We flipped " + String.format("%d", coins) + " Coins and we got " + String.format("%d TAILS\n\n", newcoins));
+			if (heads) output.add(String.format("We flipped %1$d coins and got %2$d HEADS\n\n", coins, newcoins));
+			else if (tails) output.add(String.format("We flipped %1$d coins and got %2$d TAILS\n\n", coins, newcoins));
 			coins = newcoins;
 			if (coins == 0) {
 				alive = false;
 			}
 			else {
 				stage++;
-				output.add("You won Stage " + String.format("%d and ", stage) + String.format("$%,d! \n", payTable(stage)));
+				output.add(String.format("You cleared Stage %d and won $%,d! \n", stage, payTable(stage)));
 				if (stage == 13) accept = true;
 				else output.add(makeOverview(coins, stage));
 			}
@@ -147,7 +148,7 @@ public class CoinFlip implements MiniGame {
 		StringBuilder output = new StringBuilder();
 		output.append("```\n");
 		output.append("  CoinFlip  \n\n");
-		output.append("Amount of Coins: " + String.format("%d \n", coins));
+		output.append("Number of Coins: " + String.format("%d \n", coins));
 		output.append("Current Stage: " + String.format("%d - ", stage) + String.format("$%,d\n\n", payTable(stage)));
 		output.append("'Heads' or 'Tails'   (or 'Stop')? \n");
 		
@@ -224,7 +225,7 @@ public class CoinFlip implements MiniGame {
 	{
 		//As long as we have more coins than 0-30, GO ON
 	
-		if (coins > Math.random()*5)
+		if (Math.random()*Math.pow(2,coins) > 1)
 		{
 			// Throw a single coin and decide from there.
 			if (50 < (Math.random()*100)){
