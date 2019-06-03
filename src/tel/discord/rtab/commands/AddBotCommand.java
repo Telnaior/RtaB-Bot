@@ -30,11 +30,11 @@ public class AddBotCommand extends Command {
 				else if(event.getArgs().equals("all"))
 				{
 					for(int i=0; i<80; i++)
-						game.addBot(i);
+						game.addBot(i,false);
 				}
 				else
 				{
-					game.addBot(Integer.parseInt(event.getArgs()));
+					game.addBot(Integer.parseInt(event.getArgs()),false);
 				}
 				//We found the right channel, so
 				return;

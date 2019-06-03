@@ -49,13 +49,21 @@ public class Player implements Comparable<Player>
 	LinkedList<Games> games;
 	LinkedList<Integer> knownBombs;
 	//Constructor for humans
-	Player(Member playerName, MessageChannel channelID)
+	Player(Member playerName, MessageChannel channelID, String botName)
 	{
 		user = playerName.getUser();
-		name = playerName.getEffectiveName();
 		uID = user.getId();
+		if(botName == null)
+		{
+			name = playerName.getEffectiveName();
+			newbieProtection = 10;
+		}
+		else
+		{
+			name = botName;
+			newbieProtection = 0;
+		}
 		isBot = false;
-		newbieProtection = 10;
 		initPlayer(channelID);
 	}
 	//Constructor for bots

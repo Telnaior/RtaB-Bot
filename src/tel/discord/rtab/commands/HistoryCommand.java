@@ -24,8 +24,18 @@ public class HistoryCommand extends Command {
 	protected void execute(CommandEvent event) {
 		try
 		{
-			String name = event.getMember().getEffectiveName();
-			String uID = event.getAuthor().getId();
+			String name;
+			String uID;
+			if(event.getArgs().equals(""))
+			{
+				name = event.getMember().getEffectiveName();
+				uID = event.getAuthor().getId();
+			}
+			else
+			{
+				name = event.getArgs();
+				uID = null;
+			}
 			int season = 1;
 			int minRank = Integer.MAX_VALUE;
 			List<Pair<Integer,Long>> cashFigures = new LinkedList<>();
@@ -36,7 +46,10 @@ public class HistoryCommand extends Command {
 				List<String> list = Files.readAllLines(Paths.get("history"+event.getChannel().getId()+"s"+season+".csv"));
 				int index;
 				//If we find them, add their records to the pile
-				index = GameController.findUserInList(list,uID,false);
+				if(uID != null)
+					index = GameController.findUserInList(list,uID,false);
+				else
+					index = GameController.findUserInList(list,name,true);
 				if(index >= 0 && index < list.size())
 				{
 					String[] record = list.get(index).split("#");

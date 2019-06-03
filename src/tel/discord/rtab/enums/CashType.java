@@ -33,7 +33,8 @@ public enum CashType implements WeightedSpace
 	//Meme
 	P10		(      10,1,null),
 	MYSTERY (       0,3,null),
-	DB1		(   22805,1,"a DesertBuck");
+	DB1		(   22805,1,"a DesertBuck"),
+	DANGAN  (   11037,1,"an unfamiliar memory");
 	
 	int value;
 	int weight;

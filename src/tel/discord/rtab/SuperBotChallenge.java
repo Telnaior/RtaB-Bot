@@ -17,16 +17,19 @@ public class SuperBotChallenge
 	public TextChannel channel;
 	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 	
-	public GameController initialise(TextChannel channelID, int multiplier, boolean autoSchedule)
+	public GameController initialise(TextChannel channelID, boolean autoSchedule)
 	{
 		channel = channelID;
-		gameHandler = new GameController(channel,false,false,false,true,multiplier);
+		gameHandler = new GameController(channel,false,false,false,true);
 		if(autoSchedule)
 			loadGames();
 		return gameHandler;
 	}
 	public void loadGames()
 	{
+		int playersLeft = Integer.parseInt(channel.getTopic().substring(22,24));
+		int multiplier = 1 + (80 - playersLeft) / 8;
+		gameHandler.setMultiplier(multiplier);
 		timer.purge();
 		List<String> list = null;
 		try
@@ -50,7 +53,7 @@ public class SuperBotChallenge
 				if(gameHandler.gameStatus != GameStatus.SEASON_OVER)
 				{
 					for(String next : players)
-						gameHandler.addBot(Integer.parseInt(next));
+						gameHandler.addBot(Integer.parseInt(next),true);
 					channel.sendMessage("Next game starting in five minutes:").queue();
 					if(record.length > 2)
 						channel.sendMessage(record[2]).queue();

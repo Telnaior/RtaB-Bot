@@ -94,4 +94,8 @@ public enum GameBot
 	{
         return values()[(ordinal() + 1) % values().length];
     }
+	public String getHuman()
+	{
+		return null;
+	}
 }

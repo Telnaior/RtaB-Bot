@@ -25,7 +25,7 @@ public class CoinFlip implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to CoinFlip!");
-		output.add("We have 13 stages with inreasing values to Win!");
+		output.add("Here there are 13 stages with increasing values to win!");
 		output.add("You start with 100 Coins. Each stage you choose Heads or Tails, " +
 				"and as long as at least 1 Coin shows your choice you clear the stage.");
 		output.add("Any coins that land on the wrong side are removed from your collection, however.");

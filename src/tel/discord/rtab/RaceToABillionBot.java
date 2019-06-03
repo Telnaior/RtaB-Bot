@@ -114,21 +114,19 @@ public class RaceToABillionBot
 				//If it's a designated game channel, make a controller here!
 				if(channel.getTopic().startsWith("~ MAIN CHANNEL ~"))
 				{
-					game.add(new GameController(channel,true,true,true,false,1));
+					game.add(new GameController(channel,true,true,true,false));
 					System.out.println("Main Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ GAME CHANNEL ~"))
 				{
-					game.add(new GameController(channel,true,false,false,true,1));
+					game.add(new GameController(channel,true,false,false,true));
 					System.out.println("Game Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ CHALLENGE CHANNEL ~"))
 				{
-					int playersLeft = Integer.parseInt(channel.getTopic().substring(22,24));
-					int multiplier = 1 + (80 - playersLeft) / 8;
 					SuperBotChallenge challengeHandler = new SuperBotChallenge();
 					challenge.add(challengeHandler);
-					game.add(challengeHandler.initialise(channel,multiplier,autoSchedule));
+					game.add(challengeHandler.initialise(channel,autoSchedule));
 					System.out.println("Challenge Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))
