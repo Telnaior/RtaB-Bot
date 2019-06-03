@@ -12,7 +12,7 @@ public enum Games implements WeightedSpace {
 	DEUCES_WILD		(2,"Deuces Wild","Deuces") { public MiniGame getGame() { return new DeucesWild(); } },		//Author: StrangerCoug
 	DOUBLE_TROUBLE	(2,"Double Trouble","Double") { public MiniGame getGame() { return new DoubleTrouble(); } },//Author: JerryEris
 	DEAL_OR_NO_DEAL	(2,"Deal or No Deal","DoND") { public MiniGame getGame() { return new DealOrNoDeal(); } },	//Author: Atia
-	BUMPER_CASH     (2,"Bumper Grab","Bumper") { public MiniGame getGame() { return new BumperGrab(); } },		//Author: Tara
+	//BUMPER_CASH     (2,"Bumper Grab","Bumper") { public MiniGame getGame() { return new BumperGrab(); } },		//Author: Tara
 	DOUBLE_ZERO     (2,"Double Zero","00") { public MiniGame getGame() { return new DoubleZeroes(); } },		//Author: JerryEris
 	SHUT_THE_BOX	(2,"Shut the Box","Shut") { public MiniGame getGame() { return new ShutTheBox(); } },		//Author: StrangerCoug
 	COIN_FLIP		(2,"CoinFlip","Flip") { public MiniGame getGame() { return new CoinFlip(); } },			//Author: Amy
