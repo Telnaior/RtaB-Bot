@@ -471,10 +471,10 @@ public class GameController
 						case GAME:
 							resolveTurn(peekSpace);
 							break;
-						//Cash or event can be risky, so roll the dice to pick it or not
+						//Cash or event can be risky, so roll the dice to pick it or not (unless it's 2p then there's no point)
 						case CASH:
 						case EVENT:
-							if(Math.random()<0.5)
+							if(Math.random()<0.5 || playersJoined == 2)
 								resolveTurn(peekSpace);
 							else
 								resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
