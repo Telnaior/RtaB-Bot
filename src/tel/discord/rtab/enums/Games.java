@@ -16,6 +16,7 @@ public enum Games implements WeightedSpace {
 	DOUBLE_ZERO     (2,"Double Zero","00") { public MiniGame getGame() { return new DoubleZeroes(); } },		//Author: JerryEris
 	SHUT_THE_BOX	(2,"Shut the Box","Shut") { public MiniGame getGame() { return new ShutTheBox(); } },		//Author: StrangerCoug
 	COIN_FLIP		(2,"CoinFlip","Flip") { public MiniGame getGame() { return new CoinFlip(); } },			//Author: Amy
+	BOMB_ROULETTE		(2,"Bomb Roulette","B.Roul") { public MiniGame getGame() { return new BombRoulette(); } },			//Author: StrangerCoug
 	//Don't have enough games in the pool to have a rotation yet
 	//Bonus games never appear in the pool
 	SUPERCASH		(0,"SUPERCASH","Super") { public MiniGame getGame() { return new Supercash(); } },
