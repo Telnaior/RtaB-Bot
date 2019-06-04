@@ -12,6 +12,8 @@ public enum Events implements WeightedSpace
 	BOOST_MAGNET	( 5),
 	REVERSE_ORDER	( 5),
 	STREAKPLARGE	( 5),
+	BOWSER			( 4),
+	MINEFIELD		( 4),
 	JOKER			( 4)
 	{
 		@Override
@@ -29,7 +31,7 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	DRAW_FOUR		( 4)
+	DRAW_FOUR		( 3)
 	{
 		@Override
 		public int getWeight(int playerCount)
@@ -46,9 +48,7 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	MINEFIELD		( 4),
 	LOCKDOWN		( 3),
-	COMMUNISM		( 3),
 	BLAMMO_FRENZY	( 3),
 	BRIBE			( 2),
 	SPLIT_SHARE		( 2),
@@ -63,7 +63,13 @@ public enum Events implements WeightedSpace
 		}
 	},
 	STARMAN			( 1),
-	JACKPOT			( 1);
+	JACKPOT			( 1),
+	//Bowser Events
+	COINS_FOR_BOWSER( 0) { public String getName() { return "Cash for Bowser"; } },
+	BOWSER_POTLUCK	( 0) { public String getName() { return "Bowser's Cash Potluck"; } },
+	RUNAWAY			( 0) { public String getName() { return "Billion-Dollar Present"; } },
+	BOWSER_JACKPOT	( 0) { public String getName() { return "Bowser's Jackpot"; } },
+	COMMUNISM		( 0) { public String getName() { return "Bowser Revolution"; } };
 
 	int weight;
 	Events(int valueWeight)
@@ -75,5 +81,10 @@ public enum Events implements WeightedSpace
 	{
 		//This gets overriden by a few events that don't belong in small or large games
 		return weight;
+	}
+	public String getName()
+	{
+		//This gets overridden by events that actually use it
+		return "NONAME";
 	}
 }

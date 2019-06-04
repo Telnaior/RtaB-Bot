@@ -73,7 +73,11 @@ public class BombRoulette implements MiniGame {
         output.add("...a **BOMB** space, which costs you all your winnings and "
                 + "the game. There's only one on the wheel right now, but each "
                 + "space you hit will be replaced with another BOMB space.");
+<<<<<<< HEAD
         output.add("If you had an unused joker from the main�game, it "
+=======
+        output.add("If you had an unused joker from the main game, it "
+>>>>>>> 7deaee45a9b54176ee700ea7a24dcc5354f5a7ae
                 + "unfortunately does not carry over. Sorry.");
         output.add("After you've spun the wheel at least once, you are free to "
                 + "walk away with your winning if you wish.");
@@ -134,7 +138,8 @@ public class BombRoulette implements MiniGame {
                 case BOMB:
                     output.add("It's a **BOMB**.");
                     if (hasJoker) {
-                        output.add("But since you have a joker, we'll take that"
+
+                        output.add("But since you have a joker, we'll take that "
                                 + "instead of your money!");
                         hasJoker = false;
                     }
