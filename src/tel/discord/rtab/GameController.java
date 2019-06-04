@@ -1352,7 +1352,8 @@ public class GameController
 							index += 1;
 						else
 							index -= 1;
-						bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(1,TimeUnit.SECONDS);
+						index %= 5;
+						bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(2,TimeUnit.SECONDS);
 					}
 				//Check if it's on the jackpot or runaway, and give it an extra twist if so
 				if(bowserEvents.get(index) == Events.RUNAWAY || bowserEvents.get(index) == Events.BOWSER_JACKPOT)
@@ -1371,10 +1372,13 @@ public class GameController
 							else
 								index -= 1;
 							index %= 5;
-							bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(1,TimeUnit.SECONDS);
+							bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index))
+								.completeAfter(500,TimeUnit.MILLISECONDS);
 						}
 					}
 				}
+				//Make the roulette vanish after a few seconds
+				bowserMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 				//If it's on the jackpot right now, runaway chance based on current total
 				if(bowserEvents.get(index) == Events.BOWSER_JACKPOT
 						&& Math.random() * 1_000_000_000 < players.get(currentTurn).money)
@@ -1386,7 +1390,7 @@ public class GameController
 			break;
 		case COINS_FOR_BOWSER:
 			channel.sendMessage("**Cash for Bowser** it is! "
-					+ "In this FUN event, you give your money to ME!").completeAfter(1, TimeUnit.SECONDS);
+					+ "In this FUN event, you give your money to ME!").completeAfter(3, TimeUnit.SECONDS);
 			//Coins: Up to 100-200% of their round earnings, determined by their total bank
 			int coinFraction = (int)(Math.random()*51+50);
 			int coins = (players.get(currentTurn).money - players.get(currentTurn).oldMoney) / 100;
@@ -1401,7 +1405,7 @@ public class GameController
 			break;
 		case BOWSER_POTLUCK:
 			channel.sendMessage("It's **Bowser's Cash Potluck**! "
-					+ "In this FUN event, EVERY PLAYER gives me money!").completeAfter(1,TimeUnit.SECONDS);
+					+ "In this FUN event, EVERY PLAYER gives me money!").completeAfter(3,TimeUnit.SECONDS);
 			//Potluck: 0.01% - 1.00% of the average total bank of the living players in the round
 			int potluckFraction = (int)(Math.random()*100+1);
 			int potluck = 0;
@@ -1419,10 +1423,10 @@ public class GameController
 				next.addMoney(potluck * -1, MoneyMultipliersToUse.NOTHING);
 			break;
 		case RUNAWAY:
-			channel.sendMessage("...").completeAfter(2, TimeUnit.SECONDS);
+			channel.sendMessage("...").completeAfter(3, TimeUnit.SECONDS);
 			channel.sendMessage("Bowser ran away!").completeAfter(2, TimeUnit.SECONDS);
 		case BOWSER_JACKPOT:
-			channel.sendMessage("...").completeAfter(2, TimeUnit.SECONDS);
+			channel.sendMessage("...").completeAfter(3, TimeUnit.SECONDS);
 			channel.sendMessage("Bowser looks about to run away, but then gives you a pitiful look.")
 				.completeAfter(2, TimeUnit.SECONDS);
 			channel.sendMessage("You're looking quite sad there, aren't you?").completeAfter(2,TimeUnit.SECONDS);
@@ -1435,18 +1439,18 @@ public class GameController
 				if(next.money < threshold)
 				{
 					awardJP = false;
-					channel.sendMessage("Bowser left you **ABSOLUTELY NOTHING**! PSYCHE!").completeAfter(2, TimeUnit.SECONDS);
+					channel.sendMessage("Bowser left you **ABSOLUTELY NOTHING**! PSYCHE!").completeAfter(3, TimeUnit.SECONDS);
 					break;
 				}
 			if(awardJP)
 			{
-				channel.sendMessage("Bowser left you **all the money he has collected*!!").completeAfter(2, TimeUnit.SECONDS);
+				channel.sendMessage("Bowser left you **all the money he has collected*!!").completeAfter(3, TimeUnit.SECONDS);
 				players.get(currentTurn).addMoney(jackpot, MoneyMultipliersToUse.NOTHING);
 			}
 			break;
 		case COMMUNISM:
 			channel.sendMessage("I am not always thinking about money. Why can't we all be friends?")
-				.completeAfter(1,TimeUnit.SECONDS);
+				.completeAfter(3,TimeUnit.SECONDS);
 			channel.sendMessage("So, to make the owrld a more peaceful place, "
 					+ "I've decided to *divide everyone's earnings evenly*!").completeAfter(1, TimeUnit.SECONDS);
 			channel.sendMessage("It's a **Bowser Revolution**!").completeAfter(1,TimeUnit.SECONDS);
@@ -2412,6 +2416,17 @@ public class GameController
 	}
 	String displayBowserRoulette(ArrayList<Events> list, int index)
 	{
-		return "abcde"; //TODO
+		StringBuilder board = new StringBuilder().append("```\n");
+		for(int i=0; i<list.size(); i++)
+		{
+			if(i == index)
+				board.append("> ");
+			else
+				board.append("  ");
+			board.append(list.get(i).getName());
+			board.append("\n");
+		}
+		board.append("```");
+		return board.toString();
 	}
 }
