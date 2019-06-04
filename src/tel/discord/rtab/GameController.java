@@ -73,6 +73,7 @@ public class GameController
 	public GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
 	boolean[] pickedSpaces;
 	int spacesLeft;
+	int jackpot = 0;
 	boolean[] bombs;
 	Board gameboard;
 	public static EventWaiter waiter;
@@ -135,6 +136,7 @@ public class GameController
 		gameboard = null;
 		finalCountdown = false;
 		repeatTurn = 0;
+		jackpot = 0;
 		reverse = false;
 		timer.shutdownNow();
 		timer = new ScheduledThreadPoolExecutor(1);
@@ -299,6 +301,16 @@ public class GameController
 		channel.sendMessage("Starting game...").queue();
 		gameStatus = GameStatus.IN_PROGRESS;
 		//Initialise stuff that needs initialising
+		//Jackpot lol
+		try
+		{
+			List<String> jackpotList = Files.readAllLines(Paths.get("stats"+channel.getId()+".csv"));
+			jackpot = Integer.parseInt(jackpotList.get(0));
+		}
+		catch(IOException e)
+		{
+			System.err.println("nice jackpot read fail");
+		}
 		boardSize = 5 + (5*playersJoined);
 		spacesLeft = boardSize;
 		pickedSpaces = new boolean[boardSize];
@@ -1295,9 +1307,149 @@ public class GameController
 					gameboard.typeBoard.set(i,SpaceType.BLAMMO);
 			}
 			break;
+		case BOWSER:
+			channel.sendMessage("It's B-B-B-**BOWSER**!!").completeAfter(5, TimeUnit.SECONDS);
+			channel.sendMessage("Wah, hah, HAH! Welcome to the Bowser Event!").completeAfter(1, TimeUnit.SECONDS);
+			//If they don't have any money yet, why not be kind and give them some?
+			if(players.get(currentTurn).money - players.get(currentTurn).oldMoney < 0)
+			{
+				channel.sendMessage("Oh, but you don't have any money yet this round?").completeAfter(1, TimeUnit.SECONDS);
+				channel.sendMessage("Let no one say I am unkind. Here is **$1,000,000**!").completeAfter(1, TimeUnit.SECONDS);
+				players.get(currentTurn).addMoney(1000000,MoneyMultipliersToUse.NOTHING);
+			}
+			else
+			{
+				channel.sendMessage("Step right up and let roulette decide your fate!").completeAfter(1, TimeUnit.SECONDS);
+				//Build event list
+				ArrayList<Events> bowserEvents = new ArrayList<>();
+				bowserEvents.add(Events.COINS_FOR_BOWSER);
+				bowserEvents.add(Events.COINS_FOR_BOWSER);
+				bowserEvents.add(Events.BOWSER_POTLUCK);
+				bowserEvents.add(Events.COMMUNISM);
+				//First jackpot test - 50% chance it appears at all;
+				if(Math.random() < 0.5)
+					bowserEvents.add(Events.RUNAWAY);
+				else
+					bowserEvents.add(Events.BOWSER_JACKPOT);
+				Collections.shuffle(bowserEvents);
+				int index = (int)(Math.random()*5);
+				Message bowserMessage = channel.sendMessage(displayBowserRoulette(bowserEvents,index))
+						.completeAfter(3,TimeUnit.SECONDS);
+				int addon = (int)(Math.random()*5+1);
+				//Make it spin
+				for(int i=0; i<addon; i++)
+				{
+					index += 1;
+					index %= 5;
+					bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(1,TimeUnit.SECONDS);
+				}
+				//50% chance three times to give it an extra twist
+				for(int i=0; i<3; i++)
+					if(Math.random() < 0.5)
+					{
+						//Random direction
+						if(Math.random() < 0.5)
+							index += 1;
+						else
+							index -= 1;
+						bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(1,TimeUnit.SECONDS);
+					}
+				//Check if it's on the jackpot or runaway, and give it an extra twist if so
+				if(bowserEvents.get(index) == Events.RUNAWAY || bowserEvents.get(index) == Events.BOWSER_JACKPOT)
+				{
+					//Chance based on current jackpot
+					if(Math.random() * 100_000_000 > jackpot)
+					{
+						addon = (int)(Math.random()*5+1);
+						//Randomise direction for this one
+						boolean direction = Math.random() < 0.5;
+						//Make it spin
+						for(int i=0; i<addon; i++)
+						{
+							if(direction)
+								index += 1;
+							else
+								index -= 1;
+							index %= 5;
+							bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(1,TimeUnit.SECONDS);
+						}
+					}
+				}
+				//If it's on the jackpot right now, runaway chance based on current total
+				if(bowserEvents.get(index) == Events.BOWSER_JACKPOT
+						&& Math.random() * 1_000_000_000 < players.get(currentTurn).money)
+					activateEvent(Events.RUNAWAY,location);
+				else
+					activateEvent(bowserEvents.get(index),location);
+					
+			}
+			break;
+		case COINS_FOR_BOWSER:
+			channel.sendMessage("**Cash for Bowser** it is! "
+					+ "In this FUN event, you give your money to ME!").completeAfter(1, TimeUnit.SECONDS);
+			//Coins: Up to 100-200% of their round earnings, determined by their total bank
+			int coinFraction = (int)(Math.random()*51+50);
+			int coins = (players.get(currentTurn).money - players.get(currentTurn).oldMoney) / 100;
+			coins *= (players.get(currentTurn).money / 5_000_000) + 1;
+			coins /= 100;
+			coins *= coinFraction;
+			if(coins < 50000)
+				coins = 50000;
+			channel.sendMessage(String.format("Ooh! I'm so excited! OK, that'll be **$%,d**! Wah, hah, hah, HAH!",coins))
+				.completeAfter(1,TimeUnit.SECONDS);
+			players.get(currentTurn).addMoney(coins*-1,MoneyMultipliersToUse.NOTHING);
+			break;
+		case BOWSER_POTLUCK:
+			channel.sendMessage("It's **Bowser's Cash Potluck**! "
+					+ "In this FUN event, EVERY PLAYER gives me money!").completeAfter(1,TimeUnit.SECONDS);
+			//Potluck: 0.01% - 1.00% of the average total bank of the living players in the round
+			int potluckFraction = (int)(Math.random()*100+1);
+			int potluck = 0;
+			for(Player next : players)
+				if(next.status == PlayerStatus.ALIVE)
+					potluck += next.money/100;
+			potluck /= playersAlive;
+			potluck *= potluckFraction;
+			potluck /= 100;
+			if(potluck < 50000)
+				potluck = 50000;
+			channel.sendMessage(String.format("Let the event begin! That'll be **$%,d** each! Wah, hah, hah, HAH!",potluck))
+				.completeAfter(1, TimeUnit.SECONDS);
+			for(Player next : players)
+				next.addMoney(potluck * -1, MoneyMultipliersToUse.NOTHING);
+			break;
+		case RUNAWAY:
+			channel.sendMessage("...").completeAfter(2, TimeUnit.SECONDS);
+			channel.sendMessage("Bowser ran away!").completeAfter(2, TimeUnit.SECONDS);
+		case BOWSER_JACKPOT:
+			channel.sendMessage("...").completeAfter(2, TimeUnit.SECONDS);
+			channel.sendMessage("Bowser looks about to run away, but then gives you a pitiful look.")
+				.completeAfter(2, TimeUnit.SECONDS);
+			channel.sendMessage("You're looking quite sad there, aren't you?").completeAfter(2,TimeUnit.SECONDS);
+			channel.sendMessage("Let no one say I am unkind. You can have this, but don't tell anyone...")
+				.completeAfter(2, TimeUnit.SECONDS);
+			//Final test: They need to be in last overall from the players in the round
+			boolean awardJP = true;
+			int threshold = players.get(currentTurn).money;
+			for(Player next : players)
+				if(next.money < threshold)
+				{
+					awardJP = false;
+					channel.sendMessage("Bowser left you **ABSOLUTELY NOTHING**! PSYCHE!").completeAfter(2, TimeUnit.SECONDS);
+					break;
+				}
+			if(awardJP)
+			{
+				channel.sendMessage("Bowser left you **all the money he has collected*!!").completeAfter(2, TimeUnit.SECONDS);
+				players.get(currentTurn).addMoney(jackpot, MoneyMultipliersToUse.NOTHING);
+			}
+			break;
 		case COMMUNISM:
-			channel.sendMessage("It's a **Bowser Revolution**, everyone's money is now equalised!")
-				.completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage("I am not always thinking about money. Why can't we all be friends?")
+				.completeAfter(1,TimeUnit.SECONDS);
+			channel.sendMessage("So, to make the owrld a more peaceful place, "
+					+ "I've decided to *divide everyone's earnings evenly*!").completeAfter(1, TimeUnit.SECONDS);
+			channel.sendMessage("It's a **Bowser Revolution**!").completeAfter(1,TimeUnit.SECONDS);
 			//Get the total money added during the round
 			int delta = 0;
 			for(Player next : players)
@@ -1971,6 +2123,13 @@ public class GameController
 			Path oldFile = Files.move(file, file.resolveSibling("scores"+channel.getId()+"old.csv"));
 			Files.write(file, list);
 			Files.delete(oldFile);
+			//Do the same for the jackpot
+			file = Paths.get("stats"+channel.getId()+".csv");
+			oldFile = Files.move(file, file.resolveSibling("stats"+channel.getId()+"old.csv"));
+			List<String> jackpotWrite = new LinkedList<>();
+			jackpotWrite.add(Integer.toString(jackpot));
+			Files.write(file, jackpotWrite);
+			Files.delete(oldFile);
 		}
 		catch(IOException e)
 		{
@@ -2250,5 +2409,9 @@ public class GameController
 		default: //This will never happen
 			return PeekReturnValue.BADSPACE;
 		}
+	}
+	String displayBowserRoulette(ArrayList<Events> list, int index)
+	{
+		return "abcde"; //TODO
 	}
 }
