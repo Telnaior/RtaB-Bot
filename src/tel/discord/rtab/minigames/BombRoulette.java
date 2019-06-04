@@ -134,7 +134,7 @@ public class BombRoulette implements MiniGame {
                 case BOMB:
                     output.add("It's a **BOMB**.");
                     if (hasJoker) {
-                        output.add("But since you have a joker, we'll take that"
+                        output.add("But since you have a joker, we'll take that "
                                 + "instead of your money!");
                         hasJoker = false;
                     }

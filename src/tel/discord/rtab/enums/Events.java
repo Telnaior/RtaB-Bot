@@ -12,6 +12,8 @@ public enum Events implements WeightedSpace
 	BOOST_MAGNET	( 5),
 	REVERSE_ORDER	( 5),
 	STREAKPLARGE	( 5),
+	BOWSER			( 4),
+	MINEFIELD		( 4),
 	JOKER			( 4)
 	{
 		@Override
@@ -29,7 +31,7 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	DRAW_FOUR		( 4)
+	DRAW_FOUR		( 3)
 	{
 		@Override
 		public int getWeight(int playerCount)
@@ -46,9 +48,7 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	MINEFIELD		( 4),
 	LOCKDOWN		( 3),
-	BOWSER			( 3),
 	BLAMMO_FRENZY	( 3),
 	BRIBE			( 2),
 	SPLIT_SHARE		( 2),

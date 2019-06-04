@@ -1402,6 +1402,7 @@ public class GameController
 			channel.sendMessage(String.format("Ooh! I'm so excited! OK, that'll be **$%,d**! Wah, hah, hah, HAH!",coins))
 				.completeAfter(1,TimeUnit.SECONDS);
 			players.get(currentTurn).addMoney(coins*-1,MoneyMultipliersToUse.NOTHING);
+			jackpot += coins;
 			break;
 		case BOWSER_POTLUCK:
 			channel.sendMessage("It's **Bowser's Cash Potluck**! "
@@ -1421,6 +1422,7 @@ public class GameController
 				.completeAfter(1, TimeUnit.SECONDS);
 			for(Player next : players)
 				next.addMoney(potluck * -1, MoneyMultipliersToUse.NOTHING);
+			jackpot += (potluck * playersAlive);
 			break;
 		case RUNAWAY:
 			channel.sendMessage("...").completeAfter(3, TimeUnit.SECONDS);
@@ -1461,8 +1463,13 @@ public class GameController
 				//Add their delta to the pile
 				delta += (next.money - next.oldMoney);
 			}
+			//Add the remainder to the jackpot - Bowser keeps it!
+			jackpot += (delta % playersJoined);
 			//Divide the total by the number of players
 			delta /= playersJoined;
+			//If the delta is negative, Bowser doesn't 'keep' the change!
+			if(delta < 0)
+				delta -= 1;
 			//And give it to each of them
 			for(Player next : players)
 			{
