@@ -43,12 +43,14 @@ public class HelpCommand extends Command
 			helpList.append("Events are unpredictable and could help you or hurt you, so good luck!");
 			break;
 		case "peek":
+		case "peeks":
 			helpList.append("At the beginning of each game, you have one PEEK to use.\n");
 			helpList.append("You may use it at any time during the game by typing !peek in the game channel, "
 					+ "followed by the space you wish to peek at.\n");
 			helpList.append("For example, to peek at space 13, type '!peek 13'.\n");
 			helpList.append("You will be privately told what TYPE of space it is, but not its exact contents.\n");
 			helpList.append("Use this information as you wish during your game!\n");
+			break;
 		case "boost":
 		case "booster":
 			helpList.append("You have a 'booster', which defaults to 100% and is displayed next to your score.\n");
