@@ -26,6 +26,7 @@ import tel.discord.rtab.commands.LivesCommand;
 import tel.discord.rtab.commands.LuckyNumberCommand;
 import tel.discord.rtab.commands.MemeCommand;
 import tel.discord.rtab.commands.NextCommand;
+import tel.discord.rtab.commands.PeekCommand;
 import tel.discord.rtab.commands.PingBotCommand;
 import tel.discord.rtab.commands.PlayersCommand;
 import tel.discord.rtab.commands.QuitCommand;
@@ -91,7 +92,8 @@ public class RaceToABillionBot
 							new DemoCommand(),
 							new MemeCommand(),
 							new ShopCommand(),
-							new LuckyNumberCommand());
+							new LuckyNumberCommand(),
+							new PeekCommand());
 		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
 		prepareBot.setToken(token);
 		prepareBot.addEventListener(utilities.build());

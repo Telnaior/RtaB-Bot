@@ -35,6 +35,7 @@ import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.GameStatus;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.MoneyMultipliersToUse;
+import tel.discord.rtab.enums.PeekReturnValue;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
 import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
@@ -85,6 +86,11 @@ public class GameController
 		channel = channelID;
 		playersCanJoin = allowJoining;
 		rankChannel = mainGame;
+		//TODO - remove this (temporary to prevent early S3 start)
+		if(mainGame)
+			gameStatus = GameStatus.SEASON_OVER;
+		else
+			gameStatus = GameStatus.SIGNUPS_OPEN;
 		runDemo = useDemo;
 		verboseBotGames = verbosity;
 		baseMultiplier = 1;
@@ -417,6 +423,23 @@ public class GameController
 			for(int i=0; i<boardSize; i++)
 				if(!pickedSpaces[i])
 					openSpaces.add(i);
+			//With 50% chance, look for a previous peek to use
+			if(Math.random() < 0.5)
+			{
+				//Check for known peeked spaces that are still available
+				ArrayList<Integer> peekedSpaces = new ArrayList<>(boardSize);
+				for(Integer peek : players.get(currentTurn).safePeeks)
+				{
+					if(openSpaces.contains(peek))
+						peekedSpaces.add(peek);
+				}
+				//If there's any, pick one and end our logic
+				if(peekedSpaces.size() > 0)
+				{
+					resolveTurn(peekedSpaces.get((int)(Math.random()*peekedSpaces.size())));
+					return;
+				}
+			}
 			//Remove all known bombs
 			ArrayList<Integer> safeSpaces = new ArrayList<>(boardSize);
 			safeSpaces.addAll(openSpaces);
@@ -424,7 +447,56 @@ public class GameController
 				safeSpaces.remove(bomb);
 			//If there's any pick one at random and resolve it
 			if(safeSpaces.size() > 0)
-				resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
+			{
+				/*
+				 * Use a peek under the following conditions:
+				 * - The bot has one to use
+				 * - It hasn't already peeked the space selected
+				 * - 50% chance (so it won't always fire immediately)
+				 * Note that they never bluff peek their own bomb (it's just easier that way)
+				 */
+				if(players.get(currentTurn).peek > 0 && Math.random() < 0.5)
+				{
+					int peekSpace = safeSpaces.get((int)(Math.random()*safeSpaces.size()));
+					//Don't use the peek if we've already seen this space
+					if(!players.get(currentTurn).safePeeks.contains(peekSpace))
+					{
+						//Let the players know what's going on
+						channel.sendMessage("("+players.get(currentTurn).getName()+" peeks space "+(peekSpace+1)+")").queue();
+						//Then use the peek, and decide what to do from there
+						switch(usePeek(currentTurn,peekSpace))
+						{
+						//If it's a minigame or booster, take it immediately - it's guaranteed safe
+						case BOOST:
+						case GAME:
+							resolveTurn(peekSpace);
+							break;
+						//Cash or event can be risky, so roll the dice to pick it or not
+						case CASH:
+						case EVENT:
+							if(Math.random()<0.5)
+								resolveTurn(peekSpace);
+							else
+								resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
+							break;
+						//And obviously, don't pick it if it's a bomb!
+						case BOMB:
+							safeSpaces.remove(peekSpace);
+							//Make sure there's still a safe space left to pick, otherwise BAH
+							if(safeSpaces.size()>0)
+								resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
+							else
+								resolveTurn(openSpaces.get((int)(Math.random()*openSpaces.size())));
+							break;
+						default:
+							System.err.println("Bot made a bad peek!");
+						}
+					}
+				}
+				//Otherwise just pick a space
+				else
+					resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
+			}
 			//Otherwise it sucks to be you, bot, eat bomb!
 			else
 				resolveTurn(openSpaces.get((int)(Math.random()*openSpaces.size())));
@@ -1774,14 +1846,22 @@ public class GameController
 			{
 			case ALIVE:
 			case DONE:
+				//If they're alive, display their booster
 				board.append(String.format(" [%3d%%",players.get(i).booster));
+				//If it's endgame, show their winstreak afterward
 				if(players.get(i).status == PlayerStatus.DONE || (gameStatus == GameStatus.END_GAME && currentTurn == i))
 					board.append(String.format("x%1$d.%2$d",players.get(i).winstreak/10,players.get(i).winstreak%10));
+				//Otherwise, display whether or not they have a peek
+				else if(players.get(i).peek > 0)
+					board.append("P");
+				else
+					board.append(" ");
+				//Then close off the bracket
 				board.append("]");
 				break;
 			case OUT:
 			case FOLDED:
-				board.append(" [OUT] ");
+				board.append("  [OUT] ");
 				break;
 			}
 			//If they have any games, print them too
@@ -2098,5 +2178,71 @@ public class GameController
 		}
 		pingList.clear();
 		channel.sendMessage(output.toString()).queue();
+	}
+	/**
+	 * usePeek(User peeker, String location)
+	 * Used to parse player-submitted peeks to see if they are valid, and then pass them on to the resolver.
+	 * Bot peeks should not end up here.
+	 */
+	public PeekReturnValue validatePeek(User peeker, String location)
+	{
+		//Make sure the game is running, for a start
+		if(gameStatus != GameStatus.IN_PROGRESS)
+			return PeekReturnValue.NOPEEK;
+		//Check if the peeking player is in the game
+		int player = -1;
+		for(int i=0; i<playersJoined; i++)
+		{
+			if(peeker.equals(players.get(i).user))
+			{
+				//If they don't have a peek, reject them anyway and don't bother searching further
+				if(players.get(i).peek > 0)
+					player = i;
+				break;
+			}
+		}
+		//If we didn't find it, back out
+		if(player == -1)
+			return PeekReturnValue.NOPEEK;
+		//Check the space location to see if it's valid
+		if(!checkValidNumber(location))
+		{
+			return PeekReturnValue.BADSPACE;
+		}
+		//One last check to see if the space is still on the board
+		int space = Integer.parseInt(location) - 1;
+		if(pickedSpaces[space])
+			return PeekReturnValue.BADSPACE;
+		//Cool, pass it on
+		return usePeek(player, space);
+	}
+	PeekReturnValue usePeek(int playerID, int space)
+	{
+		//Start by taking a peek from their total
+		players.get(playerID).peek --;
+		//Check if it's a bomb first, of course
+		if(bombs[space])
+		{
+			//Add it to their known bombs
+			players.get(playerID).knownBombs.add(space);
+			return PeekReturnValue.BOMB;
+		}
+		//Otherwise we know it's safe, so add it then check the precise type to return
+		players.get(playerID).safePeeks.add(space);
+		switch(gameboard.typeBoard.get(space)) //Helpfully don't need break statements because return does everything
+		{
+		case CASH:
+		case BLAMMO: //Masquerade hates you <3
+			return PeekReturnValue.CASH;
+		case BOOSTER:
+			return PeekReturnValue.BOOST;
+		case GAME:
+			return PeekReturnValue.GAME;
+		case EVENT:
+		case GRAB_BAG: //Basically the same thing, yeah?
+			return PeekReturnValue.EVENT;
+		default: //This will never happen
+			return PeekReturnValue.BADSPACE;
+		}
 	}
 }

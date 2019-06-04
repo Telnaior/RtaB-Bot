@@ -38,6 +38,7 @@ public class Player implements Comparable<Player>
 	int oldWinstreak;
 	int newbieProtection;
 	//Event fields
+	int peek;
 	int jokers;
 	int boostCharge;
 	boolean splitAndShare;
@@ -48,6 +49,7 @@ public class Player implements Comparable<Player>
 	PlayerStatus status;
 	LinkedList<Games> games;
 	LinkedList<Integer> knownBombs;
+	LinkedList<Integer> safePeeks;
 	//Constructor for humans
 	Player(Member playerName, MessageChannel channelID, String botName)
 	{
@@ -85,6 +87,7 @@ public class Player implements Comparable<Player>
 		money = 0;
 		booster = 100;
 		winstreak = 0;
+		peek = 1;
 		jokers = 0;
 		boostCharge = 0;
 		splitAndShare = false;
@@ -94,6 +97,7 @@ public class Player implements Comparable<Player>
 		status = PlayerStatus.OUT;
 		games = new LinkedList<>();
 		knownBombs = new LinkedList<>();
+		safePeeks = new LinkedList<>();
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
