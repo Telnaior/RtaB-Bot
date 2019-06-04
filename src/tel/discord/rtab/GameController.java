@@ -493,7 +493,7 @@ public class GameController
 							break;
 						//And obviously, don't pick it if it's a bomb!
 						case BOMB:
-							safeSpaces.remove(peekSpace);
+							safeSpaces.remove(new Integer(peekSpace));
 							//Make sure there's still a safe space left to pick, otherwise BAH
 							if(safeSpaces.size()>0)
 								resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
@@ -1406,7 +1406,7 @@ public class GameController
 			break;
 		case BOWSER_POTLUCK:
 			channel.sendMessage("It's **Bowser's Cash Potluck**! "
-					+ "In this FUN event, EVERY PLAYER gives me money!").completeAfter(3,TimeUnit.SECONDS);
+					+ "In this EXTRA FUN event, EVERY PLAYER gives me money!").completeAfter(3,TimeUnit.SECONDS);
 			//Potluck: 0.01% - 1.00% of the average total bank of the living players in the round
 			int potluckFraction = (int)(Math.random()*100+1);
 			int potluck = 0;
@@ -1434,7 +1434,7 @@ public class GameController
 			channel.sendMessage("You're looking quite sad there, aren't you?").completeAfter(2,TimeUnit.SECONDS);
 			channel.sendMessage("Let no one say I am unkind. You can have this, but don't tell anyone...")
 				.completeAfter(2, TimeUnit.SECONDS);
-			//Final test: They need to be in last overall from the players in the round
+			//Final test: They need to be in last overall out of the players in the round
 			boolean awardJP = true;
 			int threshold = players.get(currentTurn).money;
 			for(Player next : players)
