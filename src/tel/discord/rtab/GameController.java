@@ -1149,12 +1149,18 @@ public class GameController
 	{
 		switch(event)
 		{
+		/* Not in Season 3
 		case BOOST_DRAIN:
 			channel.sendMessage("It's a **Boost Drain**, which cuts your booster in half...")
 				.completeAfter(5,TimeUnit.SECONDS);
 			players.get(currentTurn).booster /= 2;
 			if(players.get(currentTurn).booster < Player.MIN_BOOSTER)
 				players.get(currentTurn).booster = Player.MIN_BOOSTER;
+			break;
+		*/
+		case PEEK_REPLENISH:
+			channel.sendMessage("It's an **Extra Peek**! Use it however you wish!").completeAfter(5, TimeUnit.SECONDS);
+			players.get(currentTurn).peek ++;
 			break;
 		case MINEFIELD:
 			channel.sendMessage("Oh no, it's a **Minefield**! Adding up to " + playersJoined + " more bombs...")

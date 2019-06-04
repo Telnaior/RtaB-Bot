@@ -5,9 +5,10 @@ public enum Events implements WeightedSpace
 	STREAKPSMALL	( 7),
 	BOOST_CHARGER	( 7),
 	DOUBLE_DEAL		( 7),
-	BOOST_DRAIN		( 6),
+	//BOOST_DRAIN		( 6), Not in Season 3
 	DRAW_TWO		( 6),
 	SKIP_TURN		( 6),
+	PEEK_REPLENISH	( 6),
 	BOOST_MAGNET	( 5),
 	REVERSE_ORDER	( 5),
 	STREAKPLARGE	( 5),
