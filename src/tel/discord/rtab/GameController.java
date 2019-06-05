@@ -103,7 +103,7 @@ public class GameController
 				for(int i=0; i<4; i++)
 					addRandomBot();
 				startTheGameAlready();
-			},60,TimeUnit.MINUTES);
+			},120,TimeUnit.MINUTES);
 		}
 		//If they can't join, let them bet!
 		if(!playersCanJoin)
@@ -147,7 +147,7 @@ public class GameController
 				for(int i=0; i<4; i++)
 					addRandomBot();
 				startTheGameAlready();
-			},60,TimeUnit.MINUTES);
+			},120,TimeUnit.MINUTES);
 		}
 	}
 	/**
