@@ -9,10 +9,10 @@ public enum Events implements WeightedSpace
 	DRAW_TWO		( 6),
 	SKIP_TURN		( 6),
 	PEEK_REPLENISH	( 6),
-	BOOST_MAGNET	( 5),
 	REVERSE_ORDER	( 5),
 	STREAKPLARGE	( 5),
-	BOWSER			( 4),
+	BOWSER			( 5),
+	BOOST_MAGNET	( 4),
 	MINEFIELD		( 4),
 	JOKER			( 4)
 	{

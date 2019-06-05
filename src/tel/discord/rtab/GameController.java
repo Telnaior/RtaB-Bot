@@ -1311,7 +1311,7 @@ public class GameController
 			channel.sendMessage("It's B-B-B-**BOWSER**!!").completeAfter(5, TimeUnit.SECONDS);
 			channel.sendMessage("Wah, hah, HAH! Welcome to the Bowser Event!").completeAfter(1, TimeUnit.SECONDS);
 			//If they don't have any money yet, why not be kind and give them some?
-			if(players.get(currentTurn).money - players.get(currentTurn).oldMoney < 0)
+			if(players.get(currentTurn).money - players.get(currentTurn).oldMoney <= 0)
 			{
 				channel.sendMessage("Oh, but you don't have any money yet this round?").completeAfter(1, TimeUnit.SECONDS);
 				channel.sendMessage("Let no one say I am unkind. Here is **$1,000,000**!").completeAfter(1, TimeUnit.SECONDS);
@@ -1352,7 +1352,7 @@ public class GameController
 							index += 1;
 						else
 							index -= 1;
-						index %= 5;
+						index = (index+5) % 5;
 						bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(2,TimeUnit.SECONDS);
 					}
 				//Check if it's on the jackpot or runaway, and give it an extra twist if so
@@ -1371,9 +1371,9 @@ public class GameController
 								index += 1;
 							else
 								index -= 1;
-							index %= 5;
+							index = (index + 5) % 5;
 							bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index))
-								.completeAfter(500,TimeUnit.MILLISECONDS);
+								.completeAfter(250,TimeUnit.MILLISECONDS);
 						}
 					}
 				}
@@ -1421,12 +1421,14 @@ public class GameController
 			channel.sendMessage(String.format("Let the event begin! That'll be **$%,d** each! Wah, hah, hah, HAH!",potluck))
 				.completeAfter(1, TimeUnit.SECONDS);
 			for(Player next : players)
-				next.addMoney(potluck * -1, MoneyMultipliersToUse.NOTHING);
+				if(next.status == PlayerStatus.ALIVE)
+					next.addMoney(potluck * -1, MoneyMultipliersToUse.NOTHING);
 			jackpot += (potluck * playersAlive);
 			break;
 		case RUNAWAY:
 			channel.sendMessage("...").completeAfter(3, TimeUnit.SECONDS);
 			channel.sendMessage("Bowser ran away!").completeAfter(2, TimeUnit.SECONDS);
+			break;
 		case BOWSER_JACKPOT:
 			channel.sendMessage("...").completeAfter(3, TimeUnit.SECONDS);
 			channel.sendMessage("Bowser looks about to run away, but then gives you a pitiful look.")
@@ -1446,14 +1448,15 @@ public class GameController
 				}
 			if(awardJP)
 			{
-				channel.sendMessage("Bowser left you **all the money he has collected*!!").completeAfter(3, TimeUnit.SECONDS);
+				channel.sendMessage("Bowser left you **all the money he has collected**!!").completeAfter(3, TimeUnit.SECONDS);
 				players.get(currentTurn).addMoney(jackpot, MoneyMultipliersToUse.NOTHING);
+				jackpot = 0;
 			}
 			break;
 		case COMMUNISM:
 			channel.sendMessage("I am not always thinking about money. Why can't we all be friends?")
 				.completeAfter(3,TimeUnit.SECONDS);
-			channel.sendMessage("So, to make the owrld a more peaceful place, "
+			channel.sendMessage("So, to make the world a more peaceful place, "
 					+ "I've decided to *divide everyone's earnings evenly*!").completeAfter(1, TimeUnit.SECONDS);
 			channel.sendMessage("It's a **Bowser Revolution**!").completeAfter(1,TimeUnit.SECONDS);
 			//Get the total money added during the round
