@@ -703,9 +703,9 @@ public class GameController
 	{
 		channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Mock them appropriately if they self-bombed
-		if(players.get(currentTurn).knownBombs.get(0) == location))
+		if(players.get(currentTurn).knownBombs.get(0) == location)
 			channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
-		else if(players.get(currentTurn).knownBombs.contains(location)))
+		else if(players.get(currentTurn).knownBombs.contains(location))
 			channel.sendMessage("It's a **BOMB** that you already saw.").completeAfter(5,TimeUnit.SECONDS);			
 		else
 			channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
