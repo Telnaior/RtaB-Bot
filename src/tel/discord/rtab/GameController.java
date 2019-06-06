@@ -1630,6 +1630,14 @@ public class GameController
 				players.get(currentTurn).addMoney(1000000*boardSize*baseMultiplier,MoneyMultipliersToUse.NOTHING);
 			}
 		}
+		//Cash in unused jokers, folded or not
+		int jokerCount = players.get(currentTurn).jokers;
+		if(jokerCount > 0)
+		{
+			channel.sendMessage(String.format("You cash in your unused joker"+(jokerCount!=1?"s":"")+
+					" for **$%,d**.", players.get(currentTurn).jokers * 250_000));
+			players.get(currentTurn).addMoney(250_000*jokerCount, MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+		}
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		//Search every multiple of 5 to see if we've got it
 		for(int i=50; i<=players.get(currentTurn).winstreak;i+=50)

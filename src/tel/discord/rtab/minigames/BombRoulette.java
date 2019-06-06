@@ -73,10 +73,8 @@ public class BombRoulette implements MiniGame {
         output.add("...a **BOMB** space, which costs you all your winnings and "
                 + "the game. There's only one on the wheel right now, but each "
                 + "space you hit will be replaced with another BOMB space.");
-        output.add("If you had an unused joker from the main game, it "
-                + "unfortunately does not carry over. Sorry.");
         output.add("After you've spun the wheel at least once, you are free to "
-                + "walk away with your winning if you wish.");
+                + "walk away with your winnings if you wish.");
         output.add("Good luck! Type SPIN when you're ready.");
         output.add(generateBoard());
         return output;
