@@ -87,11 +87,7 @@ public class GameController
 		channel = channelID;
 		playersCanJoin = allowJoining;
 		rankChannel = mainGame;
-		//TODO - remove this (temporary to prevent early S3 start)
-		if(mainGame)
-			gameStatus = GameStatus.SEASON_OVER;
-		else
-			gameStatus = GameStatus.SIGNUPS_OPEN;
+		gameStatus = GameStatus.SIGNUPS_OPEN;
 		runDemo = useDemo;
 		verboseBotGames = verbosity;
 		baseMultiplier = 1;
