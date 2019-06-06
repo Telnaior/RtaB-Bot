@@ -30,6 +30,9 @@ public enum CashType implements WeightedSpace
 	P500K	(  500000,2,null),
 	P750K	(  750000,2,null),
 	P1000K	( 1000000,2,null),
+	//Trophies
+	S1TROPHY(   68000,1,"a replica of Vash's Season 1 trophy"),
+	S2TROPHY(   60000,1,"a replica of Charles510's Season 2 trophy"),
 	//Meme
 	P10		(      10,1,null),
 	MYSTERY (       0,3,null),
