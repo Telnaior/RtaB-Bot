@@ -49,9 +49,9 @@ public enum Events implements WeightedSpace
 	},
 	MINEFIELD		( 3),
 	LOCKDOWN		( 3),
-	BLAMMO_FRENZY	( 3),
+	SPLIT_SHARE		( 3),
+	BLAMMO_FRENZY	( 2),
 	BRIBE			( 2),
-	SPLIT_SHARE		( 2),
 	END_ROUND		( 2),
 	SUPER_JOKER		( 1)
 	{
