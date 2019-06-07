@@ -94,17 +94,7 @@ public class HiLoDice implements MiniGame {
         dice.rollDice();
         output.add("You rolled: " + dice.toString());
         
-        if (closedSpaces[dice.getDiceTotal() - 2]) {
-            // Make the sentence grammatically correct
-            String s = "You already rolled a";
-            if (dice.getDiceTotal() == 8 || dice.getDiceTotal() == 11)
-                s += "n";
-            s += " " + dice.getDiceTotal() + ". Sorry.";
-            output.add(s);
-            score = 0;
-            isAlive = false;
-        }
-        else if (guessHigher && dice.getDiceTotal() < lastRoll) {
+        if (guessHigher && dice.getDiceTotal() < lastRoll) {
             output.add(dice.getDiceTotal() + " is not higher than "
                     + lastRoll + ". Sorry.");
             score = 0;
@@ -113,6 +103,16 @@ public class HiLoDice implements MiniGame {
         else if (!guessHigher && dice.getDiceTotal() > lastRoll) {
             output.add(dice.getDiceTotal() + " is not lower than "
                     + lastRoll + ". Sorry.");
+            score = 0;
+            isAlive = false;
+        }
+        else if (closedSpaces[dice.getDiceTotal() - 2]) {
+            // Make the sentence grammatically correct
+            String s = "You already rolled a";
+            if (dice.getDiceTotal() == 8 || dice.getDiceTotal() == 11)
+                s += "n";
+            s += " " + dice.getDiceTotal() + ". Sorry.";
+            output.add(s);
             score = 0;
             isAlive = false;
         }

@@ -24,7 +24,7 @@ public class MysteryChanceCommand extends Command
 			if(Math.random() < 0.05)
 				newScore *= -1;
 			//And tell them the result!
-			event.reply(String.format("Your new score is $%,d.", newScore));
+			event.reply(String.format("Your new score is **$%,d**.", newScore));
 		}
 		else
 		{
