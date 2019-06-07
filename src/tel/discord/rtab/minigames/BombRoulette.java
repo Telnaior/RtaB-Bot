@@ -118,7 +118,7 @@ public class BombRoulette implements MiniGame {
                     hasJoker = true;
                 break;
                 case BANKRUPT:
-                    output.add("**BANKRUPT**");
+                    output.add("Oh no, you've gone **BANKRUPT**!");
                     score = 0;
                     
                     if (cashSpaces == 0) {
