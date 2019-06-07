@@ -93,8 +93,13 @@ public class HiLoDice implements MiniGame {
         
         dice.rollDice();
         output.add("You rolled: " + dice.toString());
-        
-        if (guessHigher && dice.getDiceTotal() < lastRoll) {
+        if(dice.getDiceTotal() == lastRoll)
+        {
+        	output.add(dice.getDiceTotal() + " is not " + (guessHigher ? "higher" : "lower") + " than itself. Sorry.");
+        	score = 0;
+        	isAlive = false;
+        }
+        else if (guessHigher && dice.getDiceTotal() < lastRoll) {
             output.add(dice.getDiceTotal() + " is not higher than "
                     + lastRoll + ". Sorry.");
             score = 0;
