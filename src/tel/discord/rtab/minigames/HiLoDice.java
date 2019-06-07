@@ -106,6 +106,13 @@ public class HiLoDice implements MiniGame {
             score = 0;
             isAlive = false;
         }
+        else if (dice.getDiceTotal() == lastRoll) {
+            output.add(dice.getDiceTotal() + " is not " +
+		    (guessHigher ? "higher" : "lower") +
+                    " than itself. Sorry.");
+            score = 0;
+            isAlive = false;
+        }
         else if (closedSpaces[dice.getDiceTotal() - 2]) {
             // Make the sentence grammatically correct
             String s = "You already rolled a";
