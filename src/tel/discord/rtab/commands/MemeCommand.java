@@ -8,7 +8,8 @@ public class MemeCommand extends Command
 	public MemeCommand()
 	{
 		this.name = "meme";
-		this.aliases = new String[]{"jo","realluckynumber","om","ub","starman","previous","instantbillion","peak"};
+		this.aliases = new String[]{"jo","realluckynumber","luckyletter","om","ub","starman","previous","instantbillion",
+				"peak","peep","pee","eep"};
 		this.help = "https://niceme.me";
 		this.hidden = true;
 		this.guildOnly = false;

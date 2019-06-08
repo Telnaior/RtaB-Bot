@@ -77,7 +77,7 @@ public class BettingHandler {
 				{
 					//Add their string to the list, and their amount to the total for that player
 					//Something about this code feels really rough but I can't think of a better way to do it right now
-					bets.get(i).append(String.format("%1$,10d - %2$s\n",nextBet.betAmount,nextBet.name));
+					bets.get(i).append(String.format("¤%1$,10d - %2$s\n",nextBet.betAmount,nextBet.name));
 					betTotals.set(i,betTotals.get(i)+nextBet.betAmount);
 					break;
 				}
@@ -125,7 +125,7 @@ public class BettingHandler {
 				double bonusPortion = nextBettor.betAmount;
 				bonusPortion /= totalBets.get(0);
 				int bonusWin = (int) (totalWrongBets * bonusPortion);
-				channel.sendMessage(String.format("%1$s wins %2$,d + %3$,d!",nextBettor.name, baseWin, bonusWin))
+				channel.sendMessage(String.format("%1$s wins ¤%2$,d + ¤%3$,d!",nextBettor.name, baseWin, bonusWin))
 					.completeAfter(2,TimeUnit.SECONDS);
 				nextBettor.funds += baseWin + bonusWin;
 				//Check to see if they've won

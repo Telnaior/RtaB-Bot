@@ -57,7 +57,7 @@ public class BetRankCommand extends Command {
 				response.append(record[1] + ": ");
 				if(prestige > 0)
 					response.append(String.format("%,d BILLION + ",prestige));
-				response.append(String.format("%,d",funds));
+				response.append(String.format("¤%,d",funds));
 				response.append(" (Rank #" + (index+1) + "/" + list.size() + ")");
 				event.reply(response.toString());
 			}

@@ -52,7 +52,7 @@ public class BetTopCommand extends Command {
 					moneyLength += (moneyLength-1)/3;
 				}
 				response.append("#" + String.format("%03d",(i+1)) + ": "); 
-				response.append(String.format("%,"+moneyLength+"d",money));
+				response.append(String.format("¤%,"+moneyLength+"d",money));
 				response.append(" -" + (record[0].startsWith("-")?"*":" ") + record[1]);
 				if(prestige > 0)
 					response.append(String.format(" (+%,dB)",prestige));

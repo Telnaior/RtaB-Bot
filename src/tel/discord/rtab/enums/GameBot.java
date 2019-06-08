@@ -23,7 +23,7 @@ public enum GameBot
 	BOT18("-19","Fated to Glory"),
 	BOT19("-20","Fishbait"),
 	BOT20("-21","Frank BOTzo"),
-	BOT21("-22","Glitter"),
+	BOT21("-22","Glitter") { public String getHuman() { return "104985399826370560"; } },
 	BOT22("-23","Gray Sabot"),
 	BOT23("-24","Hagstomper"),
 	BOT24("-25","Hellefleur"),
