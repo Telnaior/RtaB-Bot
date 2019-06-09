@@ -198,7 +198,8 @@ public class DeucesWild implements MiniGame {
 						output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
 								"hold the " + cardsPicked[2] + ", the " + cardsPicked[3]  + ", and the " + cardsPicked[4] + ".");
 						output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
-						output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
+						if(hand != PokerHand.NOTHING)
+							output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
 								"prize of $%,d.", getMoneyWon()));
 						output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
 					}

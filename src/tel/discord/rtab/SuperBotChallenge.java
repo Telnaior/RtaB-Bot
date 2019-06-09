@@ -27,6 +27,7 @@ public class SuperBotChallenge
 	}
 	public void loadGames()
 	{
+		//Format is "~ CHALLENGE CHANNEL ~ XX Players Remain"
 		int playersLeft = Integer.parseInt(channel.getTopic().substring(22,24));
 		int multiplier = 1 + (80 - playersLeft) / 8;
 		gameHandler.setMultiplier(multiplier);

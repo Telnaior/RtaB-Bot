@@ -55,6 +55,7 @@ public class Player implements Comparable<Player>
 	{
 		user = playerName.getUser();
 		uID = user.getId();
+		//Bots don't get newbie protection, and neither do humans playing as bots
 		if(botName == null)
 		{
 			name = playerName.getEffectiveName();

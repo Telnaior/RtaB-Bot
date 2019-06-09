@@ -14,7 +14,7 @@ public class BetRankCommand extends Command {
     public BetRankCommand()
     {
         this.name = "betrank";
-		this.aliases = new String[]{"balance","funds","credits"};
+		this.aliases = new String[]{"balance","bal","funds","credits"};
         this.help = "view the rank of a player by name, or by rank with #[number]";
         this.guildOnly = false;
     }

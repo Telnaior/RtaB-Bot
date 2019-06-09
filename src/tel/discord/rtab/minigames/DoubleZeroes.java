@@ -153,7 +153,6 @@ public class DoubleZeroes implements MiniGame {
 				}
 				else if(zeroesLeft>0) // Otherwise let 'em pick another space.
 				{
-					output.add("Please pick another space.");
 					output.add(generateBoard());
 				}
 				else // Oops, All Digits! (tm) Better end it quick!

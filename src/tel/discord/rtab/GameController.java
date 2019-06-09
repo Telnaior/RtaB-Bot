@@ -1314,8 +1314,9 @@ public class GameController
 			if(players.get(currentTurn).money - players.get(currentTurn).oldMoney <= 0)
 			{
 				channel.sendMessage("Oh, but you don't have any money yet this round?").completeAfter(1, TimeUnit.SECONDS);
-				channel.sendMessage("Let no one say I am unkind. Here is **$1,000,000**!").completeAfter(1, TimeUnit.SECONDS);
-				players.get(currentTurn).addMoney(1000000,MoneyMultipliersToUse.NOTHING);
+				channel.sendMessage(String.format("Let no one say I am unkind. Here is **$%,d,000,000**!",1*baseMultiplier))
+					.completeAfter(1, TimeUnit.SECONDS);
+				players.get(currentTurn).addMoney(1000000*baseMultiplier,MoneyMultipliersToUse.NOTHING);
 			}
 			else
 			{
@@ -1392,13 +1393,14 @@ public class GameController
 			channel.sendMessage("**Cash for Bowser** it is! "
 					+ "In this FUN event, you give your money to ME!").completeAfter(3, TimeUnit.SECONDS);
 			//Coins: Up to 100-200% of their round earnings, determined by their total bank
+			//The base multiplier doesn't need to be applied because the formula already takes it into account
 			int coinFraction = (int)(Math.random()*51+50);
 			int coins = (players.get(currentTurn).money - players.get(currentTurn).oldMoney) / 100;
 			coins *= (players.get(currentTurn).money / 5_000_000) + 1;
 			coins /= 100;
 			coins *= coinFraction;
-			if(coins < 50000)
-				coins = 50000;
+			if(coins < 50000*baseMultiplier)
+				coins = 50000*baseMultiplier;
 			channel.sendMessage(String.format("Ooh! I'm so excited! OK, that'll be **$%,d**! Wah, hah, hah, HAH!",coins))
 				.completeAfter(1,TimeUnit.SECONDS);
 			players.get(currentTurn).addMoney(coins*-1,MoneyMultipliersToUse.NOTHING);
@@ -1418,6 +1420,7 @@ public class GameController
 			potluck /= 100;
 			if(potluck < 50000)
 				potluck = 50000;
+			potluck *= baseMultiplier;
 			channel.sendMessage(String.format("Let the event begin! That'll be **$%,d** each! Wah, hah, hah, HAH!",potluck))
 				.completeAfter(1, TimeUnit.SECONDS);
 			for(Player next : players)
@@ -1449,6 +1452,7 @@ public class GameController
 			if(awardJP)
 			{
 				channel.sendMessage("Bowser left you **all the money he has collected**!!").completeAfter(3, TimeUnit.SECONDS);
+				channel.sendMessage(String.format("**$%,d**!!",jackpot));
 				players.get(currentTurn).addMoney(jackpot, MoneyMultipliersToUse.NOTHING);
 				jackpot = 0;
 			}
@@ -2282,10 +2286,10 @@ public class GameController
 			newPlayer = new Player(chosenBot,channel);
 		players.add(newPlayer);
 		playersJoined ++;
-		if(newPlayer.money > 900000000)
+		if(newPlayer.money > 900_000_000)
 		{
 			channel.sendMessage(String.format("%1$s needs only $%2$,d more to reach the goal!",
-					newPlayer.name,(1000000000-newPlayer.money)));
+					newPlayer.name,(1_000_000_000-newPlayer.money)));
 		}
 		return newPlayer;
 	}
