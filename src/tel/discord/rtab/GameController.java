@@ -592,6 +592,8 @@ public class GameController
 			channel.sendMessage(players.get(currentTurn).getSafeMention() + 
 					" is out of time. Eliminating them.").queue();
 			//Jokers? GET OUT OF HERE!
+			if(players.get(currentTurn).jokers > 0)
+				channel.sendMessage("Joker"+(players.get(currentTurn).jokers!=1?"s":"")+" deleted.").queue();
 			players.get(currentTurn).jokers = 0;
 			//Find a bomb to destroy them with
 			int bombChosen;
@@ -1610,8 +1612,9 @@ public class GameController
 		}
 		//Now the winstreak is right, we can display the board
 		displayBoardAndStatus(false, false, false);
+		int jokerCount = players.get(currentTurn).jokers;
 		//If they're a winner and they weren't running diamond armour, give them a win bonus (folded players don't get this)
-		if(players.get(currentTurn).status == PlayerStatus.ALIVE && players.get(currentTurn).jokers >= 0)
+		if(players.get(currentTurn).status == PlayerStatus.ALIVE && jokerCount >= 0)
 		{
 			//Award $20k for each space picked, double it if every space was picked, then share with everyone in
 			int winBonus = 20000*(boardSize-spacesLeft);
@@ -1635,12 +1638,11 @@ public class GameController
 			}
 		}
 		//Cash in unused jokers, folded or not
-		int jokerCount = players.get(currentTurn).jokers;
 		if(jokerCount > 0)
 		{
 			channel.sendMessage(String.format("You cash in your unused joker"+(jokerCount!=1?"s":"")+
-					" for **$%,d**.", players.get(currentTurn).jokers * 250_000));
-			players.get(currentTurn).addMoney(250_000*jokerCount, MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+					" for **$%,d**.", jokerCount * 250_000 * baseMultiplier)).queue();
+			players.get(currentTurn).addMoney(250_000*jokerCount*baseMultiplier, MoneyMultipliersToUse.BOOSTER_AND_BONUS);
 		}
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		//Search every multiple of 5 to see if we've got it

@@ -137,7 +137,6 @@ public class BombRoulette implements MiniGame {
                         hasJoker = false;
                     }
                     else {
-                        output.add("It goes **BOOM**.");
                         score = 0;
                         isAlive = false;
                     }
