@@ -431,8 +431,8 @@ public class GameController
 			for(int i=0; i<boardSize; i++)
 				if(!pickedSpaces[i])
 					openSpaces.add(i);
-			//With 50% chance, look for a previous peek to use
-			if(Math.random() < 0.5)
+			//With chance depending on current board risk, look for a previous peek to use
+			if(Math.random() < (playersAlive / (spacesLeft - 1)))
 			{
 				//Check for known peeked spaces that are still available
 				ArrayList<Integer> peekedSpaces = new ArrayList<>(boardSize);
