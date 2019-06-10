@@ -6,6 +6,7 @@ import java.util.LinkedList;
 public class CoinFlip implements MiniGame {
 	static final String NAME = "CoinFlip";
 	static final boolean BONUS = false; 
+	static final int MAX_STAGE = 9;
 	int stage;
 	int coins;
 	boolean alive; //Player still alive?
@@ -17,7 +18,7 @@ public class CoinFlip implements MiniGame {
 	@Override
 	public LinkedList<String> initialiseGame(){
 		stage = 0; // We always start on Stage 0
-		coins = 100;
+		coins = 10;
 		
 		alive = true; 
 		accept = false;
@@ -25,11 +26,11 @@ public class CoinFlip implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to CoinFlip!");
-		output.add("Here there are 13 stages with increasing values to win!");
-		output.add("You start with 100 Coins. Each stage you choose Heads or Tails, " +
-				"and as long as at least 1 Coin shows your choice you clear the stage.");
-		output.add("Any coins that land on the wrong side are removed from your collection, however.");
-		output.add("You can stop at any time, but if you run out of coins, you lose everything."); //~Duh
+		output.add("Here there are 9 stages to clear, and an increasing money value for each one!");
+		output.add("You start with ten coins, and at each stage you choose Heads or Tails.");
+		output.add("As long as even one coin shows your choice, you clear the stage.");
+		output.add("However, any coins that land on the wrong side are removed from your collection.");
+		output.add("You can stop at any time, but if you ever run out of coins you will leave with nothing."); //~Duh
 		output.add(ShowPaytable(stage));
 		output.add(makeOverview(coins, stage)); 
 		return output;  
@@ -71,27 +72,35 @@ public class CoinFlip implements MiniGame {
 		
 		if(heads || tails)
 		{	
-			int newcoins = 0;
+			int newCoins = 0;
 			// Under 50 Heads, 50 and above Tails
 			for(int i=0; i < coins; i++)
 			{
 				if (50 < (Math.random()*100)){
-					if (tails) newcoins++;
+					if (tails) newCoins++;
 				}
 				else{
-					if (heads) newcoins++;
+					if (heads) newCoins++;
 				}
 			}
-			if (heads) output.add(String.format("We flipped %1$d coins and got %2$d HEADS\n\n", coins, newcoins));
-			else if (tails) output.add(String.format("We flipped %1$d coins and got %2$d TAILS\n\n", coins, newcoins));
-			coins = newcoins;
+			if (heads)
+				{
+				output.add(String.format("Flipping %d coins...", coins));
+				output.add(String.format("You got %d HEADS"+(coins/newCoins>=2?".":"!"), newCoins));
+				}
+			else if (tails)
+				{
+				output.add(String.format("Flipping %d coins...", coins));
+				output.add(String.format("You got %d TAILS"+(coins/newCoins>=2?".":"!"), newCoins));
+				}
+			coins = newCoins;
 			if (coins == 0) {
 				alive = false;
 			}
 			else {
 				stage++;
 				output.add(String.format("You cleared Stage %d and won $%,d! \n", stage, payTable(stage)));
-				if (stage == 13) accept = true;
+				if (stage >= MAX_STAGE) accept = true;
 				else output.add(makeOverview(coins, stage));
 			}
 		}
@@ -107,33 +116,17 @@ public class CoinFlip implements MiniGame {
 	{
 		StringBuilder output = new StringBuilder();
 		output.append("```\n");
-		output.append("      Win-Stages  \n\n");
-		if(stage==1) output.append("**Stage  1:  $    1,000**\n");
-		else output.append("Stage  1:  $    1,000\n");
-		if(stage==2) output.append("**Stage  2:  $    5,000**\n");
-		else output.append("Stage  2:  $    5,000\n");
-		if(stage==3) output.append("**Stage  3:  $   10,000**\n");
-		else output.append("Stage  3:  $   10,000\n");
-		if(stage==4) output.append("**Stage  4:  $   25,000**\n");
-		else output.append("Stage  4:  $   25,000\n");
-		if(stage==5) output.append("**Stage  5:  $   50,000**\n");
-		else output.append("Stage  5:  $   50,000\n");
-		if(stage==6) output.append("**Stage  6:  $   75,000**\n");
-		else output.append("Stage  6:  $   75,000\n");
-		if(stage==7) output.append("**Stage  7:  $  100,000**\n");
-		else output.append("Stage  7:  $  100,000\n");
-		if(stage==8) output.append("**Stage  8:  $  200,000**\n");
-		else output.append("Stage  8:  $  200,000\n");
-		if(stage==9) output.append("**Stage  9:  $  300,000**\n");
-		else output.append("Stage  9:  $  300,000\n");
-		if(stage==10) output.append("**Stage 10:  $  400,000**\n");
-		else output.append("Stage 10:  $  400,000\n");
-		if(stage==11) output.append("**Stage 11:  $  500,000**\n");
-		else output.append("Stage 11:  $  500,000\n");
-		if(stage==12) output.append("**Stage 12:  $  750,000**\n");
-		else output.append("Stage 12:  $  750,000\n");
-		if(stage==13) output.append("**Stage 13:  $1,000,000**\n");
-		else output.append("Stage 13:  $1,000,000\n");
+		output.append("     Win Stages    \n\n");
+		for(int i=1; i<=MAX_STAGE; i++)
+		{
+			//Bold current stage
+			if(i == stage)
+				output.append("**");
+			output.append(String.format("Stage %1$d: $%2$,9d", i, payTable(i)));
+			if(i == stage)
+				output.append("**");
+			output.append("\n");
+		}
 		output.append("```");
 		return output.toString();
 	}
@@ -148,10 +141,10 @@ public class CoinFlip implements MiniGame {
 		StringBuilder output = new StringBuilder();
 		output.append("```\n");
 		output.append("  CoinFlip  \n\n");
-		output.append("Number of Coins: " + String.format("%d \n", coins));
-		output.append("Current Stage: " + String.format("%d - ", stage) + String.format("$%,d\n\n", payTable(stage)));
+		output.append("Current Coins: " + String.format("%d \n", coins));
+		output.append("Current Stage: " + String.format("%d - ", stage) + String.format("$%,d\n", payTable(stage)));
+		output.append("   Next Stage: " + String.format("%d - ", stage+1) + String.format("$%,d\n\n", payTable(stage+1)));
 		output.append("'Heads' or 'Tails'   (or 'Stop')? \n");
-		
 		output.append("```");
 		return output.toString();
 	}
@@ -161,35 +154,30 @@ public class CoinFlip implements MiniGame {
 		int value = 0;
 		switch (stage) 
 		{
-			case 1:  value = 1000;
-				break;
-			case 2:  value = 5000;
-				break;
-			case 3:  value = 10000;
-				break;
-			case 4:  value = 25000;
-				break;
-			case 5:  value = 50000;
-				break;
-			case 6:  value = 75000;
-				break;
-			case 7:  value = 100000;
-				break;
-			case 8:  value = 200000;
-				break;
-			case 9:  value = 300000;
-				break;
-			case 10: value = 400000;
-				break;
-			case 11: value = 500000;
-				break;
-			case 12: value = 750000;
-				break;
-			case 13: value = 1000000;
-				break;
-			default: value = 0;
-
-
+		case 1:
+			value = 10_000;
+			break;
+		case 2:
+			value = 50_000;
+			break;
+		case 3:
+			value = 100_000;
+			break;
+		case 4:
+			value = 200_000;
+			break;
+		case 5:
+			value = 350_000;
+			break;
+		case 6:
+			value = 500_000;
+			break;
+		case 7:
+			value = 1_000_000;
+			break;
+		case 8:
+			value = 2_000_000;
+			break;
 		}
 		return(value);
 	}
