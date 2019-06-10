@@ -2303,7 +2303,7 @@ public class GameController
 		GameBot chosenBot = GameBot.values()[(int)(Math.random()*GameBot.values().length)];
 		Player newPlayer;
 		int triesLeft = GameBot.values().length;
-		//Start looping through until we get a good one (one that hasn't exploded today)
+		//Start looping through until we get a good one (one that hasn't exploded today and isn't already in the round)
 		boolean goodPick;
 		do
 		{
@@ -2321,7 +2321,7 @@ public class GameController
 			}
 		}
 		while((newPlayer.lives != Player.MAX_LIVES || !goodPick) && triesLeft > 0);
-		if(newPlayer.lives != Player.MAX_LIVES)
+		if(newPlayer.lives != Player.MAX_LIVES || !goodPick)
 		{
 			//If we've checked EVERY bot...
 			channel.sendMessage("No bots currently available. Game aborted.").queue();

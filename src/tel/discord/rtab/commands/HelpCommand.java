@@ -95,7 +95,7 @@ public class HelpCommand extends Command
 			break;
 		case "bet":
 		case "betting":
-			helpList.append("The Super Bot Challenge is (generally) just for the bots to play, "
+			helpList.append("The Super Bot Challenge is (mostly) just for the bots to play, "
 					+ "but that doesn't mean there's nothing to do but watch.\n");
 			helpList.append("The bot announces the players for each game five minutes before the game starts, "
 					+ "and during that time you can place a bet on the player you think will win.\n");
@@ -104,6 +104,7 @@ public class HelpCommand extends Command
 			helpList.append("This means that on average you can win more than you lose, "
 					+ "especially if more people bet on a single match!\n");
 			helpList.append("If you run out of betting chips, you are limited to maximum bets of 1,000 until you win your way back in.\n");
+			helpList.append("Betting chip totals will never be reset, so there's no rush on your quest to dominate.\n");
 			helpList.append("Good luck with your betting, and enjoy this side mode!");
 			break;
 		case "shop":

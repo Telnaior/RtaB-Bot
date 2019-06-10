@@ -25,7 +25,7 @@ public class ViewBetsCommand extends Command
 		{
 			if(game.channel == event.getChannel())
 			{
-				if(game.betManager.betsPlaced > 0)
+				if(game.betManager.getBetCount() > 0)
 				{
 					List<String> playerNames = new ArrayList<>(4);
 					for(Player nextPlayer : game.players)

@@ -21,7 +21,6 @@ public class BettingHandler {
 	static final int HOUSE_BET = 100;
 	TextChannel channel;
 	List<Bettor> bettors;
-	public int betsPlaced;
 	
 	BettingHandler(TextChannel channelID)
 	{
@@ -55,13 +54,13 @@ public class BettingHandler {
 		newBettor.setBet(amount, champion);
 		bettors.add(newBettor);
 		channel.sendMessage("Bet placed.").queue();
-		betsPlaced ++;
 	}
 	public Pair<String,List<Integer>> listBets(List<String> playerNames)
 	{
 		//Get our list started
 		List<StringBuilder> bets = new ArrayList<>(4);
 		List<Integer> betTotals = new ArrayList<>(4);
+		StringBuilder output = new StringBuilder();
 		for(int i=0; i<playerNames.size(); i++)
 		{
 			bets.add(new StringBuilder().append(playerNames.get(i)).append("\n"));
@@ -70,17 +69,25 @@ public class BettingHandler {
 		//Now add our bets to the right spots
 		for(Bettor nextBet : bettors)
 		{
+			boolean badBet = true;
 			//Look for the player that matches their bet
 			for(int i=0; i<playerNames.size(); i++)
 			{
 				if(nextBet.champion.equals(playerNames.get(i).toUpperCase()))
 				{
+					badBet = false;
 					//Add their string to the list, and their amount to the total for that player
 					//Something about this code feels really rough but I can't think of a better way to do it right now
 					bets.get(i).append(String.format("¤%1$,10d - %2$s\n",nextBet.betAmount,nextBet.name));
 					betTotals.set(i,betTotals.get(i)+nextBet.betAmount);
 					break;
 				}
+			}
+			//If their bet doesn't match any of the players in the game, refund it
+			if(badBet)
+			{
+				channel.sendMessage(nextBet.name+"'s bet on "+nextBet.champion+" refunded.").queue();
+				bettors.remove(nextBet);
 			}
 		}
 		//Add house bets if necessary
@@ -91,7 +98,6 @@ public class BettingHandler {
 				betTotals.set(i,HOUSE_BET);
 			}
 		//Now stitch them up together in the proper format
-		StringBuilder output = new StringBuilder();
 		{
 			output.append("```\n");
 			for(StringBuilder nextList : bets)
@@ -107,7 +113,7 @@ public class BettingHandler {
 	{
 		//List bets and get our totals
 		Pair<String,List<Integer>> betsAndTotals = listBets(playerNames);
-		if(betsPlaced > 0)
+		if(bettors.size() > 0)
 			channel.sendMessage(betsAndTotals.getLeft()).completeAfter(5,TimeUnit.SECONDS);
 		List<Integer> totalBets = betsAndTotals.getRight();
 		//Gather up all the lost bets
@@ -143,7 +149,7 @@ public class BettingHandler {
 					nextBettor.funds = 0;
 				}
 			}
-		if(noWinners && betsPlaced > 0)
+		if(noWinners && bettors.size() > 0)
 			channel.sendMessage("The house wins again! Mwahaha~").queueAfter(2,TimeUnit.SECONDS);
 		saveData();
 	}
@@ -175,11 +181,14 @@ public class BettingHandler {
 			Files.write(file, list);
 			Files.delete(oldFile);
 			bettors.clear();
-			betsPlaced = 0;
 		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
 		}
+	}
+	public int getBetCount()
+	{
+		return bettors.size();
 	}
 }

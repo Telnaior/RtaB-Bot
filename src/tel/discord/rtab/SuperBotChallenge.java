@@ -31,7 +31,8 @@ public class SuperBotChallenge
 		int playersLeft = Integer.parseInt(channel.getTopic().substring(22,24));
 		int multiplier = 1 + (80 - playersLeft) / 8;
 		gameHandler.setMultiplier(multiplier);
-		timer.purge();
+		timer.shutdownNow();
+		timer = new ScheduledThreadPoolExecutor(1);
 		List<String> list = null;
 		try
 		{

@@ -7,7 +7,8 @@ import java.util.List;
 
 import net.dv8tion.jda.core.entities.Member;
 
-public class Bettor {
+public class Bettor
+{
 	static final int STARTING_MONEY = 10000;
 	static final int BASE_BAILOUT = STARTING_MONEY / 10 * -1;
 	String uID;
@@ -17,7 +18,8 @@ public class Bettor {
 	int betAmount;
 	String champion;
 
-	public Bettor(Member bettor, String channelID) {
+	public Bettor(Member bettor, String channelID)
+	{
 		name = bettor.getEffectiveName();
 		uID = bettor.getUser().getId();
 		//Set default value
@@ -52,7 +54,8 @@ public class Bettor {
 		}
 	}
 	
-	public void setBet(int amount, String betTarget) {
+	public void setBet(int amount, String betTarget)
+	{
 		champion = betTarget;
 		betAmount = amount;
 		funds -= amount;
@@ -63,5 +66,4 @@ public class Bettor {
 		if(funds < BASE_BAILOUT * (prestige + 1))
 			funds = BASE_BAILOUT * (prestige + 1);
 	}
-	
 }
