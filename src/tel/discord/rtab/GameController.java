@@ -1616,8 +1616,9 @@ public class GameController
 		//If they're a winner and they weren't running diamond armour, give them a win bonus (folded players don't get this)
 		if(players.get(currentTurn).status == PlayerStatus.ALIVE && jokerCount >= 0)
 		{
-			//Award $20k for each space picked, double it if every space was picked, then share with everyone in
-			int winBonus = 20000*(boardSize-spacesLeft);
+			//Award $20k for each space picked, plus 5% extra per unused peek
+			//Then double it if every space was picked, and split it with any other winners
+			int winBonus = (20000 + 1000*players.get(currentTurn).peek) * (boardSize - spacesLeft);
 			if(spacesLeft <= 0)
 				winBonus *= 2;
 			winBonus *= baseMultiplier;

@@ -1,4 +1,3 @@
-
 package tel.discord.rtab.minigames;
 
 import java.util.LinkedList;
