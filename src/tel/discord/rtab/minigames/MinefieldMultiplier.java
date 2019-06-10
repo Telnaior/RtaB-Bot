@@ -40,12 +40,13 @@ public class MinefieldMultiplier implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to Minefield Multiplier");
-		output.add("You have a Board of 21 Spaces under each a Multiplier");
-		output.add("Every Turn the Amount of Money which we multiply will increase, BUT");
-		output.add("the amount of Bombs on the Board will increase by the same Multiplier!");
-		output.add("Bombs will be randomly placed and can land everywhere on the Board");
-		output.add("You can leave after each Round, with your current Bank");
-		output.add("You lose everything, if you hit a Bomb."); //~Duh
+		output.add("You have a Board of 21 Spaces with a Multiplier hiding in each space.");
+		output.add("Every Turn the Amount of Money which we multiply will increase, BUT...");
+		output.add("The number of Bombs on the Board will increase by the same Multiplier you pick!");
+		output.add("Bombs will be randomly placed anywhere on the Board, "+
+			  "including on top of other bombs or already picked spaces.");
+		output.add("You can leave after each Round with your current Bank...");
+		output.add("But you lose everything if you hit a Bomb."); //~Duh
 
 		output.add(generateBoard());
 		return output;  
@@ -63,11 +64,12 @@ public class MinefieldMultiplier implements MiniGame {
 
 		String choice = pick.toUpperCase();
 		choice = choice.replaceAll("\\s","");
-		if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE") || choice.equals("STOP"))
+		if(total > 0 && 
+		   (choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE") || choice.equals("STOP")))
 		{
 			// Player stops 
 			stop = true;
-			output.add("Very well! You ran away with your bank of " + String.format("%,d",total));
+			output.add("Very well! You escaped with your bank of " + String.format("$%,d",total));
 			output.add("Here is the revealed Board!");
 			output.add(generateRevealBoard());
 			return output;
@@ -112,12 +114,12 @@ public class MinefieldMultiplier implements MiniGame {
 				
 				if (lastPick == 0) // No Multiplier
 				{
-					output.add(String.format("That adds nothing to your total of **%,d**...", total));
-					output.add("But we also don't add any Bombs!");
+					output.add(String.format("That adds nothing to your total of **$%,d**...", total));
+					output.add("But we don't add any Bombs either.");
 				}
 				else 
 				{
-					output.add(String.format("That makes **%,d** for a total of **%,d!**", win, total));
+					output.add(String.format("That makes **$%,d** for a total of **$%,d!**", win, total));
 					output.add(String.format("We are going to add **%d** Bombs!", lastPick));
 				}
 				stageAmount = stageAmount + 10000;
@@ -188,7 +190,11 @@ public class MinefieldMultiplier implements MiniGame {
 		display.append("MINEFIELD MULTIPLIER\n");
 		for(int i=0; i<numbers.size(); i++)
 		{
-			if(bombs.get(i) == 1)
+			if(pickedSpaces[i])
+			{
+				display.append("  ");
+			}
+			else if(bombs.get(i) == 1)
 			{
 				display.append("XX");
 			}
