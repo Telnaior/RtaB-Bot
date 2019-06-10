@@ -1643,7 +1643,10 @@ public class GameController
 		{
 			channel.sendMessage(String.format("You cash in your unused joker"+(jokerCount!=1?"s":"")+
 					" for **$%,d**.", jokerCount * 250_000 * baseMultiplier)).queue();
-			players.get(currentTurn).addMoney(250_000*jokerCount*baseMultiplier, MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+			StringBuilder extraResult = players.get(currentTurn).addMoney(250_000*jokerCount*baseMultiplier, 
+					MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+			if(extraResult != null)
+				channel.sendMessage(extraResult).queue();
 		}
 		//Check to see if any bonus games have been unlocked - folded players get this too
 		//Search every multiple of 5 to see if we've got it
@@ -1819,7 +1822,8 @@ public class GameController
 		StringBuilder resultString = new StringBuilder();
 		if(players.get(currentTurn).isBot)
 		{
-			resultString.append(players.get(currentTurn).name + String.format(" won **$%,d** from ",moneyWon*multiplier*baseMultiplier));
+			resultString.append(players.get(currentTurn).name + String.format(" won **$%,d** from ",
+					moneyWon*multiplier*baseMultiplier));
 			if(multiplier > 1)
 				resultString.append(String.format("%d copies of ",multiplier));
 			resultString.append(currentGame.toString() + ".");
