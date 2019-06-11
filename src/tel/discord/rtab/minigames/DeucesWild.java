@@ -63,7 +63,7 @@ public class DeucesWild implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		
 		if (gameStage == 5) {
-			if (pick.toUpperCase().equals("STOP")) {
+			if (pick.toUpperCase().equals("STOP") && hand != PokerHand.NOTHING) {
 				redrawUsed = true;
 			}
 			else if (pick.toUpperCase().equals("DEAL")) {
@@ -83,8 +83,14 @@ public class DeucesWild implements MiniGame {
 						output.add("Redrawing all five cards.");
 				}
 				else if (cardsRedrawingAsString.equals("Cards being redrawn: ")) { // i.e. there aren't any
-					output.add("All five cards held; ending game.");
 					gameStage = 5;
+					if (hand == PokerHand.NOTHING) {
+						output.add("Holding all five cards would prevent you from winning anything. Release at least one card first.");
+						redrawUsed = false;
+					}	
+					else {
+						output.add("All five cards held; ending game.");
+					}
 					return output;
 				}
 				else {
