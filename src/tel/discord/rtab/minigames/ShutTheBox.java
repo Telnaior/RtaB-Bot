@@ -12,6 +12,7 @@ public class ShutTheBox implements MiniGame {
 	boolean[] closedSpaces;
 	Dice dice;
 	String[] isGood;
+	boolean allNumbersGood;
 	int[] waysToClose;
 	boolean isAlive;  
 	boolean isClosing;
@@ -56,8 +57,8 @@ public class ShutTheBox implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		
 		if (!isClosing) {
-			if (pick.toUpperCase().equals("STOP")) {
-				// Prevent accidentally stopping with nothing if the player hasn't rolled yet
+			if (pick.toUpperCase().equals("STOP") && !allNumbersGood) {
+				// Prevent accidentally stopping if there's no risk yet
 				if (totalShut == 0)
 					return output;
 				isAlive = false;
@@ -77,14 +78,14 @@ public class ShutTheBox implements MiniGame {
 						totalShut = MAX_SCORE - 1; // essentially closes the remaining numbers except 1 automatically
 						isAlive = false;
 					}
-                                        else if (waysToClose[dice.getDiceTotal() - 2] == 1) {
-                                                output.add("There is only one way to close that number, so " +
-                                                        "we'll do it automatically for you.");
-                                                closeNumbers(isGood[dice.getDiceTotal() - 2].split("\\s"));
-                                            	output.add(generateBoard());
-                                                output.add("ROLL again if you dare, or type STOP to stop " +
-                                                    "with your total.");
-                                        }
+                    else if (waysToClose[dice.getDiceTotal() - 2] == 1) {
+                            output.add("There is only one way to close that number, so " +
+                                    "we'll do it automatically for you.");
+                            closeNumbers(isGood[dice.getDiceTotal() - 2].split("\\s"));
+                        	output.add(generateBoard());
+                            output.add("ROLL again if you dare, or type STOP to stop " +
+                                "with your total.");
+                    }
 					else {
 						isClosing = true;
 						output.add("What number(s) totaling " + dice.getDiceTotal()
@@ -133,7 +134,10 @@ public class ShutTheBox implements MiniGame {
 				isClosing = false;
                                 output.add("Numbers closed.");
 				output.add(generateBoard());
-				output.add("ROLL again if you dare, or type STOP to stop " +
+				if(allNumbersGood)
+					output.add("There's no risk yet, so ROLL again!");
+				else
+					output.add("ROLL again if you dare, or type STOP to stop " +
 						"with your total.");
 			}
 			else {
@@ -239,7 +243,14 @@ public class ShutTheBox implements MiniGame {
 				}
 			}
 		}
-		
+		//Finally, check if every number is still good and set the boolean if it isn't
+		if(allNumbersGood)
+			for(String nextRoll : isGood)
+				if(nextRoll == null)
+				{
+					allNumbersGood = false;
+					break;
+				}
 		return;
 	}
 		
