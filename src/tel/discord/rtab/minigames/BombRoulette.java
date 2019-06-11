@@ -34,9 +34,9 @@ public class BombRoulette implements MiniGame {
                 WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
                 WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
                 WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.DOUBLE, WheelSpace.DOUBLE,
-                WheelSpace.JOKER, WheelSpace.BANKRUPT, WheelSpace.BANKRUPT,
-                WheelSpace.BOMB};
+                WheelSpace.CASH, WheelSpace.BANKRUPT, WheelSpace.BANKRUPT,
+                WheelSpace.DOUBLE, WheelSpace.DOUBLE, WheelSpace.DOUBLE,
+                WheelSpace.JOKER};
         for (int i = 0; i < spaceTypes.length; i++) {
             switch (spaceTypes[i]) {
                 case CASH:
