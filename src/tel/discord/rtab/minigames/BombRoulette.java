@@ -64,15 +64,15 @@ public class BombRoulette implements MiniGame {
         output.add("Eighteen of those spaces have various amounts of cash "
                 + "ranging from $10,000 to $100,000. The total amount on the "
                 + "wheel at the beginning of the game is $500,000.");
-        output.add("Two are **Double** spaces, which will double your score up " 
+        output.add("Three are **Double** spaces, which will double your score up " 
                 + "to that point.");
         output.add("Two are **Bankrupt** spaces, which will reset your score "
                 + "back to $0.");
         output.add("One is a **Joker** space, which will save you in the event "
                 + "that you hit...");
         output.add("...a **BOMB** space, which costs you all your winnings and "
-                + "the game. There's only one on the wheel right now, but each "
-                + "space you hit will be replaced with another BOMB space.");
+                + "the game. There aren't any on the wheel right now, but each "
+                + "space you hit will be replaced with a BOMB space.");
         output.add("After you've spun the wheel at least once, you are free to "
                 + "walk away with your winnings if you wish.");
         output.add("Good luck! Type SPIN when you're ready.");
