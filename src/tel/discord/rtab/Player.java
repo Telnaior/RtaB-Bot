@@ -33,6 +33,7 @@ public class Player implements Comparable<Player>
 	Instant lifeRefillTime;
 	int money;
 	int oldMoney;
+	int currentCashClub;
 	int booster;
 	int winstreak;
 	int oldWinstreak;
@@ -137,6 +138,7 @@ public class Player implements Comparable<Player>
 			e.printStackTrace();
 		}
 		oldMoney = money;
+		currentCashClub = money/100_000_000;
 		oldWinstreak = winstreak;
 	}
 	StringBuilder addMoney(int amount, MoneyMultipliersToUse multipliers)

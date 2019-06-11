@@ -2124,7 +2124,7 @@ public class GameController
 				else
 					list.set(location,toPrint.toString());
 				//Update a player's role if it's the role channel, they're human, and have earned a new one
-				if(players.get(i).money/100_000_000 != players.get(i).oldMoney/100_000_000 && !players.get(i).isBot && rankChannel)
+				if(players.get(i).money/100_000_000 != players.get(i).currentCashClub && !players.get(i).isBot && rankChannel)
 				{
 					//Get the mod controls
 					GuildController guild = channel.getGuild().getController();
