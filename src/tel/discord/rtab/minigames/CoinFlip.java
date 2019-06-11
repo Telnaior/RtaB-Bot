@@ -5,7 +5,8 @@ import java.util.LinkedList;
 public class CoinFlip implements MiniGame {
 	static final String NAME = "CoinFlip";
 	static final boolean BONUS = false; 
-	static final int MAX_STAGE = 8;
+	static final int[] PAYTABLE = {10_000,50_000,100_000,200_000,350_000,500_000,1_000_000,2_000_000};
+	static final int MAX_STAGE = PAYTABLE.length;
 	int stage;
 	int coins;
 	boolean alive; //Player still alive?
@@ -145,35 +146,11 @@ public class CoinFlip implements MiniGame {
 
 	private int payTable(int stage)
 	{
-		int value = 0;
-		switch (stage) 
-		{
-		case 1:
-			value = 10_000;
-			break;
-		case 2:
-			value = 50_000;
-			break;
-		case 3:
-			value = 100_000;
-			break;
-		case 4:
-			value = 200_000;
-			break;
-		case 5:
-			value = 350_000;
-			break;
-		case 6:
-			value = 500_000;
-			break;
-		case 7:
-			value = 1_000_000;
-			break;
-		case 8:
-			value = 2_000_000;
-			break;
-		}
-		return(value);
+		//If it's a stage on the paytable, return that
+		if(stage > 0 && stage <= MAX_STAGE)
+			return(PAYTABLE[stage-1]);
+		else
+			return 0;
 	}
 
 	/**
