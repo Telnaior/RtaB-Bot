@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class CoinFlip implements MiniGame {
 	static final String NAME = "CoinFlip";
 	static final boolean BONUS = false; 
-	static final int MAX_STAGE = 9;
+	static final int MAX_STAGE = 8;
 	int stage;
 	int coins;
 	boolean alive; //Player still alive?
@@ -25,7 +25,7 @@ public class CoinFlip implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to CoinFlip!");
-		output.add("Here there are 9 stages to clear, and an increasing money value for each one!");
+		output.add("Here there are "+MAX_STAGE+" stages to clear, and an increasing money value for each one!");
 		output.add("You start with ten coins, and at each stage you choose Heads or Tails.");
 		output.add("As long as even one coin shows your choice, you clear the stage.");
 		output.add("However, any coins that land on the wrong side are removed from your collection.");
@@ -82,16 +82,11 @@ public class CoinFlip implements MiniGame {
 					if (heads) newCoins++;
 				}
 			}
+			output.add(String.format("Flipping %d coin"+(coins==1?"s":"")+"...", coins));
 			if (heads)
-				{
-				output.add(String.format("Flipping %d coins...", coins));
-				output.add(String.format("You got %d HEADS"+(coins/newCoins>=2?".":"!"), newCoins));
-				}
+				output.add(String.format("You got %d HEADS"+(newCoins==0?".":(coins/newCoins>=2?".":"!")), newCoins));
 			else if (tails)
-				{
-				output.add(String.format("Flipping %d coins...", coins));
-				output.add(String.format("You got %d TAILS"+(coins/newCoins>=2?".":"!"), newCoins));
-				}
+				output.add(String.format("You got %d TAILS"+(newCoins==0?".":(coins/newCoins>=2?".":"!")), newCoins));
 			coins = newCoins;
 			if (coins == 0) {
 				alive = false;
