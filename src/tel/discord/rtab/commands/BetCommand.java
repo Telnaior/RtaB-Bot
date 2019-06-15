@@ -58,6 +58,9 @@ public class BetCommand extends Command
 		{
 			if(game.channel == event.getChannel())
 			{
+				//If it's not a betting channel, break out to the "no bets here" message
+				if(game.betManager == null)
+					break;
 				//Make sure the player we're betting on exists
 				boolean playerExists = false;
 				for(Player target : game.players)
