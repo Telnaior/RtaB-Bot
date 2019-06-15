@@ -71,6 +71,7 @@ public class SuperBotChallenge
 			timer.schedule(() -> gameHandler.startTheGameAlready(),totalDelay,TimeUnit.MINUTES);
 			totalGames ++;
 		}
-		channel.sendMessage(totalGames + " games loaded.").queue();
+		if(totalGames > 0)
+			channel.sendMessage(totalGames + " games loaded.").queue();
 	}
 }
