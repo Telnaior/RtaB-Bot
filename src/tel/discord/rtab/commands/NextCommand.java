@@ -21,7 +21,7 @@ public class NextCommand extends Command {
 		{
 			if(game.channel == event.getChannel())
 			{
-				if(game.gameStatus != GameStatus.SIGNUPS_OPEN || (!game.playersCanJoin && game.playersJoined == 0))
+				if(game.gameStatus != GameStatus.SIGNUPS_OPEN || (!game.playersCanJoin && game.players.size() == 0))
 				{
 					game.addToPingList(event.getAuthor());
 					event.reply(String.format("Noted - will ping you when you can %s.",game.playersCanJoin?"play":"bet"));
