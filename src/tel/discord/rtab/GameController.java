@@ -1720,33 +1720,39 @@ public class GameController
 		//Don't print minigame messages for bots
 		if(!players.get(currentTurn).isBot || verboseBotGames)
 		{
+			int delay = 0;
 			for(String output : result)
 			{
-				channel.sendMessage(output).completeAfter(2,TimeUnit.SECONDS);
+				delay += 2;
+				channel.sendMessage(output).queueAfter(delay,TimeUnit.SECONDS);
 			}
+			timer.schedule(() -> runNextMiniGameTurn(currentGame), delay, TimeUnit.SECONDS);
 		}
-		runNextMiniGameTurn(currentGame);
+		else
+			runNextMiniGameTurn(currentGame);
 	}
 	void runNextMiniGameTurn(MiniGame currentGame)
 	{
 		if(players.get(currentTurn).isBot)
 		{
 			LinkedList<String> result = currentGame.playNextTurn(currentGame.getBotPick());
+			int delay = 0;
 			if(verboseBotGames)
 			{
 				for(String output : result)
 				{
-					channel.sendMessage(output).completeAfter(2,TimeUnit.SECONDS);
+					delay += 2;
+					channel.sendMessage(output).queueAfter(delay,TimeUnit.SECONDS);
 				}
 			}
 			//Check if the game's over
 			if(currentGame.isGameOver())
 			{
-				completeMiniGame(currentGame);
+				timer.schedule(() -> completeMiniGame(currentGame), delay, TimeUnit.SECONDS);
 			}
 			else
 			{
-				runNextMiniGameTurn(currentGame);
+				timer.schedule(() -> runNextMiniGameTurn(currentGame), delay, TimeUnit.SECONDS);
 			}
 		}
 		else
@@ -1770,18 +1776,20 @@ public class GameController
 						String miniPick = e.getMessage().getContentRaw();
 						//Keep printing output until it runs out of output
 						LinkedList<String> result = currentGame.playNextTurn(miniPick);
+						int delay = 0;
 						for(String output : result)
 						{
-							channel.sendMessage(output).completeAfter(2,TimeUnit.SECONDS);
+							delay += 2;
+							channel.sendMessage(output).queueAfter(delay,TimeUnit.SECONDS);
 						}
 						//Check if the game's over
 						if(currentGame.isGameOver())
 						{
-							completeMiniGame(currentGame);
+							timer.schedule(() -> completeMiniGame(currentGame), delay, TimeUnit.SECONDS);
 						}
 						else
 						{
-							runNextMiniGameTurn(currentGame);
+							timer.schedule(() -> runNextMiniGameTurn(currentGame), delay, TimeUnit.SECONDS);
 						}
 					},
 					180,TimeUnit.SECONDS, () ->
