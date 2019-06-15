@@ -344,12 +344,12 @@ public class GameController
 						//Parse it and update the bomb board
 						e -> 
 						{
-							bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
-							players.get(iInner).knownBombs.add(Integer.parseInt(e.getMessage().getContentRaw())-1);
-							players.get(iInner).user.openPrivateChannel().queue(
-									(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
 							if(players.get(iInner).status == PlayerStatus.OUT)
 							{
+								bombs[Integer.parseInt(e.getMessage().getContentRaw())-1] = true;
+								players.get(iInner).knownBombs.add(Integer.parseInt(e.getMessage().getContentRaw())-1);
+								players.get(iInner).user.openPrivateChannel().queue(
+										(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
 								players.get(iInner).status = PlayerStatus.ALIVE;
 								playersAlive ++;
 							}
@@ -387,7 +387,7 @@ public class GameController
 							&& gameStatus == GameStatus.BOMB_PLACEMENT
 							&& Arrays.asList(VALID_ARC_RESPONSES).contains(e.getMessage().getContentRaw().toUpperCase()));
 				},
-				//Parse it and call the method that does stuff
+				//Read their choice and handle things accordingly
 				e -> 
 				{
 					switch(e.getMessage().getContentRaw().toUpperCase())
