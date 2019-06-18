@@ -83,7 +83,7 @@ public class CoinFlip implements MiniGame {
 					if (heads) newCoins++;
 				}
 			}
-			output.add(String.format("Flipping %d coin"+(coins==1?"s":"")+"...", coins));
+			output.add(String.format("Flipping %d coin"+(coins!=1?"s":"")+"...", coins));
 			if (heads)
 				output.add(String.format("You got %d HEADS"+(newCoins==0?".":(coins/newCoins>=2?".":"!")), newCoins));
 			else if (tails)

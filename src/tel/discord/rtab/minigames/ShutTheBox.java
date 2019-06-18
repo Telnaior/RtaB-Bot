@@ -24,6 +24,7 @@ public class ShutTheBox implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise board
 		closedSpaces = new boolean[BOARD_SIZE];
+		allNumbersGood = true;
 		dice = new Dice();
 		possibleRolls = dice.getDice().length * dice.getNumFaces() - (dice.getDice().length - 1);
 		refreshGood();
