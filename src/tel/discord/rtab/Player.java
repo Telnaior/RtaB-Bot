@@ -81,7 +81,7 @@ public class Player implements Comparable<Player>
 		initPlayer(channelID);
 	}
 	
-	private void initPlayer(MessageChannel channelID)
+	void initPlayer(MessageChannel channelID)
 	{
 		channel = channelID;
 		lives = MAX_LIVES;
@@ -282,20 +282,6 @@ public class Player implements Comparable<Player>
 		//THIS ISN'T CONSISTENT WITH EQUALS
 		//Sort by round delta, descending order
 		return (other.money - other.oldMoney) - (money - oldMoney);
-	}
-	void resetPlayer()
-	{
-		oldMoney = money;
-		oldWinstreak = winstreak;
-		warned = false;
-		games.clear();
-		knownBombs.clear();
-		jokers = 0;
-		boostCharge = 0;
-		splitAndShare = false;
-		minigameLock = false;
-		threshold = false;
-		status = PlayerStatus.OUT;
 	}
 	/*
 	 * If the player is human, gets their name as a mention

@@ -1978,7 +1978,7 @@ public class GameController
 				StringBuilder announcementText = new StringBuilder();
 				for(Player next : winners)
 				{
-					next.resetPlayer();
+					next.initPlayer(channel);
 					announcementText.append(next.getSafeMention() + ", ");
 				}
 				announcementText.append("you have reached the goal together.");
