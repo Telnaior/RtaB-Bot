@@ -862,25 +862,36 @@ public class GameController
 			do
 			{
 				chain *= 2;
-				StringBuilder nextLevel = new StringBuilder();
-				nextLevel.append("**");
-				for(int i=0; i<chain; i++)
+				if(chain <= 398) //A bomb bigger than this would exceed Discord's character limit
 				{
-					nextLevel.append("BOOM");
-					if(i+1 < chain)
-						nextLevel.append(" ");
+					StringBuilder nextLevel = new StringBuilder();
+					nextLevel.append("**");
+					for(int i=0; i<chain; i++)
+					{
+						nextLevel.append("BOOM");
+						if(i+1 < chain)
+							nextLevel.append(" ");
+					}
+					nextLevel.append("**");
+					if(chain < 8)
+						nextLevel.append("...");
+					else
+						nextLevel.append("!!!");
+					channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
 				}
-				nextLevel.append("**");
-				if(chain < 8)
-					nextLevel.append("...");
-				else
-					nextLevel.append("!!!");
-				channel.sendMessage(nextLevel).completeAfter(5,TimeUnit.SECONDS);
+				else //Congratulations on being the unluckiest player in the world (a 1/68,719,476,736 chance)
+				{
+					channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
+					channel.sendMessage(players.get(currentTurn).name+" was disintegrated by the force of the bomb.")
+						.completeAfter(5, TimeUnit.SECONDS);
+				}
 			}
 			while(Math.random() * chain < 1);
 			channel.sendMessage(String.format("**$%,d** penalty!",Math.abs(chain*penalty)))
 					.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = players.get(currentTurn).blowUp(baseMultiplier*chain,false,(players.size()-playersAlive));
+			if(chain > 398) //"Disintegrated" isn't a joke
+				players.get(currentTurn).money = -1_000_000_000;
 			break;
 		case REVERSE:
 			channel.sendMessage("It goes **BOOM**...")
