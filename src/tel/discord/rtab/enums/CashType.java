@@ -37,7 +37,8 @@ public enum CashType implements WeightedSpace
 	P10		(      10,1,null),
 	MYSTERY (       0,3,null),
 	DB1		(   22805,1,"a DesertBuck"),
-	DANGAN  (   11037,1,"an unfamiliar memory");
+	DANGAN  (   11037,1,"an unfamiliar memory"),
+	GOVERNOR(   26000,1,"the Governor's favourite");
 	
 	int value;
 	int weight;
