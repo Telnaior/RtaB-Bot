@@ -1174,6 +1174,23 @@ public class GameController
 				channel.sendMessage("You **ELIMINATED EVERYONE**!!").completeAfter(3,TimeUnit.SECONDS);
 				while(currentTurn != -1)
 				{
+					//Check for special events to bring extra pain
+					if(players.get(currentTurn).splitAndShare)
+					{
+						channel.sendMessage(String.format("Oh, %s had a split and share? Well there's no one to give your money to,"
+								+ " so we'll just take it!", players.get(currentTurn).name))
+							.completeAfter(2, TimeUnit.SECONDS);
+						players.get(currentTurn).money *= 0.9;
+						players.get(currentTurn).splitAndShare = false;
+					}
+					if(players.get(currentTurn).jackpot)
+					{
+						channel.sendMessage(String.format("Oh, %1$s had a jackpot? More like an ANTI-JACKPOT! "+
+								"**MINUS $%2$,d,000,000** for you!", players.get(currentTurn).name, boardSize*baseMultiplier))
+							.completeAfter(2, TimeUnit.SECONDS);
+						players.get(currentTurn).addMoney(boardSize*baseMultiplier*-1_000_000, MoneyMultipliersToUse.NOTHING);
+						players.get(currentTurn).jackpot = false;
+					}
 					penalty = players.get(currentTurn).newbieProtection > 0 ? Player.NEWBIE_BOMB_PENALTY : Player.BOMB_PENALTY;
 					channel.sendMessage(String.format("$%1$,d MEGA penalty for %2$s!",
 							Math.abs(penalty*16),players.get(currentTurn).getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
