@@ -1832,7 +1832,7 @@ public class GameController
 			//Check if the game's over
 			if(currentGame.isGameOver())
 			{
-				timer.schedule(() -> completeMiniGame(currentGame), delay, TimeUnit.SECONDS);
+				timer.schedule(() -> completeMiniGame(currentGame), delay+2, TimeUnit.SECONDS);
 			}
 			else
 			{
