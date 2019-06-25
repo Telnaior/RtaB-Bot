@@ -1715,12 +1715,12 @@ public class GameController
 			extraResult = players.get(currentTurn).addMoney(winBonus,MoneyMultipliersToUse.BOOSTER_AND_BONUS);
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
-			//Don't forget about the jackpot
-			if(players.get(currentTurn).jackpot)
-			{
-				channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",boardSize*baseMultiplier)).queue();
-				players.get(currentTurn).addMoney(1000000*boardSize*baseMultiplier,MoneyMultipliersToUse.NOTHING);
-			}
+		}
+		//Don't forget about the jackpot (which runs separately so it doesn't conflict with Midas Touch)
+		if(players.get(currentTurn).status == PlayerStatus.ALIVE && players.get(currentTurn).jackpot)
+		{
+			channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",boardSize*baseMultiplier)).queue();
+			players.get(currentTurn).addMoney(1000000*boardSize*baseMultiplier,MoneyMultipliersToUse.NOTHING);
 		}
 		//Cash in unused jokers, folded or not
 		if(jokerCount > 0)
