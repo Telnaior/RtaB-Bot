@@ -50,6 +50,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class RaceToABillionBot
 {
+	final static boolean AUTOSCHEDULE = false;
 	public static JDA yayBot;
 	public static ArrayList<GameController> game = new ArrayList<>(3);
 	public static ArrayList<SuperBotChallenge> challenge = new ArrayList<>(1);
@@ -101,7 +102,7 @@ public class RaceToABillionBot
 		prepareBot.addEventListener(utilities.build());
 		prepareBot.addEventListener(waiter);
 		yayBot = prepareBot.buildBlocking();
-		connectToChannels(true);
+		connectToChannels(AUTOSCHEDULE);
 	}
 	
 	public static void connectToChannels(boolean autoSchedule)
