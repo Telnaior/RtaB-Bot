@@ -62,7 +62,8 @@ public class DeucesWild implements MiniGame {
 	{
 		LinkedList<String> output = new LinkedList<>();
 		
-		if (gameStage == 5) {
+		if (gameStage == 5)
+		{
 			if (pick.toUpperCase().equals("STOP") && hand != PokerHand.NOTHING) {
 				redrawUsed = true;
 			}
@@ -166,20 +167,25 @@ public class DeucesWild implements MiniGame {
 			}
 			return output;
 		}
-		else {
-			if(!isNumber(pick))
+		else //This code only triggers if we still need to draw cards, of course
+		{
+			String[] tokens = pick.split("\\s");
+			for (int i = 0; i < tokens.length; i++)
 			{
-				//Random unrelated non-number doesn't need feedback
-				return output;
+				if (!isNumber(tokens[i]))
+					return output;
+				if(!checkValidNumber(tokens[i]))
+				{
+					output.add("Invalid pick.");
+					return output;
+				}
 			}
-			if(!checkValidNumber(pick))
+			for(String nextPick : tokens)
 			{
-				output.add("Invalid pick.");
-				return output;
-			}
-			else
-			{
-				lastSpace = Integer.parseInt(pick)-1;
+				//Stop picking cards if we've already got five
+				if(gameStage == 5)
+					break;
+				lastSpace = Integer.parseInt(nextPick)-1;
 				pickedSpaces[lastSpace] = true;
 				lastPicked = board.get(lastSpace);
 				cardsPicked[gameStage] = lastPicked;
@@ -193,22 +199,22 @@ public class DeucesWild implements MiniGame {
 					hand = evaluateHand(cardsPicked);
 				output.add(String.format("Space %d selected...",lastSpace+1));
 				output.add("**" + lastPicked.toString() + "**");
-				output.add(generateBoard());
-				if (gameStage == 5) {
-					if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
-						output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
-								+ "of each card.");
-						output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ".");
-						output.add("If you change your mind or make a mistake, type RELEASE followed by the position number of the card " +
-								"you would rather redraw, e.g. 'RELEASE 2' to remove any hold on the " + cardsPicked[1] + ".");
-						output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
-								"hold the " + cardsPicked[2] + ", the " + cardsPicked[3]  + ", and the " + cardsPicked[4] + ".");
-						output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
-						if(hand != PokerHand.NOTHING)
-							output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
-								"prize of $%,d.", getMoneyWon()));
-						output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
-					}
+			}
+			output.add(generateBoard());
+			if (gameStage == 5) {
+				if (hand != PokerHand.NATURAL_ROYAL && !redrawUsed) {
+					output.add("You may now hold any or all of your five cards by typing HOLD followed by the numeric positions "
+							+ "of each card.");
+					output.add("For example, type 'HOLD 1' to hold the " + cardsPicked[0] + ".");
+					output.add("If you change your mind or make a mistake, type RELEASE followed by the position number of the card " +
+							"you would rather redraw, e.g. 'RELEASE 2' to remove any hold on the " + cardsPicked[1] + ".");
+					output.add("You may also hold or release more than one card at a time; for example, you may type 'HOLD 3 4 5' to " +
+							"hold the " + cardsPicked[2] + ", the " + cardsPicked[3]  + ", and the " + cardsPicked[4] + ".");
+					output.add("The cards you do not hold will all be redrawn in the hopes of a better hand.");
+					if(hand != PokerHand.NOTHING)
+						output.add(String.format("If you like your hand, you may also type 'STOP' to end the game and claim your "+
+							"prize of $%,d.", getMoneyWon()));
+					output.add("When you are ready, type 'DEAL' to redraw the unheld cards.");
 				}
 			}
 			return output;
