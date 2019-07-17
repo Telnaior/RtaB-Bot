@@ -8,11 +8,11 @@ public class BombRoulette implements MiniGame {
     boolean isAlive; 
         int score;
         boolean hasJoker;
-        enum WheelSpace {CASH, DOUBLE, JOKER, BANKRUPT, BOMB};
+        enum WheelSpace {CASH, DOUBLE, HALVE, JOKER, BANKRUPT, BOMB};
         int[] spaceValues;
         WheelSpace[] spaceTypes;
-        int pointer, cashLeft, cashSpaces, doubleSpaces, jokerSpaces,
-                bankruptSpaces, bombSpaces;
+        int pointer, cashLeft, cashSpaces, doubleSpaces, halveSpaces,
+                jokerSpaces, bankruptSpaces, bombSpaces;
         
     public LinkedList<String> initialiseGame()
     {
@@ -25,17 +25,17 @@ public class BombRoulette implements MiniGame {
         /* It might not initially make sense to assign non-cash space a cash 
          * value; but the bot uses this information to determine its strategy.
          */
-        spaceValues = new int[] {10000, 10000, 10000, 10000, 10000, 15000,
-                15000, 15000, 20000, 20000, 20000, 25000, 25000, 30000, 40000,
-                50000, 75000, 100000, 0, 0, 0, 0, 0, 0};
+        spaceValues = new int[] {50000, 25000, 40000, 0, 45000, 25000,
+                100000, 0, 30000, 200000, 35000, 0, 150000, 25000, 30000,
+                0, 75000, 25000, 40000, 0, 50000, 25000, 30000, 0};
         spaceTypes = new WheelSpace[] {WheelSpace.CASH, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.DOUBLE, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.HALVE,
                 WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
+                WheelSpace.DOUBLE, WheelSpace.CASH, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.HALVE, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.DOUBLE,
                 WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.BANKRUPT, WheelSpace.BANKRUPT,
-                WheelSpace.DOUBLE, WheelSpace.DOUBLE, WheelSpace.DOUBLE,
                 WheelSpace.JOKER};
         for (int i = 0; i < spaceTypes.length; i++) {
             switch (spaceTypes[i]) {
@@ -45,6 +45,9 @@ public class BombRoulette implements MiniGame {
                     break;
                 case DOUBLE:
                     doubleSpaces++;
+                    break;
+                case HALVE:
+                    halveSpaces++;
                     break;
                 case JOKER:
                     jokerSpaces++;
@@ -62,12 +65,12 @@ public class BombRoulette implements MiniGame {
         output.add("In Bomb Roulette, you will be spinning a 24-space wheel "
                 + "trying to collect as much cash as possible.");
         output.add("Eighteen of those spaces have various amounts of cash "
-                + "ranging from $10,000 to $100,000. The total amount on the "
-                + "wheel at the beginning of the game is $500,000.");
+                + "ranging from $25,000 to $200,000. The total amount on the "
+                + "wheel at the beginning of the game is $1,000,000.");
         output.add("Three are **Double** spaces, which will double your score up " 
                 + "to that point.");
-        output.add("Two are **Bankrupt** spaces, which will reset your score "
-                + "back to $0.");
+        output.add("Two are **Halve** spaces, which will halve your score up "
+                + "to that point.");
         output.add("One is a **Joker** space, which will save you in the event "
                 + "that you hit...");
         output.add("...a **BOMB** space, which costs you all your winnings and "
@@ -96,10 +99,11 @@ public class BombRoulette implements MiniGame {
             output.add("Spinning wheel...");
             pointer = (int)(Math.random() * spaceTypes.length);
                     
-            if (spaceTypes[pointer] == WheelSpace.BANKRUPT ||
+            if (spaceTypes[pointer] == WheelSpace.HALVE ||
+                    spaceTypes[pointer] == WheelSpace.BANKRUPT ||
                     spaceTypes[pointer] == WheelSpace.BOMB ||
-                    Math.random() < (double)(bombSpaces + bankruptSpaces)
-                    / spaceTypes.length) {
+                    Math.random() < (double)(bombSpaces + halveSpaces
+					+ bankruptSpaces) / spaceTypes.length) {
                 output.add("...");
             }
                     
@@ -116,6 +120,10 @@ public class BombRoulette implements MiniGame {
                 case JOKER:
                     output.add("It's the **Joker**!");
                     hasJoker = true;
+                break;
+                case HALVE:
+                    output.add("It's a **HALVE**.");
+                    score /= 2;
                 break;
                 case BANKRUPT:
                     output.add("Oh no, you've gone **BANKRUPT**!");
@@ -171,16 +179,19 @@ public class BombRoulette implements MiniGame {
                 display.append("\n\n");
                 if (cashSpaces > 0)
                     display.append(String.format("%,2dx Cash", cashSpaces) +
-                            String.format(" ($%,7d Remaining)\n", cashLeft));
+                            String.format(" ($%,9d Remaining)\n", cashLeft));
                 if (doubleSpaces > 0)
                     display.append(String.format("%,2dx Double\n",
                             doubleSpaces));
+                if (halveSpaces > 0)
+                    display.append(String.format("%,2dx Halve\n", halveSpaces));
                 if (jokerSpaces > 0)
                     display.append(String.format("%,2dx Joker\n", jokerSpaces));
                 if (bankruptSpaces > 0)
                     display.append(String.format("%,2dx Bankrupt\n",
                             bankruptSpaces));
-                display.append(String.format("%,2dx Bomb\n", bombSpaces));
+				if (bombSpaces > 0)
+					display.append(String.format("%,2dx Bomb\n", bombSpaces));
         display.append("```");
         return display.toString();
     }
@@ -196,12 +207,15 @@ public class BombRoulette implements MiniGame {
                 case DOUBLE:
                     doubleSpaces--;
                     break;
-                case JOKER:
-                    jokerSpaces--;
-                    hasJoker = true;
+                case HALVE:
+                    halveSpaces--;
                     break;
                 case BANKRUPT:
                     bankruptSpaces--;
+                    break;
+                case JOKER:
+                    jokerSpaces--;
+                    hasJoker = true;
                     break;
                 case BOMB:
                     bombSpaces--; // it'll go back up, but deleting this line creates a bug
@@ -215,6 +229,9 @@ public class BombRoulette implements MiniGame {
                 switch (spaceTypes[i]) {
                     case DOUBLE:
                         spaceValues[i] = score;
+                        break;
+                    case HALVE:
+                        spaceValues[i] = score * -1 / 2;
                         break;
                     case BANKRUPT:
                         spaceValues[i] = score * -1;
