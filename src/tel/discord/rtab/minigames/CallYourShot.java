@@ -1,0 +1,288 @@
+package tel.discord.rtab.minigames;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+public class CallYourShot implements MiniGame {
+	static final String NAME = "Call Your Shot";
+	static final boolean BONUS = false; 
+	
+	
+	int stageAmount;
+	int roundNumber;
+	int colorPicked;
+	int total;
+	
+	List<Integer> colorNumber = Arrays.asList(0, 1,1, 2,2,2, 3,3,3,3, 4,4,4,4,4, 5,5,5,5,5,5);
+	List<String> colorNames = Arrays.asList("Gold", "Green", "Purple", "Blue", "Orange", "Red");
+	List<Integer> values = Arrays.asList(1500000,600000,400000,320000,240000,196608);
+	boolean alive; //Player still alive?
+	boolean[] pickedSpaces;
+	int lastSpace;
+	int lastPick;
+	
+	
+	/**
+	 * Initialises the variables used in the minigame and prints the starting messages.
+	 * @return A list of messages to send to the player.
+	 */
+	@Override
+	public LinkedList<String> initialiseGame(){
+		stageAmount = 0;
+		roundNumber = -1;
+		colorPicked = 9;
+		alive = true; 
+		stop = false;
+
+		pickedSpaces = new boolean[numbers.size()];
+		Collections.shuffle(colorNumber);
+
+		LinkedList<String> output = new LinkedList<>();
+		//Give instructions
+		output.add("Welcome to Call Your Shot!");
+		output.add("There are six colors of balls on this 21 space board. Six reds, five oranges, four blues, three purples, two greens, and one gold.");
+		output.add("You're going to pick one of the colors, then try to pick a ball of that color.");
+		output.add("If you pick the color you chose on your first try, you win that color's initial value!");
+		output.add("If you didn't pick your color, the value is cut in half, and you can pick again.");
+		output.add("With two exceptions, you can make mistakes equal to the number of balls of the color you picked.");
+		output.add("If you picked red, you have as many chances as you need to pick a red.");
+		output.add("If you picked gold, you only get a single chance, but if you strike it lucky on that one chance, you win the maximum value for this game: **$1,500,000**!");
+		output.add("Of course, if you run out of chances, the game is over and you don't win anything.");
+		output.add("The other initial values: $600,000 for green, $400,000 for purple, $320,000 for blue, $240,000 for orange, and $196,608 for red.");
+		output.add("With that said, what color will you try to pick?");
+
+		//output.add(generateBoard());
+		return output;  
+	}
+
+	/**
+	 * Takes the next player input and uses it to play the next "turn" - up until the next input is required.
+	 * @param pick The next input sent by the player.
+	 * @return A list of messages to send to the player.
+	 */
+	@Override
+	public LinkedList<String> playNextTurn(String pick){
+		LinkedList<String> output = new LinkedList<>();
+		
+
+		String choice = pick.toUpperCase();
+		choice = choice.replaceAll("\\s","");
+		if (roundNumber == -1 && colorPicked == 9 &&
+		(choice.equals("RED") || choice.equals("ORANGE") || choice.equals("BLUE") || choice.equals("PURPLE") || choice.equals("GREEN") || choice.equals("GOLD")))
+		{
+			roundNumber = 0;
+			
+			if (choice.equals("RED"))
+			{
+				output.add("You picked red. You're playing for $196,608 to start and you have as many chances as you need. Good luck!");
+				colorPicked = 5;
+			}
+			else if (choice.equals("ORANGE"))
+			{
+				output.add("You picked orange. You're playing for $240,000 and you can make five mistakes. Good luck!");
+				colorPicked = 4;
+			}			
+			else if (choice.equals("BLUE"))
+			{
+				output.add("You picked blue. You're playing for $320,000 and you can make four mistakes. Good luck!");
+				colorPicked = 3;
+			}			
+			else if (choice.equals("PURPLE"))
+			{
+				output.add("You picked purple. You're playing for $400,000 and you can make three mistakes. Good luck!");
+				colorPicked = 2;
+			}			
+			else if (choice.equals("GREEN"))
+			{
+				output.add("You picked green. You're playing for $600,000 and you can make two mistakes. Good luck!");
+				colorPicked = 1;
+			}			
+			else if (choice.equals("GOLD"))
+			{
+				output.add("Ooh, risky~ You picked gold. You only get one chance, but if you strike gold, you win **$1,500,000**. Good luck!");
+				colorPicked = 0;
+			}
+			stageAmount = values[colorPicked];
+			total = stageAmount;
+			output.add(generateBoard());
+			//You picked a color and didn't pick one before
+		}
+		else if(!isNumber(choice))
+		{
+			//Absolutely still don't say anything for random strings
+			return output;
+		}
+		if(!checkValidNumber(choice))
+		{
+			// EASTER EGG! 
+			output.add("Invalid pick.");
+			return output;
+			// Something something Discord noodle
+		}
+		else
+		{
+			lastSpace = Integer.parseInt(pick)-1;
+			pickedSpaces[lastSpace] = true;
+			lastPick = numbers.get(lastSpace);
+			//Start printing output
+			output.add(String.format("Space %d selected...",lastSpace+1));
+			output.add("..."); //suspend dots
+			if (colorNumber[lastSpace] == colorPicked)
+			{
+				if (colorPicked == 0) //Special message for if they go for gold and get it
+				{
+					output.add("It's **Gold**! Incredible!!!");
+				}
+				else //If they get the right color.
+				{
+				output.add("It's **" + colorNames[lastSpace] + "**!");
+				}
+			}
+			else
+			{
+				roundNumber++;
+				output.add("It's **" + colorNames[lastSpace] + "**.");
+				if (colorPicked == 0) //Tried gold and lost. Too bad :(
+				{
+					output.add("Sorry, your gamble didn't pay off this time.");
+					output.add(generateRevealBoard());
+					total = 0;
+					alive=false;
+				}
+				else if (colorPicked == 5 || roundNumber - 2 != colorPicked) //Picked red (and thus has infinite tries) or hasn't lost yet
+				{
+					total = total / 2;
+					output.add(String.format("We cut the bank in half; it is now $%,d. Please try again.",total));
+					output.add(generateBoard());
+				}
+				else //No more tries
+				{
+					output.add("Sorry, you ran out of mistakes, you lose.");
+					output.add(generateRevealBoard());
+					total = 0;
+					alive=false;
+				}
+				
+			}
+		}
+		return output;
+	}
+
+	private boolean isNumber(String message)
+	{
+		try
+		{
+			Integer.parseInt(message);
+			return true;
+		}
+		catch(NumberFormatException e1)
+		{
+			return false;
+		}
+	}
+	
+	private boolean checkValidNumber(String message)
+	{
+		int location = Integer.parseInt(message)-1;
+		return (location >= 0 && location < numbers.size() && !pickedSpaces[location]);
+	}
+
+	private String generateBoard()
+	{
+		StringBuilder display = new StringBuilder();
+		display.append("```\n");
+		display.append("  CALL YOUR SHOT   \n");
+		for(int i=0; i<numbers.size(); i++)
+		{
+			if(pickedSpaces[i])
+			{
+				display.append(colorNumber[i].substring(0,2));
+			}
+			else
+			{
+				display.append(String.format("%02d",(i+1)));
+			}
+			if(i%7 == 6)
+				display.append("\n");
+			else
+				display.append(" ");
+		}
+		display.append("\n");
+		
+		display.append(String.format("Bank: $%,d\n",total));
+		display.append(String.format("Your color: " + colorNames[colorPicked]));
+		display.append(String.format("Mistakes left: %d\n",colorPicked - roundNumber));
+		display.append("```");
+		return display.toString();
+	}
+
+	private String generateRevealBoard()
+	{
+		StringBuilder display = new StringBuilder();
+		display.append("```\n");
+		display.append("  CALL YOUR SHOT   \n");
+		for(int i=0; i<numbers.size(); i++)
+		{
+			display.append(colorNumber[i].substring(0,2));
+			if(i%7 == 6)
+				display.append("\n");
+			else
+				display.append(" ");
+		}
+		display.append("```");
+		return display.toString();
+	}
+
+	
+	/**
+	 * Returns true if the minigame has ended
+	 */
+	@Override
+	public boolean isGameOver(){
+		return !alive;
+	}
+
+
+	/**
+	 * Returns an int containing the player's winnings, pre-booster.
+	 * If game isn't over yet, should return lowest possible win (usually 0) because player timed out for inactivity.
+	 */
+	@Override
+	public int getMoneyWon(){
+		return (isGameOver() & alive) ? total : 0;
+	}
+	/**
+	 * Returns true if the game is a bonus game (and therefore shouldn't have boosters or winstreak applied)
+	 * Returns false if it isn't (and therefore should have boosters and winstreak applied)
+	 */
+	@Override
+	public boolean isBonusGame(){
+		return BONUS;
+	}
+	
+	@Override
+	public String getBotPick()
+	{
+		if (roundNumber == -1 && colorPicked == 9) //Let's let the computer pick a random color
+		{
+			colorPicked = colorNumber[(int)(Math.random()*21)];
+		}
+		else //No stopping this train!
+		{
+		ArrayList<Integer> openSpaces = new ArrayList<>(numbers.size());
+		for(int i=0; i<numbers.size(); i++)
+			if(!pickedSpaces[i])
+				openSpaces.add(i+1);
+		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return NAME;
+	}
+}
