@@ -42,7 +42,7 @@ public class MinefieldMultiplier implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to Minefield Multiplier");
-		output.add("You have a Board of 21 Spaces You have a Board of 21 Spaces with a Multiplier hiding in each space.");
+		output.add("You have a Board of 21 Spaces with a Multiplier hiding in each space.");
 		output.add("Every Turn the Amount of Money which we multiply will increase, BUT...");
 		output.add("The number of Bombs on the Board will increase as well!");
 		output.add("There will be 8 Rounds and there is one x10 Multiplier.");
