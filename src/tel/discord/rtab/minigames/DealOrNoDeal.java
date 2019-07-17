@@ -53,7 +53,7 @@ public class DealOrNoDeal implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		String choice = pick.toUpperCase();
 		choice = choice.replaceAll("\\s","");
-		if(choice.equals("REFUSE") || choice.equals("NODEAL"))
+		if(choice.equals("REFUSE") || choice.equals("NODEAL") || choice.equals("ND"))
 		{
 			output.add("NO DEAL!");
 			if(casesLeft == 2)
@@ -75,7 +75,7 @@ public class DealOrNoDeal implements MiniGame {
 				output.add("Deal or No Deal?");
 			}
 		}
-		else if(choice.equals("ACCEPT") || choice.equals("DEAL"))
+		else if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("D"))
 		{
 			accept = true;
 			output.add("It's a DONE DEAL!");
