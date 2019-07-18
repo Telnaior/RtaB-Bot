@@ -11,7 +11,8 @@ public class MinefieldMultiplier implements MiniGame {
 	static final boolean BONUS = false; 
 	int total;
 	int stageAmount;
-	List<Integer> numbers = Arrays.asList(0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,3,3,3,4,4,5);
+	int stage;
+	List<Integer> numbers = Arrays.asList(-1,1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,5,5,10);
 	List<Integer> bombs;
 	int maxBombs;
 	boolean alive; //Player still alive?
@@ -29,7 +30,8 @@ public class MinefieldMultiplier implements MiniGame {
 	public LinkedList<String> initialiseGame(){
 		bombs = Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 		total = 0;
-		maxBombs = 0;
+		stage = 1;
+		maxBombs = 1;
 		stageAmount = 10000;
 		alive = true; 
 		stop = false;
@@ -42,11 +44,12 @@ public class MinefieldMultiplier implements MiniGame {
 		output.add("Welcome to Minefield Multiplier");
 		output.add("You have a Board of 21 Spaces with a Multiplier hiding in each space.");
 		output.add("Every Turn the Amount of Money which we multiply will increase, BUT...");
-		output.add("The number of Bombs on the Board will increase by the same Multiplier you pick!");
+		output.add("The number of Bombs on the Board will increase as well!");
+		output.add("There will be 8 Rounds and there is one x10 Multiplier.");
 		output.add("Bombs will be randomly placed anywhere on the Board, "+
 			  "including on top of other bombs or already picked spaces.");
-		output.add("You can leave after each Round with your current Bank...");
-		output.add("But you lose everything if you hit a Bomb."); //~Duh
+		output.add("You can **STOP** after each Round, with your current Bank or **PASS** to the next stage!");
+		output.add("But you lose everything, if you hit a Bomb."); //~Duh
 
 		output.add(generateBoard());
 		return output;  
@@ -64,14 +67,29 @@ public class MinefieldMultiplier implements MiniGame {
 
 		String choice = pick.toUpperCase();
 		choice = choice.replaceAll("\\s","");
-		if(total > 0 && 
-		   (choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE") || choice.equals("STOP")))
+		if(choice.equals("ACCEPT") || choice.equals("DEAL") || choice.equals("TAKE") || choice.equals("STOP"))
 		{
 			// Player stops 
 			stop = true;
-			output.add("Very well! You escaped with your bank of " + String.format("$%,d",total));
+			output.add("Very well! You escaped with your bank of " + String.format("%,d",total));
 			output.add("Here is the revealed Board!");
 			output.add(generateRevealBoard());
+			return output;
+		}
+		else if(choice.equals("PASS")){
+			if (stage >= 8) {
+				output.add("You can't pass the Last Stage. Either **STOP** or Pick your space!");
+			}
+			else {
+				output.add("We going to pass this Stage, but we still add the Bombs!");
+				if (bombTable(stage + 1) == 1) {
+					output.add("**1** Bomb was placed!");
+				} else {
+					output.add(String.format("**%d** Bombs were placed!", bombTable(stage + 1)));
+				}
+				increaseStage();
+				output.add(generateBoard());
+			}
 			return output;
 		}
 		else if(!isNumber(choice))
@@ -95,7 +113,7 @@ public class MinefieldMultiplier implements MiniGame {
 			//Start printing output
 			output.add(String.format("Space %d selected...",lastSpace+1));
 			output.add("..."); //suspend dots
-			if(bombs.get(lastSpace) == 1) // If it's a Bomb
+			if(bombs.get(lastSpace) == 1 || lastPick == -1) // If it's a Bomb
 			{
 				output.add("**BOOM**");
 				output.add("Sorry, you lose!");
@@ -111,27 +129,18 @@ public class MinefieldMultiplier implements MiniGame {
 				total = win + total; // Either way, put the total on the board.
 
 				output.add("It's a " + String.format("**x%d** Multiplier!", lastPick));
-				
-				if (lastPick == 0) // No Multiplier
-				{
-					output.add(String.format("That adds nothing to your total of **$%,d**...", total));
-					output.add("But we don't add any Bombs either.");
+				output.add(String.format("That makes **%,d** for a total of **%,d!**", win, total));
+				if (bombTable(stage+1)==1){
+					output.add("We are going to add **%1** Bomb!");
 				}
-				else 
-				{
-					output.add(String.format("That makes **$%,d** for a total of **$%,d!**", win, total));
-					output.add(String.format("We are going to add **%d** Bombs!", lastPick));
+				else{
+					output.add(String.format("We are going to add **%d** Bombs!", bombTable(stage+1)));
 				}
-				stageAmount = stageAmount + 10000;
-				maxBombs = maxBombs + lastPick;
-				for(int i=0; i<lastPick; i++)
-				{
-					int rand = (int) (Math.random()*numbers.size()); //0-20 (21 Spaces in the Array, 0 is included*)
-					bombs.set(rand, 1);
-				}
+				increaseStage();
 				output.add(generateBoard());
 			}
 		}
+
 		return output;
 	}
 
@@ -194,13 +203,18 @@ public class MinefieldMultiplier implements MiniGame {
 			{
 				display.append("  ");
 			}
-			else if(bombs.get(i) == 1)
+			else if(bombs.get(i) == 1 || numbers.get(i)== -1)
 			{
 				display.append("XX");
 			}
 			else
 			{
-				display.append(String.format("x%d",numbers.get(i)));
+				if (numbers.get(i) == 10){
+					display.append(String.format("%d",numbers.get(i)));
+				}
+				else{
+					display.append(String.format("x%d",numbers.get(i)));
+				}
 			}
 			if(i%7 == 6)
 				display.append("\n");
@@ -211,13 +225,76 @@ public class MinefieldMultiplier implements MiniGame {
 		return display.toString();
 	}
 
-	
+	private int stageTable(int stage)
+	{
+		int value = 0;
+		switch (stage)
+		{
+			case 1:
+				value = 10000;
+				break;
+			case 2:
+				value = 20000;
+				break;
+			case 3:
+				value = 30000;
+				break;
+			case 4:
+				value = 40000;
+				break;
+			case 5:
+				value = 50000;
+				break;
+			case 6:
+				value = 75000;
+				break;
+			case 7:
+				value = 100000;
+				break;
+			case 8:
+				value = 200000;
+				break;
+		}
+		return(value);
+	}
+
+	private int bombTable(int stage)
+	{
+		int value = 0;
+		switch (stage)
+		{
+			case 6:
+				value = 2;
+				break;
+			case 7:
+				value = 3;
+				break;
+			case 8:
+				value = 5;
+				break;
+			default:
+				value = 1;
+				break;
+		}
+		return(value);
+	}
+
+	private void increaseStage(){
+		stage++;
+		stageAmount = stageTable(stage);
+		maxBombs = maxBombs + bombTable(stage);
+		for(int i=0; i<bombTable(stage); i++)
+		{
+			int rand = (int) (Math.random()*numbers.size()); //0-20 (21 Spaces in the Array, 0 is included*)
+			bombs.set(rand, 1);
+		}
+	}
 	/**
 	 * Returns true if the minigame has ended
 	 */
 	@Override
 	public boolean isGameOver(){
-		return stop || !alive;
+		return stop || !alive || stage >=9;
 	}
 
 
@@ -247,6 +324,10 @@ public class MinefieldMultiplier implements MiniGame {
 		{
 			if((int)(Math.random()*2)< 1)
 				return "STOP";
+		}
+		else if (stageAmount<=40000){
+			if((int)(Math.random()*2)<1)
+				return "PASS";
 		}
 		//If we aren't going to stop, let's just pick our next space
 
