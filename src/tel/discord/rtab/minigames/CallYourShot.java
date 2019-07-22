@@ -20,6 +20,7 @@ public class CallYourShot implements MiniGame {
 	List<String> colorNames = Arrays.asList("Gold", "Green", "Purple", "Blue", "Orange", "Red");
 	List<Integer> values = Arrays.asList(1500000,600000,400000,320000,240000,196608);
 	boolean alive; //Player still alive?
+	boolean stop; //Has the player called it quits?
 	boolean[] pickedSpaces;
 	int lastSpace;
 	int lastPick;
@@ -37,7 +38,7 @@ public class CallYourShot implements MiniGame {
 		alive = true; 
 		stop = false;
 
-		pickedSpaces = new boolean[numbers.size()];
+		pickedSpaces = new boolean[colorNumber.size()];
 		Collections.shuffle(colorNumber);
 
 		LinkedList<String> output = new LinkedList<>();
@@ -105,7 +106,7 @@ public class CallYourShot implements MiniGame {
 				output.add("Ooh, risky~ You picked gold. You only get one chance, but if you strike gold, you win **$1,500,000**. Good luck!");
 				colorPicked = 0;
 			}
-			stageAmount = values[colorPicked];
+			stageAmount = values.get(colorPicked);
 			total = stageAmount;
 			output.add(generateBoard());
 			//You picked a color and didn't pick one before
@@ -115,22 +116,20 @@ public class CallYourShot implements MiniGame {
 			//Absolutely still don't say anything for random strings
 			return output;
 		}
-		if(!checkValidNumber(choice))
+		else if(!checkValidNumber(choice))
 		{
-			// EASTER EGG! 
 			output.add("Invalid pick.");
 			return output;
-			// Something something Discord noodle
 		}
 		else
 		{
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
-			lastPick = numbers.get(lastSpace);
+			lastPick = colorNumber.get(lastSpace);
 			//Start printing output
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			output.add("..."); //suspend dots
-			if (colorNumber[lastSpace] == colorPicked)
+			output.add("..."); //suspense dots
+			if (colorNumber.get(lastSpace).equals(colorPicked))
 			{
 				if (colorPicked == 0) //Special message for if they go for gold and get it
 				{
@@ -138,19 +137,21 @@ public class CallYourShot implements MiniGame {
 				}
 				else //If they get the right color.
 				{
-				output.add("It's **" + colorNames[lastSpace] + "**!");
+					output.add("It's **" + colorNames.get(colorNumber.get(lastSpace)) + "**!");
 				}
+				output.add("Congratulations, you win!");
+				stop = true;
 			}
 			else
 			{
 				roundNumber++;
-				output.add("It's **" + colorNames[lastSpace] + "**.");
+				output.add("It's **" + colorNames.get(colorNumber.get(lastSpace)) + "**.");
 				if (colorPicked == 0) //Tried gold and lost. Too bad :(
 				{
 					output.add("Sorry, your gamble didn't pay off this time.");
 					output.add(generateRevealBoard());
 					total = 0;
-					alive=false;
+					alive = false;
 				}
 				else if (colorPicked == 5 || roundNumber - 2 != colorPicked) //Picked red (and thus has infinite tries) or hasn't lost yet
 				{
@@ -163,7 +164,7 @@ public class CallYourShot implements MiniGame {
 					output.add("Sorry, you ran out of mistakes, you lose.");
 					output.add(generateRevealBoard());
 					total = 0;
-					alive=false;
+					alive = false;
 				}
 				
 			}
@@ -187,7 +188,7 @@ public class CallYourShot implements MiniGame {
 	private boolean checkValidNumber(String message)
 	{
 		int location = Integer.parseInt(message)-1;
-		return (location >= 0 && location < numbers.size() && !pickedSpaces[location]);
+		return (location >= 0 && location < colorNumber.size() && !pickedSpaces[location]);
 	}
 
 	private String generateBoard()
@@ -195,11 +196,11 @@ public class CallYourShot implements MiniGame {
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
 		display.append("  CALL YOUR SHOT   \n");
-		for(int i=0; i<numbers.size(); i++)
+		for(int i=0; i<colorNumber.size(); i++)
 		{
 			if(pickedSpaces[i])
 			{
-				display.append(colorNumber[i].substring(0,2));
+				display.append(colorNames.get(colorNumber.get(i)).substring(0,2));
 			}
 			else
 			{
@@ -213,8 +214,10 @@ public class CallYourShot implements MiniGame {
 		display.append("\n");
 		
 		display.append(String.format("Bank: $%,d\n",total));
-		display.append(String.format("Your color: " + colorNames[colorPicked]));
-		display.append(String.format("Mistakes left: %d\n",colorPicked - roundNumber));
+		display.append(String.format("Your color: %s\n",colorNames.get(colorPicked)));
+		//If they picked red or gold, don't display the counter at all
+		if(colorPicked > 0 && colorPicked < 5)
+			display.append(String.format("Mistakes left: %d\n",colorPicked + 1 - roundNumber));
 		display.append("```");
 		return display.toString();
 	}
@@ -224,9 +227,9 @@ public class CallYourShot implements MiniGame {
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
 		display.append("  CALL YOUR SHOT   \n");
-		for(int i=0; i<numbers.size(); i++)
+		for(int i=0; i<colorNumber.size(); i++)
 		{
-			display.append(colorNumber[i].substring(0,2));
+			display.append(colorNames.get(colorNumber.get(i)).substring(0,2));
 			if(i%7 == 6)
 				display.append("\n");
 			else
@@ -242,7 +245,7 @@ public class CallYourShot implements MiniGame {
 	 */
 	@Override
 	public boolean isGameOver(){
-		return !alive;
+		return !alive || stop;
 	}
 
 
@@ -268,15 +271,15 @@ public class CallYourShot implements MiniGame {
 	{
 		if (roundNumber == -1 && colorPicked == 9) //Let's let the computer pick a random color
 		{
-			colorPicked = colorNumber[(int)(Math.random()*21)];
+			return colorNames.get(colorNumber.get((int)(Math.random()*21)));
 		}
 		else //No stopping this train!
 		{
-		ArrayList<Integer> openSpaces = new ArrayList<>(numbers.size());
-		for(int i=0; i<numbers.size(); i++)
-			if(!pickedSpaces[i])
-				openSpaces.add(i+1);
-		return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
+			ArrayList<Integer> openSpaces = new ArrayList<>(colorNumber.size());
+			for(int i=0; i<colorNumber.size(); i++)
+				if(!pickedSpaces[i])
+					openSpaces.add(i+1);
+			return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
 		}
 	}
 	
