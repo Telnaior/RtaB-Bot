@@ -41,8 +41,6 @@ import tel.discord.rtab.enums.PlayerQuitReturnValue;
 import tel.discord.rtab.enums.PlayerStatus;
 import tel.discord.rtab.enums.SpaceType;
 import tel.discord.rtab.minigames.MiniGame;
-import tel.discord.rtab.minigames.SuperBonusRound;
-
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class GameController
@@ -1995,7 +1993,7 @@ public class GameController
 						channel.sendMessage(players.get(0).getSafeMention() + "...").complete();
 						channel.sendMessage("It is time to enter the Super Bonus Round.").completeAfter(5,TimeUnit.SECONDS);
 						channel.sendMessage("...").completeAfter(10,TimeUnit.SECONDS);
-						startMiniGame(new SuperBonusRound());
+						startMiniGame(Games.SUPER_BONUS_ROUND.getGame());
 					}, 90, TimeUnit.SECONDS);
 				}
 			}
