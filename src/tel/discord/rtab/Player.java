@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.Games;
+import tel.discord.rtab.enums.HiddenCommand;
 import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PlayerStatus;
 
@@ -38,6 +39,7 @@ public class Player implements Comparable<Player>
 	int winstreak;
 	int oldWinstreak;
 	int newbieProtection;
+	HiddenCommand hiddenCommand;
 	//Event fields
 	int peek;
 	int jokers;
@@ -92,6 +94,7 @@ public class Player implements Comparable<Player>
 		peek = 1;
 		jokers = 0;
 		boostCharge = 0;
+		hiddenCommand = HiddenCommand.NONE;
 		splitAndShare = false;
 		minigameLock = false;
 		threshold = false;

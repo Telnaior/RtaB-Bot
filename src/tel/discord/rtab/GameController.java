@@ -1100,7 +1100,22 @@ public class GameController
 		StringBuilder extraResult = getCurrentPlayer().addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 		if(extraResult != null)
 			output.add(extraResult.toString());
+		//Award hidden command with 10% chance if cash is negative and they don't have one already
+		if(cashWon < 0 && Math.random() < 0.1 && getCurrentPlayer().hiddenCommand == HiddenCommand.NONE)
+			awardHiddenCommand();
 		return output;
+	}
+	
+	private void awardHiddenCommand()
+	{
+		HiddenCommand[] possibleCommands = HiddenCommand.values();
+		//Never pick "none", which is at the start of the list
+		int commandNumber = (int) Math.random() * (possibleCommands.length - 1) + 1;
+		HiddenCommand chosenCommand = possibleCommands[commandNumber];
+		getCurrentPlayer().hiddenCommand = chosenCommand;
+		//TODO - send them the PM telling them they have it
+		channel.sendMessage("You also got the "+chosenCommand+" hidden command, but it doesn't work yet.").queue();
+		return;
 	}
 
 	private String awardBoost(int location)
