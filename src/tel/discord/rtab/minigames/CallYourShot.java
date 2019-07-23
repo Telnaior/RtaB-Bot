@@ -40,8 +40,17 @@ public class CallYourShot implements MiniGame {
 
 		pickedSpaces = new boolean[colorNumber.size()];
 		Collections.shuffle(colorNumber);
-
+			
 		LinkedList<String> output = new LinkedList<>();
+
+		/*for(int i=0; i<21; i++)
+		{
+			if (colorNumber.get(i) == 0)
+			{
+
+				output.add("Gold is " + (i + 1));
+			}
+		} // debug */
 		//Give instructions
 		output.add("Welcome to Call Your Shot!");
 		output.add("There are six colors of balls on this 21 space board. Six reds, five oranges, four blues, three purples, two greens, and one gold.");
@@ -121,7 +130,7 @@ public class CallYourShot implements MiniGame {
 			output.add("Invalid pick.");
 			return output;
 		}
-		else
+		else if(colorPicked != 9)
 		{
 			lastSpace = Integer.parseInt(pick)-1;
 			pickedSpaces[lastSpace] = true;
