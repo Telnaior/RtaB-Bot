@@ -1415,88 +1415,94 @@ public class GameController
 			if(players.get(currentTurn).money - players.get(currentTurn).oldMoney <= 0)
 			{
 				channel.sendMessage("Oh, but you don't have any money yet this round?").completeAfter(1, TimeUnit.SECONDS);
-				channel.sendMessage(String.format("Let no one say I am unkind. Here is **$%,d,000,000**!",1*baseMultiplier))
-					.completeAfter(1, TimeUnit.SECONDS);
-				players.get(currentTurn).addMoney(1000000*baseMultiplier,MoneyMultipliersToUse.NOTHING);
-			}
-			else
-			{
-				channel.sendMessage("Step right up and let roulette decide your fate!").completeAfter(1, TimeUnit.SECONDS);
-				//Build event list
-				ArrayList<Events> bowserEvents = new ArrayList<>();
-				bowserEvents.add(Events.COINS_FOR_BOWSER);
-				bowserEvents.add(Events.COINS_FOR_BOWSER);
-				bowserEvents.add(Events.BOWSER_POTLUCK);
-				bowserEvents.add(Events.COMMUNISM);
-				//First jackpot test - 50% chance it appears at all;
-				if(Math.random() < 0.5)
-					bowserEvents.add(Events.RUNAWAY);
-				else
-					bowserEvents.add(Events.BOWSER_JACKPOT);
-				Collections.shuffle(bowserEvents);
-				int index = (int)(Math.random()*5);
-				Message bowserMessage = channel.sendMessage(displayBowserRoulette(bowserEvents,index))
-						.completeAfter(3,TimeUnit.SECONDS);
-				int addon = (int)(Math.random()*5+1);
-				//Make it spin
-				for(int i=0; i<addon; i++)
+				//100% chance of pity money at start, then 90% chance for $100M club, down to 10% chance in $900M club
+				if(Math.random() > players.get(currentTurn).money / 100_000_000)
 				{
-					index += 1;
-					index %= 5;
-					bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(1,TimeUnit.SECONDS);
+					//Only award the same percentage of the $1m "base" pity money
+					int pityMoney = baseMultiplier*100_000*(10-(players.get(currentTurn).money/100_000_000));
+					channel.sendMessage(String.format("Let no one say I am unkind. Here is **$%,d**!",pityMoney))
+						.completeAfter(1, TimeUnit.SECONDS);
+					players.get(currentTurn).addMoney(pityMoney,MoneyMultipliersToUse.NOTHING);
+					break;
 				}
-				//50% chance three times to give it an extra twist
-				for(int i=0; i<3; i++)
+				channel.sendMessage("Too bad!").completeAfter(1, TimeUnit.SECONDS);
+			}
+			channel.sendMessage("Step right up and let roulette decide your fate!").completeAfter(1, TimeUnit.SECONDS);
+			//Build event list
+			ArrayList<Events> bowserEvents = new ArrayList<>();
+			bowserEvents.add(Events.COINS_FOR_BOWSER);
+			bowserEvents.add(Events.COINS_FOR_BOWSER);
+			bowserEvents.add(Events.BOWSER_POTLUCK);
+			bowserEvents.add(Events.COMMUNISM);
+			//First jackpot test - 50% chance it appears at all;
+			if(Math.random() < 0.5)
+				bowserEvents.add(Events.RUNAWAY);
+			else
+				bowserEvents.add(Events.BOWSER_JACKPOT);
+			Collections.shuffle(bowserEvents);
+			int index = (int)(Math.random()*5);
+			Message bowserMessage = channel.sendMessage(displayBowserRoulette(bowserEvents,index))
+					.completeAfter(3,TimeUnit.SECONDS);
+			int addon = (int)(Math.random()*5+1);
+			//Make it spin
+			for(int i=0; i<addon; i++)
+			{
+				index += 1;
+				index %= 5;
+				bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(1,TimeUnit.SECONDS);
+			}
+			//50% chance three times to give it an extra twist
+			for(int i=0; i<3; i++)
+				if(Math.random() < 0.5)
+				{
+					//Random direction
 					if(Math.random() < 0.5)
+						index += 1;
+					else
+						index -= 1;
+					index = (index+5) % 5;
+					bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(2,TimeUnit.SECONDS);
+				}
+			//Check if it's on the jackpot or runaway, and give it an extra twist if so
+			if(bowserEvents.get(index) == Events.RUNAWAY || bowserEvents.get(index) == Events.BOWSER_JACKPOT)
+			{
+				//If it lands on the jackpot space, consider giving it another twist (overall chance 8% to land on it)
+				if(Math.random() < 0.75)
+				{
+					addon = (int)(Math.random()*5+1);
+					//Randomise direction for this one
+					boolean direction = Math.random() < 0.5;
+					//Make it spin
+					for(int i=0; i<addon; i++)
 					{
-						//Random direction
-						if(Math.random() < 0.5)
+						if(direction)
 							index += 1;
 						else
 							index -= 1;
-						index = (index+5) % 5;
-						bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index)).completeAfter(2,TimeUnit.SECONDS);
-					}
-				//Check if it's on the jackpot or runaway, and give it an extra twist if so
-				if(bowserEvents.get(index) == Events.RUNAWAY || bowserEvents.get(index) == Events.BOWSER_JACKPOT)
-				{
-					//Chance based on current jackpot
-					if(Math.random() * 100_000_000 > jackpot)
-					{
-						addon = (int)(Math.random()*5+1);
-						//Randomise direction for this one
-						boolean direction = Math.random() < 0.5;
-						//Make it spin
-						for(int i=0; i<addon; i++)
-						{
-							if(direction)
-								index += 1;
-							else
-								index -= 1;
-							index = (index + 5) % 5;
-							bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index))
-								.completeAfter(250,TimeUnit.MILLISECONDS);
-						}
+						index = (index + 5) % 5;
+						bowserMessage.editMessage(displayBowserRoulette(bowserEvents,index))
+							.completeAfter(250,TimeUnit.MILLISECONDS);
 					}
 				}
-				//Make the roulette vanish after a few seconds
-				bowserMessage.delete().queueAfter(5, TimeUnit.SECONDS);
-				//If it's on the jackpot right now, runaway chance based on current total
-				if(bowserEvents.get(index) == Events.BOWSER_JACKPOT
-						&& Math.random() * 1_000_000_000 < players.get(currentTurn).money)
-					activateEvent(Events.RUNAWAY,location);
-				else
-					activateEvent(bowserEvents.get(index),location);
-					
 			}
+			//Make the roulette vanish after a few seconds
+			bowserMessage.delete().queueAfter(5, TimeUnit.SECONDS);
+			//If it's on the jackpot right now, runaway chance based on current total
+			if(bowserEvents.get(index) == Events.BOWSER_JACKPOT
+					&& Math.random() * 1_000_000_000 < (jackpot+players.get(currentTurn).money))
+				activateEvent(Events.RUNAWAY,location);
+			else
+				activateEvent(bowserEvents.get(index),location);
 			break;
 		case COINS_FOR_BOWSER:
 			channel.sendMessage("**Cash for Bowser** it is! "
 					+ "In this FUN event, you give your money to ME!").completeAfter(3, TimeUnit.SECONDS);
-			//Coins: Up to 100-200% of their round earnings, determined by their total bank
-			//The base multiplier doesn't need to be applied because the formula already takes it into account
+			//Coins: Up to 100-200% of the base amount, determined by their round earnings and their total bank
 			int coinFraction = (int)(Math.random()*51+50);
-			int coins = (players.get(currentTurn).money - players.get(currentTurn).oldMoney) / 100;
+			//Use the greater of either their round earnings or 0.5% of their total bank
+			int coins = Math.max(players.get(currentTurn).money - players.get(currentTurn).oldMoney,
+					players.get(currentTurn).money*baseMultiplier / 200);
+			coins /= 100;
 			coins *= (players.get(currentTurn).money / 5_000_000) + 1;
 			coins /= 100;
 			coins *= coinFraction;
