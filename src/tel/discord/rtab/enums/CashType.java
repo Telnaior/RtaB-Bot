@@ -3,11 +3,12 @@ package tel.discord.rtab.enums;
 public enum CashType implements WeightedSpace
 {
 	//Negative
-	N25K	(-  25000,3,null),
-	N20K	(-  20000,3,null),
-	N15K	(-  15000,3,null),
-	N10K	(-  10000,3,null),
-	N05K	(-   5000,3,null),
+	N25K	(-  25000,30,null),
+	N20K	(-  20000,30,null),
+	N15K	(-  15000,30,null),
+	N10K	(-  10000,30,null),
+	N05K	(-   5000,30,null),
+	//TODO - FIX DEBUG VALUES
 	//Small
 	P10K	(   10000,5,null),
 	P20K	(   20000,5,null),
@@ -33,6 +34,7 @@ public enum CashType implements WeightedSpace
 	//Trophies
 	S1TROPHY(   68000,1,"a replica of Vash's Season 1 trophy"),
 	S2TROPHY(   60000,1,"a replica of Charles510's Season 2 trophy"),
+	S3TROPHY(   54000,1,"a replica of Archstered's Season 3 trophy"),
 	//Meme
 	P10		(      10,1,null),
 	MYSTERY (       0,3,null),

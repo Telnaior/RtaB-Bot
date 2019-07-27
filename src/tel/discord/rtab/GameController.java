@@ -508,6 +508,7 @@ public class GameController
 				if(!starman && getCurrentPlayer().peek < 1 && 
 						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 1)
 				{
+					getCurrentPlayer().hiddenCommand = HiddenCommand.NONE;
 					foldPlayer(getCurrentPlayer());
 					currentPlayerFoldedLogic();
 					return;
@@ -1133,8 +1134,8 @@ public class GameController
 		if(extraResult != null)
 			output.add(extraResult.toString());
 		//Award hidden command with 10% chance if cash is negative and they don't have one already
-		if(cashWon < 0 && Math.random() < 0.1 && getCurrentPlayer().hiddenCommand == HiddenCommand.NONE)
-			awardHiddenCommand();
+		if(cashWon < 0 && Math.random() < 1 && getCurrentPlayer().hiddenCommand == HiddenCommand.NONE)
+			awardHiddenCommand(); //TODO - FIX CHANCE
 		return output;
 	}
 	
@@ -1146,7 +1147,8 @@ public class GameController
 		HiddenCommand chosenCommand = possibleCommands[commandNumber];
 		getCurrentPlayer().hiddenCommand = chosenCommand;
 		//TODO - send them the PM telling them they have it
-		channel.sendMessage("You also got the "+chosenCommand+" hidden command, type !"+chosenCommand+" to use it.").queue();
+		channel.sendMessage("You also got the "+chosenCommand+" hidden command, "
+				+ "type !"+chosenCommand.toString().toLowerCase()+" to use it.").queue();
 		return;
 	}
 
@@ -2544,6 +2546,7 @@ public class GameController
 				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.FOLD)
 			return false;
 		//Cool, we're good, fold them out
+		channel.sendMessage(players.get(player).name + " folded!").queue();
 		foldPlayer(players.get(player));
 		players.get(player).hiddenCommand = HiddenCommand.NONE;
 		//If it was the active player, shift things over to the next turn
@@ -2562,13 +2565,13 @@ public class GameController
 	void foldPlayer(Player folder)
 	{
 		//Fold if they have minigames, or qualified for a bonus game
-		if(getCurrentPlayer().oldWinstreak < 50 * (getCurrentPlayer().winstreak / 50)
-				|| getCurrentPlayer().games.size() > 0)
+		if(folder.oldWinstreak < 50 * (folder.winstreak / 50)
+				|| folder.games.size() > 0)
 		{
 			channel.sendMessage("You'll still get to play your minigames too.").queueAfter(1,TimeUnit.SECONDS);
-			getCurrentPlayer().status = PlayerStatus.FOLDED;
+			folder.status = PlayerStatus.FOLDED;
 		}
-		else getCurrentPlayer().status = PlayerStatus.OUT;
+		else folder.status = PlayerStatus.OUT;
 		playersAlive --;
 	}
 	public PeekReturnValue validatePeek(User peeker, String location)

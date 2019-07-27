@@ -13,37 +13,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.TextChannel;
-import tel.discord.rtab.commands.AddBotCommand;
-import tel.discord.rtab.commands.BetCommand;
-import tel.discord.rtab.commands.BetRankCommand;
-import tel.discord.rtab.commands.BetTopCommand;
-import tel.discord.rtab.commands.BoardCommand;
-import tel.discord.rtab.commands.DemoCommand;
-import tel.discord.rtab.commands.HelpCommand;
-import tel.discord.rtab.commands.HistoryCommand;
-import tel.discord.rtab.commands.JoinCommand;
-import tel.discord.rtab.commands.LivesCommand;
-import tel.discord.rtab.commands.LuckyNumberCommand;
-import tel.discord.rtab.commands.MemeCommand;
-import tel.discord.rtab.commands.MysteryChanceCommand;
-import tel.discord.rtab.commands.NextCommand;
-import tel.discord.rtab.commands.PeekCommand;
-import tel.discord.rtab.commands.PingBotCommand;
-import tel.discord.rtab.commands.PlayersCommand;
-import tel.discord.rtab.commands.QuitCommand;
-import tel.discord.rtab.commands.RankCommand;
-import tel.discord.rtab.commands.ReconnectCommand;
-import tel.discord.rtab.commands.ReloadCommand;
-import tel.discord.rtab.commands.ResetCommand;
-import tel.discord.rtab.commands.ShopCommand;
-import tel.discord.rtab.commands.ShutdownBotCommand;
-import tel.discord.rtab.commands.StartCommand;
-import tel.discord.rtab.commands.StatsCommand;
-import tel.discord.rtab.commands.TopCommand;
-import tel.discord.rtab.commands.TotalsCommand;
-import tel.discord.rtab.commands.ViewBetsCommand;
-import tel.discord.rtab.commands.ViewBombsCommand;
-import tel.discord.rtab.commands.ViewConnectionsCommand;
+import tel.discord.rtab.commands.*;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -70,6 +40,7 @@ public class RaceToABillionBot
 							new JoinCommand(),
 							new QuitCommand(),
 							new PeekCommand(),
+							new FoldCommand(),
 							new PlayersCommand(),
 							new BoardCommand(),
 							new TotalsCommand(),

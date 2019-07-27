@@ -23,6 +23,7 @@ public class FoldCommand extends Command
 			{
 				if(!game.useFold(event.getAuthor()))
 					event.reply("You can't fold right now.");
+				return;
 			}
 		}
 		//We aren't in a game channel? Uh...
