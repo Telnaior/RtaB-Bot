@@ -1622,12 +1622,22 @@ public class GameController
 			channel.sendMessage("So, to make the world a more peaceful place, "
 					+ "I've decided to *divide everyone's earnings evenly*!").completeAfter(1, TimeUnit.SECONDS);
 			channel.sendMessage("It's a **Bowser Revolution**!").completeAfter(1,TimeUnit.SECONDS);
+			boolean superRevolution = Math.random() < 0.5;
+			if(superRevolution)
+				channel.sendMessage("And let's throw in 1% of your total banks as well!").completeAfter(1, TimeUnit.SECONDS);
 			//Get the total money added during the round
 			int delta = 0;
 			for(Player next : players)
 			{
 				//Add their delta to the pile
 				delta += (next.money - next.oldMoney);
+				next.money = next.oldMoney;
+				//Take total banks as well if necessary
+				if(superRevolution)
+				{
+					delta += (next.oldMoney / 100);
+					next.money -= next.oldMoney / 100;
+				}
 			}
 			//Add the remainder to the jackpot - Bowser keeps it!
 			jackpot += (delta % players.size());
@@ -1639,7 +1649,7 @@ public class GameController
 			//And give it to each of them
 			for(Player next : players)
 			{
-				next.addMoney(delta-(next.money-next.oldMoney),MoneyMultipliersToUse.NOTHING);
+				next.addMoney(delta,MoneyMultipliersToUse.NOTHING);
 			}
 			break;
 		case REVERSE_ORDER:
