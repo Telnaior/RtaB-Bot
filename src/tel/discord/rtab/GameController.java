@@ -65,6 +65,7 @@ public class GameController
 	int fcTurnsLeft;
 	int repeatTurn = 0;
 	boolean reverse = false;
+	boolean starman = false;
 	int playersAlive = 0;
 	int boardMultiplier;
 	int baseMultiplier;
@@ -133,6 +134,7 @@ public class GameController
 		repeatTurn = 0;
 		jackpot = 0;
 		reverse = false;
+		starman = false;
 		timer.shutdownNow();
 		timer = new ScheduledThreadPoolExecutor(1);
 		if(runDemo)
@@ -145,12 +147,6 @@ public class GameController
 			},120,TimeUnit.MINUTES);
 		}
 	}
-	/**
-	 * addPlayer - adds a player to the game, or updates their name if they're already in.
-	 * MessageChannel channelID - channel the request took place in (only used to know where to send game details to)
-	 * String playerID - ID of player to be added.
-	 * Returns an enum which gives the result of the join attempt.
-	 */
 	public int findPlayerInGame(String playerID)
 	{
 		for(int i=0; i < players.size(); i++)
@@ -158,6 +154,12 @@ public class GameController
 				return i;
 		return -1;
 	}
+	/**
+	 * addPlayer - adds a player to the game, or updates their name if they're already in.
+	 * MessageChannel channelID - channel the request took place in (only used to know where to send game details to)
+	 * String playerID - ID of player to be added.
+	 * Returns an enum which gives the result of the join attempt.
+	 */
 	public PlayerJoinReturnValue addPlayer(Member playerID)
 	{
 		//Are player joins even *allowed* here?
@@ -498,6 +500,23 @@ public class GameController
 		if(getCurrentPlayer().isBot)
 		{
 			displayBoardAndStatus(true, false, false, 2);
+			//Test for hidden command stuff first
+			switch(getCurrentPlayer().hiddenCommand)
+			{
+			//Fold if they have no peeks, jokers, there's been no starman, and a random chance is hit
+			case FOLD:
+				if(!starman && getCurrentPlayer().peek < 1 && 
+						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 1)
+				{
+					foldPlayer(getCurrentPlayer());
+					currentPlayerFoldedLogic();
+					return;
+				}
+				break;
+			default:
+				break;
+			//TODO Add more of these
+			}
 			//Get safe spaces, starting with all unpicked spaces
 			ArrayList<Integer> openSpaces = new ArrayList<>(boardSize);
 			for(int i=0; i<boardSize; i++)
@@ -584,17 +603,22 @@ public class GameController
 		else
 		{
 			displayBoardAndStatus(true, false, false);
+			int thisPlayer = currentTurn;
 			ScheduledFuture<?> warnPlayer = timer.schedule(() -> 
 			{
-				channel.sendMessage(getCurrentPlayer().getSafeMention() + 
-						", thirty seconds left to choose a space!").queue();
-				displayBoardAndStatus(true,false,false);
+				//If they're out of the round somehow, why are we warning them?
+				if(players.get(thisPlayer).status == PlayerStatus.ALIVE)
+				{
+					channel.sendMessage(players.get(thisPlayer).getSafeMention() + 
+							", thirty seconds left to choose a space!").queue();
+					displayBoardAndStatus(true,false,false);
+				}
 			}, 60, TimeUnit.SECONDS);
 			waiter.waitForEvent(MessageReceivedEvent.class,
 					//Right player and channel
 					e ->
 					{
-						if(e.getAuthor().equals(getCurrentPlayer().user) && e.getChannel().equals(channel)
+						if(e.getAuthor().equals(players.get(thisPlayer).user) && e.getChannel().equals(channel)
 								&& checkValidNumber(e.getMessage().getContentRaw()))
 						{
 								int location = Integer.parseInt(e.getMessage().getContentRaw());
@@ -611,14 +635,22 @@ public class GameController
 					//Parse it and call the method that does stuff
 					e -> 
 					{
-						warnPlayer.cancel(false);
-						int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
-						//Anyway go play out their turn
-						timer.schedule(() -> resolveTurn(location), 1, TimeUnit.SECONDS);
+						//If they're somehow taking their turn when they're out of the round, just don't do anything
+						if(players.get(thisPlayer).status == PlayerStatus.ALIVE)
+						{
+							warnPlayer.cancel(false);
+							int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
+							//Anyway go play out their turn
+							timer.schedule(() -> resolveTurn(location), 1, TimeUnit.SECONDS);
+						}
 					},
 					90,TimeUnit.SECONDS, () ->
 					{
-						timeOutTurn();
+						//If they're somehow taking their turn when they're out of the round, just don't do anything
+						if(players.get(thisPlayer).status == PlayerStatus.ALIVE)
+						{
+							timeOutTurn();
+						}
 					});
 		}
 	}
@@ -1114,7 +1146,7 @@ public class GameController
 		HiddenCommand chosenCommand = possibleCommands[commandNumber];
 		getCurrentPlayer().hiddenCommand = chosenCommand;
 		//TODO - send them the PM telling them they have it
-		channel.sendMessage("You also got the "+chosenCommand+" hidden command, but it doesn't work yet.").queue();
+		channel.sendMessage("You also got the "+chosenCommand+" hidden command, type !"+chosenCommand+" to use it.").queue();
 		return;
 	}
 
@@ -1296,6 +1328,7 @@ public class GameController
 				.completeAfter(5,TimeUnit.SECONDS);
 			for(int i=0; i<players.size(); i++)
 				bombs[(int)(Math.random()*boardSize)] = true;
+			starman = false;
 			break;
 		case LOCKDOWN:
 			channel.sendMessage("It's the **Triple Deal Lockdown**, "
@@ -1313,6 +1346,7 @@ public class GameController
 			channel.sendMessage("Hooray, it's a **Starman**, here to destroy all the bombs!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			detonateBombs();
+			starman = true;
 			break;
 		case DRAW_TWO:
 			if(repeatTurn > 0)
@@ -1668,16 +1702,8 @@ public class GameController
 			StringBuilder extraResult = getCurrentPlayer().addMoney(bribe,MoneyMultipliersToUse.BOOSTER_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult.toString()).queue();
-			//Fold if they have minigames, or qualified for a bonus game
-			if(getCurrentPlayer().oldWinstreak < 50 * (getCurrentPlayer().winstreak / 50)
-					|| getCurrentPlayer().games.size() > 0)
-			{
-				channel.sendMessage("You'll still get to play your minigames too.").queueAfter(1,TimeUnit.SECONDS);
-				getCurrentPlayer().status = PlayerStatus.FOLDED;
-			}
-			else getCurrentPlayer().status = PlayerStatus.OUT;
+			foldPlayer(getCurrentPlayer());
 			repeatTurn = 0;
-			playersAlive --;
 			break;
 		case BOOST_MAGNET:
 			//Get the total boost in play
@@ -2509,25 +2535,54 @@ public class GameController
 	 * Used to parse player-submitted peeks to see if they are valid, and then pass them on to the resolver.
 	 * Bot peeks should not end up here.
 	 */
+	public boolean useFold(User folder)
+	{
+		//Find them in the game
+		int player = findPlayerInGame(folder.getId());
+		//Check that the fold is valid
+		if(gameStatus != GameStatus.IN_PROGRESS || player == -1 
+				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.FOLD)
+			return false;
+		//Cool, we're good, fold them out
+		foldPlayer(players.get(player));
+		players.get(player).hiddenCommand = HiddenCommand.NONE;
+		//If it was the active player, shift things over to the next turn
+		if(player == currentTurn)
+			currentPlayerFoldedLogic();
+		return true;
+	}
+	void currentPlayerFoldedLogic()
+	{
+		repeatTurn = 0;
+		//Since they didn't pick, make sure the final countdown doesn't tick
+		if(finalCountdown)
+			fcTurnsLeft ++;
+		runEndTurnLogic();
+	}
+	void foldPlayer(Player folder)
+	{
+		//Fold if they have minigames, or qualified for a bonus game
+		if(getCurrentPlayer().oldWinstreak < 50 * (getCurrentPlayer().winstreak / 50)
+				|| getCurrentPlayer().games.size() > 0)
+		{
+			channel.sendMessage("You'll still get to play your minigames too.").queueAfter(1,TimeUnit.SECONDS);
+			getCurrentPlayer().status = PlayerStatus.FOLDED;
+		}
+		else getCurrentPlayer().status = PlayerStatus.OUT;
+		playersAlive --;
+	}
 	public PeekReturnValue validatePeek(User peeker, String location)
 	{
 		//Make sure the game is running, for a start
 		if(gameStatus != GameStatus.IN_PROGRESS)
 			return PeekReturnValue.NOPEEK;
 		//Check if the peeking player is in the game
-		int player = -1;
-		for(int i=0; i<players.size(); i++)
-		{
-			if(peeker.equals(players.get(i).user))
-			{
-				//If they don't have a peek, reject them anyway and don't bother searching further
-				if(players.get(i).peek > 0)
-					player = i;
-				break;
-			}
-		}
+		int player = findPlayerInGame(peeker.getId());
 		//If we didn't find it, back out
 		if(player == -1)
+			return PeekReturnValue.NOPEEK;
+		//If they don't have a peek, do the same
+		if(players.get(player).peek < 1)
 			return PeekReturnValue.NOPEEK;
 		//Check the space location to see if it's valid
 		if(!checkValidNumber(location))
