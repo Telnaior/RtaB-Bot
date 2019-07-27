@@ -56,7 +56,7 @@ public class BetCommand extends Command
 		//So at this point we've got our bet laid out, let's get the right channel
 		for(GameController game : RaceToABillionBot.game)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				//If it's not a betting channel, break out to the "no bets here" message
 				if(game.betManager == null)

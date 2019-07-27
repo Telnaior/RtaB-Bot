@@ -20,7 +20,7 @@ public class AddBotCommand extends Command {
 	{
 		for(GameController game : RaceToABillionBot.game)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				if(event.getArgs().equals(""))
 				{

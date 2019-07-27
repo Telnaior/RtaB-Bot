@@ -18,7 +18,7 @@ public class PeekCommand extends Command
 	{
 		for(GameController game : RaceToABillionBot.game)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				String peekSpot = event.getArgs();
 				switch(game.validatePeek(event.getAuthor(),peekSpot))

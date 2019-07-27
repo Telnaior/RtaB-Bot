@@ -20,7 +20,7 @@ public class TotalsCommand extends Command
 	protected void execute(CommandEvent event) {
 		for(GameController game : RaceToABillionBot.game)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				if(game.gameStatus == GameStatus.SIGNUPS_OPEN)
 				{

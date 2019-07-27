@@ -23,7 +23,7 @@ public class DemoCommand extends Command {
 			playerCount = Integer.parseInt(event.getArgs());
 		for(GameController game : RaceToABillionBot.game)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				if(game.runDemo)
 					game.demoMode.cancel(true);

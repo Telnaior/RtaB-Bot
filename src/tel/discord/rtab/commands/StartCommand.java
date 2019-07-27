@@ -22,7 +22,7 @@ public class StartCommand extends Command
 	{
 		for(GameController game : RaceToABillionBot.game)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				game.timer.shutdownNow();
 				game.timer = new ScheduledThreadPoolExecutor(1);

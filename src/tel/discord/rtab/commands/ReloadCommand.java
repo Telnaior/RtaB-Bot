@@ -21,11 +21,13 @@ public class ReloadCommand extends Command
 	{
 		for(SuperBotChallenge game : RaceToABillionBot.challenge)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				game.loadGames();
 				return;
 			}
 		}
+		//If no channel found, actually say something
+		event.getChannel().sendMessage("Bad channel.").queue();
 	}
 }

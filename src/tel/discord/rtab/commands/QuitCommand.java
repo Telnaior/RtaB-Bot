@@ -18,7 +18,7 @@ public class QuitCommand extends Command {
 		String name = event.getMember().getEffectiveName();
 		for(GameController game : RaceToABillionBot.game)
 		{
-			if(game.channel == event.getChannel())
+			if(game.channel.equals(event.getChannel()))
 			{
 				switch(game.removePlayer(event.getChannel(),event.getAuthor()))
 				{
