@@ -47,8 +47,8 @@ public class DeucesWild implements MiniGame {
 				+ "Those are always treated as the best card possible.");
 		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
 		output.add("You must get at least a pair to win any money. That pays $20,000.");
-		output.add("Two pairs win $50,000, while a three of a kind pays $100,000.");
-		output.add("Straights pay $150,000, flushes pay $200,000, a full house pays $250,000, a four of a kind pays $500,000, "
+		output.add("Two pairs pay $50,000, a three of a kind pays $100,000, a straight pays $150,000, " + "
+				"a flush pays $200,000, a full house pays $250,000, a four of a kind pays $500,000, "
 				+ "a straight flush pays $750,000, a five of a kind pays $1,000,000, a wild royal flush pays $2,000,000, "
 				+ "and four deuces pay $5,000,000.");
 		output.add("If you are lucky enough to get a natural royal flush, you will win $10,000,000!");
