@@ -66,6 +66,8 @@ public class GameController
 	int repeatTurn = 0;
 	boolean reverse = false;
 	boolean starman = false;
+	boolean currentBlammo = false;
+	boolean futureBlammo = false;
 	int playersAlive = 0;
 	int boardMultiplier;
 	int baseMultiplier;
@@ -135,6 +137,8 @@ public class GameController
 		jackpot = 0;
 		reverse = false;
 		starman = false;
+		currentBlammo = false;
+		futureBlammo = false;
 		timer.shutdownNow();
 		timer = new ScheduledThreadPoolExecutor(1);
 		if(runDemo)
@@ -462,6 +466,15 @@ public class GameController
 	}
 	void runTurn()
 	{
+		//If someone from the Gallery has given our hapless player a blammo, they get that instead of their normal turn
+		if(futureBlammo)
+		{
+			futureBlammo = false;
+			channel.sendMessage(getCurrentPlayer().getSafeMention()
+					+ ", someone from the gallery has given you a Blammo!").completeAfter(2, TimeUnit.SECONDS);
+			startBlammo(false);
+			return;
+		}
 		//Count down if necessary
 		if(finalCountdown)
 		{
@@ -473,11 +486,12 @@ public class GameController
 				timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
 				return;
 			}
+			//Otherwise display the appropriate message
 			else if(fcTurnsLeft == 1)
 				channel.sendMessage("The round will end **after this pick!**").queue();
 			else
 				channel.sendMessage(String.format("The round will end in **%d picks**.",fcTurnsLeft)).queue();
-			//Otherwise subtract one
+			//And then subtract one
 			fcTurnsLeft --;
 		}
 		//Figure out who to ping and what to tell them
@@ -1061,7 +1075,7 @@ public class GameController
 			activateEvent(gameboard.eventBoard.get(location),location);
 			break;
 		case BLAMMO:
-			channel.sendMessage("It's a **BLAMMO!**").completeAfter(5,TimeUnit.SECONDS);
+			channel.sendMessage(getCurrentPlayer().getSafeMention() + ", it's a **BLAMMO!**").completeAfter(5,TimeUnit.SECONDS);
 			startBlammo(false);
 			return;
 		}
@@ -1146,8 +1160,8 @@ public class GameController
 	
 	private void startBlammo(boolean mega)
 	{
-		channel.sendMessage("Quick " + getCurrentPlayer().getSafeMention() + ", press a button!\n```"
-						+ (mega ? "\n MEGA " : "") + "\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
+		channel.sendMessage("Quick, press a button!\n```" + (mega ? "\n MEGA " : "") + "\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
+		currentBlammo = true;
 		List<BlammoChoices> buttons = Arrays.asList(BlammoChoices.values());
 		Collections.shuffle(buttons);
 		if(getCurrentPlayer().isBot)
@@ -1167,20 +1181,29 @@ public class GameController
 					//Parse it and call the method that does stuff
 					e -> 
 					{
-						int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-						timer.schedule(() -> runBlammo(buttons, button,false), 1, TimeUnit.SECONDS);
+						//Don't resolve the blammo if there is no blammo right now
+						if(currentBlammo)
+						{
+							int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
+							timer.schedule(() -> runBlammo(buttons, button,false), 1, TimeUnit.SECONDS);
+						}
 					},
 					30,TimeUnit.SECONDS, () ->
 					{
-						channel.sendMessage("Too slow, autopicking!").queue();
-						int button = (int) Math.random() * 4;
-						runBlammo(buttons, button,false);
+						if(currentBlammo)
+						{
+							channel.sendMessage("Too slow, autopicking!").queue();
+							int button = (int) Math.random() * 4;
+							runBlammo(buttons, button,false);
+						}
 					});
 		}
 	}
 
 	private void runBlammo(List<BlammoChoices> buttons, int buttonPressed, boolean mega)
 	{
+		//Blammo is done now
+		currentBlammo = false;
 		if(getCurrentPlayer().isBot)
 		{
 			channel.sendMessage(getCurrentPlayer().name + " presses button " + (buttonPressed+1) + "...").queue();
@@ -1257,7 +1280,8 @@ public class GameController
 			else if(getCurrentPlayer().threshold)
 			{
 				//You already have a threshold situation? Time for some fun!
-				channel.sendMessage("You **UPGRADED the BLAMMO!** Don't panic, it can still be stopped...").completeAfter(5,TimeUnit.SECONDS);
+				channel.sendMessage(getCurrentPlayer().getSafeMention() + ", you **UPGRADED the BLAMMO!** "
+						+ "Don't panic, it can still be stopped...").completeAfter(5,TimeUnit.SECONDS);
 				startBlammo(true);
 				return;
 			}
