@@ -41,15 +41,15 @@ public class MinefieldMultiplier implements MiniGame {
 
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
-		output.add("Welcome to Minefield Multiplier");
-		output.add("You have a board of 21 Spaces with a Multiplier hiding in each space.");
+		output.add("Welcome to Minefield Multiplier!");
+		output.add("You have a board of 21 spaces with a multiplier hiding in each space.");
 		output.add("Every Turn the Amount of Money which we multiply will increase, BUT...");
-		output.add("The number of Bombs on the Board will increase as well!");
-		output.add("There will be 8 Rounds and there is one x10 Multiplier.");
-		output.add("Bombs will be randomly placed anywhere on the Board, "+
+		output.add("The number of bombs on the board will increase as well!");
+		output.add("There will be 8 rounds and there is one x10 multiplier.");
+		output.add("Bombs will be randomly placed anywhere on the board, "+
 			  "including on top of other bombs or already picked spaces.");
-		output.add("You can **STOP** after each Round with your current Bank or **PASS** to the next stage!");
-		output.add("But you lose everything, if you hit a Bomb."); //~Duh
+		output.add("You can **STOP** after each round with your current bank or **PASS** to the next stage!");
+		output.add("But you lose everything if you hit a bomb."); //~Duh
 
 		output.add(generateBoard());
 		return output;  
@@ -72,7 +72,7 @@ public class MinefieldMultiplier implements MiniGame {
 			// Player stops 
 			stop = true;
 			output.add(String.format("Very well! You escaped with your bank of $%,d",total));
-			output.add("Here is the revealed Board!");
+			output.add("Here is the revealed board!");
 			output.add(generateRevealBoard());
 			return output;
 		}
@@ -81,7 +81,7 @@ public class MinefieldMultiplier implements MiniGame {
 				output.add("You can't pass the last stage. Either **STOP** or pick your space!");
 			}
 			else {
-				output.add("You have passed this stage, but we still add the Bombs!");
+				output.add("You have passed this stage, but we still add the bombs!");
 				output.add(String.format("**%d** bomb"+ (bombTable(stage+1) != 1 ? "s were" : " was")
 						+" added!", bombTable(stage + 1)));
 				increaseStage();
@@ -114,7 +114,7 @@ public class MinefieldMultiplier implements MiniGame {
 			{
 				output.add("**BOOM**");
 				output.add("Sorry, you lose!");
-				output.add("Here is the revealed Board!");
+				output.add("Here is the revealed board!");
 				output.add(generateRevealBoard());
 				alive=false;
 
@@ -127,8 +127,8 @@ public class MinefieldMultiplier implements MiniGame {
 
 				output.add("It's a " + String.format("**x%d** Multiplier!", lastPick));
 				output.add(String.format("That makes **$%,d** for a total of **$%,d!**", win, total));
-				output.add(String.format("**%d** bomb"+ (bombTable(stage+1) != 1 ? "s" : "")
-						+" has been added!", bombTable(stage + 1)));
+				output.add(String.format("**%d** bomb"+ (bombTable(stage+1) != 1 ? "s have" : " has")
+						+" been added!", bombTable(stage + 1)));
 				increaseStage();
 				output.add(generateBoard());
 			}
@@ -180,7 +180,7 @@ public class MinefieldMultiplier implements MiniGame {
 		//Next display Bank, StageAmount and Number of Max Bombs 
 		display.append(String.format("Bank: $%,d\n",total));
 		display.append(String.format("Next pick: $%,d\n",stageAmount));
-		display.append(String.format("Max Bombs: %d\n",maxBombs));
+		display.append(String.format("Max bombs: %d\n",maxBombs));
 		display.append("```");
 		return display.toString();
 	}
