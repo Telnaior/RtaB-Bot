@@ -1061,36 +1061,8 @@ public class GameController
 			activateEvent(gameboard.eventBoard.get(location),location);
 			break;
 		case BLAMMO:
-			channel.sendMessage("It's a **BLAMMO!** Quick " +
-					getCurrentPlayer().getSafeMention() + ", press a button!").completeAfter(5,TimeUnit.SECONDS);
-			channel.sendMessage("```\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
-			if(getCurrentPlayer().isBot)
-			{
-				runBlammo((int) (Math.random() * 4),false);
-			}
-			else
-			{
-				waiter.waitForEvent(MessageReceivedEvent.class,
-						//Right player and channel
-						e ->
-						{
-							return (e.getAuthor().equals(getCurrentPlayer().user) && e.getChannel().equals(channel)
-									&& checkValidNumber(e.getMessage().getContentRaw()) 
-											&& Integer.parseInt(e.getMessage().getContentRaw()) <= 4);
-						},
-						//Parse it and call the method that does stuff
-						e -> 
-						{
-							int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-							timer.schedule(() -> runBlammo(button,false), 1, TimeUnit.SECONDS);
-						},
-						30,TimeUnit.SECONDS, () ->
-						{
-							channel.sendMessage("Too slow, autopicking!").queue();
-							int button = (int) Math.random() * 4;
-							runBlammo(button,false);
-						});
-			}
+			channel.sendMessage("It's a **BLAMMO!**").completeAfter(5,TimeUnit.SECONDS);
+			startBlammo(false);
 			return;
 		}
 		runEndTurnLogic();
@@ -1171,13 +1143,44 @@ public class GameController
 		getCurrentPlayer().games.sort(null);
 		return ("It's a minigame, **" + gameFound + "**!");
 	}
-
-	private void runBlammo(int buttonPressed, boolean mega)
+	
+	private void startBlammo(boolean mega)
 	{
-		//Yes I know it's generating the result after they've already picked
-		//But that's the sort of thing a blammo would do so I'm fine with it
+		channel.sendMessage("Quick " + getCurrentPlayer().getSafeMention() + ", press a button!\n```"
+						+ (mega ? "\n MEGA " : "") + "\nBLAMMO\n 1  2 \n 3  4 \n```").queue();
 		List<BlammoChoices> buttons = Arrays.asList(BlammoChoices.values());
 		Collections.shuffle(buttons);
+		if(getCurrentPlayer().isBot)
+		{
+			runBlammo(buttons, (int) (Math.random() * 4), false);
+		}
+		else
+		{
+			waiter.waitForEvent(MessageReceivedEvent.class,
+					//Right player and channel
+					e ->
+					{
+						return (e.getAuthor().equals(getCurrentPlayer().user) && e.getChannel().equals(channel)
+								&& checkValidNumber(e.getMessage().getContentRaw()) 
+										&& Integer.parseInt(e.getMessage().getContentRaw()) <= 4);
+					},
+					//Parse it and call the method that does stuff
+					e -> 
+					{
+						int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
+						timer.schedule(() -> runBlammo(buttons, button,false), 1, TimeUnit.SECONDS);
+					},
+					30,TimeUnit.SECONDS, () ->
+					{
+						channel.sendMessage("Too slow, autopicking!").queue();
+						int button = (int) Math.random() * 4;
+						runBlammo(buttons, button,false);
+					});
+		}
+	}
+
+	private void runBlammo(List<BlammoChoices> buttons, int buttonPressed, boolean mega)
+	{
 		if(getCurrentPlayer().isBot)
 		{
 			channel.sendMessage(getCurrentPlayer().name + " presses button " + (buttonPressed+1) + "...").queue();
@@ -1255,34 +1258,7 @@ public class GameController
 			{
 				//You already have a threshold situation? Time for some fun!
 				channel.sendMessage("You **UPGRADED the BLAMMO!** Don't panic, it can still be stopped...").completeAfter(5,TimeUnit.SECONDS);
-				channel.sendMessage("```\n MEGA \nBLAMMO\n 1  2 \n 3  4 \n```").queue();
-				if(getCurrentPlayer().isBot)
-				{
-					runBlammo((int) (Math.random() * 4),true);
-				}
-				else
-				{
-					waiter.waitForEvent(MessageReceivedEvent.class,
-							//Right player and channel
-							e ->
-							{
-								return (e.getAuthor().equals(getCurrentPlayer().user) && e.getChannel().equals(channel)
-										&& checkValidNumber(e.getMessage().getContentRaw()) 
-												&& Integer.parseInt(e.getMessage().getContentRaw()) <= 4);
-							},
-							//Parse it and call the method that does stuff
-							e -> 
-							{
-								int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-								timer.schedule(() -> runBlammo(button,true), 1, TimeUnit.SECONDS);
-							},
-							30,TimeUnit.SECONDS, () ->
-							{
-								channel.sendMessage("Too slow, autopicking!").queue();
-								int button = (int) Math.random() * 4;
-								runBlammo(button,true);
-							});
-				}
+				startBlammo(true);
 				return;
 			}
 			else
