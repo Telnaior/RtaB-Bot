@@ -25,17 +25,17 @@ public class BombRoulette implements MiniGame {
         /* It might not initially make sense to assign non-cash space a cash 
          * value; but the bot uses this information to determine its strategy.
          */
-        spaceValues = new int[] {50000, 25000, 40000, 0, 45000, 25000,
-                100000, 0, 30000, 200000, 35000, 0, 150000, 25000, 30000,
-                0, 75000, 25000, 40000, 0, 50000, 25000, 30000, 0};
+        spaceValues = new int[] {25000, 25000, 25000, 25000, 25000, 30000,
+                30000, 30000, 35000, 40000, 40000, 45000, 50000, 50000, 75000,
+                100000, 150000, 200000, 0, 0, 0, 0, 0, 0};
         spaceTypes = new WheelSpace[] {WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.DOUBLE, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.HALVE,
                 WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.DOUBLE, WheelSpace.CASH, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.HALVE, WheelSpace.CASH,
-                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.DOUBLE,
                 WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.CASH, WheelSpace.CASH,
+                WheelSpace.CASH, WheelSpace.DOUBLE, WheelSpace.DOUBLE,
+                WheelSpace.DOUBLE, WheelSpace.HALVE, WheelSpace.HALVE,
                 WheelSpace.JOKER};
         for (int i = 0; i < spaceTypes.length; i++) {
             switch (spaceTypes[i]) {
