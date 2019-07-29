@@ -43,7 +43,7 @@ public class MinefieldMultiplier implements MiniGame {
 		//Give instructions
 		output.add("Welcome to Minefield Multiplier!");
 		output.add("You have a board of 21 spaces with a multiplier hiding in each space.");
-		output.add("Every Turn the Amount of Money which we multiply will increase, BUT...");
+		output.add("Every turn the amount of money which we multiply will increase, BUT...");
 		output.add("The number of bombs on the board will increase as well!");
 		output.add("There will be 8 rounds and there is one x10 multiplier.");
 		output.add("Bombs will be randomly placed anywhere on the board, "+
