@@ -37,38 +37,22 @@ public class RaceToABillionBot
 		utilities.setPrefix("!");
 		utilities.setHelpWord("commands");
 		utilities.addCommands(new HelpCommand(),
-							new JoinCommand(),
-							new QuitCommand(),
-							new PeekCommand(),
-							new FoldCommand(),
-							new RepelCommand(),
-							new BlammoCommand(),
-							new PlayersCommand(),
-							new BoardCommand(),
-							new TotalsCommand(),
-							new NextCommand(),
-							new LivesCommand(),
-							new RankCommand(),
-							new TopCommand(),
-							new StatsCommand(),
-							new HistoryCommand(),
-							new BetCommand(),
-							new ViewBetsCommand(),
-							new BetRankCommand(),
-							new BetTopCommand(),
-							new PingBotCommand(),
-							new StartCommand(),
-							new ResetCommand(),
-							new ReconnectCommand(),
-							new ReloadCommand(),
-							new ViewBombsCommand(),
-							new ViewConnectionsCommand(),
-							new ShutdownBotCommand(),
-							new AddBotCommand(),
-							new DemoCommand(),
-							new MemeCommand(),
-							new LuckyNumberCommand(),
-							new MysteryChanceCommand(),
+							//Basic Game Commands
+							new JoinCommand(), new QuitCommand(), new PeekCommand(),
+							//Hidden Commands
+							new FoldCommand(), new RepelCommand(), new BlammoCommand(), new DefuseCommand(),
+							//Info Commands
+							new PlayersCommand(), new BoardCommand(), new TotalsCommand(), new NextCommand(),
+							new LivesCommand(), new RankCommand(), new TopCommand(), new StatsCommand(), new HistoryCommand(),
+							//Betting Commands
+							new BetCommand(), new ViewBetsCommand(), new BetRankCommand(), new BetTopCommand(),
+							//Mod Commands
+							new PingBotCommand(), new StartCommand(), new ResetCommand(),
+							new ReconnectCommand(), new ReloadCommand(), new ViewBombsCommand(), new ViewConnectionsCommand(),
+							new ShutdownBotCommand(), new AddBotCommand(), new DemoCommand(),
+							//Joke Commands
+							new MemeCommand(), new LuckyNumberCommand(), new MysteryChanceCommand(),
+							//Misc Commands
 							new ShopCommand());
 		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
 		prepareBot.setToken(token);
