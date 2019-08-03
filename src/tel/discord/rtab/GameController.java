@@ -537,7 +537,6 @@ public class GameController
 				{
 					getCurrentPlayer().hiddenCommand = HiddenCommand.NONE;
 					summonBlammo(getCurrentPlayer());
-					return;
 				}
 				break;
 			//If they have a repel or nothing at all, don't use those commands at this time
@@ -1375,12 +1374,12 @@ public class GameController
 		case DRAW_TWO:
 			if(repeatTurn > 0)
 			{
-				channel.sendMessage("It's another **Draw Two**, and that means even more spaces for the next player!")
+				channel.sendMessage("It's another **Draw Two**, and that means even more turns for the next player!")
 					.completeAfter(5,TimeUnit.SECONDS);
 			}
 			else
 			{
-				channel.sendMessage("It's a **Draw Two**, the next player needs to pick two spaces in a row!")
+				channel.sendMessage("It's a **Draw Two**, the next player needs to take two turns in a row!")
 					.completeAfter(5,TimeUnit.SECONDS);
 			}
 			advanceTurn(false);
@@ -1390,12 +1389,12 @@ public class GameController
 		case DRAW_FOUR:
 			if(repeatTurn > 0)
 			{
-				channel.sendMessage("It's another **Draw Four**, and that means even more spaces for the next player!")
+				channel.sendMessage("It's another **Draw Four**, and that means even more turns for the next player!")
 					.completeAfter(5,TimeUnit.SECONDS);
 			}
 			else
 			{
-				channel.sendMessage("It's a **Draw Four**, the next player needs to pick FOUR spaces in a row!")
+				channel.sendMessage("It's a **Draw Four**, the next player needs to take FOUR turns in a row!")
 					.completeAfter(5,TimeUnit.SECONDS);
 			}
 			advanceTurn(false);
