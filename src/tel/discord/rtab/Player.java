@@ -270,6 +270,7 @@ public class Player implements Comparable<Player>
 			booster = 100;
 		//Wipe everything else too, and dock them a life
 		winstreak = 0;
+		hiddenCommand = HiddenCommand.NONE;
 		//Dumb easter egg
 		if(money <= -1000000000)
 		{

@@ -534,12 +534,12 @@ public class GameController
 			//But do increase the chance for it compared to folding
 			case BLAMMO:
 				if(!starman && getCurrentPlayer().peek < 1 && repeatTurn == 0 &&
-						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 5)
+						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < players.size())
 				{
 					summonBlammo(getCurrentPlayer());
 				}
 				break;
-			//If they have a repel or nothing at all, don't use those commands at this time
+			//Repel and Defuse are more situational and aren't used at this time
 			default:
 				break;
 			//TODO Add more of these
@@ -623,9 +623,14 @@ public class GameController
 				else
 					resolveTurn(safeSpaces.get((int)(Math.random()*safeSpaces.size())));
 			}
-			//Otherwise it sucks to be you, bot, eat bomb!
+			//Otherwise it sucks to be you, bot, eat bomb (or defuse bomb)!
 			else
-				resolveTurn(openSpaces.get((int)(Math.random()*openSpaces.size())));
+			{
+				int bombToPick = openSpaces.get((int)(Math.random()*openSpaces.size()));
+				if(getCurrentPlayer().hiddenCommand == HiddenCommand.DEFUSE)
+					defuseSpace(getCurrentPlayer(),bombToPick);
+				resolveTurn(bombToPick);
+			}
 		}
 		else
 		{
@@ -2642,6 +2647,25 @@ public class GameController
 		channel.sendMessage(summoner.name + " summoned a blammo for the next player!").queue();
 		summoner.hiddenCommand = HiddenCommand.NONE;
 		futureBlammo = true;
+	}
+	public boolean useDefuse(User defuser, String rawSpace)
+	{
+		//Find them in the game
+		int player = findPlayerInGame(defuser.getId());
+		//Check that it's valid (the game is running, the space is legit, they're alive, and they have the command)
+		if(gameStatus != GameStatus.IN_PROGRESS || player == -1 || !checkValidNumber(rawSpace)
+				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.DEFUSE)
+			return false;
+		//Cool, we're good, summon it
+		int space = Integer.parseInt(rawSpace);
+		defuseSpace(players.get(player), space);
+		return true;
+	}
+	void defuseSpace(Player defuser, int space)
+	{
+		channel.sendMessage(defuser.name + " defused space " + (space+1) + "!").queue();
+		defuser.hiddenCommand = HiddenCommand.NONE;
+		gameboard.bombBoard.set(space,BombType.DUD);
 	}
 	public PeekReturnValue validatePeek(User peeker, String location)
 	{
