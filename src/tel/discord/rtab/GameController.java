@@ -76,6 +76,7 @@ public class GameController
 	boolean[] pickedSpaces;
 	int spacesLeft;
 	int jackpot = 0;
+	int wagerPot = 0;
 	boolean[] bombs;
 	Board gameboard;
 	public static EventWaiter waiter;
@@ -135,6 +136,7 @@ public class GameController
 		finalCountdown = false;
 		repeatTurn = 0;
 		jackpot = 0;
+		wagerPot = 0;
 		reverse = false;
 		starman = false;
 		currentBlammo = false;
@@ -186,8 +188,8 @@ public class GameController
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
 		{
 			int entryFee = Math.max(newPlayer.money/100,100000);
-			newPlayer.money -= entryFee;
-			newPlayer.oldMoney -= entryFee;
+			newPlayer.addMoney(-1*entryFee,MoneyMultipliersToUse.NOTHING);
+			newPlayer.oldMoney = newPlayer.money;
 			channel.sendMessage(newPlayer.getSafeMention() + String.format(", you are out of lives. "
 					+ "Playing this round will incur an entry fee of $%,d.",entryFee)).queue();
 		}
@@ -539,10 +541,16 @@ public class GameController
 					summonBlammo(getCurrentPlayer());
 				}
 				break;
+			//Wager should be used if it's early enough in the round that it should catch most/all players
+			//Teeeeeechnically it isn't playing to win with this, but it is making the game more exciting for the real players.
+			case WAGER:
+				if(players.size() * 4 < spacesLeft)
+				{
+					wagerGame(getCurrentPlayer());
+				}
 			//Repel and Defuse are more situational and aren't used at this time
 			default:
 				break;
-			//TODO Add more of these
 			}
 			//Get safe spaces, starting with all unpicked spaces
 			ArrayList<Integer> openSpaces = new ArrayList<>(boardSize);
@@ -1137,8 +1145,8 @@ public class GameController
 		if(extraResult != null)
 			output.add(extraResult.toString());
 		//Award hidden command with 10% chance if cash is negative and they don't have one already
-		if(cashWon < 0 && Math.random() < 1 && getCurrentPlayer().hiddenCommand == HiddenCommand.NONE)
-			awardHiddenCommand(); //TODO - FIX CHANCE
+		if(cashWon < 0 && Math.random() < 0.1 && getCurrentPlayer().hiddenCommand == HiddenCommand.NONE)
+			awardHiddenCommand();
 		return output;
 	}
 	
@@ -1661,8 +1669,8 @@ public class GameController
 				//Take total banks as well if necessary
 				if(superRevolution)
 				{
-					delta += (next.oldMoney / 100);
-					next.money -= next.oldMoney / 100;
+					delta += (next.money / 100);
+					next.money -= next.money / 100;
 				}
 			}
 			//Add the remainder to the jackpot - Bowser keeps it!
@@ -1817,11 +1825,21 @@ public class GameController
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
 		}
-		//Don't forget about the jackpot (which runs separately so it doesn't conflict with Midas Touch)
-		if(getCurrentPlayer().status == PlayerStatus.ALIVE && getCurrentPlayer().jackpot)
+		//Now for other winner-only stuff (done separately to avoid conflicting with Midas Touch)
+		if(getCurrentPlayer().status == PlayerStatus.ALIVE)
 		{
-			channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",boardSize*baseMultiplier)).queue();
-			getCurrentPlayer().addMoney(1000000*boardSize*baseMultiplier,MoneyMultipliersToUse.NOTHING);
+			//If there's any wager pot, award their segment of it
+			if(wagerPot > 0)
+			{
+				channel.sendMessage(String.format("You won $%d from the wager!", wagerPot / playersAlive)).queue();
+				getCurrentPlayer().addMoney(wagerPot / playersAlive, MoneyMultipliersToUse.NOTHING);
+			}
+			//Award the Jackpot if it's there
+			if(getCurrentPlayer().jackpot)
+			{
+				channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",boardSize*baseMultiplier)).queue();
+				getCurrentPlayer().addMoney(1000000*boardSize*baseMultiplier,MoneyMultipliersToUse.NOTHING);
+			}
 		}
 		//Cash in unused jokers, folded or not
 		if(jokerCount > 0)
@@ -2666,6 +2684,32 @@ public class GameController
 		channel.sendMessage(defuser.name + " defused space " + (space+1) + "!").queue();
 		defuser.hiddenCommand = HiddenCommand.NONE;
 		gameboard.bombBoard.set(space,BombType.DUD);
+	}
+	public boolean useWager(User wagerer)
+	{
+		//Find them in the game
+		int player = findPlayerInGame(wagerer.getId());
+		//Check that it's valid (the game is running, they're alive, and they have the command)
+		if(gameStatus != GameStatus.IN_PROGRESS || player == -1
+				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.BLAMMO)
+			return false;
+		//Cool, we're good, summon it
+		wagerGame(players.get(player));
+		return true;
+	}
+	void wagerGame(Player wagerer)
+	{
+		channel.sendMessage(wagerer.name + " started a wager!").queue();
+		wagerer.hiddenCommand = HiddenCommand.NONE;
+		int amountToWager = 1_000_000_000;
+		for(Player next : players)
+			if(next.status == PlayerStatus.ALIVE && next.money / 100 < amountToWager)
+				amountToWager = next.money / 100;
+		channel.sendMessage(String.format("Everyone bets $%,d as a wager on the game!",amountToWager)).queue();
+		wagerPot += amountToWager * playersAlive;
+		for(Player next : players)
+			if(next.status == PlayerStatus.ALIVE)
+				next.addMoney(-1*amountToWager, MoneyMultipliersToUse.NOTHING);
 	}
 	public PeekReturnValue validatePeek(User peeker, String location)
 	{

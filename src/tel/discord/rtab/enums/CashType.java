@@ -3,11 +3,11 @@ package tel.discord.rtab.enums;
 public enum CashType implements WeightedSpace
 {
 	//Negative
-	N25K	(-  25000,300,null),
-	N20K	(-  20000,300,null),
-	N15K	(-  15000,300,null),
-	N10K	(-  10000,300,null),
-	N05K	(-   5000,300,null),
+	N25K	(-  25000,3,null),
+	N20K	(-  20000,3,null),
+	N15K	(-  15000,3,null),
+	N10K	(-  10000,3,null),
+	N05K	(-   5000,3,null),
 	//TODO - FIX DEBUG VALUES
 	//Small
 	P10K	(   10000,5,null),
