@@ -862,7 +862,7 @@ public class GameController
 			penalty = Player.NEWBIE_BOMB_PENALTY*baseMultiplier;
 		//Reduce penalty for others out
 		penalty /= 10;
-		penalty *= (10 - Math.min(9,players.size()-playersAlive));
+		penalty *= (10 - Math.min(5,players.size()-playersAlive));
 		switch(gameboard.bombBoard.get(location))
 		{
 		case NORMAL:
