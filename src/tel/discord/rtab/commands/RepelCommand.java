@@ -6,12 +6,12 @@ import tel.discord.rtab.RaceToABillionBot;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
-public class FoldCommand extends Command
+public class RepelCommand extends Command
 {
-	public FoldCommand()
+	public RepelCommand()
 	{
-		this.name = "fold";
-		this.help = "voluntarily exit the round, keeping your booster and minigames";
+		this.name = "repel";
+		this.help = "block a blammo that is currently active";
 		this.hidden = true;
 	}
 	@Override
@@ -21,7 +21,7 @@ public class FoldCommand extends Command
 		{
 			if(game.channel.equals(event.getChannel()))
 			{
-				if(!game.useFold(event.getAuthor()))
+				if(!game.useRepel(event.getAuthor()))
 					event.reply("You can't use this right now.");
 				return;
 			}

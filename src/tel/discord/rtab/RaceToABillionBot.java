@@ -41,6 +41,8 @@ public class RaceToABillionBot
 							new QuitCommand(),
 							new PeekCommand(),
 							new FoldCommand(),
+							new RepelCommand(),
+							new BlammoCommand(),
 							new PlayersCommand(),
 							new BoardCommand(),
 							new TotalsCommand(),

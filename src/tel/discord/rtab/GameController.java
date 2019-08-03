@@ -522,12 +522,25 @@ public class GameController
 				if(!starman && getCurrentPlayer().peek < 1 && 
 						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 1)
 				{
+					channel.sendMessage(getCurrentPlayer().name + " folded!").queue();
 					getCurrentPlayer().hiddenCommand = HiddenCommand.NONE;
 					foldPlayer(getCurrentPlayer());
 					currentPlayerFoldedLogic();
 					return;
 				}
 				break;
+			//Blammo under the same condition as the fold, but make sure they aren't repeating turns either
+			//We really don't want them triggering a blammo if they have a joker, because it could eliminate them despite it
+			case BLAMMO:
+				if(!starman && getCurrentPlayer().peek < 1 && repeatTurn == 0 &&
+						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 1)
+				{
+					getCurrentPlayer().hiddenCommand = HiddenCommand.NONE;
+					summonBlammo(getCurrentPlayer());
+					return;
+				}
+				break;
+			//If they have a repel or nothing at all, don't use those commands at this time
 			default:
 				break;
 			//TODO Add more of these
@@ -798,8 +811,8 @@ public class GameController
 	}
 	void runEndTurnLogic()
 	{
-		//Test if game over
-		if(spacesLeft <= 0 || playersAlive <= 1)
+		//Test if game over - either all spaces gone and no blammo queued, or one player left alive
+		if((spacesLeft <= 0 && !futureBlammo) || playersAlive <= 1) 
 		{
 			gameStatus = GameStatus.END_GAME;
 			if(spacesLeft < 0)
@@ -1166,7 +1179,16 @@ public class GameController
 		Collections.shuffle(buttons);
 		if(getCurrentPlayer().isBot)
 		{
-			runBlammo(buttons, (int) (Math.random() * 4), false);
+			//Repel it if they have a repel to use
+			if(getCurrentPlayer().hiddenCommand == HiddenCommand.REPELLENT)
+			{
+				channel.sendMessage("But " + getCurrentPlayer().name + " repelled it!").queue();
+				getCurrentPlayer().hiddenCommand = HiddenCommand.NONE;
+				repelBlammo();
+			}
+			//Otherwise wait a few seconds for someone else to potentially repel it before pressing a button
+			else
+				timer.schedule(() -> runBlammo(buttons, (int) (Math.random() * 4), false), 5, TimeUnit.SECONDS);
 		}
 		else
 		{
@@ -2551,7 +2573,7 @@ public class GameController
 	{
 		//Find them in the game
 		int player = findPlayerInGame(folder.getId());
-		//Check that the fold is valid
+		//Check that the fold is valid (the game is running, they're alive, and they have the command)
 		if(gameStatus != GameStatus.IN_PROGRESS || player == -1 
 				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.FOLD)
 			return false;
@@ -2574,15 +2596,51 @@ public class GameController
 	}
 	void foldPlayer(Player folder)
 	{
-		//Fold if they have minigames, or qualified for a bonus game
+		//Mark them as folded if they have minigames, or qualified for a bonus game
 		if(folder.oldWinstreak < 50 * (folder.winstreak / 50)
 				|| folder.games.size() > 0)
 		{
 			channel.sendMessage("You'll still get to play your minigames too.").queueAfter(1,TimeUnit.SECONDS);
 			folder.status = PlayerStatus.FOLDED;
 		}
+		//Otherwise just mark them as out
 		else folder.status = PlayerStatus.OUT;
 		playersAlive --;
+	}
+	public boolean useRepel(User repeller)
+	{
+		//Find them in the game
+		int player = findPlayerInGame(repeller.getId());
+		//Check that it's valid (the game is running, they're alive, they have the command, and there's currently a blammo)
+		if(gameStatus != GameStatus.IN_PROGRESS || player == -1 || !currentBlammo
+				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.REPELLENT)
+			return false;
+		//Cool, we're good, block the blammo
+		channel.sendMessage("But " + players.get(player).name + " repelled the blammo!").queue();
+		repelBlammo();
+		return true;
+	}
+	void repelBlammo()
+	{
+		currentBlammo = false;
+		runEndTurnLogic();
+	}
+	public boolean useBlammo(User summoner)
+	{
+		//Find them in the game
+		int player = findPlayerInGame(summoner.getId());
+		//Check that it's valid (the game is running, they're alive, they have the command, and there's no blammo already waiting)
+		if(gameStatus != GameStatus.IN_PROGRESS || player == -1 || futureBlammo
+				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.BLAMMO)
+			return false;
+		//Cool, we're good, summon it
+		summonBlammo(players.get(player));
+		return true;
+	}
+	void summonBlammo(Player summoner)
+	{
+		channel.sendMessage(summoner.name + " summoned a blammo for the next player!").queue();
+		futureBlammo = true;
 	}
 	public PeekReturnValue validatePeek(User peeker, String location)
 	{
