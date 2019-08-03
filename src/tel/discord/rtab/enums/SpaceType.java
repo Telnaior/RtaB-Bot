@@ -2,7 +2,7 @@ package tel.discord.rtab.enums;
 
 public enum SpaceType implements WeightedSpace
 {
-	CASH	(58)
+	CASH	(5800)
 	{
 		@Override
 		public int getWeight(int playerCount)

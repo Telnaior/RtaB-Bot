@@ -357,8 +357,8 @@ public class GameController
 										(channel) -> channel.sendMessage("Bomb placement confirmed.").queue());
 								players.get(iInner).status = PlayerStatus.ALIVE;
 								playersAlive ++;
+								checkReady();
 							}
-							checkReady();
 						},
 						//Or timeout the prompt after a minute (nothing needs to be done here)
 						90, TimeUnit.SECONDS, () -> {});
@@ -531,11 +531,11 @@ public class GameController
 				break;
 			//Blammo under the same condition as the fold, but make sure they aren't repeating turns either
 			//We really don't want them triggering a blammo if they have a joker, because it could eliminate them despite it
+			//But do increase the chance for it compared to folding
 			case BLAMMO:
 				if(!starman && getCurrentPlayer().peek < 1 && repeatTurn == 0 &&
-						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 1)
+						getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 5)
 				{
-					getCurrentPlayer().hiddenCommand = HiddenCommand.NONE;
 					summonBlammo(getCurrentPlayer());
 				}
 				break;
@@ -1141,7 +1141,7 @@ public class GameController
 	{
 		HiddenCommand[] possibleCommands = HiddenCommand.values();
 		//Never pick "none", which is at the start of the list
-		int commandNumber = (int) Math.random() * (possibleCommands.length - 1) + 1;
+		int commandNumber = (int) (Math.random() * (possibleCommands.length - 1) + 1);
 		HiddenCommand chosenCommand = possibleCommands[commandNumber];
 		getCurrentPlayer().hiddenCommand = chosenCommand;
 		//TODO - send them the PM telling them they have it
@@ -2616,6 +2616,7 @@ public class GameController
 			return false;
 		//Cool, we're good, block the blammo
 		channel.sendMessage("But " + players.get(player).name + " repelled the blammo!").queue();
+		players.get(player).hiddenCommand = HiddenCommand.NONE;
 		repelBlammo();
 		return true;
 	}
@@ -2639,6 +2640,7 @@ public class GameController
 	void summonBlammo(Player summoner)
 	{
 		channel.sendMessage(summoner.name + " summoned a blammo for the next player!").queue();
+		summoner.hiddenCommand = HiddenCommand.NONE;
 		futureBlammo = true;
 	}
 	public PeekReturnValue validatePeek(User peeker, String location)

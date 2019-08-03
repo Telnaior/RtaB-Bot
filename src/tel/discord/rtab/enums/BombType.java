@@ -9,7 +9,7 @@ public enum BombType implements WeightedSpace
 	CHAIN		( 2),
 	DETONATION	( 2),
 	REVERSE		( 2),
-	DUD			( 1)
+	DUD			( 1000)
 	{
 		@Override
 		public int getWeight(int playerCount)
