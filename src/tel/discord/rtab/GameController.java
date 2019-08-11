@@ -1740,7 +1740,7 @@ public class GameController
 			boardMultiplier *= 2;
 			break;
 		case BOOST_CHARGER:
-			channel.sendMessage("It's a **Boost Charger**, you'll gain 5% boost every turn for the rest of the round!")
+			channel.sendMessage("It's a **Boost Charger**, you'll gain 5% boost every turn until you next bomb!")
 				.completeAfter(5,TimeUnit.SECONDS);
 			getCurrentPlayer().boostCharge += 5;
 			break;
@@ -2325,14 +2325,16 @@ public class GameController
 							+ "From now on, your base bomb penalty will be $250,000.").queue();
 				int location = findUserInList(list,players.get(i).uID,false);
 				StringBuilder toPrint = new StringBuilder();
-				toPrint.append(players.get(i).uID+"#");
-				toPrint.append(players.get(i).name+"#");
-				toPrint.append(players.get(i).money+"#");
-				toPrint.append(players.get(i).booster+"#");
-				toPrint.append(players.get(i).winstreak+"#");
-				toPrint.append(Math.max(players.get(i).newbieProtection-1,0)+"#");
-				toPrint.append(players.get(i).lives+"#");
-				toPrint.append(players.get(i).lifeRefillTime);
+				toPrint.append(players.get(i).uID);
+				toPrint.append("#"+players.get(i).name);
+				toPrint.append("#"+players.get(i).money);
+				toPrint.append("#"+players.get(i).booster);
+				toPrint.append("#"+players.get(i).winstreak);
+				toPrint.append("#"+Math.max(players.get(i).newbieProtection-1,0));
+				toPrint.append("#"+players.get(i).lives);
+				toPrint.append("#"+players.get(i).lifeRefillTime);
+				toPrint.append("#"+players.get(i).hiddenCommand);
+				toPrint.append("#"+players.get(i).boostCharge);
 				if(location == -1)
 					list.add(toPrint.toString());
 				else

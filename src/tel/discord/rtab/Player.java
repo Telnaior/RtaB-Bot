@@ -119,6 +119,8 @@ public class Player implements Comparable<Player>
 				 * record[5] = newbieProtection
 				 * record[6] = lives
 				 * record[7] = time at which lives refill
+				 * record[8] = saved hidden command
+				 * record[9] = saved boost charge
 				 */
 				record = list.get(i).split("#");
 				if(record[0].equals(uID))
@@ -127,8 +129,10 @@ public class Player implements Comparable<Player>
 					booster = Integer.parseInt(record[3]);
 					winstreak = Integer.parseInt(record[4]);
 					newbieProtection = Integer.parseInt(record[5]);
-					lifeRefillTime = Instant.parse(record[7]);
 					lives = Integer.parseInt(record[6]);
+					lifeRefillTime = Instant.parse(record[7]);
+					hiddenCommand = HiddenCommand.valueOf(record[8]);
+					boostCharge = Integer.parseInt(record[9]);
 					//If we're short on lives and we've passed the refill time, restock them
 					if(lifeRefillTime.isBefore(Instant.now()) && lives < MAX_LIVES && lives >= 0)
 						lives = MAX_LIVES;
