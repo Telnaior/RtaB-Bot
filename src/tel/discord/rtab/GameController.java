@@ -209,6 +209,37 @@ public class GameController
 		}
 		//Haven't found one, add them to the list
 		players.add(newPlayer);
+		if(newPlayer.hiddenCommand != HiddenCommand.NONE)
+		{
+			StringBuilder commandHelp = new StringBuilder();
+			switch(newPlayer.hiddenCommand)
+			{
+			case FOLD:
+				commandHelp.append("You are carrying over a **FOLD** from a previous game.\n"
+						+ "You may use it at any time by typing **!fold**.");
+				break;
+			case REPELLENT:
+				commandHelp.append("You are carrying over **BLAMMO REPELLENT** from a previous game.\n"
+						+ "You may use it when a blammo is in play by typing **!repel**.");
+				break;
+			case BLAMMO:
+				commandHelp.append("You are carrying over a **BLAMMO SUMMONER** from a previous game.\n"
+						+ "You may use it at any time by typing **!blammo**.");
+				break;
+			case DEFUSE:
+				commandHelp.append("You are carryng over a **DEFUSER** from a previous game.\n"
+						+ "You may use it at any time by typing **!defuse** _followed by the space you wish to defuse_.");
+				break;
+			case WAGER:
+				commandHelp.append("You are carrying over a **WAGERER** from a previous game.\n"
+						+ "You may use it at any time by typing **!wager**.");
+				break;
+			default:
+				break;
+			}
+			getCurrentPlayer().user.openPrivateChannel().queue(
+					(channel) -> channel.sendMessage(commandHelp.toString()).queueAfter(5,TimeUnit.SECONDS));
+		}
 		if(newPlayer.money > 900000000)
 		{
 			channel.sendMessage(String.format("%1$s needs only $%2$,d more to reach the goal!",
@@ -1148,8 +1179,8 @@ public class GameController
 		StringBuilder extraResult = getCurrentPlayer().addMoney(cashWon, MoneyMultipliersToUse.BOOSTER_ONLY);
 		if(extraResult != null)
 			output.add(extraResult.toString());
-		//Award hidden command with 10% chance if cash is negative and they don't have one already
-		if(cashWon < 0 && Math.random() < 0.1 && getCurrentPlayer().hiddenCommand == HiddenCommand.NONE)
+		//Award hidden command with 25% chance if cash is negative and they don't have one already
+		if(cashWon < 0 && Math.random() < 0.25 && getCurrentPlayer().hiddenCommand == HiddenCommand.NONE)
 			awardHiddenCommand();
 		return output;
 	}
