@@ -1161,9 +1161,51 @@ public class GameController
 		int commandNumber = (int) (Math.random() * (possibleCommands.length - 1) + 1);
 		HiddenCommand chosenCommand = possibleCommands[commandNumber];
 		getCurrentPlayer().hiddenCommand = chosenCommand;
-		//TODO - send them the PM telling them they have it
-		channel.sendMessage("You also got the "+chosenCommand+" hidden command, "
-				+ "type !"+chosenCommand.toString().toLowerCase()+" to use it.").queue();
+		//debug info lol TODO remove this
+		System.out.println(getCurrentPlayer().name+" found a "+chosenCommand.name());
+		//Send them the PM telling them they have it
+		if(!getCurrentPlayer().isBot)
+		{
+			StringBuilder commandHelp = new StringBuilder();
+			switch(chosenCommand)
+			{
+			case FOLD:
+				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **FOLD**!\n"
+						+ "The fold allows you to drop out of the round at any time by typing **!fold**.\n"
+						+ "If you use it, you will keep your mulipliers and minigames, "
+						+ "so consider it a free escape from a dangerous board!\n");
+				break;
+			case REPELLENT:
+				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **BLAMMO REPELLENT**!\n"
+						+ "You may use this by typing **!repel** whenever any player is facing a blammo to automatically block it.\n");
+				break;
+			case BLAMMO:
+				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **BLAMMO SUMMONER**!\n"
+						+ "You may use this by typing **!blammo** at any time to give the next player a blammo!\n"
+						+ "This will activate on the NEXT turn (not the current one), and will replace that player's normal turn.");
+				break;
+			case DEFUSE:
+				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **DEFUSER**!\n"
+						+ "You may use this at any time by typing **!defuse 13**, replacing '13' with the space you wish to defuse.\n"
+						+ "Any bomb placed on the defused space will fail to explode. Use this wisely!\n");
+				break;
+			case WAGER:
+				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **WAGERER**!\n"
+						+ "The wager allows you to force all living players to add a portion of their total bank to a prize pool, "
+						+ "which the winner(s) of the round will claim.\n"
+						+ "The amount is equal to 1% of the last-place player's total bank, "
+						+ "and you can activate this at any time by typing **!wager**."); 
+				break;
+			default:
+				commandHelp.append("You also got an ERROR, report this to @Atia#2084 to get it fixed.");
+				break;
+			}
+			commandHelp.append("You may only have one Hidden Command at a time, and you will keep it even across rounds "
+					+ "until you either use it or hit a bomb and lose it.\n"
+					+ "Hidden commands must be used in the game channel, not in private.");
+			getCurrentPlayer().user.openPrivateChannel().queue(
+					(channel) -> channel.sendMessage(commandHelp.toString()).queueAfter(5,TimeUnit.SECONDS));
+		}
 		return;
 	}
 
