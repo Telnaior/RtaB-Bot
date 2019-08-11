@@ -27,6 +27,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.managers.GuildController;
+import net.dv8tion.jda.core.utils.tuple.Pair;
 import tel.discord.rtab.enums.BlammoChoices;
 import tel.discord.rtab.enums.BombType;
 import tel.discord.rtab.enums.CashType;
@@ -1111,6 +1112,7 @@ public class GameController
 	{
 		LinkedList<String> output = new LinkedList<>();
 		int cashWon;
+		String prizeWon = null;
 		//Is it Mystery Money? Do that thing instead then
 		if(gameboard.cashBoard.get(location) == CashType.MYSTERY)
 		{
@@ -1122,18 +1124,20 @@ public class GameController
 		}
 		else
 		{
-			cashWon = gameboard.cashBoard.get(location).getValue();
+			Pair<Integer,String> data = gameboard.cashBoard.get(location).getValue();
+			cashWon = data.getLeft();
+			prizeWon = data.getRight();
 		}
 		//Boost by board multiplier
 		cashWon *= boardMultiplier;
 		//On cash, update the player's score and tell them how much they won
 		StringBuilder resultString = new StringBuilder();
-		if(gameboard.cashBoard.get(location).getPrize() != null)
+		if(prizeWon != null)
 		{
 			resultString.append("It's **");
 			if(boardMultiplier > 1)
 				resultString.append(String.format("%dx ",boardMultiplier));
-			resultString.append(gameboard.cashBoard.get(location).getPrize());
+			resultString.append(prizeWon);
 			resultString.append("**, worth ");
 		}
 		resultString.append("**");
