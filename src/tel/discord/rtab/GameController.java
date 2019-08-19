@@ -2754,7 +2754,7 @@ public class GameController
 				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.DEFUSE)
 			return false;
 		//Cool, we're good, summon it
-		int space = Integer.parseInt(rawSpace);
+		int space = Integer.parseInt(rawSpace) - 1;
 		defuseSpace(players.get(player), space);
 		return true;
 	}
@@ -2770,7 +2770,7 @@ public class GameController
 		int player = findPlayerInGame(wagerer.getId());
 		//Check that it's valid (the game is running, they're alive, and they have the command)
 		if(gameStatus != GameStatus.IN_PROGRESS || player == -1
-				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.BLAMMO)
+				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.WAGER)
 			return false;
 		//Cool, we're good, summon it
 		wagerGame(players.get(player));
