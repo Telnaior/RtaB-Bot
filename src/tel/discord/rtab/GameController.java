@@ -36,6 +36,7 @@ import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.GameStatus;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.HiddenCommand;
+import tel.discord.rtab.enums.Jackpots;
 import tel.discord.rtab.enums.MoneyMultipliersToUse;
 import tel.discord.rtab.enums.PeekReturnValue;
 import tel.discord.rtab.enums.PlayerJoinReturnValue;
@@ -76,7 +77,7 @@ public class GameController
 	public GameStatus gameStatus = GameStatus.SIGNUPS_OPEN;
 	boolean[] pickedSpaces;
 	int spacesLeft;
-	int jackpot = 0;
+	int bowserJackpot;
 	int wagerPot = 0;
 	boolean[] bombs;
 	Board gameboard;
@@ -136,7 +137,6 @@ public class GameController
 		boardSize = 0;
 		finalCountdown = false;
 		repeatTurn = 0;
-		jackpot = 0;
 		wagerPot = 0;
 		reverse = false;
 		starman = false;
@@ -334,16 +334,7 @@ public class GameController
 		channel.sendMessage("Starting game...").queue();
 		gameStatus = GameStatus.BOMB_PLACEMENT;
 		//Initialise stuff that needs initialising
-		//Jackpot lol
-		try
-		{
-			List<String> jackpotList = Files.readAllLines(Paths.get("stats"+channel.getId()+".csv"));
-			jackpot = Integer.parseInt(jackpotList.get(0));
-		}
-		catch(IOException e)
-		{
-			System.err.println("nice jackpot read fail");
-		}
+		bowserJackpot = Jackpots.BOWSER.getJackpot(channel.getId());
 		boardSize = 5 + (5*players.size());
 		spacesLeft = boardSize;
 		pickedSpaces = new boolean[boardSize];
@@ -1652,7 +1643,7 @@ public class GameController
 			bowserMessage.delete().queueAfter(5, TimeUnit.SECONDS);
 			//If it's on the jackpot right now, runaway chance based on current total
 			if(bowserEvents.get(index) == Events.BOWSER_JACKPOT
-					&& Math.random() * 1_000_000_000 < (jackpot+getCurrentPlayer().money))
+					&& Math.random() * 1_000_000_000 < (bowserJackpot+getCurrentPlayer().money))
 				activateEvent(Events.RUNAWAY,location);
 			else
 				activateEvent(bowserEvents.get(index),location);
@@ -1674,7 +1665,7 @@ public class GameController
 			channel.sendMessage(String.format("Ooh! I'm so excited! OK, that'll be **$%,d**! Wah, hah, hah, HAH!",coins))
 				.completeAfter(1,TimeUnit.SECONDS);
 			getCurrentPlayer().addMoney(coins*-1,MoneyMultipliersToUse.NOTHING);
-			jackpot += coins;
+			bowserJackpot += coins;
 			break;
 		case BOWSER_POTLUCK:
 			channel.sendMessage("It's **Bowser's Cash Potluck**! "
@@ -1696,7 +1687,7 @@ public class GameController
 			for(Player next : players)
 				if(next.status == PlayerStatus.ALIVE)
 					next.addMoney(potluck * -1, MoneyMultipliersToUse.NOTHING);
-			jackpot += (potluck * playersAlive);
+			bowserJackpot += (potluck * playersAlive);
 			break;
 		case RUNAWAY:
 			channel.sendMessage("...").completeAfter(3, TimeUnit.SECONDS);
@@ -1722,9 +1713,9 @@ public class GameController
 			if(awardJP)
 			{
 				channel.sendMessage("Bowser left you **all the money he has collected**!!").completeAfter(3, TimeUnit.SECONDS);
-				channel.sendMessage(String.format("**$%,d**!!",jackpot));
-				getCurrentPlayer().addMoney(jackpot, MoneyMultipliersToUse.NOTHING);
-				jackpot = 0;
+				channel.sendMessage(String.format("**$%,d**!!",bowserJackpot));
+				getCurrentPlayer().addMoney(bowserJackpot, MoneyMultipliersToUse.NOTHING);
+				bowserJackpot = Jackpots.BOWSER.resetValue;
 			}
 			break;
 		case COMMUNISM:
@@ -1751,7 +1742,7 @@ public class GameController
 				}
 			}
 			//Add the remainder to the jackpot - Bowser keeps it!
-			jackpot += (delta % players.size());
+			bowserJackpot += (delta % players.size());
 			//Divide the total by the number of players
 			delta /= players.size();
 			//If the delta is negative, Bowser doesn't 'keep' the change!
@@ -2377,6 +2368,9 @@ public class GameController
 	}
 	void saveData()
 	{
+		//Start with saving bowser's jackpot
+		Jackpots.BOWSER.setJackpot(channel.getId(),bowserJackpot);
+		//Then go save the actual players
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
@@ -2444,13 +2438,6 @@ public class GameController
 			Path file = Paths.get("scores"+channel.getId()+".csv");
 			Path oldFile = Files.move(file, file.resolveSibling("scores"+channel.getId()+"old.csv"));
 			Files.write(file, list);
-			Files.delete(oldFile);
-			//Do the same for the jackpot
-			file = Paths.get("stats"+channel.getId()+".csv");
-			oldFile = Files.move(file, file.resolveSibling("stats"+channel.getId()+"old.csv"));
-			List<String> jackpotWrite = new LinkedList<>();
-			jackpotWrite.add(Integer.toString(jackpot));
-			Files.write(file, jackpotWrite);
 			Files.delete(oldFile);
 		}
 		catch(IOException e)
