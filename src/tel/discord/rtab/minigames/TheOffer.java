@@ -8,6 +8,7 @@ public class TheOffer implements MiniGame {
 	double chanceToBomb; 
 	int offer;
 	int seconds;
+	int baseMultiplier;
 	boolean alive; //Player still alive?
 	boolean accept; //Accepting the Offer
 	/**
@@ -15,7 +16,8 @@ public class TheOffer implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame(){
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier){
+		this.baseMultiplier = baseMultiplier;
 		offer = 1000 * (int)(Math.random()*51+50); // First Offer starts between 50,000 and 100,000
 		chanceToBomb = offer/10000;  // Start chance to Bomb 5-10% based on first offer
 		seconds = 1;
@@ -93,7 +95,7 @@ public class TheOffer implements MiniGame {
 		output.append("Next Room:\n");
 		output.append("Bomb: " + String.format ("%.2f%%\n", bomb));
 		output.append("Ticks: " + String.format("%,d Times\n\n", times));
-		output.append("Current Money: " + String.format("$%,d\n\n", offer));
+		output.append("Current Money: " + String.format("$%,d\n\n", offer*baseMultiplier));
 
 		output.append(" 'Take' the Money  or  'Dare' the Bomb \n");
 		output.append("```");
@@ -115,7 +117,7 @@ public class TheOffer implements MiniGame {
 	 */
 	@Override
 	public int getMoneyWon(){
-		return (isGameOver() & alive) ? offer : 0;
+		return (isGameOver() & alive) ? offer*baseMultiplier : 0;
 	}
 	/**
 	 * Returns true if the game is a bonus game (and therefore shouldn't have boosters or winstreak applied)

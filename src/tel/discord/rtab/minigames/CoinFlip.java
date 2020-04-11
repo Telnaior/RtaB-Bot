@@ -7,6 +7,7 @@ public class CoinFlip implements MiniGame {
 	static final boolean BONUS = false; 
 	static final int[] PAYTABLE = {1_000,10_000,50_000,100_000,200_000,350_000,500_000,1_000_000,2_000_000};
 	static final int MAX_STAGE = PAYTABLE.length-1;
+	int baseMultiplier;
 	int stage;
 	int coins;
 	boolean alive; //Player still alive?
@@ -16,7 +17,8 @@ public class CoinFlip implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame(){
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier){
+		this.baseMultiplier = baseMultiplier;
 		stage = 0; // We always start on Stage 0
 		coins = 10;
 		
@@ -148,7 +150,7 @@ public class CoinFlip implements MiniGame {
 	{
 		//If it's a stage on the paytable, return that
 		if(stage >= 0 && stage <= MAX_STAGE)
-			return(PAYTABLE[stage]);
+			return(PAYTABLE[stage]*baseMultiplier);
 		else
 			return 0;
 	}

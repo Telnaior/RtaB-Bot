@@ -17,10 +17,12 @@ public class ShutTheBox implements MiniGame {
 	boolean isAlive;  
 	boolean isClosing;
 	byte totalShut;
+	int baseMultiplier;
 
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		this.baseMultiplier = baseMultiplier;
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise board
 		closedSpaces = new boolean[BOARD_SIZE];
@@ -44,7 +46,7 @@ public class ShutTheBox implements MiniGame {
 				"progresses. How much each roll adds to your winnings is " +
 			  	"displayed below the board.");
 		output.add("If you shut the box completely, we'll augment your " +
-				   "winnings to $1,500,000!");
+				   "winnings to "+String.format("$%,d!",1_500_000*baseMultiplier));
 		output.add("You are free to stop after any roll, but if you can't " +
 				"exactly close the number thrown, you lose everything.");
 		output.add("Good luck! Type ROLL when you're ready.");
@@ -277,8 +279,8 @@ public class ShutTheBox implements MiniGame {
 	public int getMoneyWon()
 	{
 		if (totalShut == MAX_SCORE)
-			return 1500000;
-		else return findNthTetrahedralNumber(totalShut) * 50;
+			return 1500000*baseMultiplier;
+		else return findNthTetrahedralNumber(totalShut) * 50 * baseMultiplier;
 	}
 
 	@Override

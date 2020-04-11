@@ -13,6 +13,7 @@ public class Hypercube implements MiniGame {
 	static final int MAX_NUM = 99;
 	static final int BOMBS = 15;
 	static final int BOARD_SIZE = (MAX_NUM-MIN_NUM+1)+BOMBS;
+	int baseMultiplier;
 	int picksUsed;
 	int total;
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
@@ -21,8 +22,9 @@ public class Hypercube implements MiniGame {
 	int lastPicked;
 
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		this.baseMultiplier = baseMultiplier;
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise board
 		board.clear();
@@ -42,7 +44,8 @@ public class Hypercube implements MiniGame {
 		output.add("In Hypercube, you can win hundreds of millions of dollars!");
 		output.add("You have ten picks to build up the largest total you can by selecting the largest numbers.");
 		output.add("But if you find one of the fifteen bombs, your total will be reset to zero!");
-		output.add("Once you've made all ten picks, your total is cubed and the result is the money you win.");
+		output.add("Once you've made all ten picks, your total is cubed and you win " +
+				(baseMultiplier > 1 ? baseMultiplier + " times " : "")+"the result in cash.");
 		output.add("Good luck, go for a top score!");
 		output.add(generateBoard());
 		return output;
@@ -128,7 +131,7 @@ public class Hypercube implements MiniGame {
 		display.append("\n");
 		//Next display our total and the cash it converts to
 		display.append(String.format("   Total So Far: %03d   \n",total));
-		display.append(String.format("     $ %,11d     \n",(int)Math.pow(total,3)));
+		display.append(String.format("     $ %,11d     \n",(int)Math.pow(total,3)*baseMultiplier));
 		if(picksUsed == (MAX_PICKS-1))
 			display.append(String.format("    %02d Pick Remains    \n",(MAX_PICKS-picksUsed)));
 		else
@@ -145,7 +148,7 @@ public class Hypercube implements MiniGame {
 	@Override
 	public int getMoneyWon() {
 		if(isGameOver())
-			return (int) Math.pow(total,3);
+			return (int) Math.pow(total,3)*baseMultiplier;
 		else
 			return 0;
 	}

@@ -28,8 +28,9 @@ public class DoubleTrouble implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		//TODO make base multiplier matter
 		alive = true;
 		rounds = 0;
 		total = 5000; // Player starts with $5,000

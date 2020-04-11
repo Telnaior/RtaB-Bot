@@ -19,19 +19,21 @@ public class MathTime implements MiniGame {
 	String equation = "";
 	
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise stuff
 		total = 0;
 		equation = "";
+		for(int i=0; i<money.size(); i++)
+			money.set(i, money.get(i)*baseMultiplier);
 		Collections.shuffle(money);
 		Collections.shuffle(ops1);
 		Collections.shuffle(ops2);
 		Collections.shuffle(multis);
 		//Give instructions
 		output.add("In Math Time, you will pick five spaces that will, together, form an equation.");
-		output.add("If you pick well, you could win up to $2,000,000!");
+		output.add("If you pick well, you could win up to "+String.format("$%,d!",2_000_000*baseMultiplier));
 		output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
 		output.add("When you are ready, make your first pick from the money stage.");
 		stage = 1;

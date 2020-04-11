@@ -50,7 +50,7 @@ public class MinigameTest
 	}
 	static void runGame(MiniGame game, boolean isBot)
 	{
-		game.initialiseGame().forEach(line -> System.out.println(line));
+		game.initialiseGame("test", 1).forEach(line -> System.out.println(line));
 		while(!game.isGameOver())
 		{
 			String nextChoice;

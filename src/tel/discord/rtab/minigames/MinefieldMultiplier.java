@@ -27,12 +27,12 @@ public class MinefieldMultiplier implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame(){
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier){
 		bombs = Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 		total = 0;
 		stage = 1;
 		maxBombs = 1;
-		stageAmount = 10000;
+		stageAmount = 10000*baseMultiplier;
 		alive = true; 
 		stop = false;
 

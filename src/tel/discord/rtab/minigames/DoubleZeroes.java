@@ -23,8 +23,9 @@ public class DoubleZeroes implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		//TODO make base multiplier matter
 		alive = true;
 		total = 0;
 		zeroesLeft = 10;

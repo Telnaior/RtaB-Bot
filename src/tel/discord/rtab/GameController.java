@@ -1183,8 +1183,6 @@ public class GameController
 		int commandNumber = (int) (Math.random() * (possibleCommands.length - 1) + 1);
 		HiddenCommand chosenCommand = possibleCommands[commandNumber];
 		getCurrentPlayer().hiddenCommand = chosenCommand;
-		//debug info lol TODO remove this
-		System.out.println(getCurrentPlayer().name+" found a "+chosenCommand.name());
 		//Send them the PM telling them they have it
 		if(!getCurrentPlayer().isBot)
 		{
@@ -1987,7 +1985,7 @@ public class GameController
 	}
 	void startMiniGame(MiniGame currentGame)
 	{
-		LinkedList<String> result = currentGame.initialiseGame();
+		LinkedList<String> result = currentGame.initialiseGame(channel.getId(), baseMultiplier);
 		//Don't print minigame messages for bots
 		if(!getCurrentPlayer().isBot || verboseBotGames)
 		{
@@ -2102,7 +2100,7 @@ public class GameController
 		if(getCurrentPlayer().isBot)
 		{
 			resultString.append(getCurrentPlayer().name + String.format(" won **$%,d** from ",
-					moneyWon*multiplier*baseMultiplier));
+					moneyWon*multiplier));
 			if(multiplier > 1)
 				resultString.append(String.format("%d copies of ",multiplier));
 			resultString.append(currentGame.toString() + ".");
@@ -2115,8 +2113,6 @@ public class GameController
 			else
 				resultString.append(".");
 		}
-		//Toss the base multiplier into the mix too so it doesn't get left out
-		multiplier *= baseMultiplier;
 		StringBuilder extraResult = null;
 		extraResult = getCurrentPlayer().addMoney(moneyWon*multiplier,
 				currentGame.isBonusGame() ? MoneyMultipliersToUse.NOTHING : MoneyMultipliersToUse.BOOSTER_AND_BONUS);

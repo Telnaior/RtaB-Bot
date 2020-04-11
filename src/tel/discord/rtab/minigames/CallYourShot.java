@@ -10,7 +10,6 @@ public class CallYourShot implements MiniGame {
 	static final String NAME = "Call Your Shot";
 	static final boolean BONUS = false; 
 	
-	
 	int stageAmount;
 	int roundNumber;
 	int colorPicked;
@@ -31,7 +30,11 @@ public class CallYourShot implements MiniGame {
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame(){
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier){
+		for(int nextValue : values)
+		{
+			nextValue = nextValue * baseMultiplier;
+		}
 		stageAmount = 0;
 		roundNumber = -1;
 		colorPicked = 9;
@@ -53,15 +56,19 @@ public class CallYourShot implements MiniGame {
 		} // debug */
 		//Give instructions
 		output.add("Welcome to Call Your Shot!");
-		output.add("There are six colors of balls on this 21 space board. Six reds, five oranges, four blues, three purples, two greens, and one gold.");
+		output.add("There are six colors of balls on this 21 space board. "
+				+ "Six reds, five oranges, four blues, three purples, two greens, and one gold.");
 		output.add("You're going to pick one of the colors, then try to pick a ball of that color.");
 		output.add("If you pick the color you chose on your first try, you win that color's initial value!");
 		output.add("If you didn't pick your color, the value is cut in half, and you can pick again.");
 		output.add("With two exceptions, you can make mistakes equal to the number of balls of the color you picked.");
 		output.add("If you picked red, you have as many chances as you need to pick a red.");
-		output.add("If you picked gold, you only get a single chance, but if you strike it lucky on that one chance, you win the maximum value for this game: **$1,500,000**!");
+		output.add("If you picked gold, you only get a single chance, but if you strike it lucky on that one chance, "
+				+ String.format("you win the maximum value for this game: **$%,d**!",values.get(0)));
 		output.add("Of course, if you run out of chances, the game is over and you don't win anything.");
-		output.add("The other initial values: $600,000 for green, $400,000 for purple, $320,000 for blue, $240,000 for orange, and $196,608 for red.");
+		output.add("The other initial values: "
+				+ String.format("$%,d for green, $%,d for purple, $%,d for blue, $%,d for orange, and $%,d for red.",
+						values.get(1),values.get(2),values.get(3),values.get(4),values.get(5)));
 		output.add("With that said, what color will you try to pick?");
 
 		//output.add(generateBoard());
@@ -87,32 +94,44 @@ public class CallYourShot implements MiniGame {
 			
 			if (choice.equals("RED"))
 			{
-				output.add("You picked red. You're playing for $196,608 to start and you have as many chances as you need. Good luck!");
+				output.add("You picked red. "
+						+ String.format("You're playing for $%,d to start and you have as many chances as you need. ",values.get(5))
+						+ "Good luck!");
 				colorPicked = 5;
 			}
 			else if (choice.equals("ORANGE"))
 			{
-				output.add("You picked orange. You're playing for $240,000 and you can make five mistakes. Good luck!");
+				output.add("You picked orange. "
+						+ String.format("You're playing for $%,d and you can make five mistakes. ",values.get(4))
+						+ "Good luck!");
 				colorPicked = 4;
 			}			
 			else if (choice.equals("BLUE"))
 			{
-				output.add("You picked blue. You're playing for $320,000 and you can make four mistakes. Good luck!");
+				output.add("You picked blue. "
+						+ String.format("You're playing for $%,d and you can make four mistakes. ",values.get(3))
+						+ "Good luck!");
 				colorPicked = 3;
 			}			
 			else if (choice.equals("PURPLE"))
 			{
-				output.add("You picked purple. You're playing for $400,000 and you can make three mistakes. Good luck!");
+				output.add("You picked purple. "
+						+ String.format("You're playing for $%,d and you can make three mistakes. ",values.get(2))
+						+ "Good luck!");
 				colorPicked = 2;
 			}			
 			else if (choice.equals("GREEN"))
 			{
-				output.add("You picked green. You're playing for $600,000 and you can make two mistakes. Good luck!");
+				output.add("You picked green. "
+						+ String.format("You're playing for $%,d and you can make two mistakes. ",values.get(1))
+						+ "Good luck!");
 				colorPicked = 1;
 			}			
 			else if (choice.equals("GOLD"))
 			{
-				output.add("Ooh, risky~ You picked gold. You only get one chance, but if you strike gold, you win **$1,500,000**. Good luck!");
+				output.add("Ooh, risky~ You picked gold. "
+						+ String.format("You only get one chance, but if you strike gold, you win **$%,d**. ",values.get(0))
+						+ "Good luck!");
 				colorPicked = 0;
 			}
 			stageAmount = values.get(colorPicked);

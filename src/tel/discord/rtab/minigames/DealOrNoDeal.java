@@ -8,7 +8,7 @@ import java.util.List;
 public class DealOrNoDeal implements MiniGame {
 	static final String NAME = "Deal or No Deal";
 	static final boolean BONUS = false;
-	final List<Integer> VALUE_LIST = Arrays.asList(1,2,5,10,50,100,500,1000,2500,5000,7500, //Blues
+	List<Integer> VALUE_LIST = Arrays.asList(1,2,5,10,50,100,500,1000,2500,5000,7500, //Blues
 			10000,30000,50000,100000,150000,200000,350000,500000,750000,1000000,2500000); //Reds
 	LinkedList<Integer> values = new LinkedList<>();
 	int offer;
@@ -16,17 +16,23 @@ public class DealOrNoDeal implements MiniGame {
 	boolean accept; //Accepting the Offer
 
 	@Override
-	public LinkedList<String> initialiseGame() {
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier) {
 		casesLeft = 22;
 		offer = 0;
 		accept = false;
-		//Reset and shuffle the boxes
+		//Multiply each value, EXCEPT the $1, by the base multiplier
+		for(int i = 1; i < VALUE_LIST.size(); i++)
+		{
+			VALUE_LIST.set(i, VALUE_LIST.get(i)*baseMultiplier);
+		}
+		//Load up the boxes and shuffle them
 		values.clear();
 		values.addAll(VALUE_LIST);
 		Collections.shuffle(values);
-		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
-		output.add("In Deal or No Deal, there are 22 boxes, each holding an amount of money from $1 to $2,500,000.");
+		LinkedList<String> output = new LinkedList<>();
+		output.add("In Deal or No Deal, there are 22 boxes, "
+				+ String.format("each holding an amount of money from $1 to $%,d.",2500000*baseMultiplier));
 		output.add("One of these boxes is 'yours', and if you refuse all the offers you win the contents of that box.");
 		output.add("We open the other boxes one by one to find out which values *aren't* in your own box.");
 		output.add("The first offer comes after five boxes are opened, after which offers are received every three boxes.");
@@ -95,8 +101,8 @@ public class DealOrNoDeal implements MiniGame {
 		}
 		totalSqrts /= casesLeft;
 		offer = (int)Math.pow(totalSqrts,2);
-		//Add random factor - .85-1.15
-		int multiplier = (int)((Math.random()*31) + 85);
+		//Add random factor - 1.00-1.30
+		int multiplier = (int)((Math.random()*31) + 100);
 		offer *= multiplier;
 		offer /= 100;
 		//Round it off

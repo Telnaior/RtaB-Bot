@@ -6,9 +6,10 @@ public interface MiniGame {
 	
 	/**
 	 * Initialises the variables used in the minigame and prints the starting messages.
+	 * @param The channel the minigame is being played in, and the multiplier to apply to the minigame's values.
 	 * @return A list of messages to send to the player.
 	 */
-	LinkedList<String> initialiseGame();
+	LinkedList<String> initialiseGame(String channelID, int baseMultiplier);
 	
 	/**
 	 * Takes the next player input and uses it to play the next "turn" - up until the next input is required.

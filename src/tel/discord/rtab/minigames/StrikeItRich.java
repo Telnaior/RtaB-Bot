@@ -16,12 +16,14 @@ public class StrikeItRich implements MiniGame {
 	int lastSpace;
 	int lastPicked;
 	int multiplier;
+	int baseMultiplier;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean pinchMode = false;
 	
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		this.baseMultiplier = baseMultiplier;
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise board
 		board.clear();
@@ -36,7 +38,7 @@ public class StrikeItRich implements MiniGame {
 		//Display instructions
 		output.add("In Strike it Rich, your objective is to match three of a kind.");
 		output.add("Simply keep choosing numbers until you have three the same, and that is what you will win.");
-		output.add("The top prize is $1,000,000!");
+		output.add("The top prize is "+String.format("$%,d!",1_000_000*baseMultiplier));
 		output.add("Make your first pick when you are ready.");
 		output.add(generateBoard());
 		return output;
@@ -64,7 +66,7 @@ public class StrikeItRich implements MiniGame {
 			output.add(String.format("Space %d selected...",lastSpace+1));
 			if(pinchMode)
 				output.add("...");
-			output.add(String.format("$%,d!",lastPicked));
+			output.add(String.format("$%,d!",lastPicked*baseMultiplier));
 			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
 			if(numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= (NEEDED_TO_WIN-1))
 				pinchMode = true;
@@ -129,7 +131,7 @@ public class StrikeItRich implements MiniGame {
 		//Next display how many of each we have
 		for(int i=0; i<VALUES.length; i++)
 		{
-			display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]*multiplier));
+			display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]*multiplier*baseMultiplier));
 		}
 		display.append("```");
 		return display.toString();
@@ -148,7 +150,7 @@ public class StrikeItRich implements MiniGame {
 	public int getMoneyWon()
 	{
 		if(isGameOver())
-			return lastPicked*multiplier;
+			return lastPicked*multiplier*baseMultiplier;
 		else
 			return 0;
 	}

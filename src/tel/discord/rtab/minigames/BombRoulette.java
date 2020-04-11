@@ -6,19 +6,17 @@ public class BombRoulette implements MiniGame {
     static final String NAME = "Bomb Roulette";
     static final boolean BONUS = false;
     boolean isAlive; 
-        int score;
-        boolean hasJoker;
-        enum WheelSpace {CASH, DOUBLE, HALVE, JOKER, BANKRUPT, BOMB};
-        int[] spaceValues;
-        WheelSpace[] spaceTypes;
-        int pointer, cashLeft, cashSpaces, doubleSpaces, halveSpaces,
-                jokerSpaces, bankruptSpaces, bombSpaces;
+    int score;
+    boolean hasJoker;
+    enum WheelSpace {CASH, DOUBLE, HALVE, JOKER, BANKRUPT, BOMB};
+    int[] spaceValues;
+    WheelSpace[] spaceTypes;
+    int pointer, cashLeft, cashSpaces, doubleSpaces, halveSpaces, jokerSpaces, bankruptSpaces, bombSpaces;
         
-    public LinkedList<String> initialiseGame()
+    public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
     {
         LinkedList<String> output = new LinkedList<>();
         //Initialise wheel
-        
         isAlive = true;
         score = 0;
         hasJoker = false;
@@ -40,6 +38,7 @@ public class BombRoulette implements MiniGame {
         for (int i = 0; i < spaceTypes.length; i++) {
             switch (spaceTypes[i]) {
                 case CASH:
+                	spaceValues[i] *= baseMultiplier;
                     cashLeft += spaceValues[i];
                     cashSpaces++;
                     break;
@@ -65,8 +64,9 @@ public class BombRoulette implements MiniGame {
         output.add("In Bomb Roulette, you will be spinning a 24-space wheel "
                 + "trying to collect as much cash as possible.");
         output.add("Eighteen of those spaces have various amounts of cash "
-                + "ranging from $25,000 to $200,000. The total amount on the "
-                + "wheel at the beginning of the game is $1,000,000.");
+                + String.format("ranging from $%,d to $%,d. The total amount on the "
+                		,25000*baseMultiplier,200000*baseMultiplier)
+                + String.format("wheel at the beginning of the game is $%,d.",1000000*baseMultiplier));
         output.add("Three are **Double** spaces, which will double your score up " 
                 + "to that point.");
         output.add("Two are **Halve** spaces, which will halve your score up "

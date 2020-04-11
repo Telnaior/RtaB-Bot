@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import tel.discord.rtab.enums.Jackpots;
+
 public class DigitalFortress implements MiniGame {
 	static final String NAME = "Digital Fortress";
 	static final boolean BONUS = true;
@@ -17,10 +19,16 @@ public class DigitalFortress implements MiniGame {
 	boolean[] lockedIn;
 	int digitsCorrect;
 	int attemptsLeft;
+	int jackpot;
+	int baseMultiplier;
+	String channelID;
 	
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		this.channelID = channelID;
+		this.baseMultiplier = baseMultiplier;
+		jackpot = Jackpots.DIGITAL.getJackpot(channelID);
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise stuff
 		Collections.shuffle(solution);
@@ -34,8 +42,9 @@ public class DigitalFortress implements MiniGame {
 		output.add("Your job is to guess this passcode.");
 		output.add("You have four attempts to do so, "
 				+ "and after each attempt you will be told which digits are in the right place.");
+		output.add("If you crack the code completely, you will win a jackpot of "+String.format("$%,d!",jackpot*baseMultiplier));
 		output.add("Once you have solved the passcode (or been locked out after four attempts), "
-				+ "you will earn $2,500,000 for each digit you had correct.");
+				+ "you will earn "+String.format("$%,d",PRIZE_PER_DIGIT*baseMultiplier)+" for each digit you had correct.");
 		output.add("Submit your first guess at the passcode when you are ready, and good luck!");
 		output.add(generateBoard());
 		return output;
@@ -70,7 +79,7 @@ public class DigitalFortress implements MiniGame {
 			output.add(digitsCorrect + " digit correct.");
 		else
 			output.add(digitsCorrect + " digits correct.");
-		if(digitsCorrect < 10)
+		if(digitsCorrect < solution.size())
 			output.add(generateBoard());
 		return output;
 	}
@@ -86,7 +95,7 @@ public class DigitalFortress implements MiniGame {
 					return false;
 			}
 			//Needs to be exactly ten digits
-			return (message.length() == 10);
+			return (message.length() == solution.size());
 		}
 		catch(NumberFormatException e1)
 		{
@@ -127,7 +136,17 @@ public class DigitalFortress implements MiniGame {
 	@Override
 	public int getMoneyWon() {
 		if(isGameOver())
-			return (PRIZE_PER_DIGIT * digitsCorrect);
+			//Award the jackpot and reset it if they won it, otherwise increment it and award the basic prize
+			if(digitsCorrect == solution.size())
+			{
+				Jackpots.DIGITAL.resetJackpot(channelID);
+				return jackpot * baseMultiplier;
+			}
+			else
+			{
+				Jackpots.DIGITAL.setJackpot(channelID,jackpot+250_000);
+				return (PRIZE_PER_DIGIT * digitsCorrect * baseMultiplier);
+			}
 		else
 			return 0;
 	}

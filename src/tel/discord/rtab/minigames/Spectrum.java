@@ -14,14 +14,16 @@ public class Spectrum implements MiniGame {
 	static final int NEEDED_TO_WIN = (BOARD_SIZE/VALUES.length); //Integer division lol, 25/12 = 2
 	int[] numberPicked = new int[VALUES.length];
 	ArrayList<Integer> board = new ArrayList<Integer>(BOARD_SIZE);
+	int baseMultiplier;
 	int lastSpace;
 	int lastPicked;
 	int total;
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		this.baseMultiplier = baseMultiplier;
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise board
 		board.clear();
@@ -36,7 +38,7 @@ public class Spectrum implements MiniGame {
 		total = 0;
 		//Display instructions
 		output.add("For reaching a streak bonus of x15, you have earned the right to play the third bonus game!");
-		output.add("In Spectrum, you can win up to one hundred million dollars!");
+		output.add(String.format("In Spectrum, you can win up to **$%,d**!",100_000_000*baseMultiplier));
 		output.add("Pairs of money are hidden on the board, along with three bombs.");
 		output.add("If you make a pair, you win that amount and get to keep picking!");
 		output.add("The game only ends when you make a pair of bombs.");
@@ -66,7 +68,7 @@ public class Spectrum implements MiniGame {
 			lastPicked = board.get(lastSpace);
 			numberPicked[Arrays.binarySearch(VALUES,lastPicked)] ++;
 			if(numberPicked[Arrays.binarySearch(VALUES,lastPicked)] >= NEEDED_TO_WIN)
-				total += lastPicked;
+				total += lastPicked * baseMultiplier;
 			//Print output
 			output.add(String.format("Space %d selected...",lastSpace+1));
 			if(numberPicked[0] >= (NEEDED_TO_WIN-1))
@@ -74,7 +76,7 @@ public class Spectrum implements MiniGame {
 			if(lastPicked == 0)
 				output.add("**BOMB**");
 			else
-				output.add(String.format("$%,d!",lastPicked));
+				output.add(String.format("$%,d!",lastPicked*baseMultiplier));
 			output.add(generateBoard());
 			return output;
 		}
@@ -128,7 +130,7 @@ public class Spectrum implements MiniGame {
 		for(int i=1; i<VALUES.length; i++)
 		{
 			if(numberPicked[i] > 0 && numberPicked[i] < NEEDED_TO_WIN)
-				display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]));
+				display.append(String.format("%1$dx $%2$,d\n",numberPicked[i],VALUES[i]*baseMultiplier));
 		}
 		display.append("```");
 		return display.toString();

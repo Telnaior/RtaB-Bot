@@ -16,16 +16,20 @@ public class Gamble implements MiniGame {
 	int lastPick;
 	int lastSpace;
 	int total;
+	int baseMultiplier;
 	
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		this.baseMultiplier = baseMultiplier;
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise the game
 		alive = true;
 		pickedSpaces = new boolean[money.size()];
 		total = 0;
 		lastPick = 0;
+		for(int i=0; i<money.size(); i++)
+			money.set(i, money.get(i)*baseMultiplier);
 		Collections.shuffle(money);
 		//Give instructions
 		output.add("In The Gamble, your objective is to guess "
@@ -34,8 +38,9 @@ public class Gamble implements MiniGame {
 		output.add("Then, you can choose to either take the money revealed or pick another one.");
 		output.add("If you pick another space, the amount revealed must be higher. If it isn't, you lose everything.");
 		output.add("If it is higher, you can choose to stop and take both spaces, or continue to pick another one.");
-		output.add("The spaces range from $100 to $1,000,000, "
-				+ "and if you're lucky and brave you can win more than $2,500,000 in total.");
+		output.add("The spaces range from "+String.format("$%,d",100*baseMultiplier)
+				+"to "+String.format("$%,d",1_000_000*baseMultiplier) + ", and if you're lucky and brave you can win more than "
+				+String.format("$%,d",2_500_000*baseMultiplier) + "in total.");
 		output.add("Best of luck! Pick your first space when you're ready.");
 		output.add(generateBoard());
 		return output;
@@ -80,7 +85,7 @@ public class Gamble implements MiniGame {
 			if(alive)
 			{
 				output.add(String.format("$%,d!",lastPick));
-				if(lastPick == 1000000)
+				if(lastPick == 1000000*baseMultiplier)
 				{
 					output.add("You found the highest amount!");
 					alive = false;

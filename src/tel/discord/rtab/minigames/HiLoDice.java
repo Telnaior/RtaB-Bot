@@ -16,7 +16,9 @@ public class HiLoDice implements MiniGame {
     int score, lastRoll;
     
     @Override
-    public LinkedList<String> initialiseGame() {
+    public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
+    {
+    	//TODO make base multiplier matter
         LinkedList<String> output = new LinkedList<>();
         
         dice = new Dice();

@@ -18,9 +18,14 @@ public class TriplePlay implements MiniGame {
 	int total;
 	int target;
 	int picksLeft;
+	int baseMultiplier;
 	
-	public TriplePlay()
+	@Override
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		this.baseMultiplier = baseMultiplier;
+		for(int i=0; i<money.size(); i++)
+			money.set(i, money.get(i)*baseMultiplier);
 		alive = true;
 		pickedSpaces = new boolean[money.size()];
 		total = 0;
@@ -28,12 +33,6 @@ public class TriplePlay implements MiniGame {
 		lastPick = 0;
 		picksLeft = 3;
 		Collections.shuffle(money);
-	}
-	
-	@Override
-	public LinkedList<String> initialiseGame()
-	{
-		//Dummy method so I can work on separating constructor work from instructions
 		return giveInstructions();
 	}
 	
@@ -44,7 +43,7 @@ public class TriplePlay implements MiniGame {
 		output.add("In this game, you pick three spaces and add their values together.");
 		output.add("Then, you can either leave with that total or throw it away to pick three more spaces.");
 		output.add("If you play on, your previous total becomes a target that you must beat, or you will leave with nothing.");
-		output.add("The biggest possible win is $1,500,000.");
+		output.add("The biggest possible win is "+String.format("$%,d!",1_500_000*baseMultiplier));
 		output.add("Best of luck! Pick your first space when you're ready.");
 		output.add(generateBoard());
 		return output;
@@ -192,7 +191,7 @@ public class TriplePlay implements MiniGame {
 		if(picksLeft == 0)
 		{
 			//Arbitrary stopping point lol
-			boolean willStop = target > 200000 ? true : false;
+			boolean willStop = target > 200000*baseMultiplier ? true : false;
 			if(willStop)
 				return "STOP";
 		}
