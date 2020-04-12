@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class CoinFlip implements MiniGame {
 	static final String NAME = "CoinFlip";
 	static final boolean BONUS = false; 
-	static final int[] PAYTABLE = {1_000,10_000,50_000,100_000,200_000,350_000,500_000,1_000_000,2_000_000};
+	static final int[] PAYTABLE = {100,1_000,3_500,10_000,35_000,100_000,350_000,1_000_000,2_500_000};
 	static final int MAX_STAGE = PAYTABLE.length-1;
 	int baseMultiplier;
 	int stage;
