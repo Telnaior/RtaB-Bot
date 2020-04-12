@@ -19,7 +19,7 @@ public enum Games implements WeightedSpace {
 	//Games rotated out
 	THE_OFFER			(0,"The Offer","Offer") { public MiniGame getGame() { return new TheOffer(); }	},							//Author: Amy
 	STRIKE_IT_RICH		(0,"Strike it Rich","Strike") { public MiniGame getGame() { return new StrikeItRich(); } },					//Author: Atia
-	GAMBLE				(2,"The Gamble","Gamble") { public MiniGame getGame() { return new Gamble(); } },							//Author: Atia
+	GAMBLE				(0,"The Gamble","Gamble") { public MiniGame getGame() { return new Gamble(); } },							//Author: Atia
 	//BUMPER_CASH   	(2,"Bumper Grab","Bumper") { public MiniGame getGame() { return new BumperGrab(); } },						//Author: Tara
 	//Bonus games never appear in the pool
 	SUPERCASH			(0,"SUPERCASH","Super") { public MiniGame getGame() { return new Supercash(); } },

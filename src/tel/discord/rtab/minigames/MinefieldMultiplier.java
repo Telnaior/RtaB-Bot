@@ -71,7 +71,7 @@ public class MinefieldMultiplier implements MiniGame {
 		{
 			// Player stops 
 			stop = true;
-			output.add(String.format("Very well! You escaped with your bank of $%,d",total));
+			output.add(String.format("Very well! You escaped with your bank of $%,d.",total));
 			output.add("Here is the revealed board!");
 			output.add(generateRevealBoard());
 			return output;

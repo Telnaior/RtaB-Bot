@@ -144,7 +144,7 @@ public class DigitalFortress implements MiniGame {
 			}
 			else
 			{
-				Jackpots.DIGITAL.setJackpot(channelID,jackpot+250_000);
+				Jackpots.DIGITAL.setJackpot(channelID,jackpot+500_000);
 				return (PRIZE_PER_DIGIT * digitsCorrect * baseMultiplier);
 			}
 		else

@@ -235,7 +235,7 @@ public class Player implements Comparable<Player>
 		penalty = newbieProtection > 0 ? NEWBIE_BOMB_PENALTY : BOMB_PENALTY;
 		//Reduce penalty by 10% for each player already gone
 		penalty /= 10;
-		penalty *= (10 - Math.min(9,othersOut));
+		penalty *= (10 - Math.min(5,othersOut));
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
@@ -271,7 +271,10 @@ public class Player implements Comparable<Player>
 		}
 		//Wipe their booster if they didn't hit a boost holder
 		if(!holdBoost)
+		{
 			booster = 100;
+			boostCharge = 0;
+		}
 		//Wipe everything else too, and dock them a life
 		winstreak = 0;
 		hiddenCommand = HiddenCommand.NONE;

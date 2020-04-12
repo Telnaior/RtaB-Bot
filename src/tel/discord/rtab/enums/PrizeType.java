@@ -10,7 +10,6 @@ public enum PrizeType {
 	
 	//Regular prizes
 	DB1		  (   22805,"a DesertBuck"),
-	DANGAN    (   11037,"an unfamiliar memory"),
 	GOVERNOR  (   26000,"the Governor's favourite"),
 	PI  	  (   31416,"a fresh pi"),
 	ECONSTANT (   27183,"some e"),

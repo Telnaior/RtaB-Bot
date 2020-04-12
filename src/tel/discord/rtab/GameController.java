@@ -237,7 +237,7 @@ public class GameController
 			default:
 				break;
 			}
-			getCurrentPlayer().user.openPrivateChannel().queue(
+			newPlayer.user.openPrivateChannel().queue(
 					(channel) -> channel.sendMessage(commandHelp.toString()).queueAfter(5,TimeUnit.SECONDS));
 		}
 		if(newPlayer.money > 900000000)
@@ -1266,7 +1266,7 @@ public class GameController
 			}
 			//Otherwise wait a few seconds for someone else to potentially repel it before pressing a button
 			else
-				timer.schedule(() -> runBlammo(buttons, (int) (Math.random() * 4), false), 5, TimeUnit.SECONDS);
+				timer.schedule(() -> runBlammo(buttons, (int) (Math.random() * 4), mega), 5, TimeUnit.SECONDS);
 		}
 		else
 		{
@@ -1285,7 +1285,7 @@ public class GameController
 						if(currentBlammo)
 						{
 							int button = Integer.parseInt(e.getMessage().getContentRaw())-1;
-							timer.schedule(() -> runBlammo(buttons, button,false), 1, TimeUnit.SECONDS);
+							timer.schedule(() -> runBlammo(buttons, button, mega), 1, TimeUnit.SECONDS);
 						}
 					},
 					30,TimeUnit.SECONDS, () ->
@@ -1294,7 +1294,7 @@ public class GameController
 						{
 							channel.sendMessage("Too slow, autopicking!").queue();
 							int button = (int) Math.random() * 4;
-							runBlammo(buttons, button,false);
+							runBlammo(buttons, button, mega);
 						}
 					});
 		}
@@ -1568,7 +1568,7 @@ public class GameController
 			{
 				channel.sendMessage("Oh, but you don't have any money yet this round?").completeAfter(1, TimeUnit.SECONDS);
 				//100% chance of pity money at start, then 90% chance for $100M club, down to 10% chance in $900M club
-				if(Math.random() > getCurrentPlayer().money / 100_000_000)
+				if(Math.random()*10 > getCurrentPlayer().money / 100_000_000)
 				{
 					//Only award the same percentage of the $1m "base" pity money
 					int pityMoney = baseMultiplier*100_000*(10-(getCurrentPlayer().money/100_000_000));
@@ -1839,7 +1839,7 @@ public class GameController
 			else
 			{
 				//No boost in play? BACKUP PLAN
-				channel.sendMessage("It's a **Boost Magnet**, but there's no boost to give you...")
+				channel.sendMessage("It's a **Boost Magnet**, but there's no boost to steal...")
 					.completeAfter(5,TimeUnit.SECONDS);
 				channel.sendMessage("So you can have this instead.").completeAfter(3,TimeUnit.SECONDS);
 				channel.sendMessage(awardBoost(location)).queue();
