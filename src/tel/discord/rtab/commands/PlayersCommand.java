@@ -10,6 +10,7 @@ public class PlayersCommand extends Command {
     public PlayersCommand()
     {
         this.name = "players";
+		this.aliases = new String[]{"playing"};
         this.help = "get a list of the players signed up for the current game";
     }
     
