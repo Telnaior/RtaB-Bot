@@ -51,7 +51,7 @@ public class GameController
 	final static int MAX_PLAYERS = 16;
 	final static String[] VALID_ARC_RESPONSES = {"A","ABORT","R","RETRY","C","CONTINUE"};
 	final boolean rankChannel;
-	public final boolean runDemo;
+	public final int runDemo;
 	final boolean verboseBotGames;
 	public final boolean playersCanJoin;
 	public TextChannel channel;
@@ -87,24 +87,24 @@ public class GameController
 	Message waitingMessage;
 	
 	public GameController(TextChannel channelID, boolean allowJoining, boolean mainGame, 
-			boolean useDemo, boolean verbosity)
+			int demoTimer, boolean verbosity)
 	{
 		channel = channelID;
 		playersCanJoin = allowJoining;
 		rankChannel = mainGame;
 		gameStatus = GameStatus.SIGNUPS_OPEN;
-		runDemo = useDemo;
+		runDemo = demoTimer;
 		verboseBotGames = verbosity;
 		baseMultiplier = 1;
 		boardMultiplier = baseMultiplier;
-		if(runDemo)
+		if(runDemo != 0)
 		{
 			demoMode = timer.schedule(() -> 
 			{
 				for(int i=0; i<4; i++)
 					addRandomBot();
 				startTheGameAlready();
-			},120,TimeUnit.MINUTES);
+			},runDemo,TimeUnit.MINUTES);
 		}
 		//If they can't join, let them bet!
 		if(!playersCanJoin)
@@ -144,14 +144,14 @@ public class GameController
 		futureBlammo = false;
 		timer.shutdownNow();
 		timer = new ScheduledThreadPoolExecutor(1);
-		if(runDemo)
+		if(runDemo != 0)
 		{
 			demoMode = timer.schedule(() -> 
 			{
 				for(int i=0; i<4; i++)
 					addRandomBot();
 				startTheGameAlready();
-			},120,TimeUnit.MINUTES);
+			},runDemo,TimeUnit.MINUTES);
 		}
 	}
 	public int findPlayerInGame(String playerID)
@@ -247,7 +247,7 @@ public class GameController
 		}
 		if(players.size() == 1)
 		{
-			if(runDemo)
+			if(runDemo != 0)
 				demoMode.cancel(false);
 			timer.schedule(() -> 
 			{

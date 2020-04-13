@@ -20,7 +20,7 @@ public class SuperBotChallenge
 	public GameController initialise(TextChannel channelID, boolean autoSchedule)
 	{
 		channel = channelID;
-		gameHandler = new GameController(channel,false,false,false,true);
+		gameHandler = new GameController(channel,false,false,0,true);
 		if(autoSchedule)
 			loadGames();
 		return gameHandler;

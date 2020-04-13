@@ -76,12 +76,12 @@ public class RaceToABillionBot
 				//If it's a designated game channel, make a controller here!
 				if(channel.getTopic().startsWith("~ MAIN CHANNEL ~"))
 				{
-					game.add(new GameController(channel,true,true,true,false));
+					game.add(new GameController(channel,true,true,60,false));
 					System.out.println("Main Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ GAME CHANNEL ~"))
 				{
-					game.add(new GameController(channel,true,false,false,true));
+					game.add(new GameController(channel,true,false,0,true));
 					System.out.println("Game Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ CHALLENGE CHANNEL ~"))
