@@ -25,7 +25,7 @@ public class DemoCommand extends Command {
 		{
 			if(game.channel.equals(event.getChannel()))
 			{
-				if(game.runDemo)
+				if(game.runDemo != 0)
 					game.demoMode.cancel(true);
 				for(int i=0; i<playerCount; i++)
 				{
