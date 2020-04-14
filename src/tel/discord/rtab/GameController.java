@@ -495,8 +495,10 @@ public class GameController
 		if(futureBlammo)
 		{
 			futureBlammo = false;
+			if(repeatTurn > 0)
+				repeatTurn --;
 			channel.sendMessage(getCurrentPlayer().getSafeMention()
-					+ ", someone from the gallery has given you a Blammo!").completeAfter(2, TimeUnit.SECONDS);
+					+ ", someone from the gallery has given you a **BLAMMO!**").completeAfter(2, TimeUnit.SECONDS);
 			startBlammo(false);
 			return;
 		}
@@ -506,9 +508,7 @@ public class GameController
 			//End the game if we're out of turns
 			if(fcTurnsLeft == 0)
 			{
-				gameStatus = GameStatus.END_GAME;
-				channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-				timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
+				gameOver();
 				return;
 			}
 			//Otherwise display the appropriate message
@@ -849,12 +849,7 @@ public class GameController
 		//Test if game over - either all spaces gone and no blammo queued, or one player left alive
 		if((spacesLeft <= 0 && !futureBlammo) || playersAlive <= 1) 
 		{
-			gameStatus = GameStatus.END_GAME;
-			if(spacesLeft < 0)
-				channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
-			channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-			detonateBombs();
-			timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
+			gameOver();
 		}
 		else
 		{
@@ -863,6 +858,15 @@ public class GameController
 				advanceTurn(false);
 			timer.schedule(() -> runTurn(), 1, TimeUnit.SECONDS);
 		}
+	}
+	void gameOver()
+	{
+		gameStatus = GameStatus.END_GAME;
+		if(spacesLeft < 0)
+			channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
+		channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
+		detonateBombs();
+		timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
 	}
 	void runBombLogic(int location)
 	{
@@ -1650,7 +1654,7 @@ public class GameController
 			channel.sendMessage("**Cash for Bowser** it is! "
 					+ "In this FUN event, you give your money to ME!").completeAfter(3, TimeUnit.SECONDS);
 			//Coins: Up to 100-200% of the base amount, determined by their round earnings and their total bank
-			int coinFraction = (int)(Math.random()*51+50);
+			int coinFraction = (int)(Math.random()*100+1);
 			//Use the greater of either their round earnings or 0.5% of their total bank
 			int coins = Math.max(getCurrentPlayer().money - getCurrentPlayer().oldMoney,
 					getCurrentPlayer().money*baseMultiplier / 200);
@@ -1897,7 +1901,7 @@ public class GameController
 			//If there's any wager pot, award their segment of it
 			if(wagerPot > 0)
 			{
-				channel.sendMessage(String.format("You won $%d from the wager!", wagerPot / playersAlive)).queue();
+				channel.sendMessage(String.format("You won $%,d from the wager!", wagerPot / playersAlive)).queue();
 				getCurrentPlayer().addMoney(wagerPot / playersAlive, MoneyMultipliersToUse.NOTHING);
 			}
 			//Award the Jackpot if it's there
@@ -2767,6 +2771,9 @@ public class GameController
 		for(Player next : players)
 			if(next.status == PlayerStatus.ALIVE && next.money / 100 < amountToWager)
 				amountToWager = next.money / 100;
+		//Minimum lol
+		if(amountToWager < 100_000 * baseMultiplier)
+			amountToWager = 100_000 * baseMultiplier;
 		channel.sendMessage(String.format("Everyone bets $%,d as a wager on the game!",amountToWager)).queue();
 		wagerPot += amountToWager * playersAlive;
 		for(Player next : players)

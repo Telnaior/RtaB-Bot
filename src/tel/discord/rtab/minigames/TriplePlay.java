@@ -39,8 +39,7 @@ public class TriplePlay implements MiniGame {
 	public LinkedList<String> giveInstructions()
 	{
 		LinkedList<String> output = new LinkedList<>();
-		output.add("Triple Play is a variant of The Gamble.");
-		output.add("In this game, you pick three spaces and add their values together.");
+		output.add("In Triple Play, you pick three spaces and add their values together.");
 		output.add("Then, you can either leave with that total or throw it away to pick three more spaces.");
 		output.add("If you play on, your previous total becomes a target that you must beat, or you will leave with nothing.");
 		output.add("The biggest possible win is "+String.format("$%,d!",1_500_000*baseMultiplier));
