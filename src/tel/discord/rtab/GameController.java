@@ -1654,7 +1654,7 @@ public class GameController
 			channel.sendMessage("**Cash for Bowser** it is! "
 					+ "In this FUN event, you give your money to ME!").completeAfter(3, TimeUnit.SECONDS);
 			//Coins: Up to 100-200% of the base amount, determined by their round earnings and their total bank
-			int coinFraction = (int)(Math.random()*100+1);
+			int coinFraction = (int)(Math.random()*51+50);
 			//Use the greater of either their round earnings or 0.5% of their total bank
 			int coins = Math.max(getCurrentPlayer().money - getCurrentPlayer().oldMoney,
 					getCurrentPlayer().money*baseMultiplier / 200);
