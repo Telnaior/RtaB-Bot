@@ -1201,12 +1201,13 @@ public class GameController
 				break;
 			case REPELLENT:
 				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **BLAMMO REPELLENT**!\n"
-						+ "You may use this by typing **!repel** whenever any player is facing a blammo to automatically block it.\n");
+						+ "You may use this by typing **!repel** whenever any player is facing a blammo to automatically block it.\n"
+						+ "The person affected will then need to choose a different space from the board.\n");
 				break;
 			case BLAMMO:
 				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **BLAMMO SUMMONER**!\n"
 						+ "You may use this by typing **!blammo** at any time to give the next player a blammo!\n"
-						+ "This will activate on the NEXT turn (not the current one), and will replace that player's normal turn.");
+						+ "This will activate on the NEXT turn (not the current one), and will replace that player's normal turn.\n");
 				break;
 			case DEFUSE:
 				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **DEFUSER**!\n"
@@ -1218,7 +1219,7 @@ public class GameController
 						+ "The wager allows you to force all living players to add a portion of their total bank to a prize pool, "
 						+ "which the winner(s) of the round will claim.\n"
 						+ "The amount is equal to 1% of the last-place player's total bank, "
-						+ "and you can activate this at any time by typing **!wager**."); 
+						+ "and you can activate this at any time by typing **!wager**.\n"); 
 				break;
 			default:
 				commandHelp.append("You also got an ERROR, report this to @Atia#2084 to get it fixed.");
@@ -2058,11 +2059,11 @@ public class GameController
 						//Check if the game's over
 						if(currentGame.isGameOver())
 						{
-							timer.schedule(() -> completeMiniGame(currentGame), delay, TimeUnit.SECONDS);
+							timer.schedule(() -> completeMiniGame(currentGame), delay+1, TimeUnit.SECONDS);
 						}
 						else
 						{
-							timer.schedule(() -> runNextMiniGameTurn(currentGame), delay, TimeUnit.SECONDS);
+							timer.schedule(() -> runNextMiniGameTurn(currentGame), delay-2, TimeUnit.SECONDS);
 						}
 					},
 					180,TimeUnit.SECONDS, () ->
@@ -2093,7 +2094,7 @@ public class GameController
 				multiplier++;
 				gamesToPlay.remove();
 			}
-			//Otherwise we'd better out it back where it belongs
+			//Otherwise we'd better put it back where it belongs
 			else
 			{
 				gamesToPlay.previous();
@@ -2712,6 +2713,7 @@ public class GameController
 	void repelBlammo()
 	{
 		currentBlammo = false;
+		repeatTurn++;
 		runEndTurnLogic();
 	}
 	public boolean useBlammo(User summoner)
