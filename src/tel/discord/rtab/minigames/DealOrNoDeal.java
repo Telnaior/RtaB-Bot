@@ -93,16 +93,21 @@ public class DealOrNoDeal implements MiniGame {
 	}
 
 	private String generateOffer() {
-		//Generate "fair deal"
-		int totalSqrts = 0;
+		//Generate "fair deal" and average
+		int fairDeal = 0;
+		int average = 0;
 		for(int i : values)
 		{
-			totalSqrts += Math.sqrt(i);
+			fairDeal += Math.sqrt(i);
+			average += i;
 		}
-		totalSqrts /= casesLeft;
-		offer = (int)Math.pow(totalSqrts,2);
-		//Add random factor - 1.00-1.30
-		int multiplier = (int)((Math.random()*31) + 100);
+		fairDeal /= casesLeft;
+		average /= casesLeft;
+		fairDeal = (int)Math.pow(fairDeal,2);
+		//Use the fair deal as the base of the offer, then add a portion of the average to it depending on round
+		offer = fairDeal + ((average-fairDeal) * (20-casesLeft) / 40);
+		//Add random factor: 0.90-1.10
+		int multiplier = (int)((Math.random()*21) + 90);
 		offer *= multiplier;
 		offer /= 100;
 		//Round it off
