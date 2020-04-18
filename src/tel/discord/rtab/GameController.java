@@ -670,7 +670,7 @@ public class GameController
 			ScheduledFuture<?> warnPlayer = timer.schedule(() -> 
 			{
 				//If they're out of the round somehow, why are we warning them?
-				if(players.get(thisPlayer).status == PlayerStatus.ALIVE)
+				if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1)
 				{
 					channel.sendMessage(players.get(thisPlayer).getSafeMention() + 
 							", thirty seconds left to choose a space!").queue();
@@ -699,7 +699,7 @@ public class GameController
 					e -> 
 					{
 						//If they're somehow taking their turn when they're out of the round, just don't do anything
-						if(players.get(thisPlayer).status == PlayerStatus.ALIVE)
+						if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1)
 						{
 							warnPlayer.cancel(false);
 							int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
@@ -710,7 +710,7 @@ public class GameController
 					90,TimeUnit.SECONDS, () ->
 					{
 						//If they're somehow taking their turn when they're out of the round, just don't do anything
-						if(players.get(thisPlayer).status == PlayerStatus.ALIVE)
+						if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1)
 						{
 							timeOutTurn();
 						}
@@ -2670,8 +2670,8 @@ public class GameController
 		channel.sendMessage(players.get(player).name + " folded!").queue();
 		foldPlayer(players.get(player));
 		players.get(player).hiddenCommand = HiddenCommand.NONE;
-		//If it was the active player, shift things over to the next turn
-		if(player == currentTurn)
+		//If it was the active player or there's only one left after this, shift things over to the next turn
+		if(player == currentTurn || playersAlive <= 1)
 			currentPlayerFoldedLogic();
 		return true;
 	}
