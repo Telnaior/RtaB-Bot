@@ -42,13 +42,13 @@ public class MinefieldMultiplier implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to Minefield Multiplier!");
-		output.add("You have a board of 21 spaces with a multiplier hiding in each space.");
-		output.add("Every turn the amount of money which we multiply will increase, BUT...");
-		output.add("The number of bombs on the board will increase as well!");
-		output.add("There will be 8 rounds and there is one x10 multiplier.");
+		output.add("Here there a board of 21 spaces with a multiplier hiding in each space, ranging from x1 to x5 and a single x10.");
+		output.add("There are eight stages, and each stage offers a higher cash value to multiply...");
+		output.add("But more bombs will be added to the board in every stage as well!");
 		output.add("Bombs will be randomly placed anywhere on the board, "+
 			  "including on top of other bombs or already picked spaces.");
-		output.add("You can **STOP** after each round with your current bank or **PASS** to the next stage!");
+		output.add("You can **STOP** after each round with your current bank (or stop automatically if you survive all eight rounds),"
+				+ "or **PASS** to skip the current stage without gaining anything and advance to the next one.");
 		output.add("But you lose everything if you hit a bomb."); //~Duh
 
 		output.add(generateBoard());
@@ -114,7 +114,6 @@ public class MinefieldMultiplier implements MiniGame {
 			{
 				output.add("**BOOM**");
 				output.add("Sorry, you lose!");
-				output.add("Here is the revealed board!");
 				output.add(generateRevealBoard());
 				alive=false;
 
@@ -127,10 +126,18 @@ public class MinefieldMultiplier implements MiniGame {
 
 				output.add("It's a " + String.format("**x%d** Multiplier!", lastPick));
 				output.add(String.format("That makes **$%,d** for a total of **$%,d!**", win, total));
-				output.add(String.format("**%d** bomb"+ (bombTable(stage+1) != 1 ? "s have" : " has")
-						+" been added!", bombTable(stage + 1)));
-				increaseStage();
-				output.add(generateBoard());
+				if(stage >= 8)
+				{
+					stage++; //Allowing the game to detect that you've reached the end
+					output.add(generateRevealBoard());
+				}
+				else
+				{
+					output.add(String.format("**%d** bomb"+ (bombTable(stage+1) != 1 ? "s have" : " has")
+							+" been added!", bombTable(stage + 1)));
+					increaseStage();
+					output.add(generateBoard());
+				}
 			}
 		}
 
