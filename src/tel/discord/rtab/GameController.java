@@ -803,8 +803,6 @@ public class GameController
 	}
 	void resolveTurn(int location)
 	{
-		pickedSpaces[location] = true;
-		spacesLeft--;
 		if(getCurrentPlayer().isBot)
 		{
 			channel.sendMessage(getCurrentPlayer().name + " selects space " + (location+1) + "...")
@@ -813,6 +811,14 @@ public class GameController
 		else
 		{
 			channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
+		}
+		//Try to detect double-turns and negate them before damage is done
+		if(pickedSpaces[location])
+			return;
+		else
+		{
+			pickedSpaces[location] = true;
+			spacesLeft--;
 		}
 		//Event things
 		if(getCurrentPlayer().threshold)
@@ -846,6 +852,9 @@ public class GameController
 	}
 	void runEndTurnLogic()
 	{
+		//Make sure the game isn't already overs
+		if(gameStatus == GameStatus.END_GAME)
+			return;
 		//Test if game over - either all spaces gone and no blammo queued, or one player left alive
 		if((spacesLeft <= 0 && !futureBlammo) || playersAlive <= 1) 
 		{
@@ -861,7 +870,10 @@ public class GameController
 	}
 	void gameOver()
 	{
-		gameStatus = GameStatus.END_GAME;
+		if(gameStatus == GameStatus.END_GAME)
+			return;
+		else
+			gameStatus = GameStatus.END_GAME;
 		if(spacesLeft < 0)
 			channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
 		channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
@@ -1307,8 +1319,6 @@ public class GameController
 
 	private void runBlammo(List<BlammoChoices> buttons, int buttonPressed, boolean mega)
 	{
-		//Blammo is done now
-		currentBlammo = false;
 		if(getCurrentPlayer().isBot)
 		{
 			channel.sendMessage(getCurrentPlayer().name + " presses button " + (buttonPressed+1) + "...").queue();
@@ -1318,6 +1328,11 @@ public class GameController
 			channel.sendMessage("Button " + (buttonPressed+1) + " pressed...").queue();
 		}
 		channel.sendMessage("...").completeAfter(3,TimeUnit.SECONDS);
+		//Double-check that there is actually a blammo
+		if(!currentBlammo)
+			return;
+		else
+			currentBlammo = false; //Too late to repel now
 		StringBuilder extraResult = null;
 		int penalty = Player.BOMB_PENALTY*baseMultiplier;
 		switch(buttons.get(buttonPressed))
