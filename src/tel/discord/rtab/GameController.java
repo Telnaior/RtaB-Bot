@@ -852,7 +852,7 @@ public class GameController
 	}
 	void runEndTurnLogic()
 	{
-		//Make sure the game isn't already overs
+		//Make sure the game isn't already over
 		if(gameStatus == GameStatus.END_GAME)
 			return;
 		//Test if game over - either all spaces gone and no blammo queued, or one player left alive
@@ -1365,7 +1365,7 @@ public class GameController
 			if(mega)
 			{
 				//They actually did it hahahahahahahaha
-				channel.sendMessage("You **ELIMINATED EVERYONE**!!").completeAfter(3,TimeUnit.SECONDS);
+				channel.sendMessage("Oh no, you **ELIMINATED EVERYONE**!!").completeAfter(3,TimeUnit.SECONDS);
 				while(currentTurn != -1)
 				{
 					//Check for special events to bring extra pain
@@ -1390,7 +1390,8 @@ public class GameController
 							Math.abs(penalty*16),getCurrentPlayer().getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
 					getCurrentPlayer().threshold = true;
 					extraResult = getCurrentPlayer().blowUp(4*baseMultiplier,false,0);
-					channel.sendMessage(extraResult).queue();
+					if(extraResult != null)
+						channel.sendMessage(extraResult).queue();
 					advanceTurn(false);
 				}
 				//Re-null this so we don't get an extra quote of it
