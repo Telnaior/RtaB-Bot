@@ -85,6 +85,7 @@ public class GameController
 	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
 	public ScheduledFuture<?> demoMode;
 	Message waitingMessage;
+	boolean resolvingSpace;
 	
 	public GameController(TextChannel channelID, boolean allowJoining, boolean mainGame, 
 			int demoTimer, boolean verbosity)
@@ -97,6 +98,7 @@ public class GameController
 		verboseBotGames = verbosity;
 		baseMultiplier = 1;
 		boardMultiplier = baseMultiplier;
+		resolvingSpace = false;
 		if(runDemo != 0)
 		{
 			demoMode = timer.schedule(() -> 
@@ -144,6 +146,7 @@ public class GameController
 		futureBlammo = false;
 		timer.shutdownNow();
 		timer = new ScheduledThreadPoolExecutor(1);
+		resolvingSpace = false;
 		if(runDemo != 0)
 		{
 			demoMode = timer.schedule(() -> 
@@ -670,7 +673,7 @@ public class GameController
 			ScheduledFuture<?> warnPlayer = timer.schedule(() -> 
 			{
 				//If they're out of the round somehow, why are we warning them?
-				if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1)
+				if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1 && thisPlayer == currentTurn)
 				{
 					channel.sendMessage(players.get(thisPlayer).getSafeMention() + 
 							", thirty seconds left to choose a space!").queue();
@@ -699,7 +702,7 @@ public class GameController
 					e -> 
 					{
 						//If they're somehow taking their turn when they're out of the round, just don't do anything
-						if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1)
+						if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1 && thisPlayer == currentTurn)
 						{
 							warnPlayer.cancel(false);
 							int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
@@ -710,7 +713,7 @@ public class GameController
 					90,TimeUnit.SECONDS, () ->
 					{
 						//If they're somehow taking their turn when they're out of the round, just don't do anything
-						if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1)
+						if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1 && thisPlayer == currentTurn)
 						{
 							timeOutTurn();
 						}
@@ -740,6 +743,10 @@ public class GameController
 			//If it isn't, throw out the space and let the players know what's up
 			else
 			{
+				if(resolvingSpace)
+					return;
+				else
+					resolvingSpace = true;
 				pickedSpaces[spaceChosen] = true;
 				spacesLeft --;
 				channel.sendMessage("Space " + (spaceChosen+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
@@ -803,6 +810,11 @@ public class GameController
 	}
 	void resolveTurn(int location)
 	{
+		//Check for a hold on the board, and hold it if there isn't
+		if(resolvingSpace)
+			return;
+		else
+			resolvingSpace = true;
 		if(getCurrentPlayer().isBot)
 		{
 			channel.sendMessage(getCurrentPlayer().name + " selects space " + (location+1) + "...")
@@ -852,6 +864,8 @@ public class GameController
 	}
 	void runEndTurnLogic()
 	{
+		//Release the hold placed on the board
+		resolvingSpace = false;
 		//Make sure the game isn't already over
 		if(gameStatus == GameStatus.END_GAME)
 			return;
@@ -947,7 +961,7 @@ public class GameController
 			break;
 		case BOOSTHOLD:
 			StringBuilder boostHoldResult = new StringBuilder().append("It ");
-			if(getCurrentPlayer().booster != 100)
+			if(getCurrentPlayer().booster != 100 || getCurrentPlayer().boostCharge != 0)
 				boostHoldResult.append("holds your boost, then ");
 			boostHoldResult.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
 			channel.sendMessage(boostHoldResult)
@@ -2678,8 +2692,8 @@ public class GameController
 	{
 		//Find them in the game
 		int player = findPlayerInGame(folder.getId());
-		//Check that the fold is valid (the game is running, they're alive, and they have the command)
-		if(gameStatus != GameStatus.IN_PROGRESS || player == -1 
+		//Check that the fold is valid (the game is running, they're alive, they have the command, and haven't picked a space)
+		if(gameStatus != GameStatus.IN_PROGRESS || player == -1 || resolvingSpace
 				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.FOLD)
 			return false;
 		//Cool, we're good, fold them out
