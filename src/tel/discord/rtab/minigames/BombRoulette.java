@@ -9,6 +9,7 @@ public class BombRoulette implements MiniGame {
     int score;
     boolean hasJoker;
     enum WheelSpace {CASH, DOUBLE, HALVE, JOKER, BANKRUPT, BOMB};
+	int bottomDollar, topDollar; // both only needed for intro spiel
     int[] spaceValues;
     WheelSpace[] spaceTypes;
     int pointer, cashLeft, cashSpaces, doubleSpaces, halveSpaces, jokerSpaces, bankruptSpaces, bombSpaces;
@@ -19,6 +20,8 @@ public class BombRoulette implements MiniGame {
         //Initialise wheel
         isAlive = true;
         score = 0;
+	bottomDollar = Integer.MAX_VALUE;
+	topDollar = Integer.MIN_VALUE;
         hasJoker = false;
         /* It might not initially make sense to assign non-cash space a cash 
          * value; but the bot uses this information to determine its strategy.
@@ -39,6 +42,10 @@ public class BombRoulette implements MiniGame {
             switch (spaceTypes[i]) {
                 case CASH:
                 	spaceValues[i] *= baseMultiplier;
+			if (spaceValues[i] < bottomDollar)
+				bottomDollar = spaceValues[i];
+			if (spaceValues[i] > topDollar)
+				topDollar = spaceValues[i];
                     cashLeft += spaceValues[i];
                     cashSpaces++;
                     break;
@@ -65,8 +72,8 @@ public class BombRoulette implements MiniGame {
                 + "trying to collect as much cash as possible.");
         output.add("Eighteen of those spaces have various amounts of cash "
                 + String.format("ranging from $%,d to $%,d. The total amount on the "
-                		,25000*baseMultiplier,200000*baseMultiplier)
-                + String.format("wheel at the beginning of the game is $%,d.",1000000*baseMultiplier));
+                		,bottomDollar,topDollar)
+                + String.format("wheel at the beginning of the game is $%,d.",cashLeft));
         output.add("Three are **Double** spaces, which will double your score up " 
                 + "to that point.");
         output.add("Two are **Halve** spaces, which will halve your score up "
