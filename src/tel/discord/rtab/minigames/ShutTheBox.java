@@ -11,7 +11,7 @@ public class ShutTheBox implements MiniGame {
 	int possibleRolls;
 	boolean[] closedSpaces;
 	Dice dice;
-	String[] isGood;
+	String[] strategy;
 	boolean allNumbersGood;
 	int[] waysToClose;
 	boolean isAlive;  
@@ -36,7 +36,7 @@ public class ShutTheBox implements MiniGame {
 		
 		//Display instructions
 		output.add("In Shut the Box, you will be given a pair of six-sided dice"
-				+ " and a box with the numbers 1 through 9 on it.");
+				+ " and a box with the numbers 1 through " + BOARD_SIZE + " on it.");
 		output.add("Your objective is to close all nine numbers.");
 		output.add("Each time you roll the dice, you may close one or more " +
 				"numbers that total *exactly* the amount thrown.");
@@ -69,7 +69,7 @@ public class ShutTheBox implements MiniGame {
 			else if (pick.toUpperCase().equals("ROLL")) {
 				dice.rollDice();
 				output.add("You rolled: " + dice.toString());
-				if (isGood[dice.getDiceTotal() - 2] != null) {
+				if (waysToClose[dice.getDiceTotal() - 2] != 0) {
 					if (totalShut + dice.getDiceTotal() == MAX_SCORE) {
 						output.add("Congratulations, you shut the box!");
 						totalShut = MAX_SCORE; // essentially closes the remaining numbers automatically
@@ -84,7 +84,7 @@ public class ShutTheBox implements MiniGame {
                     else if (waysToClose[dice.getDiceTotal() - 2] == 1) {
                             output.add("There is only one way to close that number, so " +
                                     "we'll do it automatically for you.");
-                            closeNumbers(isGood[dice.getDiceTotal() - 2].split("\\s"));
+                            closeNumbers(strategy[dice.getDiceTotal() - 2].split("\\s"));
                         	output.add(generateBoard());
                             output.add("ROLL again if you dare, or type STOP to stop " +
                                 "with your total.");
@@ -189,8 +189,8 @@ public class ShutTheBox implements MiniGame {
 		display.append("\n Points:      " + String.format("%2d", totalShut));
 		display.append("\n Total: $" + String.format("%,7d", getMoneyWon()));
 		display.append("\n\n Possible Rolls:");
-		for (int i = 0; i < isGood.length; i++) {
-			if (isGood[i] != null)
+		for (int i = 0; i < waysToClose.length; i++) {
+			if (waysToClose[i] != 0)
 				display.append("\n " + String.format("%2d", i+2) + ": +$" +
 						String.format("%,9d", rollValue(i+2)));
 			else
@@ -208,13 +208,13 @@ public class ShutTheBox implements MiniGame {
         }
         
 	void refreshGood() {
-		isGood = new String[possibleRolls];
+		strategy = new String[possibleRolls];
                 waysToClose = new int[possibleRolls];
 		
 		// The numbers that are still open besides 1 are obviously still good, so start there.
 		for (int i = 1; i < closedSpaces.length; i++)
 			if(!closedSpaces[i]) {
-				isGood[i-1] = Integer.toString(i+1);
+				strategy[i-1] = Integer.toString(i+1);
                                 waysToClose[i-1]++;
                         }
 		
@@ -227,20 +227,20 @@ public class ShutTheBox implements MiniGame {
 					continue;
 				// i-1 and j-1 must both be open; otherwise we wouldn't reach this point in the code
                                 waysToClose[i+j-2]++;
-				if(isGood[i+j-2] == null || isGood[i+j-2].length() > 3)
-					isGood[i+j-2] = Integer.toString(i) + " " + Integer.toString(j);
+				if(strategy[i+j-2] == null || strategy[i+j-2].length() > 3)
+					strategy[i+j-2] = Integer.toString(i) + " " + Integer.toString(j);
 				for (int k = j+1; i+j+k < possibleRolls + 2; k++) {
 					if (closedSpaces[k-1])
 						continue;
                                         waysToClose[i+j+k-2]++;
-					if(isGood[i+j+k-2] == null || isGood[i+j+k-2].length() > 5)
-						isGood[i+j+k-2] = Integer.toString(i) + " " + Integer.toString(j) + " " + Integer.toString(k);
+					if(strategy[i+j+k-2] == null || strategy[i+j+k-2].length() > 5)
+						strategy[i+j+k-2] = Integer.toString(i) + " " + Integer.toString(j) + " " + Integer.toString(k);
 					for (int l = k+1; i+j+k+l < possibleRolls + 2; l++) {
 						if (closedSpaces[l-1])
 							continue;
                                                 waysToClose[i+j+k+l-2]++;
-						if(isGood[i+j+k+l-2] == null || isGood[i+j+k+l-2].length() > 7)
-							isGood[i+j+k+l-2] = Integer.toString(i) + " " + Integer.toString(j) + " " 
+						if(strategy[i+j+k+l-2] == null || strategy[i+j+k+l-2].length() > 7)
+							strategy[i+j+k+l-2] = Integer.toString(i) + " " + Integer.toString(j) + " " 
 								+ Integer.toString(k) + " " + Integer.toString(l);
 					}
 				}
@@ -248,8 +248,8 @@ public class ShutTheBox implements MiniGame {
 		}
 		//Finally, check if every number is still good and set the boolean if it isn't
 		if(allNumbersGood)
-			for(String nextRoll : isGood)
-				if(nextRoll == null)
+			for(int nextRoll : waysToClose)
+				if(nextRoll == 0)
 				{
 					allNumbersGood = false;
 					break;
@@ -258,7 +258,7 @@ public class ShutTheBox implements MiniGame {
 	}
 		
 	public int rollValue(int roll) {
-		if (isGood[roll-2] == null)
+		if (waysToClose[roll-2] == 0)
 			return getMoneyWon() * -1;
 		if (totalShut + roll == MAX_SCORE)
 			return 1500000 - getMoneyWon();
@@ -291,12 +291,12 @@ public class ShutTheBox implements MiniGame {
 	@Override
 	public String getBotPick() {
 		if (isClosing) {
-			return isGood[dice.getDiceTotal() - 2];
+			return strategy[dice.getDiceTotal() - 2];
 		}
 		else {
 			Dice testDice = new Dice();
 			testDice.rollDice();
-			if (isGood[testDice.getDiceTotal()-2] != null)
+			if (waysToClose[testDice.getDiceTotal()-2] != 0)
 				return "ROLL";
 			else return "STOP";
 		}
