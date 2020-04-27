@@ -8,13 +8,14 @@ public enum PrizeType {
 	S2TROPHY (   60000,"a replica of Charles510's Season 2 trophy"),
 	S3TROPHY (   54000,"a replica of Archstered's Season 3 trophy"),
 	
-	//Regular prizes
+	//(Ir)Regular prizes
 	DB1		  (   22805,"a DesertBuck"),
 	GOVERNOR  (   26000,"the Governor's favourite"),
 	PI  	  (   31416,"a fresh pi"),
 	ECONSTANT (   27183,"some e"),
 	VOWEL     (   250,"a vowel"),
 	QUESTION  (   64000,"the famous question"),
+	BIGJON    (    1906,"the BigJon special"),	
 	WEIRDAL   (   27000,"Weird Al's accordion"),
 	ROCKEFELLER (  1273,"a trip down Rockefeller Street"),
 	EWW       (     144,"something gross"),
