@@ -15,7 +15,12 @@ public enum PrizeType {
 	ECONSTANT (   27183,"some e"),
 	VOWEL     (   250,"a vowel"),
 	QUESTION  (   64000,"the famous question"),
-	BIGJON    (    1906,"the BigJon special");
+	WEIRDAL   (   27000,"Weird Al's accordion"),
+	ROCKEFELLER (  1273,"a trip down Rockefeller Street"),
+	EWW       (     144,"something gross"),
+	NEWJERSEY (   -1000,"a trip to New Jersey"),
+	HUNDREDG  (  100000,"a 100 Grand bar"),
+	DISCORD   (   70013,"Discord's ginseng (that really sings)");
     
     private final int prizeValue;
     private final String prizeName;
