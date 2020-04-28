@@ -24,6 +24,7 @@ public class DeucesWild implements MiniGame {
 	boolean[] pickedSpaces = new boolean[BOARD_SIZE];
 	boolean redrawUsed;
 	byte gameStage;
+	int baseMultiplier;
 
 	@Override
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
@@ -41,18 +42,22 @@ public class DeucesWild implements MiniGame {
 		pickedSpaces = new boolean[BOARD_SIZE];
 		redrawUsed = false;
 		gameStage = 0;
+		this.baseMultiplier = baseMultiplier;
 		//Display instructions
 		output.add("In Deuces Wild, your objective is to obtain the best poker hand possible.");
 		output.add("We have shuffled a standard deck of 52 playing cards, from which you will pick five cards.");
 		output.add("As the name of the game suggests, deuces (twos) are wild. "
 				+ "Those are always treated as the best card possible.");
 		output.add("After you draw your five cards, you may redraw as many of them as you wish, but only once.");
-		output.add("You must get at least a pair to win any money. That pays $20,000.");
-		output.add("Two pairs pay $50,000, a three of a kind pays $100,000, a straight pays $150,000, "
-				+ "a flush pays $200,000, a full house pays $250,000, a four of a kind pays $500,000, "
-				+ "a straight flush pays $750,000, a five of a kind pays $1,000,000, a wild royal flush pays $2,000,000, "
-				+ "and four deuces pay $5,000,000.");
-		output.add("If you are lucky enough to get a natural royal flush, you will win $10,000,000!");
+		output.add(String.format("You must get at least a pair to win any money. That pays $%,d.",getMoneyWon(PokerHand.ONE_PAIR)));
+		output.add(String.format("Two pairs pay $%,d, a three of a kind pays $%,d, a straight pays $%,d, ",
+				getMoneyWon(PokerHand.TWO_PAIR), getMoneyWon(PokerHand.THREE_OF_A_KIND), getMoneyWon(PokerHand.STRAIGHT))
+				+ String.format("a flush pays $%,d, a full house pays $%,d, a four of a kind pays $%,d, ",
+				getMoneyWon(PokerHand.FLUSH), getMoneyWon(PokerHand.FULL_HOUSE), getMoneyWon(PokerHand.FOUR_OF_A_KIND))
+				+ String.format("a straight flush pays $%,d, a five of a kind pays $%,d, a wild royal flush pays $%,d, ",
+				getMoneyWon(PokerHand.STRAIGHT_FLUSH), getMoneyWon(PokerHand.FIVE_OF_A_KIND), getMoneyWon(PokerHand.WILD_ROYAL))
+				+ String.format("and four deuces pay $%,d.", getMoneyWon(PokerHand.FOUR_DEUCES)));
+		output.add(String.format("If you are lucky enough to get a natural royal flush, you will win $%,d!", getMoneyWon(PokerHand.NATURAL_ROYAL)));
 		output.add("Best of luck! Pick your first card when you're ready.");
 		output.add(generateBoard());
 		return output;
@@ -327,24 +332,28 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public int getMoneyWon()
 	{
-		switch(hand) {
-			case NOTHING: return 0;
-			case ONE_PAIR: return 20000;
-			case TWO_PAIR: return 50000;
-			case THREE_OF_A_KIND: return 100000;
-			case STRAIGHT: return 150000;
-			case FLUSH: return 200000;
-			case FULL_HOUSE: return 250000;
-			case FOUR_OF_A_KIND: return 500000;
-			case STRAIGHT_FLUSH: return 750000;
-			case FIVE_OF_A_KIND: return 1000000;
-			case WILD_ROYAL: return 2000000;
-			case FOUR_DEUCES: return 5000000;
-			case NATURAL_ROYAL: return 10000000;
-			default: throw new IllegalArgumentException(); // since the above is supposed to already handle everything
-		}
+		return getMoneyWon(hand);
 	}
 
+	public int getMoneyWon(PokerHand pokerHand) {
+		switch(pokerHand) {
+			case NOTHING: return 0;
+			case ONE_PAIR: return 20000 * baseMultiplier;
+			case TWO_PAIR: return 50000 * baseMultiplier;
+			case THREE_OF_A_KIND: return 100000 * baseMultiplier;
+			case STRAIGHT: return 150000 * baseMultiplier;
+			case FLUSH: return 200000 * baseMultiplier;
+			case FULL_HOUSE: return 250000 * baseMultiplier;
+			case FOUR_OF_A_KIND: return 500000 * baseMultiplier;
+			case STRAIGHT_FLUSH: return 750000 * baseMultiplier;
+			case FIVE_OF_A_KIND: return 1000000 * baseMultiplier;
+			case WILD_ROYAL: return 2000000 * baseMultiplier;
+			case FOUR_DEUCES: return 5000000 * baseMultiplier;
+			case NATURAL_ROYAL: return 10000000 * baseMultiplier;
+			default: throw new IllegalArgumentException(); // since the above is supposed to already handle everything
+		}		
+	}
+	
 	@Override
 	public boolean isBonusGame() {
 		return BONUS;
