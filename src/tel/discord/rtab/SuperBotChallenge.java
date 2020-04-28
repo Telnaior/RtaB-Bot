@@ -29,7 +29,7 @@ public class SuperBotChallenge
 	{
 		//Format is "~ CHALLENGE CHANNEL ~ XX Players Remain"
 		int playersLeft = Integer.parseInt(channel.getTopic().substring(22,24));
-		int multiplier = 1 + (80 - playersLeft) / 8;
+		int multiplier = getMultiplier(playersLeft);
 		gameHandler.setMultiplier(multiplier);
 		timer.shutdownNow();
 		timer = new ScheduledThreadPoolExecutor(1);
@@ -73,5 +73,56 @@ public class SuperBotChallenge
 		}
 		if(totalGames > 0)
 			channel.sendMessage(totalGames + " games loaded.").queue();
+	}
+	int getMultiplier(int playersLeft)
+	{
+		int multiplier;
+		switch(playersLeft)
+		{
+		case 4:
+			multiplier = 10;
+			break;
+		case 8:
+			multiplier = 9;
+			break;
+		case 12:
+			multiplier = 8;
+			break;
+		case 16:
+		case 20:
+			multiplier = 7;
+			break;
+		case 24:
+		case 28:
+			multiplier = 6;
+			break;
+		case 32:
+		case 36:
+			multiplier = 5;
+			break;
+		case 40:
+		case 44:
+			multiplier = 4;
+			break;
+		case 48:
+		case 52:
+		case 56:
+			multiplier = 3;
+			break;
+		case 60:
+		case 64:
+		case 68:
+			multiplier = 2;
+			break;
+		case 72:
+		case 76:
+		case 80:
+			multiplier = 1;
+			break;
+		default:
+			multiplier = 1;
+			channel.sendMessage("Multiplier not initialised properly!").queue();
+		}
+		return multiplier;
 	}
 }
