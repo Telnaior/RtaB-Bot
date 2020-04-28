@@ -10,15 +10,18 @@ import tel.discord.rtab.objs.Dice;
 public class HiLoDice implements MiniGame {
     static final String NAME = "Hi/Lo Dice";
     static final boolean BONUS = false;
+    static final int DICE_MULTIPLIER = 10_000;
+    static final int BASE_CORRECT_WIN = 50_000;
     boolean[] closedSpaces;
     Dice dice;
     boolean isAlive; 
     int score, lastRoll;
+    int baseMultiplier;
     
     @Override
     public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
     {
-    	//TODO make base multiplier matter
+    	this.baseMultiplier = baseMultiplier;
         LinkedList<String> output = new LinkedList<>();
         
         dice = new Dice();
@@ -31,9 +34,10 @@ public class HiLoDice implements MiniGame {
                 + "roll two six-sided dice without repeating a number and "
                 + "whether each roll is higher or lower than the roll before "
                 + "it.");
-        output.add("You will start off with $10,000 times the first roll.");
+        output.add(String.format("You will start off with $%,d times the first roll.",DICE_MULTIPLIER*baseMultiplier));
         output.add("For each successful higher/lower prediction, you'll get "
-                + "$50,000 plus $10,000 times the amount thrown.");
+                + String.format("$%,d plus $%,d times the amount thrown.",
+                		BASE_CORRECT_WIN*baseMultiplier,DICE_MULTIPLIER*baseMultiplier));
         output.add("But if you predict incorrectly or you roll a number that "
                 + "you've already rolled, you lose everything.");
         output.add("You are free to walk away with your winnings at any point, "
@@ -41,7 +45,7 @@ public class HiLoDice implements MiniGame {
         output.add("Good luck!");
         
         dice.rollDice();
-        score += dice.getDiceTotal() * 10000;
+        score += dice.getDiceTotal() * DICE_MULTIPLIER*baseMultiplier;
         closedSpaces[dice.getDiceTotal() - 2] = true;
         lastRoll = dice.getDiceTotal();
         output.add("You rolled: " + dice.toString());
@@ -125,7 +129,7 @@ public class HiLoDice implements MiniGame {
         }
         else {
             output.add("Correct prediction!");
-            score += 50000 + 10000 * dice.getDiceTotal();
+            score += BASE_CORRECT_WIN*baseMultiplier + DICE_MULTIPLIER*baseMultiplier * dice.getDiceTotal();
             closedSpaces[dice.getDiceTotal() - 2] = true;
             lastRoll = dice.getDiceTotal();
             output.add(promptChoice());

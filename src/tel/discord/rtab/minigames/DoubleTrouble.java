@@ -22,6 +22,7 @@ public class DoubleTrouble implements MiniGame {
 	boolean[] pickedSpaces;
 	int lastSpace;
 	int lastPick;
+	int baseMultiplier;
 	
 	/**
 	 * Initializes the variables used in the minigame and prints the starting messages.
@@ -30,13 +31,14 @@ public class DoubleTrouble implements MiniGame {
 	@Override
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
-		//TODO make base multiplier matter
+		this.baseMultiplier = baseMultiplier;
 		alive = true;
 		rounds = 0;
-		total = 5000; // Player starts with $5,000
+		total = 5000 * baseMultiplier; // Player starts with $5,000
 		mystery = 100*(int)((Math.random()*200+1)); // Generates a random number from 100 - 20,000 in $100 increments
 		if(Math.random() < 0.25) //With 25% chance, give it another random number with the same distribution
 			mystery += 100*(int)((Math.random()*100+1));
+		mystery *= baseMultiplier;
 		bombsLeft = 1;
 		crashLeft = 1;
 		cashLeft = 9;
@@ -89,7 +91,7 @@ public class DoubleTrouble implements MiniGame {
 			lastPick = money.get(lastSpace);
 			//Start printing output
 			output.add(String.format("Space %d selected...",lastSpace+1));
-			switch(money.get(lastSpace))
+			switch(lastPick)
 			{
 			case 0: //Bomb
 				alive = false;
@@ -116,8 +118,8 @@ public class DoubleTrouble implements MiniGame {
 				doublesLeft --;
 				break;
 			default: //Regular cash
-				output.add(String.format("It's $%,d!",lastPick));
-				total += money.get(lastSpace);
+				output.add(String.format("It's $%,d!",lastPick*baseMultiplier));
+				total += lastPick*baseMultiplier;
 				cashLeft --;
 				break;
 			}

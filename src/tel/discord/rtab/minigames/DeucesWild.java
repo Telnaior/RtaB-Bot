@@ -29,7 +29,6 @@ public class DeucesWild implements MiniGame {
 	@Override
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
-		//TODO make base multiplier matter
 		LinkedList<String> output = new LinkedList<>();
 		//Initialise board
 		board.clear();

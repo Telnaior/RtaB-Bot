@@ -20,6 +20,7 @@ public class MinefieldMultiplier implements MiniGame {
 	boolean[] pickedSpaces;
 	int lastSpace;
 	int lastPick;
+	int baseMultiplier;
 	
 	
 	/**
@@ -28,6 +29,7 @@ public class MinefieldMultiplier implements MiniGame {
 	 */
 	@Override
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier){
+		this.baseMultiplier = baseMultiplier;
 		bombs = Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 		total = 0;
 		stage = 1;
@@ -255,7 +257,7 @@ public class MinefieldMultiplier implements MiniGame {
 				value = 200000;
 				break;
 		}
-		return(value);
+		return(value*baseMultiplier);
 	}
 
 	private int bombTable(int stage)

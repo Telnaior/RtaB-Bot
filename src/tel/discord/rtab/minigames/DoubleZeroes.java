@@ -17,6 +17,7 @@ public class DoubleZeroes implements MiniGame {
 	boolean[] pickedSpaces;
 	int lastSpace;
 	int lastPick;
+	int baseMultiplier;
 	
 	/**
 	 * Initializes the variables used in the minigame and prints the starting messages.
@@ -25,7 +26,7 @@ public class DoubleZeroes implements MiniGame {
 	@Override
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
-		//TODO make base multiplier matter
+		this.baseMultiplier = baseMultiplier;
 		alive = true;
 		total = 0;
 		zeroesLeft = 10;
@@ -223,7 +224,7 @@ public class DoubleZeroes implements MiniGame {
 	@Override
 	public int getMoneyWon() {
 		if(isGameOver())
-			return total;
+			return total * baseMultiplier;
 		else
 			return 0;
 	}
