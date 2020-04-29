@@ -50,6 +50,7 @@ public class GameController
 {
 	final static int MAX_PLAYERS = 16;
 	final static String[] VALID_ARC_RESPONSES = {"A","ABORT","R","RETRY","C","CONTINUE"};
+	final static int REQUIRED_STREAK_FOR_BONUS = 50;
 	final boolean rankChannel;
 	public final int runDemo;
 	final boolean verboseBotGames;
@@ -1953,23 +1954,23 @@ public class GameController
 				channel.sendMessage(extraResult).queue();
 		}
 		//Check to see if any bonus games have been unlocked - folded players get this too
-		//Search every multiple of 5 to see if we've got it
-		for(int i=50; i<=getCurrentPlayer().winstreak;i+=50)
+		//Search every multiple to see if we've got it
+		for(int i=REQUIRED_STREAK_FOR_BONUS; i<=getCurrentPlayer().winstreak;i+=REQUIRED_STREAK_FOR_BONUS)
 		{
 			if(getCurrentPlayer().oldWinstreak < i)
 			{
 				switch(i)
 				{
-				case 50:
+				case REQUIRED_STREAK_FOR_BONUS*1:
 					getCurrentPlayer().games.add(Games.SUPERCASH);
 					break;
-				case 100:
+				case REQUIRED_STREAK_FOR_BONUS*2:
 					getCurrentPlayer().games.add(Games.DIGITAL_FORTRESS);
 					break;
-				case 150:
+				case REQUIRED_STREAK_FOR_BONUS*3:
 					getCurrentPlayer().games.add(Games.SPECTRUM);
 					break;
-				case 200:
+				case REQUIRED_STREAK_FOR_BONUS*4:
 					getCurrentPlayer().games.add(Games.HYPERCUBE);
 					break;
 				default:
@@ -2716,7 +2717,7 @@ public class GameController
 	void foldPlayer(Player folder)
 	{
 		//Mark them as folded if they have minigames, or qualified for a bonus game
-		if(folder.oldWinstreak < 50 * (folder.winstreak / 50)
+		if(folder.oldWinstreak < REQUIRED_STREAK_FOR_BONUS * (folder.winstreak / REQUIRED_STREAK_FOR_BONUS)
 				|| folder.games.size() > 0)
 		{
 			channel.sendMessage("You'll still get to play your minigames too.").queueAfter(1,TimeUnit.SECONDS);
