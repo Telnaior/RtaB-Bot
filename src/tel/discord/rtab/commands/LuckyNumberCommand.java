@@ -50,7 +50,7 @@ public class LuckyNumberCommand extends Command
 		//Here be spoilers!
 		else
 		{
-			int chosenText = (int) (Math.random() * 10);
+			int chosenText = (int) (Math.random() * 11);
 			switch(chosenText)
 			{
 			case 0:
@@ -70,7 +70,7 @@ public class LuckyNumberCommand extends Command
 				break;
 			case 5:
 				event.reply("Your lucky number is a **BOMB**.");
-				event.reply("It goes "+(Math.random() < 0.04 ? "_\\*fizzle*_." : "**BOOM**."));
+				event.reply("It goes "+(Math.random() < 0.04 ? "_\\*fizzle*_." : "**BOOM**. $250,000 penalty."));
 				break;
 			case 6:
 				event.reply("This fortune cookie is delicious! Unfortunately, you ate the lucky number.");
@@ -83,6 +83,9 @@ public class LuckyNumberCommand extends Command
 				break;
 			case 9:
 				event.reply("Didn't you see the horoscope?");
+				break;
+			case 10:
+				event.reply("Should've picked 33!");
 				break;
 			}
 		}
