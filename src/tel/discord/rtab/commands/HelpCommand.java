@@ -107,22 +107,6 @@ public class HelpCommand extends Command
 			helpList.append("Betting chip totals will never be reset, so there's no rush on your quest to dominate.\n");
 			helpList.append("Good luck with your betting, and enjoy this side mode!");
 			break;
-		case "shop":
-		case "support":
-		case "donate":
-			helpList.append("It is of course possible to play RtaB entirely free (and most people do), "
-					+ "but if you wish to support the server there are a few perks you can gain for this.\n");
-			helpList.append("The simple choices are that you can purchase some extra lives or betting chips - "
-					+ "there are several price points available for this.\n");
-			helpList.append("It's also worth noting that you can purchase unlimited lives for an entire season.\n");
-			helpList.append("You can also rent custom roles if you wish to give yourself (or another player) a special title.\n");
-			helpList.append("Finally, there are a couple of 'special' perks you can buy.\n");
-			helpList.append("Firstly, you can buy the right to participate in a Super Bot Challenge. "
-					+ "If you manage to win, you earn a permanent custom role!\n");
-			helpList.append("Secondly, you can rent the RtaB bot if you wish to run the game in your own server "
-					+ "without the burden of having to host it yourself.\n");
-			helpList.append("The full price list can be seen at https://i.imgur.com/gcsGHev.png and all prices are in AUD.");
-			break;
 		case "list":
 		default:
 			helpList.append("```\n");
@@ -135,7 +119,6 @@ public class HelpCommand extends Command
 			helpList.append("!help newbie - Explains newbie protection\n");
 			helpList.append("!help lives  - Explains the life system\n");
 			helpList.append("!help bet    - Explains the betting system in the Super Bot Challenge\n");
-			helpList.append("!help shop   - Explains what you can buy should you choose to support RtaB\n");
 			helpList.append("```");
 			break;
 		}
