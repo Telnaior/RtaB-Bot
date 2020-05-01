@@ -368,7 +368,7 @@ public class GameController
 			else
 			{
 				players.get(iInner).user.openPrivateChannel().queue(
-						(channel) -> channel.sendMessage("Please place your bomb within the next 60 seconds "
+						(channel) -> channel.sendMessage("Please place your bomb within the next "+(playersCanJoin?60:90)+" seconds "
 								+ "by sending a number 1-" + boardSize).queue());
 				waiter.waitForEvent(MessageReceivedEvent.class,
 						//Check if right player, and valid bomb pick
@@ -393,7 +393,7 @@ public class GameController
 						90, TimeUnit.SECONDS, () -> {});
 			}
 		}
-		timer.schedule(() -> abortRetryContinue(), 60, TimeUnit.SECONDS);
+		timer.schedule(() -> abortRetryContinue(), playersCanJoin?60:90, TimeUnit.SECONDS);
 		checkReady();
 	}
 	void abortRetryContinue()
@@ -401,6 +401,15 @@ public class GameController
 		//We don't need to do this if we aren't still waiting for bombs
 		if(gameStatus != GameStatus.BOMB_PLACEMENT)
 			return;
+		//If this is SBC, just turn over control to AI
+		if(!playersCanJoin)
+		{
+			for(int i=0; i<players.size(); i++)
+				if(players.get(i).status != PlayerStatus.ALIVE)
+					players.get(i).isBot = true;
+			sendBombPlaceMessages();
+			return;
+		}
 		//If *no one* placed (including human v bot), abort automatically
 		if(playersAlive == 0 || players.get(1).isBot)
 		{
