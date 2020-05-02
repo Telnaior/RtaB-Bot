@@ -213,7 +213,6 @@ public class OpenPass implements MiniGame {
 					operators--;
 				}
 				output.add("Okay, we'll discard that one, but we must now **OPEN** the rest of the boxes, as there are no more boxes available to discard.");
-				output.add(generateBoard());
 				output.add("How will the board resolve? Let's find out...");
 				passed++;
 				
