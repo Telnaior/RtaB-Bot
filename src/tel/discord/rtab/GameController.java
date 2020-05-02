@@ -2791,6 +2791,7 @@ public class GameController
 	{
 		channel.sendMessage(defuser.name + " defused space " + (space+1) + "!").queue();
 		defuser.hiddenCommand = HiddenCommand.NONE;
+		bombs[space] = false;
 		gameboard.bombBoard.set(space,BombType.DUD);
 	}
 	public boolean useWager(User wagerer)
