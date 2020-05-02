@@ -67,8 +67,9 @@ public class OpenPass implements MiniGame {
 		output.add("A operator at the end of the equation will not count, either.");
 		output.add("Once ten boxes have been opened, the equation is evaluated from left to right, "
 				+ String.format("and you'll win %d times the result!",finalMultiplier));
-		output.add("Good luck! Let's bring out the first box for you...");
+		output.add("Good luck! Let's show you the order (N is a number and ? is an operator, and bring out the first box for you...");
 		output.add(generateBoard());
+		output.add(generateOrder());
 		return output;
 	}
 
@@ -338,6 +339,23 @@ public class OpenPass implements MiniGame {
 
 }
 
+	String generateOrder()
+	{
+		String orderString = "```";
+		for (int i = 0; i < 20; i++)
+		{
+			if (numbers.get(i) > 1)
+			{
+				orderString += "N ";
+			}
+			else
+			{
+				orderString += "? ";
+			}
+		}
+		return orderString + "```";
+	}
+	
 	String generateBoard()
 	{
 		StringBuilder display = new StringBuilder();
@@ -540,7 +558,7 @@ public class OpenPass implements MiniGame {
 			}
 			else if (lastNumber > 1 && lastSign == -1) 
 			{
-				//Previous was 4 to 40 and second-previous was x?
+				//Previous was 10 or under and second-previous was x?
 				//random chance to act like above (lower #s give less chance)
 				int theChance = lastNumber * 9;
 				if (numbers.get(placed+passed) > 1)
