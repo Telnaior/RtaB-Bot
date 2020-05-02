@@ -51,7 +51,7 @@ public class GameController
 	final static int MAX_PLAYERS = 16;
 	final static String[] VALID_ARC_RESPONSES = {"A","ABORT","R","RETRY","C","CONTINUE"};
 	final static int REQUIRED_STREAK_FOR_BONUS = 50;
-	final static int THRESHOLD_PER_TURN_PENALTY = 50_000;
+	final static int THRESHOLD_PER_TURN_PENALTY = 100_000;
 	final boolean rankChannel;
 	public final int runDemo;
 	final boolean verboseBotGames;
@@ -2154,15 +2154,55 @@ public class GameController
 			}
 		}
 		//Figure out if it's a minigame to do anything special with
+		StringBuilder resultString;
 		switch(gamesToPlay.previous())
 		{
 		case SUPER_BONUS_ROUND:
 			//SBR doesn't want to do anything, the season's over, don't touch it just leave it there to update manually later
 			//How did we even get here?
 			return;
+		case BOOSTER_SMASH:
+			//Here, we award the prize as boost instead of cash...
+			//but if it's -1, representing a loss, you lose half your current boost!
+			resultString = new StringBuilder();
+			if(moneyWon == -1) //Lost
+			{
+				if(getCurrentPlayer().isBot) //Third-person for bot
+				{
+					resultString.append(getCurrentPlayer().name + (getCurrentPlayer().booster<100?" \"lost\" ":" lost ")
+							+ "half their boost in Booster Smash...");
+				}
+				else //Second-person for human
+				{
+					resultString.append("You" + (getCurrentPlayer().booster<100?" \"lost\" ":" lost ") + "half your boost...");
+				}
+				getCurrentPlayer().booster = (getCurrentPlayer().booster+100)/2;
+			}
+			else //Won
+			{
+				if(getCurrentPlayer().isBot)
+				{
+					resultString.append(getCurrentPlayer().name + String.format(" won **+%d%%** from ",
+							moneyWon*multiplier));
+					if(multiplier > 1)
+						resultString.append(String.format("%d copies of ",multiplier));
+					resultString.append("Booster Smash.");
+				}
+				else
+				{
+					resultString.append(String.format("Game Over. You won **+%d%%**",moneyWon));
+					if(multiplier > 1)
+						resultString.append(String.format(" times %d copies!",multiplier));
+					else
+						resultString.append(".");
+				}
+				getCurrentPlayer().addBooster(moneyWon*multiplier);
+			}
+			channel.sendMessage(resultString).queue();
+			break;
 		default:
 			//Other minigames just award your cash
-			StringBuilder resultString = new StringBuilder();
+			resultString = new StringBuilder();
 			if(getCurrentPlayer().isBot)
 			{
 				resultString.append(getCurrentPlayer().name + String.format(" won **$%,d** from ",
@@ -2173,7 +2213,7 @@ public class GameController
 			}
 			else
 			{
-				resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*baseMultiplier));
+				resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*multiplier));
 				if(multiplier > 1)
 					resultString.append(String.format(" times %d copies!",multiplier));
 				else

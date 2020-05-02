@@ -4,6 +4,8 @@ import tel.discord.rtab.minigames.*;
 
 public enum Games implements WeightedSpace {
 	//Minigame Pool
+	//Booster Smash at the top intentionally
+	BOOSTER_SMASH		(2,"Booster Smash","Smash") { public MiniGame getGame() { return new BoosterSmash(); } },					//Author: Atia
 	MINEFIELD_MULTIPLIER(2,"Minefield Multiplier","Multiplier") {public MiniGame getGame() { return new MinefieldMultiplier(); } }, //Author: Amy
 	COIN_FLIP			(2,"CoinFlip","Flip") { public MiniGame getGame() { return new CoinFlip(); } },								//Author: Amy
 	MATH_TIME			(2,"Math Time","Math") { public MiniGame getGame() { return new MathTime(); } },							//Author: Atia
