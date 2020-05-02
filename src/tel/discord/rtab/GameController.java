@@ -51,6 +51,7 @@ public class GameController
 	final static int MAX_PLAYERS = 16;
 	final static String[] VALID_ARC_RESPONSES = {"A","ABORT","R","RETRY","C","CONTINUE"};
 	final static int REQUIRED_STREAK_FOR_BONUS = 50;
+	final static int THRESHOLD_PER_TURN_PENALTY = 50_000;
 	final boolean rankChannel;
 	public final int runDemo;
 	final boolean verboseBotGames;
@@ -763,8 +764,9 @@ public class GameController
 				//Don't forget the threshold
 				if(getCurrentPlayer().threshold)
 				{
-					channel.sendMessage(String.format("(-$%d,000)",50*baseMultiplier)).queueAfter(1,TimeUnit.SECONDS);
-					getCurrentPlayer().addMoney(-50000*baseMultiplier,MoneyMultipliersToUse.NOTHING);
+					channel.sendMessage(String.format("(-$%,d)",THRESHOLD_PER_TURN_PENALTY*baseMultiplier))
+						.queueAfter(1,TimeUnit.SECONDS);
+					getCurrentPlayer().addMoney(-1*THRESHOLD_PER_TURN_PENALTY*baseMultiplier,MoneyMultipliersToUse.NOTHING);
 				}
 				channel.sendMessage("It's not a bomb, so its contents are lost.").completeAfter(5,TimeUnit.SECONDS);
 				runEndTurnLogic();
@@ -845,8 +847,8 @@ public class GameController
 		//Event things
 		if(getCurrentPlayer().threshold)
 		{
-			getCurrentPlayer().addMoney(-50000*baseMultiplier,MoneyMultipliersToUse.NOTHING);
-			channel.sendMessage(String.format("(-$%d,000)",50*baseMultiplier)).queueAfter(1,TimeUnit.SECONDS);
+			getCurrentPlayer().addMoney(-1*THRESHOLD_PER_TURN_PENALTY*baseMultiplier,MoneyMultipliersToUse.NOTHING);
+			channel.sendMessage(String.format("(-$%,d)",THRESHOLD_PER_TURN_PENALTY*baseMultiplier)).queueAfter(1,TimeUnit.SECONDS);
 		}
 		if(getCurrentPlayer().boostCharge != 0)
 		{
@@ -1441,7 +1443,8 @@ public class GameController
 			else
 			{
 				channel.sendMessage("You're entering a THRESHOLD SITUATION!").completeAfter(3,TimeUnit.SECONDS);
-				channel.sendMessage(String.format("You'll lose $%d,000 for every pick you make, ",50*baseMultiplier)
+				channel.sendMessage(String.format("You'll lose $%,d for every pick you make, ",
+						THRESHOLD_PER_TURN_PENALTY*baseMultiplier)
 						+ "and if you lose the penalty will be four times as large!").queue();
 				getCurrentPlayer().threshold = true;
 				break;
