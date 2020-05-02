@@ -1457,7 +1457,6 @@ public class GameController
 	{
 		switch(event)
 		{
-		/* Not in Season 3
 		case BOOST_DRAIN:
 			channel.sendMessage("It's a **Boost Drain**, which cuts your booster in half...")
 				.completeAfter(5,TimeUnit.SECONDS);
@@ -1465,7 +1464,6 @@ public class GameController
 			if(getCurrentPlayer().booster < Player.MIN_BOOSTER)
 				getCurrentPlayer().booster = Player.MIN_BOOSTER;
 			break;
-		*/
 		case PEEK_REPLENISH:
 			channel.sendMessage("It's an **Extra Peek**! Use it however you wish!").completeAfter(5, TimeUnit.SECONDS);
 			getCurrentPlayer().peek ++;

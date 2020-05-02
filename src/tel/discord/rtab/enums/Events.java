@@ -2,18 +2,17 @@ package tel.discord.rtab.enums;
 
 public enum Events implements WeightedSpace
 {
-	STREAKPSMALL	( 7),
-	BOOST_CHARGER	( 7),
-	DOUBLE_DEAL		( 7),
-	//BOOST_DRAIN		( 6), Not in Season 3
-	DRAW_TWO		( 6),
-	SKIP_TURN		( 6),
-	PEEK_REPLENISH	( 6),
-	REVERSE_ORDER	( 5),
-	STREAKPLARGE	( 5),
-	BOWSER			( 5),
-	BOOST_MAGNET	( 4),
-	JOKER			( 4)
+	STREAKPSMALL	( 7,"Streak Bonus"),
+	BOOST_CHARGER	( 7,"Boost Charger"),
+	DOUBLE_DEAL		( 7,"Double Deal"),
+	DRAW_TWO		( 6,"Draw Two"),
+	SKIP_TURN		( 6,"Skip Turn"),
+	PEEK_REPLENISH	( 6,"Extra Peek"),
+	REVERSE_ORDER	( 5,"Reverse"),
+	STREAKPLARGE	( 5,"Streak Bonus"),
+	BOWSER			( 5,"Bowser Event"),
+	BOOST_MAGNET	( 4,"Boost Magnet"),
+	JOKER			( 4,"Joker")
 	{
 		@Override
 		public int getWeight(int playerCount)
@@ -30,7 +29,7 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	DRAW_FOUR		( 4)
+	DRAW_FOUR		( 4,"Draw Four")
 	{
 		@Override
 		public int getWeight(int playerCount)
@@ -47,13 +46,13 @@ public enum Events implements WeightedSpace
 			}
 		}
 	},
-	MINEFIELD		( 3),
-	BRIBE			( 3),
-	SPLIT_SHARE		( 3),
-	LOCKDOWN		( 2),
-	BLAMMO_FRENZY	( 2),
-	END_ROUND		( 2),
-	SUPER_JOKER		( 1)
+	MINEFIELD		( 3,"Minefield"),
+	BRIBE			( 3,"Ejector Seat"),
+	SPLIT_SHARE		( 3,"Split & Share"),
+	LOCKDOWN		( 2,"Triple Deal Lockdown"),
+	BLAMMO_FRENZY	( 2,"Blammo Frenzy"),
+	END_ROUND		( 2,"Final Countdown"),
+	SUPER_JOKER		( 1,"Midas Touch")
 	{
 		@Override
 		public int getWeight(int playerCount)
@@ -62,19 +61,23 @@ public enum Events implements WeightedSpace
 			return (playerCount < 4) ? 0 : weight;
 		}
 	},
-	STARMAN			( 1),
-	JACKPOT			( 1),
+	STARMAN			( 1,"Starman"),
+	JACKPOT			( 1,"Jackpot"),
+	//Events Rotated Out
+	BOOST_DRAIN		( 0,"Boost Drain"),
 	//Bowser Events
-	COINS_FOR_BOWSER( 0) { public String getName() { return "Cash for Bowser"; } },
-	BOWSER_POTLUCK	( 0) { public String getName() { return "Bowser's Cash Potluck"; } },
-	RUNAWAY			( 0) { public String getName() { return "Billion-Dollar Present"; } },
-	BOWSER_JACKPOT	( 0) { public String getName() { return "Bowser's Jackpot"; } },
-	COMMUNISM		( 0) { public String getName() { return "Bowser Revolution"; } };
+	COINS_FOR_BOWSER( 0,"Cash for Bowser"),
+	BOWSER_POTLUCK	( 0,"Bowser's Cash Potluck"),
+	RUNAWAY			( 0,"Billion-Dollar Present"),
+	BOWSER_JACKPOT	( 0,"Bowser's Jackpot"),
+	COMMUNISM		( 0,"Bowser Revolution");
 
 	int weight;
-	Events(int valueWeight)
+	String name;
+	Events(int valueWeight, String eventName)
 	{
 		weight = valueWeight;
+		name = eventName;
 	}
 	@Override
 	public int getWeight(int playerCount)
@@ -84,7 +87,6 @@ public enum Events implements WeightedSpace
 	}
 	public String getName()
 	{
-		//This gets overridden by events that actually use it
-		return "NONAME";
+		return name;
 	}
 }
