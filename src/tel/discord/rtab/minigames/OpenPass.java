@@ -1,6 +1,5 @@
 package tel.discord.rtab.minigames;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,14 +27,16 @@ public class OpenPass implements MiniGame {
 	int lastPick;
 	int lastSign;
 	int lastNumber;
+	int finalMultiplier;
 	
 	/**
 	 * Initializes the variables used in the minigame and prints the starting messages.
 	 * @return A list of messages to send to the player.
 	 */
 	@Override
-	public LinkedList<String> initialiseGame()
+	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
+		finalMultiplier = 5*baseMultiplier;
 		alive = true;
 		needNumber = true;
 		lastSign = -9;
@@ -57,15 +58,16 @@ public class OpenPass implements MiniGame {
 
 		// Give 'em the run down
 		LinkedList<String> output = new LinkedList<>();
-		output.add("In Open, Pass, you will build an equation with ten boxes.");
-		output.add("You have a series of 20 boxes in it. Ten hold the numbers 2, 3, 5, 7, 8, 9, 10, 15, 30, and 50.");
-		output.add("Ten are mathematical operators: 5 x's, 2 /'s, 2 +'s, and 1 -.");
+		output.add("In Open, Pass, you will build an equation by opening ten boxes.");
+		output.add("You have a series of 20 boxes. Ten hold the numbers 2, 3, 5, 7, 8, 9, 10, 15, 30, and 50.");
+		output.add("The other ten are mathematical operators: 5 x's, 2 /'s, 2 +'s, and 1 -.");
 		output.add("The boxes have been shuffled, and we will place them out one at a time.");
 		output.add("You can choose to '**OPEN**' a box, locking it into place, or you can '**PASS**', discarding it.");
 		output.add("If there are multiple numbers or operators in a row, only the rightmost one will count.");
 		output.add("A operator at the end of the equation will not count, either.");
-		output.add("Once ten boxes have been OPENed, the equation is evaluated from left to right, and you'll win five times the result!");
-		output.add("If the final value is negative, we'll take the absolute value of that. Good luck! Let's place the first box in place for you...");
+		output.add("Once ten boxes have been OPENed, the equation is evaluated from left to right, "
+				+ String.format("and you'll win %d times the result!",finalMultiplier));
+		output.add("Good luck! Let's bring out the first box for you...");
 		output.add(generateBoard());
 		return output;
 	}
@@ -459,7 +461,7 @@ public class OpenPass implements MiniGame {
 				}		
 			}
 		}
-		display.append(String.format("Value x5 = $%,d\n",total * 5));
+		display.append(String.format("Value x%d = $%,d\n", finalMultiplier, total * finalMultiplier));
 		display.append(String.format("Boxes left: %d\n",20 - (placed + passed)));
 		display.append(String.format("(Numbers: %d, ",digits));
 		display.append(String.format("Operators: %d)\n",operators));
@@ -477,7 +479,7 @@ public class OpenPass implements MiniGame {
 	@Override
 	public int getMoneyWon() {
 		if(isGameOver())
-			return total * 5;
+			return total * finalMultiplier;
 		else
 			return 0;
 	}
@@ -549,8 +551,7 @@ public class OpenPass implements MiniGame {
 				if (numbers.get(placed+passed) > 1)
 				{					
 					if ((int)(Math.random() * 100) < theChance)
-					{
-						
+					{	
 						return "PASS";
 					}
 					else
