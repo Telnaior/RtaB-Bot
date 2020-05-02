@@ -2165,7 +2165,7 @@ public class GameController
 			//Here, we award the prize as boost instead of cash...
 			//but if it's -1, representing a loss, you lose half your current boost!
 			resultString = new StringBuilder();
-			if(moneyWon == -1) //Lost
+			if(moneyWon == -1 && getCurrentPlayer().booster!=100) //Lost, and have boost to lose
 			{
 				if(getCurrentPlayer().isBot) //Third-person for bot
 				{
@@ -2178,19 +2178,19 @@ public class GameController
 				}
 				getCurrentPlayer().booster = (getCurrentPlayer().booster+100)/2;
 			}
-			else //Won
+			else //Otherwise
 			{
 				if(getCurrentPlayer().isBot)
 				{
 					resultString.append(getCurrentPlayer().name + String.format(" won **+%d%%** from ",
-							moneyWon*multiplier));
+							Math.max(moneyWon*multiplier,0)));
 					if(multiplier > 1)
 						resultString.append(String.format("%d copies of ",multiplier));
 					resultString.append("Booster Smash.");
 				}
 				else
 				{
-					resultString.append(String.format("Game Over. You won **+%d%%**",moneyWon));
+					resultString.append(String.format("Game Over. You won **+%d%%**",Math.max(moneyWon,0)));
 					if(multiplier > 1)
 						resultString.append(String.format(" times %d copies!",multiplier));
 					else
