@@ -10,8 +10,9 @@ public class DoubleZeroes implements MiniGame {
 	static final String NAME = "Double Zeroes";
 	static final boolean BONUS = false;
 	int total;
+	int digitsPicked;
 	int zeroesLeft;
-	List<Integer> numbers = Arrays.asList(-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,0,1,2,3,4,5,6,7,8,9);
+	List<Integer> numbers = Arrays.asList(-1,-1,-1,-1,-1,0,0,1,1,2,2,3,3,4,4,5,6,7,8,9);
 	// -1 = Double Zero
 	boolean alive;
 	boolean[] pickedSpaces;
@@ -29,13 +30,14 @@ public class DoubleZeroes implements MiniGame {
 		this.baseMultiplier = baseMultiplier;
 		alive = true;
 		total = 0;
-		zeroesLeft = 10;
+		digitsPicked = 0;
+		zeroesLeft = 5;
 		pickedSpaces = new boolean[numbers.size()];
 		Collections.shuffle(numbers);
 		// Give 'em the run down
 		LinkedList<String> output = new LinkedList<>();
 		output.add("In Double Zeroes, you will see twenty spaces.");
-		output.add("Ten of these are Double Zeroes, and ten are digits from 0 to 9.");
+		output.add("Five of these are Double Zeroes, and the other ten are digits from 0 to 9.");
 		output.add("You'll pick spaces, one at a time, until you uncover four single digits.");
 		output.add("These digits will be put on the board as your bank.");
 		output.add("At this point, everything but the Double Zeroes turn into BOMBs!");
@@ -56,7 +58,7 @@ public class DoubleZeroes implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		if(pick.toUpperCase().equals("STOP"))
 		{
-			if(total > 1000) // 'total > 1000' doesn't happen until there are four digits picked
+			if(digitsPicked == 4)
 			{
 				// Player stops at the decision point? Tell 'em what they've won and end the game!
 			alive = false;
@@ -93,7 +95,7 @@ public class DoubleZeroes implements MiniGame {
 			output.add(String.format("Space %d selected...",lastSpace+1));
 			if(numbers.get(lastSpace) == -1) // If it's a Double Zero...
 			{
-				if(total > 1000) // ...and you decided to go on, you win!
+				if(digitsPicked == 4) // ...and you decided to go on, you win!
 				{
 					alive = false;
 					total = total*100;
@@ -110,26 +112,14 @@ public class DoubleZeroes implements MiniGame {
 			}
 			else // If it's NOT a Double Zero...
 			{
-				if(total > 1000) // ...and you decided to go...
+				if(digitsPicked == 4) // ...and you decided to go...
 				{
 					alive = false; // BOMB, shoulda taken the bribe!
 					total = 0;
 					output.add("It's a **BOMB**.");
 					output.add("Sorry, you lose.");
 				}
-				else if(total == 0) // ...and it's the first phase with no prior numbers...
-				{
-					if (numbers.get(lastSpace) == 8) // ... and it's an 8, use an 'an'
-					{
-					  output.add("It's an " + String.format("**%,d!**",numbers.get(lastSpace)));
-					}
-					else // ... and it's not an 8, use an 'a'
-					{
-					output.add("It's a " + String.format("**%,d!**",numbers.get(lastSpace)));
-					}
-					total = numbers.get(lastSpace); // Either way, put the total on the board.
-				}
-				else // ...and it's the first phase with a prior number...
+				else
 				{
 					if (numbers.get(lastSpace) == 8) // ... and it's an 8, use an 'an'
 					{
@@ -139,14 +129,16 @@ public class DoubleZeroes implements MiniGame {
 					{
 					output.add("It's a " + String.format("**%,d!**",numbers.get(lastSpace)));
 					}
-					total = (total * 10) + numbers.get(lastSpace); // Either way, put the total on the board by multiplying the previous total by 10 and adding this number.
+					total += Math.pow(10, digitsPicked) * numbers.get(lastSpace);
+					// Either way, put the total on the board by placing it in the next-left-most position, then increment
+					digitsPicked++;
 				}
 			
 			}
 			if(alive)
 			{
 
-				if(total>1000) // If we just hit the 4th number, tell 'em about the DECISION~!
+				if(digitsPicked == 4) // If we just hit the 4th number, tell 'em about the DECISION~!
 				{
 				output.add("You can now choose to continue by picking a number, "
 						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
@@ -238,10 +230,10 @@ public class DoubleZeroes implements MiniGame {
 	public String getBotPick()
 		{
 			//If the game's at its decision point, make the decision
-			//There should be (6 + zeroesLeft) spaces left here
-			if(total > 1000)
+			//There should be (11 + zeroesLeft) spaces left here
+			if(digitsPicked == 4)
 			{
-				int goChance = (100 * zeroesLeft) / (6 + zeroesLeft);
+				int goChance = (100 * zeroesLeft) / (11 + zeroesLeft);
 				if(Math.random()*100>goChance)
 					return "STOP";
 			}
