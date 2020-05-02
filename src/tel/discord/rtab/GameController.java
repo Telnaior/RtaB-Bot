@@ -1036,71 +1036,79 @@ public class GameController
 			splitMoney(-penalty,MoneyMultipliersToUse.BOOSTER_ONLY, false);
 			break;
 		case DETONATION:
-			channel.sendMessage("It goes **KABLAM**! "
-					+ String.format("$%,d lost as penalty, plus board damage.",Math.abs(penalty)))
-				.completeAfter(5,TimeUnit.SECONDS);
-			extraResult = getCurrentPlayer().blowUp(baseMultiplier,false,(players.size()-playersAlive));
 			//Wipe out adjacent spaces
 			int boardWidth = Math.max(5,players.size()+1);
 			boolean canAbove = (location >= boardWidth);
 			boolean canBelow = (boardSize - location > boardWidth);
 			boolean canLeft  = (location % boardWidth != 0);
 			boolean canRight = (location % boardWidth != (boardWidth-1));
-			//Orthogonal or diagonal?
-			if(Math.random() < 0.5)
+			int spacesWrecked = 0;
+			//Go through each space in order
+			//Above
+			if(canAbove && !pickedSpaces[location-boardWidth] && Math.random()<0.5)
 			{
-				//Above
-				if(canAbove && !pickedSpaces[location-boardWidth])
-				{
-					pickedSpaces[location-boardWidth] = true;
-					spacesLeft --;
-				}
-				//Below
-				if(canBelow && !pickedSpaces[location+boardWidth])
-				{
-					pickedSpaces[location+boardWidth] = true;
-					spacesLeft --;
-				}
-				//Left
-				if(canLeft && !pickedSpaces[location-1])
-				{
-					pickedSpaces[location-1] = true;
-					spacesLeft --;
-				}
-				//Right
-				if(canRight && !pickedSpaces[location+1])
-				{
-					pickedSpaces[location+1] = true;
-					spacesLeft --;
-				}
+				pickedSpaces[location-boardWidth] = true;
+				spacesLeft --;
+				spacesWrecked ++;
 			}
+			//Below
+			if(canBelow && !pickedSpaces[location+boardWidth] && Math.random()<0.5)
+			{
+				pickedSpaces[location+boardWidth] = true;
+				spacesLeft --;
+				spacesWrecked ++;
+			}
+			//Left
+			if(canLeft && !pickedSpaces[location-1] && Math.random()<0.5)
+			{
+				pickedSpaces[location-1] = true;
+				spacesLeft --;
+				spacesWrecked ++;
+			}
+			//Right
+			if(canRight && !pickedSpaces[location+1] && Math.random()<0.5)
+			{
+				pickedSpaces[location+1] = true;
+				spacesLeft --;
+				spacesWrecked ++;
+			}
+			//Up-left
+			if(canAbove && canLeft && !pickedSpaces[(location-1)-boardWidth] && Math.random()<0.5)
+			{
+				pickedSpaces[(location-1)-boardWidth] = true;
+				spacesLeft --;
+				spacesWrecked ++;
+			}
+			//Up-right
+			if(canAbove && canRight && !pickedSpaces[(location+1)-boardWidth] && Math.random()<0.5)
+			{
+				pickedSpaces[(location+1)-boardWidth] = true;
+				spacesLeft --;
+				spacesWrecked ++;
+			}
+			//Down-left
+			if(canBelow && canLeft && !pickedSpaces[(location-1)+boardWidth] && Math.random()<0.5)
+			{
+				pickedSpaces[(location-1)+boardWidth] = true;
+				spacesLeft --;
+				spacesWrecked ++;
+			}
+			//Down-right
+			if(canBelow && canRight && !pickedSpaces[(location+1)+boardWidth] && Math.random()<0.5)
+			{
+				pickedSpaces[(location+1)+boardWidth] = true;
+				spacesLeft --;
+				spacesWrecked ++;
+			}
+			//Then print the appropriate message
+			if(spacesWrecked > 0)
+				channel.sendMessage("It goes **KABLAM**! "
+						+ String.format("$%,d lost as penalty, and %d spaces destroyed.",Math.abs(penalty),spacesWrecked))
+					.completeAfter(5,TimeUnit.SECONDS);
 			else
-			{
-				//Up-left
-				if(canAbove && canLeft && !pickedSpaces[(location-1)-boardWidth])
-				{
-					pickedSpaces[(location-1)-boardWidth] = true;
-					spacesLeft --;
-				}
-				//Up-right
-				if(canAbove && canRight && !pickedSpaces[(location+1)-boardWidth])
-				{
-					pickedSpaces[(location+1)-boardWidth] = true;
-					spacesLeft --;
-				}
-				//Down-left
-				if(canBelow && canLeft && !pickedSpaces[(location-1)+boardWidth])
-				{
-					pickedSpaces[(location-1)+boardWidth] = true;
-					spacesLeft --;
-				}
-				//Down-right
-				if(canBelow && canRight && !pickedSpaces[(location+1)+boardWidth])
-				{
-					pickedSpaces[(location+1)+boardWidth] = true;
-					spacesLeft --;
-				}
-			}
+				channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
+					.completeAfter(5,TimeUnit.SECONDS);
+			extraResult = getCurrentPlayer().blowUp(baseMultiplier,false,(players.size()-playersAlive));
 			break;
 		case DUD:
 			channel.sendMessage("It goes _\\*fizzle*_.")
