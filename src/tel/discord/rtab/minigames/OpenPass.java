@@ -67,7 +67,7 @@ public class OpenPass implements MiniGame {
 		output.add("A operator at the end of the equation will not count, either.");
 		output.add("Once ten boxes have been opened, the equation is evaluated from left to right, "
 				+ String.format("and you'll win %d times the result!",finalMultiplier));
-		output.add("Good luck! Let's show you the order (N is a number and ? is an operator, and bring out the first box for you...");
+		output.add("Good luck! Let's show you the order (N is a number and ? is an operator), and bring out the first box for you...");
 		output.add(generateBoard());
 		output.add(generateOrder());
 		return output;
@@ -82,6 +82,11 @@ public class OpenPass implements MiniGame {
 	public LinkedList<String> playNextTurn(String pick)
 	{
 		LinkedList<String> output = new LinkedList<>();
+		if(pick.equalsIgnoreCase("!string") || pick.equalsIgnoreCase("!order"))
+		{
+			output.add(generateOrder());
+			return output;
+		}
 		if(pick.toUpperCase().equals("OPEN"))
 		{
 			output.add("The box is...");
@@ -197,6 +202,11 @@ public class OpenPass implements MiniGame {
 		}	
 		else if(pick.toUpperCase().equals("PASS"))
 		{
+			if(placed == 0)
+			{
+				output.add("Surely you meant to OPEN the first box?");
+				return output;
+			}
 			if (10 - placed == 20 - (placed + passed + 1))
 			{
 				if (numbers.get(passed+placed) > 1)
@@ -342,7 +352,7 @@ public class OpenPass implements MiniGame {
 	String generateOrder()
 	{
 		String orderString = "```";
-		for (int i = 0; i < 20; i++)
+		for (int i = placed+passed; i < 20; i++)
 		{
 			if (numbers.get(i) > 1)
 			{
