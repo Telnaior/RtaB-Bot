@@ -87,7 +87,7 @@ public class OpenPass implements MiniGame {
 			output.add(generateOrder());
 			return output;
 		}
-		if(pick.toUpperCase().equals("OPEN") || pick.toUpperCase().equals("O"))
+		if(pick.equalsIgnoreCase("OPEN") || pick.equalsIgnoreCase("O"))
 		{
 			output.add("The box is...");
 			if (numbers.get(passed+placed) > 1 && needNumber)
@@ -200,7 +200,7 @@ public class OpenPass implements MiniGame {
 			return output;
 
 		}	
-		else if(pick.toUpperCase().equals("PASS") || pick.toUpperCase().equals("P"))
+		else if(pick.equalsIgnoreCase("PASS") || pick.equalsIgnoreCase("P"))
 		{
 			if (10 - placed == 20 - (placed + passed + 1))
 			{
@@ -348,7 +348,7 @@ public class OpenPass implements MiniGame {
 			}
 			return output;
 		}		
-		else if(pick.toUpperCase().equals("STOP"))
+		else if(pick.equalsIgnoreCase("STOP"))
 		{
 			output.add("No stopping in this game, silly! Would you like to **OPEN** or **PASS**?");
 			return output;
