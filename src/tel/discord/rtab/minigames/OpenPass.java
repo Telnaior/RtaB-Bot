@@ -87,7 +87,7 @@ public class OpenPass implements MiniGame {
 			output.add(generateOrder());
 			return output;
 		}
-		if(pick.toUpperCase().equals("OPEN"))
+		if(pick.equalsIgnoreCase("OPEN") || pick.equalsIgnoreCase("O"))
 		{
 			output.add("The box is...");
 			if (numbers.get(passed+placed) > 1 && needNumber)
@@ -200,13 +200,8 @@ public class OpenPass implements MiniGame {
 			return output;
 
 		}	
-		else if(pick.toUpperCase().equals("PASS"))
+		else if(pick.equalsIgnoreCase("PASS") || pick.equalsIgnoreCase("P"))
 		{
-			if(placed == 0)
-			{
-				output.add("Surely you meant to OPEN the first box?");
-				return output;
-			}
 			if (10 - placed == 20 - (placed + passed + 1))
 			{
 				if (numbers.get(passed+placed) > 1)
@@ -223,7 +218,23 @@ public class OpenPass implements MiniGame {
 				
 				while (!(placed == 10))
 				{
-					if (numbers.get(passed+placed) > 1 && needNumber)
+					if (equPart == 0 && numbers.get(passed+placed) < 1)
+					{
+						equation[equPart] = numbers.get(passed+placed);
+						equPart++;
+						//Operator starting the equation, so don't add it to the real equation
+						operators--;
+					}
+					else if (equPart == 0 && numbers.get(passed+placed) > 1)
+					{
+						equation[equPart] = numbers.get(passed+placed);
+						needNumber = false;
+						equPart++;
+						equationReal[0] = equation[equPart];
+						equPartReal++;
+						digits--;
+					}
+					else if (numbers.get(passed+placed) > 1 && needNumber)
 					{
 						equation[equPart] = numbers.get(passed+placed);
 						needNumber = false;
@@ -336,7 +347,7 @@ public class OpenPass implements MiniGame {
 			}
 			return output;
 		}		
-		else if(pick.toUpperCase().equals("STOP"))
+		else if(pick.equalsIgnoreCase("STOP"))
 		{
 			output.add("No stopping in this game, silly! Would you like to **OPEN** or **PASS**?");
 			return output;
