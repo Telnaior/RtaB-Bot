@@ -65,7 +65,7 @@ public class OpenPass implements MiniGame {
 		output.add("You can choose to '**OPEN**' a box, locking it into place, or you can '**PASS**', discarding it.");
 		output.add("If there are multiple numbers or operators in a row, only the rightmost one will count.");
 		output.add("A operator at the end of the equation will not count, either.");
-		output.add("Once ten boxes have been OPENed, the equation is evaluated from left to right, "
+		output.add("Once ten boxes have been opened, the equation is evaluated from left to right, "
 				+ String.format("and you'll win %d times the result!",finalMultiplier));
 		output.add("Good luck! Let's bring out the first box for you...");
 		output.add(generateBoard());
@@ -207,7 +207,6 @@ public class OpenPass implements MiniGame {
 					operators--;
 				}
 				output.add("Okay, we'll discard that one, but we must now **OPEN** the rest of the boxes, as there are no more boxes available to discard.");
-				output.add(generateBoard());
 				output.add("How will the board resolve? Let's find out...");
 				passed++;
 				
@@ -424,43 +423,39 @@ public class OpenPass implements MiniGame {
 						display.append("-");
 				}
 			}
-
 			display.append(" ");
 		}	
-		display.append("\n");
-		if (equPartReal > 2)
+		for (int j = 0; j < equPartReal; j++)
 		{
-			for (int j = 0; j < equPartReal; j++)
+			if (j % 2 == 0) //number
 			{
-				if (j % 2 == 0) //number
-				{
-						if (lastSign == -9)
-						{
-							total = equationReal[j];
-						}
-						else if (lastSign == -1)
-						{
-							total = total * equationReal[j];
-						}
-						else if (lastSign == -2)
-						{
-							total = total / equationReal[j];
-						}
-						else if (lastSign == -3)
-						{
-							total = total + equationReal[j];
-						}
-						else if (lastSign == -4)
-						{
-							total = total - equationReal[j];
-						}
-				}
-				else
-				{
-					lastSign = equationReal[j]; 
-				}		
+					if (lastSign == -9)
+					{
+						total = equationReal[j];
+					}
+					else if (lastSign == -1)
+					{
+						total = total * equationReal[j];
+					}
+					else if (lastSign == -2)
+					{
+						total = total / equationReal[j];
+					}
+					else if (lastSign == -3)
+					{
+						total = total + equationReal[j];
+					}
+					else if (lastSign == -4)
+					{
+						total = total - equationReal[j];
+					}
 			}
+			else
+			{
+				lastSign = equationReal[j]; 
+			}		
 		}
+		display.append(String.format("= %,d\n",total));
 		display.append(String.format("Value x%d = $%,d\n", finalMultiplier, total * finalMultiplier));
 		display.append(String.format("Boxes left: %d\n",20 - (placed + passed)));
 		display.append(String.format("(Numbers: %d, ",digits));
