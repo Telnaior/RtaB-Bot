@@ -2130,10 +2130,11 @@ public class GameController
 	{
 		//Cool, game's over now, let's grab their winnings
 		int moneyWon = currentGame.getMoneyWon();
-		//Only the Super Bonus Round will do this
-		if(moneyWon == -1000000000)
-			return;
 		int multiplier = 1;
+		//SBR will return a negative billion kindly notice this and take the opportunity to abandon ship
+		//Otherwise this method breaks everything >_>
+		if(moneyWon == -1_000_000_000)
+			return;
 		//Did they have multiple copies of the game?
 		while(gamesToPlay.hasNext())
 		{
@@ -2152,29 +2153,41 @@ public class GameController
 				break;
 			}
 		}
-		StringBuilder resultString = new StringBuilder();
-		if(getCurrentPlayer().isBot)
+		//Figure out if it's a minigame to do anything special with
+		switch(gamesToPlay.previous())
 		{
-			resultString.append(getCurrentPlayer().name + String.format(" won **$%,d** from ",
-					moneyWon*multiplier));
-			if(multiplier > 1)
-				resultString.append(String.format("%d copies of ",multiplier));
-			resultString.append(currentGame.toString() + ".");
-		}
-		else
-		{
-			resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*baseMultiplier));
-			if(multiplier > 1)
-				resultString.append(String.format(" times %d copies!",multiplier));
+		case SUPER_BONUS_ROUND:
+			//SBR doesn't want to do anything, the season's over, don't touch it just leave it there to update manually later
+			//How did we even get here?
+			return;
+		default:
+			//Other minigames just award your cash
+			StringBuilder resultString = new StringBuilder();
+			if(getCurrentPlayer().isBot)
+			{
+				resultString.append(getCurrentPlayer().name + String.format(" won **$%,d** from ",
+						moneyWon*multiplier));
+				if(multiplier > 1)
+					resultString.append(String.format("%d copies of ",multiplier));
+				resultString.append(currentGame.toString() + ".");
+			}
 			else
-				resultString.append(".");
+			{
+				resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*baseMultiplier));
+				if(multiplier > 1)
+					resultString.append(String.format(" times %d copies!",multiplier));
+				else
+					resultString.append(".");
+			}
+			StringBuilder extraResult = null;
+			extraResult = getCurrentPlayer().addMoney(moneyWon*multiplier,
+					currentGame.isBonusGame() ? MoneyMultipliersToUse.NOTHING : MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+			channel.sendMessage(resultString).queue();
+			if(extraResult != null)
+				channel.sendMessage(extraResult).queue();
 		}
-		StringBuilder extraResult = null;
-		extraResult = getCurrentPlayer().addMoney(moneyWon*multiplier,
-				currentGame.isBonusGame() ? MoneyMultipliersToUse.NOTHING : MoneyMultipliersToUse.BOOSTER_AND_BONUS);
-		channel.sendMessage(resultString).queue();
-		if(extraResult != null)
-			channel.sendMessage(extraResult).queue();
+		//Finally, put the iterator back in the right place
+		gamesToPlay.next();
 		//Off to the next minigame! (After clearing the queue)
 		timer.schedule(() -> prepareNextMiniGame(), 1, TimeUnit.SECONDS);
 	}
