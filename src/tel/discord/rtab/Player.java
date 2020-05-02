@@ -44,9 +44,9 @@ public class Player implements Comparable<Player>
 	int peek;
 	int jokers;
 	int boostCharge;
+	int jackpot;
 	boolean splitAndShare;
 	boolean minigameLock;
-	boolean jackpot;
 	boolean threshold;
 	boolean warned;
 	PlayerStatus status;

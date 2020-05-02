@@ -1401,13 +1401,13 @@ public class GameController
 						getCurrentPlayer().money *= 0.9;
 						getCurrentPlayer().splitAndShare = false;
 					}
-					if(getCurrentPlayer().jackpot)
+					if(getCurrentPlayer().jackpot >= 0)
 					{
 						channel.sendMessage(String.format("Oh, %1$s had a jackpot? More like an ANTI-JACKPOT! "+
-								"**MINUS $%2$,d,000,000** for you!", getCurrentPlayer().name, boardSize*baseMultiplier))
+								"**MINUS $%2$,d,000,000** for you!", getCurrentPlayer().name, getCurrentPlayer().jackpot))
 							.completeAfter(2, TimeUnit.SECONDS);
-						getCurrentPlayer().addMoney(boardSize*baseMultiplier*-1_000_000, MoneyMultipliersToUse.NOTHING);
-						getCurrentPlayer().jackpot = false;
+						getCurrentPlayer().addMoney(getCurrentPlayer().jackpot*-1_000_000, MoneyMultipliersToUse.NOTHING);
+						getCurrentPlayer().jackpot = 0;
 					}
 					penalty = getCurrentPlayer().newbieProtection > 0 ? Player.NEWBIE_BOMB_PENALTY : Player.BOMB_PENALTY;
 					channel.sendMessage(String.format("$%1$,d MEGA penalty for %2$s!",
@@ -1562,20 +1562,10 @@ public class GameController
 			}
 			break;
 		case JACKPOT:
-			if(!(getCurrentPlayer().jackpot))
-			{
 				channel.sendMessage(String.format("You found the $%d,000,000 **JACKPOT**, "
-						+ "win the round to claim it!",boardSize*baseMultiplier))
+						+ "win the round to claim it!",spacesLeft*baseMultiplier))
 					.completeAfter(5,TimeUnit.SECONDS);
-				getCurrentPlayer().jackpot = true;
-			}
-			else
-			{
-				channel.sendMessage("You found a **JACKPOT**, but you already have one!")
-					.completeAfter(5,TimeUnit.SECONDS);
-				channel.sendMessage("So you can cash this one in right away!").completeAfter(3,TimeUnit.SECONDS);
-				getCurrentPlayer().addMoney(1000000*boardSize*baseMultiplier,MoneyMultipliersToUse.NOTHING);
-			}
+				getCurrentPlayer().jackpot += spacesLeft*baseMultiplier;
 			break;
 		case STREAKPSMALL:
 			int smallStreakAwarded = (int) ((Math.random() * 11) + 5);
@@ -1944,10 +1934,10 @@ public class GameController
 				getCurrentPlayer().addMoney(wagerPot / playersAlive, MoneyMultipliersToUse.NOTHING);
 			}
 			//Award the Jackpot if it's there
-			if(getCurrentPlayer().jackpot)
+			if(getCurrentPlayer().jackpot > 0)
 			{
-				channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",boardSize*baseMultiplier)).queue();
-				getCurrentPlayer().addMoney(1000000*boardSize*baseMultiplier,MoneyMultipliersToUse.NOTHING);
+				channel.sendMessage(String.format("You won the $%d,000,000 **JACKPOT**!",getCurrentPlayer().jackpot)).queue();
+				getCurrentPlayer().addMoney(1000000*getCurrentPlayer().jackpot,MoneyMultipliersToUse.NOTHING);
 			}
 		}
 		//Cash in unused jokers, folded or not
