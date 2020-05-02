@@ -939,8 +939,20 @@ public class GameController
 		switch(gameboard.bombBoard.get(location))
 		{
 		case NORMAL:
-			channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
-				.completeAfter(5,TimeUnit.SECONDS);
+			//Small chance of making them think something exciting is gonna happen
+			if(Math.random() < 0.1)
+			{
+				channel.sendMessage("It goes **BOOM**...")
+						.completeAfter(5, TimeUnit.SECONDS);
+				channel.sendMessage(String.format("$%,d lost as penalty.",Math.abs(penalty)))
+						.completeAfter(5, TimeUnit.SECONDS);
+			}
+			//But most of the time, just blow them up
+			else
+			{
+				channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))
+					.completeAfter(5,TimeUnit.SECONDS);
+			}
 			extraResult = getCurrentPlayer().blowUp(baseMultiplier,false,(players.size()-playersAlive));
 			break;
 		case BANKRUPT:
