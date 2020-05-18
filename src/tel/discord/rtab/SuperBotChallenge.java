@@ -78,6 +78,12 @@ public class SuperBotChallenge
 		//If the season's over, just abort this and don't schedule another
 		if(gameHandler.gameStatus == GameStatus.SEASON_OVER)
 			return;
+		//If there's already a game running or being set up, reschedule for another time
+		if(loadingHumanGame || gameHandler.players.size() > 0)
+		{
+			timer.schedule(() -> loadDemoGame(), runDemos, TimeUnit.MINUTES);
+			return;
+		}
 		//Run through the list of games
 		ListIterator<int[]> currentGame = gameList.listIterator(0);
 		while(currentGame.hasNext())
@@ -111,6 +117,12 @@ public class SuperBotChallenge
 			channel.sendMessage("The season is already over!").queue();
 			return;
 		}
+		//If there's already a game running, make them wait
+		if(gameHandler.players.size() > 0)
+		{
+			channel.sendMessage("Wait until after the current game.").queue();
+			return;
+		}
 		//Check which bot they represent, and cut it off early if they aren't any of them
 		int botNumber = GameBot.getBotFromHuman(humanID);
 		if(botNumber == -1)
@@ -118,6 +130,8 @@ public class SuperBotChallenge
 			channel.sendMessage("You are not a player in the Super Bot Challenge.").queue();
 			return;
 		}
+		//Now we've passed all the initial checks, mark that we're in the human process so that a demo doesn't cut us off
+		loadingHumanGame = true;
 		//Run through the list of games
 		ListIterator<int[]> currentGame = gameList.listIterator(0);
 		List<Integer> gamesWithPlayer = new ArrayList<>(4);
@@ -144,6 +158,7 @@ public class SuperBotChallenge
 		case 0:
 			//If we didn't find any, what are they doing? Just exit
 			channel.sendMessage("No scheduled games found.").queue();
+			loadingHumanGame = false;
 			break;
 		case 1:
 			//If we found exactly one, load it up right away
@@ -184,7 +199,11 @@ public class SuperBotChallenge
 						return false;
 					},
 					e -> loadHumanGame(gamesWithPlayer.get(Integer.parseInt(e.getMessage().getContentRaw())-1),humanID),
-					30,TimeUnit.SECONDS, () -> channel.sendMessage("Timed out. !ready again when you decide.").queue());
+					30,TimeUnit.SECONDS, () -> 
+					{
+						channel.sendMessage("Timed out. !ready again when you decide.").queue();
+						loadingHumanGame = false;
+					});
 			break;
 		}
 	}
@@ -209,7 +228,6 @@ public class SuperBotChallenge
 		//If there are, give them 30 seconds to confirm that they're here too
 		else
 		{
-			loadingHumanGame = true;
 			gameToLoad = index;
 			//Ping everyone missing
 			for(String nextPlayer : missingPlayers)
@@ -239,7 +257,6 @@ public class SuperBotChallenge
 				{
 					prepGame(gameList.get(gameToLoad));
 					gameList.remove(gameToLoad);
-					loadingHumanGame = false;
 				}
 				break;
 			}
@@ -247,6 +264,7 @@ public class SuperBotChallenge
 	
 	void prepGame(int[] players)
 	{
+		loadingHumanGame = false;
 		for(int next : players)
 			gameHandler.addBot(next,true);
 		channel.sendMessage("Next game starting in five minutes:").queue();
