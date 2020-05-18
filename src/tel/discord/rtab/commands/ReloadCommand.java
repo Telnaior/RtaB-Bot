@@ -19,6 +19,11 @@ public class ReloadCommand extends Command
 	@Override
 	protected void execute(CommandEvent event)
 	{
+		if(event.getArgs().equals(""))
+		{
+			event.reply("You forgot to put a number on it, dummy.");
+			return;
+		}
 		for(SuperBotChallenge game : RaceToABillionBot.challenge)
 		{
 			if(game.channel.equals(event.getChannel()))
