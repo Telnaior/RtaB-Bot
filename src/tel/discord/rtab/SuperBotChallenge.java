@@ -181,7 +181,7 @@ public class SuperBotChallenge
 								return false;
 							}
 						}
-						return true;
+						return false;
 					},
 					e -> loadHumanGame(gamesWithPlayer.get(Integer.parseInt(e.getMessage().getContentRaw())-1),humanID),
 					30,TimeUnit.SECONDS, () -> channel.sendMessage("Timed out. !ready again when you decide.").queue());
