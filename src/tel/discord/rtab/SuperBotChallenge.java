@@ -203,6 +203,7 @@ public class SuperBotChallenge
 		//If there aren't any, just load it up
 		if(missingPlayers.size() == 0)
 		{
+			gameList.remove(index);
 			prepGame(players);
 		}
 		//If there are, give them 30 seconds to confirm that they're here too
@@ -237,6 +238,7 @@ public class SuperBotChallenge
 				if(missingPlayers.size() == 0)
 				{
 					prepGame(gameList.get(gameToLoad));
+					gameList.remove(gameToLoad);
 					loadingHumanGame = false;
 				}
 				break;
