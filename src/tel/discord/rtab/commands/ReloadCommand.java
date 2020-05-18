@@ -23,7 +23,7 @@ public class ReloadCommand extends Command
 		{
 			if(game.channel.equals(event.getChannel()))
 			{
-				game.loadGames();
+				game.loadGames(Integer.parseInt(event.getArgs()));
 				return;
 			}
 		}
