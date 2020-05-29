@@ -269,7 +269,7 @@ public class SuperBotChallenge
 			gameHandler.addBot(next,true);
 		channel.sendMessage("Next game starting in five minutes:").queue();
 		gamesRun++;
-		channel.sendMessage(String.format("**Game %2d/%2d**", gamesRun, totalGames)).queue();
+		channel.sendMessage(String.format("**Game %02d/%02d**", gamesRun, totalGames)).queue();
 		channel.sendMessage(gameHandler.listPlayers(false)).queue();
 		gameHandler.runPingList();
 		timer.schedule(() -> gameHandler.startTheGameAlready(), 5, TimeUnit.MINUTES);
