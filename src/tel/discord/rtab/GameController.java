@@ -2152,7 +2152,7 @@ public class GameController
 		}
 		else
 		{
-			resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*baseMultiplier));
+			resultString.append(String.format("Game Over. You won **$%,d**",moneyWon));
 			if(multiplier > 1)
 				resultString.append(String.format(" times %d copies!",multiplier));
 			else
