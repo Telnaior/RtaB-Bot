@@ -261,8 +261,8 @@ public class ShutTheBox implements MiniGame {
 		if (waysToClose[roll-2] == 0)
 			return getMoneyWon() * -1;
 		if (totalShut + roll == MAX_SCORE)
-			return 1500000 - getMoneyWon();
-		return findNthTetrahedralNumber(totalShut+roll) * 50 - getMoneyWon();
+			return 1500000 * baseMultiplier - getMoneyWon();
+		return findNthTetrahedralNumber(totalShut+roll) * 50 * baseMultiplier - getMoneyWon();
 	}
 	
 	public int findNthTetrahedralNumber(int n) {

@@ -20,7 +20,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class RaceToABillionBot
 {
-	final static boolean AUTOSCHEDULE = false;
 	public static JDA yayBot;
 	public static ArrayList<GameController> game = new ArrayList<>(3);
 	public static ArrayList<SuperBotChallenge> challenge = new ArrayList<>(1);
@@ -44,25 +43,23 @@ public class RaceToABillionBot
 							//Info Commands
 							new PlayersCommand(), new BoardCommand(), new TotalsCommand(), new NextCommand(),
 							new LivesCommand(), new RankCommand(), new TopCommand(), new StatsCommand(), new HistoryCommand(),
-							//Betting Commands
-							new BetCommand(), new ViewBetsCommand(), new BetRankCommand(), new BetTopCommand(),
+							//SBC Commands
+							new ReadyCommand(), new BetCommand(), new ViewBetsCommand(), new BetRankCommand(), new BetTopCommand(),
 							//Mod Commands
 							new PingBotCommand(), new StartCommand(), new ResetCommand(),
 							new ReconnectCommand(), new ReloadCommand(), new ViewBombsCommand(), new ViewConnectionsCommand(),
 							new ShutdownBotCommand(), new AddBotCommand(), new DemoCommand(),
 							//Joke Commands
-							new MemeCommand(), new LuckyNumberCommand(), new MysteryChanceCommand(),
-							//Misc Commands
-							new ShopCommand());
+							new MemeCommand(), new LuckyNumberCommand(), new MysteryChanceCommand());
 		JDABuilder prepareBot = new JDABuilder(AccountType.BOT);
 		prepareBot.setToken(token);
 		prepareBot.addEventListener(utilities.build());
 		prepareBot.addEventListener(waiter);
 		yayBot = prepareBot.buildBlocking();
-		connectToChannels(AUTOSCHEDULE);
+		connectToChannels();
 	}
 	
-	public static void connectToChannels(boolean autoSchedule)
+	public static void connectToChannels()
 	{
 		//Get all the guilds we're in
 		List<Guild> guildList = yayBot.getGuilds();
@@ -88,7 +85,7 @@ public class RaceToABillionBot
 				{
 					SuperBotChallenge challengeHandler = new SuperBotChallenge();
 					challenge.add(challengeHandler);
-					game.add(challengeHandler.initialise(channel,autoSchedule));
+					game.add(challengeHandler.initialise(channel));
 					System.out.println("Challenge Channel: " + channel.getName() + " ("+ channel.getId() + ")");
 				}
 				else if(channel.getTopic().startsWith("~ RESULT CHANNEL ~"))

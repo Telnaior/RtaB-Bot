@@ -33,6 +33,6 @@ public class ReconnectCommand extends Command
 		}
 		RaceToABillionBot.challenge.clear();
 		
-		RaceToABillionBot.connectToChannels(false);
+		RaceToABillionBot.connectToChannels();
 	}
 }
