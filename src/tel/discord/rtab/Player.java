@@ -87,7 +87,7 @@ public class Player implements Comparable<Player>
 	{
 		channel = channelID;
 		lives = MAX_LIVES;
-		lifeRefillTime = Instant.now();
+		lifeRefillTime = Instant.now().plusSeconds(72000);
 		money = 0;
 		booster = 100;
 		winstreak = 0;
@@ -134,8 +134,15 @@ public class Player implements Comparable<Player>
 					hiddenCommand = HiddenCommand.valueOf(record[8]);
 					boostCharge = Integer.parseInt(record[9]);
 					//If we're short on lives and we've passed the refill time, restock them
-					if(lifeRefillTime.isBefore(Instant.now()) && lives < MAX_LIVES && lives >= 0)
-						lives = MAX_LIVES;
+					//Or if we still have lives but it's been 20 hours since we lost any, give an extra
+					while(lifeRefillTime.isBefore(Instant.now()))
+					{
+						if(lives < MAX_LIVES)
+							lives = MAX_LIVES;
+						else
+							lives++;
+						lifeRefillTime = lifeRefillTime.plusSeconds(72000);
+					}
 					break;
 				}
 			}
@@ -239,16 +246,14 @@ public class Player implements Comparable<Player>
 		//Set their refill time if this is their first life lost, then dock it if they aren't in newbie protection
 		if(newbieProtection <= 0)
 		{
-			if(lives == MAX_LIVES) lifeRefillTime = Instant.now().plusSeconds(72000);
-			if(lives > 0)
+			if(lives == MAX_LIVES)
+				lifeRefillTime = Instant.now().plusSeconds(72000);
+			if(lives == 1)
 			{
-				if(lives == 1)
-				{
-					channel.sendMessage(getSafeMention() + ", you are out of lives. "
-							+ "Further games today will incur an entry fee.").queue();
-				}
-				lives --;
+				channel.sendMessage(getSafeMention() + ", you are out of lives. "
+						+ "Further games today will incur an entry fee.").queue();
 			}
+			lives --;
 		}
 		StringBuilder output = addMoney(penalty*multiplier,MoneyMultipliersToUse.BOOSTER_ONLY);
 		//If they've got a split and share, they're in for a bad time
