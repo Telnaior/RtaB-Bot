@@ -93,7 +93,7 @@ public class HelpCommand extends Command
 					+ "and every additional life you lose in a day increases this fee by 20%.\n");
 			helpList.append("But never fear! They'll all come back tomorrow. "
 					+ "20 hours after you lose your first life, you'll be restocked to 5.\n");
-			helpList.append("If you miss a day altogether, it'll give you an additional life above the base 5,"
+			helpList.append("If you miss a day altogether, it'll give you an additional life above the base 5, "
 					+ "so if you aren't a regular player it's likely you won't have to worry about lives at all.");
 			break;
 		case "bet":
