@@ -191,9 +191,10 @@ public class GameController
 		if(newPlayer.money <= -1000000000)
 			return PlayerJoinReturnValue.ELIMINATED;
 		//If they're out of lives, charge them and let them know
+		//Fee is 1% plus an extra 0.2% per additional life spent while already out
 		if(newPlayer.lives <= 0 && newPlayer.newbieProtection <= 0)
 		{
-			int entryFee = Math.max(newPlayer.money/100,100000);
+			int entryFee = calculateEntryFee(newPlayer.money, newPlayer.lives);
 			newPlayer.addMoney(-1*entryFee,MoneyMultipliersToUse.NOTHING);
 			newPlayer.oldMoney = newPlayer.money;
 			channel.sendMessage(newPlayer.getSafeMention() + String.format(", you are out of lives. "
@@ -2607,48 +2608,64 @@ public class GameController
 			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
 			String[] record = list.get(index).split("#");
 			output.append(record[1] + ": ");
-			if(Integer.parseInt(record[5]) > 0)
+			int newbieProtection = Integer.parseInt(record[5]);
+			int lives = Integer.parseInt(record[6]);
+			if(newbieProtection > 0)
 			{
-				output.append(record[5]);
+				output.append(newbieProtection);
 				output.append(" game");
-				if(Integer.parseInt(record[5]) != 1)
+				if(newbieProtection != 1)
 					output.append("s");
 				output.append(" of newbie protection left.");
 			}
 			else
 			{
-				if(Instant.parse(record[7]).isBefore(Instant.now()) && Integer.parseInt(record[6]) < Player.MAX_LIVES)
-					output.append(Player.MAX_LIVES + " lives left.");
-				else
+				//Calculate how much their lives have refilled
+				Instant lifeRefill = Instant.parse(record[7]);
+				while(lifeRefill.isBefore(Instant.now()))
 				{
-					output.append(record[6]);
-					if(Integer.parseInt(record[6]) == 1)
-						output.append(" life left.");
+					if(lives < Player.MAX_LIVES)
+						lives = Player.MAX_LIVES;
 					else
-						output.append(" lives left.");
-					if(Integer.parseInt(record[6]) < Player.MAX_LIVES)
+						lives++;
+					lifeRefill = lifeRefill.plusSeconds(72000);
+				}
+				//Just display a negative life count as 0 lol
+				output.append(Math.max(lives,0));
+				if(lives == 1)
+					output.append(" life left.");
+				else
+					output.append(" lives left.");
+				//If they're out of lives, tell them how much their next game's entry fee would be
+				if(lives <= 0)
+				{
+					int money = Integer.parseInt(record[2]);
+					int entryFee = calculateEntryFee(money, lives);
+					output.append(String.format(" Playing now will cost $%,d.",entryFee));
+				}
+				//If they're below the base maximum, tell them how long until they get a refill
+				if(lives < Player.MAX_LIVES)
+				{
+					output.append(" Lives refill in ");
+					//Check hours, then minutes, then seconds
+					OffsetDateTime lifeRefillTime = lifeRefill.minusSeconds(Instant.now().getEpochSecond())
+							.atOffset(ZoneOffset.UTC);
+					int hours = lifeRefillTime.getHour();
+					if(hours>0)
 					{
-						output.append(" Lives refill in ");
-						//Check hours, then minutes, then seconds
-						OffsetDateTime lifeRefillTime = Instant.parse(record[7]).minusSeconds(Instant.now().getEpochSecond())
-								.atOffset(ZoneOffset.UTC);
-						int hours = lifeRefillTime.getHour();
-						if(hours>0)
-						{
-							output.append(hours + " hours, ");
-						}
-						int minutes = lifeRefillTime.getMinute();
-						if(hours>0 || minutes>0)
-						{
-							output.append(minutes + " minutes, ");
-						}
-						int seconds = lifeRefillTime.getSecond();
-						if(hours>0 || minutes>0 || seconds>0)
-						{
-							output.append(seconds + " seconds");
-						}
-						output.append(".");
+						output.append(hours + " hours, ");
 					}
+					int minutes = lifeRefillTime.getMinute();
+					if(hours>0 || minutes>0)
+					{
+						output.append(minutes + " minutes, ");
+					}
+					int seconds = lifeRefillTime.getSecond();
+					if(hours>0 || minutes>0 || seconds>0)
+					{
+						output.append(seconds + " seconds");
+					}
+					output.append(".");
 				}
 			}
 		}
@@ -2657,6 +2674,14 @@ public class GameController
 		}
 		return output.toString();
 	}
+	
+	public int calculateEntryFee(int money, int lives)
+	{
+		int entryFee = Math.max(money/500,20000);
+		entryFee *= 5 - lives;
+		return entryFee;
+	}
+	
 	public Player addBot(int botNumber, boolean humanOverride)
 	{
 		//Only do this if we're in signups!
