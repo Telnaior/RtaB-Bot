@@ -89,9 +89,12 @@ public class HelpCommand extends Command
 			helpList.append("By default, you have five lives. Every time you blow up in a game, you lose a life.\n");
 			helpList.append("You can check how many lives you have remaining with !lives. "
 					+ "If you run out of lives you can keep playing, but every additional game will cost an entry fee.\n");
-			helpList.append("The entry fee is 1% of your total bank or $100,000, whichever is greater.\n");
+			helpList.append("The base entry fee is 1% of your total bank or $100,000, whichever is greater, "
+					+ "and every additional life you lose in a day increases this fee by 20%.\n");
 			helpList.append("But never fear! They'll all come back tomorrow. "
-					+ "20 hours after you lose your first life, you'll be restocked to 5.");
+					+ "20 hours after you lose your first life, you'll be restocked to 5.\n");
+			helpList.append("If you miss a day altogether, it'll give you an additional life above the base 5,"
+					+ "so if you aren't a regular player it's likely you won't have to worry about lives at all.");
 			break;
 		case "bet":
 		case "betting":
