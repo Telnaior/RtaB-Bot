@@ -162,7 +162,18 @@ public class BettingHandler {
 			//Go through each player in the game to update their stats
 			for(Bettor nextBettor : bettors)
 			{
-				int location = GameController.findUserInList(list,nextBettor.uID,false);
+				//Find if they already exist in the savefile, and where
+				String[] record;
+				int location = -1;
+				for(int i=0; i<list.size(); i++)
+				{
+					record = list.get(i).split("#");
+					if(record[0].compareToIgnoreCase(bettors.get(i).uID) == 0)
+					{
+						location = i;
+						break;
+					}
+				}
 				StringBuilder toPrint = new StringBuilder();
 				toPrint.append(nextBettor.uID+"#");
 				toPrint.append(nextBettor.name+"#");

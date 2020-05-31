@@ -5,12 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import tel.discord.rtab.GameController;
-
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
-public class BetRankCommand extends Command {
+public class BetRankCommand extends ParsingCommand {
     public BetRankCommand()
     {
         this.name = "betrank";
@@ -27,7 +24,8 @@ public class BetRankCommand extends Command {
 			int index;
 			//Search for own ID if no name given (to ensure match even if name changed)
 			if(name.equals(""))
-				index = GameController.findUserInList(list,event.getAuthor().getId(),false);
+				index = findUserInList(list,event.getAuthor().getId(),false);
+			//Or search by rank if they gave a rank
 			else if(name.startsWith("#"))
 			{
 				try
@@ -36,11 +34,15 @@ public class BetRankCommand extends Command {
 				}
 				catch(NumberFormatException e1)
 				{
-					index = GameController.findUserInList(list,name,true);
+					index = findUserInList(list,name,true);
 				}
 			}
+			//Or search for another's ID if a mention given
+			else if(name.startsWith("<@!"))
+				index = findUserInList(list,parseMention(name),false);
+			//Or just search by the name given
 			else
-				index = GameController.findUserInList(list,name,true);
+				index = findUserInList(list,name,true);
 			if(index < 0 || index >= list.size())
 			{
 				if(name.equals(""))

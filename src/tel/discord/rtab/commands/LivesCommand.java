@@ -8,10 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
-public class LivesCommand extends Command {
+public class LivesCommand extends ParsingCommand {
 	public LivesCommand()
     {
         this.name = "lives";
@@ -33,11 +32,17 @@ public class LivesCommand extends Command {
 					//If no name given, check it for themselves
 					int index;
 					if(event.getArgs() == "")
-						index = GameController.findUserInList(list,event.getAuthor().getId(),false);
+						index = findUserInList(list,event.getAuthor().getId(),false);
+					//If it's a mention, search by the id of the mention
+					else if(event.getArgs().startsWith("<@!"))
+					{
+						String mentionID = parseMention(event.getArgs());
+						index = findUserInList(list,mentionID,false);
+					}
 					//Otherwise check it for the player named
 					else
 					{
-						index = GameController.findUserInList(list,event.getArgs(),true);
+						index = findUserInList(list,event.getArgs(),true);
 					}
 					//Then pass off to the actual controller if they're an actual user
 					if(index < 0 || index >= list.size())

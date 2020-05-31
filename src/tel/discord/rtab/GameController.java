@@ -2496,7 +2496,19 @@ public class GameController
 				if(players.get(i).newbieProtection == 1)
 					channel.sendMessage(players.get(i).getSafeMention() + ", your newbie protection has expired. "
 							+ "From now on, your base bomb penalty will be $250,000.").queue();
-				int location = findUserInList(list,players.get(i).uID,false);
+				//Find if they already exist in the savefile, and where
+				String[] record;
+				int location = -1;
+				for(int j=0; j<list.size(); j++)
+				{
+					record = list.get(j).split("#");
+					if(record[0].compareToIgnoreCase(players.get(i).uID) == 0)
+					{
+						location = j;
+						break;
+					}
+				}
+				//Then build their record and put it in the right place
 				StringBuilder toPrint = new StringBuilder();
 				toPrint.append(players.get(i).uID);
 				toPrint.append("#"+players.get(i).name);
@@ -2550,27 +2562,6 @@ public class GameController
 		{
 			e.printStackTrace();
 		}
-	}
-	public static int findUserInList(List<String> list, String userID, boolean searchByName)
-	{
-		int field;
-		if(searchByName)
-			field = 1;
-		else
-			field = 0;
-		/*
-		 * record format:
-		 * record[0] = uID
-		 * record[1] = name
-		 */
-		String[] record;
-		for(int i=0; i<list.size(); i++)
-		{
-			record = list.get(i).split("#");
-			if(record[field].compareToIgnoreCase(userID) == 0)
-				return i;
-		}
-		return -1;
 	}
 	public String listPlayers(boolean waitingOn)
 	{

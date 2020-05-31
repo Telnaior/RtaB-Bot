@@ -6,15 +6,12 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import tel.discord.rtab.GameController;
-
-import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
 import net.dv8tion.jda.core.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.core.utils.tuple.Pair;
 
-public class HistoryCommand extends Command {
+public class HistoryCommand extends ParsingCommand {
     public HistoryCommand()
     {
         this.name = "history";
@@ -30,6 +27,11 @@ public class HistoryCommand extends Command {
 			{
 				name = event.getMember().getEffectiveName();
 				uID = event.getAuthor().getId();
+			}
+			else if(event.getArgs().startsWith("<@!"))
+			{
+				uID = parseMention(event.getArgs());
+				name = event.getGuild().getMemberById(uID).getEffectiveName();
 			}
 			else
 			{
@@ -47,9 +49,9 @@ public class HistoryCommand extends Command {
 				int index;
 				//If we find them, add their records to the pile
 				if(uID != null)
-					index = GameController.findUserInList(list,uID,false);
+					index = findUserInList(list,uID,false);
 				else
-					index = GameController.findUserInList(list,name,true);
+					index = findUserInList(list,name,true);
 				if(index >= 0 && index < list.size())
 				{
 					String[] record = list.get(index).split("#");
