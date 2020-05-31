@@ -38,7 +38,7 @@ public class Supercash implements MiniGame {
 			for(int j=0; j<neededToWin; j++)
 				board.add(values[i]);
 		//Switch one of the lowest values for an extra copy of the highest value
-		board.set(0,maxValue);
+		board.set(0,values[values.length-1]);
 		Collections.shuffle(board);
 		numberPicked = new int[values.length];
 		pickedSpaces = new boolean[BOARD_SIZE];
