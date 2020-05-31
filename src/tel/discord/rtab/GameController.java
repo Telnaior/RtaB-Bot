@@ -1410,6 +1410,7 @@ public class GameController
 						getCurrentPlayer().jackpot = false;
 					}
 					penalty = getCurrentPlayer().newbieProtection > 0 ? Player.NEWBIE_BOMB_PENALTY : Player.BOMB_PENALTY;
+					penalty *= baseMultiplier;
 					channel.sendMessage(String.format("$%1$,d MEGA penalty for %2$s!",
 							Math.abs(penalty*16),getCurrentPlayer().getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
 					getCurrentPlayer().threshold = true;
