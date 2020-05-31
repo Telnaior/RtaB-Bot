@@ -41,16 +41,18 @@ public class MinigameTest
 			return;
 		}
 		//Now we know they matched, so...
+		System.out.print("Base multiplier?");
+		int baseMultiplier = sc.nextInt();
 		System.out.print("Have a bot play for you? (Y/N) ");
 		String botChoice = sc.nextLine();
 		if(botChoice.toLowerCase().equals("y"))
-			runGame(gameChosen.get().getGame(),true);
+			runGame(gameChosen.get().getGame(),baseMultiplier,true);
 		else
-			runGame(gameChosen.get().getGame(),false);
+			runGame(gameChosen.get().getGame(),baseMultiplier,false);
 	}
-	static void runGame(MiniGame game, boolean isBot)
+	static void runGame(MiniGame game, int baseMultiplier, boolean isBot)
 	{
-		game.initialiseGame("test", 1).forEach(line -> System.out.println(line));
+		game.initialiseGame("test", baseMultiplier).forEach(line -> System.out.println(line));
 		while(!game.isGameOver())
 		{
 			String nextChoice;
