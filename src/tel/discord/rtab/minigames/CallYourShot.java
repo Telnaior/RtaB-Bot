@@ -31,10 +31,8 @@ public class CallYourShot implements MiniGame {
 	 */
 	@Override
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier){
-		for(int nextValue : values)
-		{
-			nextValue = nextValue * baseMultiplier;
-		}
+		for(int i=0; i<values.size(); i++)
+			values.set(i, values.get(i)*baseMultiplier);
 		stageAmount = 0;
 		roundNumber = -1;
 		colorPicked = 9;

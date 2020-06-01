@@ -251,6 +251,7 @@ public class GameController
 			channel.sendMessage(String.format("%1$s needs only $%2$,d more to reach the goal!",
 					newPlayer.name,(1000000000-newPlayer.money))).queue();
 		}
+		//If there's only one player right now, that means we're starting a new game so schedule the relevant things
 		if(players.size() == 1)
 		{
 			if(runDemo != 0)
@@ -1433,6 +1434,7 @@ public class GameController
 						getCurrentPlayer().jackpot = 0;
 					}
 					penalty = getCurrentPlayer().newbieProtection > 0 ? Player.NEWBIE_BOMB_PENALTY : Player.BOMB_PENALTY;
+					penalty *= baseMultiplier;
 					channel.sendMessage(String.format("$%1$,d MEGA penalty for %2$s!",
 							Math.abs(penalty*16),getCurrentPlayer().getSafeMention())).completeAfter(2,TimeUnit.SECONDS);
 					getCurrentPlayer().threshold = true;
