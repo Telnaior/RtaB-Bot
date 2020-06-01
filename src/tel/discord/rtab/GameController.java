@@ -300,41 +300,9 @@ public class GameController
 		{
 			return;
 		}
-		if(players.size() == 1)
+		if(gameStatus == GameStatus.SIGNUPS_OPEN && (players.size() == 1 || Math.random() < 0.2))
 		{
-			//Didn't get players? How about a bot?
-			channel.sendMessage(players.get(0).getSafeMention()+", would you like to play against a bot? (Y/N)").queue();
-			gameStatus = GameStatus.ADD_BOT_QUESTION;
-			waiter.waitForEvent(MessageReceivedEvent.class,
-					//Right player and channel
-					e ->
-					{
-						if(e.getAuthor().equals(players.get(0).user) && e.getChannel().equals(channel))
-						{
-							String firstLetter = e.getMessage().getContentRaw().toUpperCase().substring(0,1);
-							return(firstLetter.startsWith("Y") || firstLetter.startsWith("N"));
-						}
-						return false;
-					},
-					//Parse it and call the method that does stuff
-					e -> 
-					{
-						if(e.getMessage().getContentRaw().toUpperCase().startsWith("Y"))
-						{
-							addRandomBot();
-							startTheGameAlready();
-						}
-						else
-						{
-							channel.sendMessage("Very well. Game aborted.").queue();
-							reset();
-						}
-					},
-					30,TimeUnit.SECONDS, () ->
-					{
-						channel.sendMessage("Game aborted.").queue();
-						reset();
-					});
+			addBotQuestion();
 			return;
 		}
 		//Declare game in progress so we don't get latecomers
@@ -348,6 +316,62 @@ public class GameController
 		bombs = new boolean[boardSize];
 		//Then do bomb placement
 		sendBombPlaceMessages();
+	}
+	void addBotQuestion()
+	{
+		//Didn't get players? How about a bot?
+		if(players.size() == 1)
+			channel.sendMessage(players.get(0).getSafeMention()+", would you like to play against a bot? (Y/N)").queue();
+		else
+			channel.sendMessage("Would you like to play against a bot? (Y/N)").queue();
+		gameStatus = GameStatus.ADD_BOT_QUESTION;
+		waiter.waitForEvent(MessageReceivedEvent.class,
+				//Right player and channel
+				e ->
+				{
+					if(getPlayerFromUser(e.getAuthor()) != -1 && e.getChannel().equals(channel))
+					{
+						String firstLetter = e.getMessage().getContentRaw().toUpperCase().substring(0,1);
+						return(firstLetter.startsWith("Y") || firstLetter.startsWith("N"));
+					}
+					return false;
+				},
+				//Parse it and call the method that does stuff
+				e -> 
+				{
+					if(e.getMessage().getContentRaw().toUpperCase().startsWith("Y"))
+					{
+						do
+							addRandomBot();
+						while(players.size() < 4 && Math.random() < 0.2);
+						startTheGameAlready();
+					}
+					else
+					{
+						if(players.size() == 1)
+						{
+							channel.sendMessage("Very well. Game aborted.").queue();
+							reset();
+						}
+						else
+						{
+							channel.sendMessage("Very well.").queue();
+							startTheGameAlready();
+						}
+					}
+				},
+				30,TimeUnit.SECONDS, () ->
+				{
+					if(players.size() == 1)
+					{
+						channel.sendMessage("Game aborted.").queue();
+						reset();
+					}
+					else
+					{
+						startTheGameAlready();
+					}
+				});
 	}
 	void sendBombPlaceMessages()
 	{
