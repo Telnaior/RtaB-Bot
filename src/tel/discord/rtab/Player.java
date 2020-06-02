@@ -46,7 +46,6 @@ public class Player implements Comparable<Player>
 	int boostCharge;
 	int jackpot;
 	boolean splitAndShare;
-	boolean minigameLock;
 	boolean threshold;
 	boolean warned;
 	PlayerStatus status;
@@ -96,7 +95,6 @@ public class Player implements Comparable<Player>
 		boostCharge = 0;
 		hiddenCommand = HiddenCommand.NONE;
 		splitAndShare = false;
-		minigameLock = false;
 		threshold = false;
 		warned = false;
 		status = PlayerStatus.OUT;
@@ -213,7 +211,7 @@ public class Player implements Comparable<Player>
 		money = oldMoney;
 		return lostMoney;
 	}
-	public StringBuilder blowUp(int multiplier, boolean holdBoost, int othersOut)
+	public StringBuilder blowUp(int multiplier, boolean holdLoot, int othersOut)
 	{
 		//Start with modifiers the main controller needs
 		for(GameController game : RaceToABillionBot.game)
@@ -227,7 +225,7 @@ public class Player implements Comparable<Player>
 			}
 		}
 		//Just fold if they've got a minigame lock so they still play their games
-		if(minigameLock && games.size() > 0)
+		if(holdLoot && games.size() > 0)
 		{
 			status = PlayerStatus.FOLDED;
 		}
@@ -275,7 +273,7 @@ public class Player implements Comparable<Player>
 			}
 		}
 		//Wipe their booster if they didn't hit a boost holder
-		if(!holdBoost)
+		if(!holdLoot)
 		{
 			booster = 100;
 			boostCharge = 0;

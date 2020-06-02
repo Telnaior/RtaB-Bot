@@ -1009,25 +1009,14 @@ public class GameController
 			}
 			extraResult = getCurrentPlayer().blowUp(baseMultiplier,false,(players.size()-playersAlive));
 			break;
-		case BOOSTHOLD:
+		case LOOTHOLD:
 			StringBuilder boostHoldResult = new StringBuilder().append("It ");
-			if(getCurrentPlayer().booster != 100 || getCurrentPlayer().boostCharge != 0)
-				boostHoldResult.append("holds your boost, then ");
+			if(getCurrentPlayer().booster != 100 || getCurrentPlayer().boostCharge != 0 || getCurrentPlayer().games.size() > 0)
+				boostHoldResult.append("holds your boost and minigames, then ");
 			boostHoldResult.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
 			channel.sendMessage(boostHoldResult)
 					.completeAfter(5,TimeUnit.SECONDS);
 			extraResult = getCurrentPlayer().blowUp(baseMultiplier,true,(players.size()-playersAlive));
-			break;
-		case GAMELOCK:
-			StringBuilder gameLockResult = new StringBuilder().append("It ");
-			if(getCurrentPlayer().games.size() > 0)
-				gameLockResult.append("locks in your minigame" +
-						(getCurrentPlayer().games.size() > 1 ? "s" : "") + ", then ");
-			gameLockResult.append(String.format("goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)));
-			channel.sendMessage(gameLockResult)
-					.completeAfter(5,TimeUnit.SECONDS);
-			getCurrentPlayer().minigameLock = true;
-			extraResult = getCurrentPlayer().blowUp(baseMultiplier,false,(players.size()-playersAlive));
 			break;
 		case CHAIN:
 			channel.sendMessage("It goes **BOOM**...")
