@@ -1961,16 +1961,12 @@ public class GameController
 			//Award $20k for each space picked, plus 5% extra per unused peek
 			//Then double it if every space was picked, and split it with any other winners
 			int winBonus = (20000 + 1000*getCurrentPlayer().peek) * (boardSize - spacesLeft);
-			if(spacesLeft <= 0)
-				winBonus *= 2;
 			winBonus *= baseMultiplier;
 			winBonus /= playersAlive;
-			if(spacesLeft <= 0 && playersAlive == 1)
-				channel.sendMessage("**SOLO BOARD CLEAR!**").queue();
 			channel.sendMessage(getCurrentPlayer().name + " receives a win bonus of **$"
 					+ String.format("%,d",winBonus) + "**.").queue();
 			StringBuilder extraResult = null;
-			extraResult = getCurrentPlayer().addMoney(winBonus,MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+			extraResult = getCurrentPlayer().addMoney(winBonus,MoneyMultipliersToUse.BONUS_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
 		}
