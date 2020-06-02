@@ -2,7 +2,7 @@ package tel.discord.rtab.enums;
 
 public enum BombType implements WeightedSpace
 {
-	NORMAL		(12),
+	NORMAL		(14),
 	BANKRUPT	( 2),
 	LOOTHOLD	( 2),
 	CHAIN		( 2),
