@@ -157,7 +157,8 @@ public class Player implements Comparable<Player>
 	{
 		//Start with the base amount
 		long adjustedPrize = amount;
-		if(multipliers.useBoost)
+		//Boost and bonus don't stack - if both are permitted, only use whichever is greater
+		if((multipliers.useBoost && !multipliers.useBonus) || (multipliers.useBoost && booster >= winstreak*10))
 		{
 			//Multiply by the booster (then divide by 100 since it's a percentage)
 			adjustedPrize *= booster;
@@ -165,7 +166,7 @@ public class Player implements Comparable<Player>
 		}
 		//And if it's a "bonus" (win bonus, minigames, the like), multiply by winstreak ("bonus multiplier") too
 		//But make sure they still get something even if they're on x0
-		if(multipliers.useBonus)
+		if((multipliers.useBonus && !multipliers.useBoost) || (multipliers.useBonus && winstreak*10 > booster))
 		{
 			adjustedPrize *= Math.max(10,winstreak);
 			adjustedPrize /= 10;

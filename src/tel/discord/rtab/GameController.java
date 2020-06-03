@@ -1956,7 +1956,7 @@ public class GameController
 			channel.sendMessage(getCurrentPlayer().name + " receives a win bonus of **$"
 					+ String.format("%,d",winBonus) + "**.").queue();
 			StringBuilder extraResult = null;
-			extraResult = getCurrentPlayer().addMoney(winBonus,MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+			extraResult = getCurrentPlayer().addMoney(winBonus,MoneyMultipliersToUse.BONUS_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
 		}
@@ -1982,7 +1982,7 @@ public class GameController
 			channel.sendMessage(String.format("You cash in your unused joker"+(jokerCount!=1?"s":"")+
 					" for **$%,d**.", jokerCount * 250_000 * baseMultiplier)).queue();
 			StringBuilder extraResult = getCurrentPlayer().addMoney(250_000*jokerCount*baseMultiplier, 
-					MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+					MoneyMultipliersToUse.BONUS_ONLY);
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
 		}
@@ -2234,7 +2234,7 @@ public class GameController
 			}
 			StringBuilder extraResult = null;
 			extraResult = getCurrentPlayer().addMoney(moneyWon*multiplier,
-					currentGame.isBonusGame() ? MoneyMultipliersToUse.NOTHING : MoneyMultipliersToUse.BOOSTER_AND_BONUS);
+					currentGame.isBonusGame() ? MoneyMultipliersToUse.NOTHING : MoneyMultipliersToUse.BOOSTER_OR_BONUS);
 			channel.sendMessage(resultString).queue();
 			if(extraResult != null)
 				channel.sendMessage(extraResult).queue();
