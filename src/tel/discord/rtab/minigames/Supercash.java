@@ -43,7 +43,7 @@ public class Supercash implements MiniGame {
 		numberPicked = new int[values.length];
 		pickedSpaces = new boolean[BOARD_SIZE];
 		//Display instructions
-		output.add("For reaching a streak bonus of x5, you have earned the right to play the first bonus game!");
+		output.add("For reaching a streak bonus of x4, you have earned the right to play the first bonus game!");
 		output.add("In Supercash, you can win a jackpot of up to "+String.format("$%,d!",values[values.length-1]));
 		output.add("Hidden on the board are three jackpot spaces, simply pick them all to win.");
 		output.add("There are also other, lesser values, make a pair of those to win that amount instead.");

@@ -89,7 +89,7 @@ public class Player implements Comparable<Player>
 		lifeRefillTime = Instant.now().plusSeconds(72000);
 		money = 0;
 		booster = 100;
-		winstreak = 0;
+		winstreak = 10;
 		peek = 1;
 		jokers = 0;
 		boostCharge = 0;
@@ -279,7 +279,7 @@ public class Player implements Comparable<Player>
 			boostCharge = 0;
 		}
 		//Wipe everything else too, and dock them a life
-		winstreak = 0;
+		winstreak = 10;
 		hiddenCommand = HiddenCommand.NONE;
 		//Dumb easter egg
 		if(money <= -1000000000)

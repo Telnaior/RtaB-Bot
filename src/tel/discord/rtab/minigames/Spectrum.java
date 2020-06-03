@@ -37,7 +37,7 @@ public class Spectrum implements MiniGame {
 		pickedSpaces = new boolean[BOARD_SIZE];
 		total = 0;
 		//Display instructions
-		output.add("For reaching a streak bonus of x15, you have earned the right to play the third bonus game!");
+		output.add("For reaching a streak bonus of x12, you have earned the right to play the third bonus game!");
 		output.add(String.format("In Spectrum, you can win up to **$%,d**!",100_000_000*baseMultiplier));
 		output.add("Pairs of money are hidden on the board, along with three bombs.");
 		output.add("If you make a pair, you win that amount and get to keep picking!");

@@ -50,7 +50,7 @@ public class GameController
 {
 	final static int MAX_PLAYERS = 16;
 	final static String[] VALID_ARC_RESPONSES = {"A","ABORT","R","RETRY","C","CONTINUE"};
-	final static int REQUIRED_STREAK_FOR_BONUS = 50;
+	final static int REQUIRED_STREAK_FOR_BONUS = 40;
 	final static int THRESHOLD_PER_TURN_PENALTY = 100_000;
 	final boolean rankChannel;
 	public final int runDemo;
@@ -1935,11 +1935,8 @@ public class GameController
 		{
 			channel.sendMessage(getCurrentPlayer().getSafeMention() + " Wins!")
 				.completeAfter(1,TimeUnit.SECONDS);
-			//+1 for first opponent defeated, +0.9 for second opponent, down to +0.1 for 10th+
-			for(int i=0; i<(players.size()-playersAlive); i++)
-			{
-				getCurrentPlayer().winstreak += Math.max(10-i, 1);
-			}
+			//+0.5 per opponent defeated on a solo win, reduced on joint wins based on the ratio of surviving opponents
+			getCurrentPlayer().winstreak += (5 - (playersAlive-1)*5/(players.size()-1)) * (players.size() - playersAlive);
 		}
 		//Now the winstreak is right, we can display the board
 		displayBoardAndStatus(false, false, false);
