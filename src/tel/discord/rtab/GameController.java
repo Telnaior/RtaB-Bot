@@ -1259,43 +1259,47 @@ public class GameController
 		//Never pick "none", which is at the start of the list
 		int commandNumber = (int) (Math.random() * (possibleCommands.length - 1) + 1);
 		HiddenCommand chosenCommand = possibleCommands[commandNumber];
+		StringBuilder commandHelp = new StringBuilder();
+		if(getCurrentPlayer().hiddenCommand != HiddenCommand.NONE)
+			commandHelp.append("Your Hidden Command has been replaced with...");
+		else
+			commandHelp.append("You found a Hidden Command...");
 		getCurrentPlayer().hiddenCommand = chosenCommand;
 		//Send them the PM telling them they have it
 		if(!getCurrentPlayer().isBot)
 		{
-			StringBuilder commandHelp = new StringBuilder();
 			switch(chosenCommand)
 			{
 			case FOLD:
-				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **FOLD**!\n"
+				commandHelp.append("A **FOLD**!\n"
 						+ "The fold allows you to drop out of the round at any time by typing **!fold**.\n"
 						+ "If you use it, you will keep your mulipliers and minigames, "
 						+ "so consider it a free escape from a dangerous board!\n");
 				break;
 			case REPELLENT:
-				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **BLAMMO REPELLENT**!\n"
+				commandHelp.append("A **BLAMMO REPELLENT**!\n"
 						+ "You may use this by typing **!repel** whenever any player is facing a blammo to automatically block it.\n"
 						+ "The person affected will then need to choose a different space from the board.\n");
 				break;
 			case BLAMMO:
-				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **BLAMMO SUMMONER**!\n"
+				commandHelp.append("A **BLAMMO SUMMONER**!\n"
 						+ "You may use this by typing **!blammo** at any time to give the next player a blammo!\n"
 						+ "This will activate on the NEXT turn (not the current one), and will replace that player's normal turn.\n");
 				break;
 			case DEFUSE:
-				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **DEFUSER**!\n"
+				commandHelp.append("A **DEFUSER**!\n"
 						+ "You may use this at any time by typing **!defuse 13**, replacing '13' with the space you wish to defuse.\n"
 						+ "Any bomb placed on the defused space will fail to explode. Use this wisely!\n");
 				break;
 			case WAGER:
-				commandHelp.append("Behind the negative cash, you found a Hidden Command, a **WAGERER**!\n"
+				commandHelp.append("A **WAGERER**!\n"
 						+ "The wager allows you to force all living players to add a portion of their total bank to a prize pool, "
 						+ "which the winner(s) of the round will claim.\n"
 						+ "The amount is equal to 1% of the last-place player's total bank, "
 						+ "and you can activate this at any time by typing **!wager**.\n"); 
 				break;
 			default:
-				commandHelp.append("You also got an ERROR, report this to @Atia#2084 to get it fixed.");
+				commandHelp.append("An **ERROR**. Report this to @Atia#2084 to get it fixed.");
 				break;
 			}
 			commandHelp.append("You may only have one Hidden Command at a time, and you will keep it even across rounds "
@@ -1916,6 +1920,20 @@ public class GameController
 				channel.sendMessage("So you can have this instead.").completeAfter(3,TimeUnit.SECONDS);
 				channel.sendMessage(awardBoost(location)).queue();
 			}
+			break;
+		case SPOILER_TAG:
+			channel.sendMessage("It's ||**Commands for All**||!").completeAfter(5, TimeUnit.SECONDS);
+			//Save the current turn
+			int savedTurn = currentTurn;
+			//Award all living players a hidden command
+			for(int i=0; i<players.size(); i++)
+				if(players.get(i).status == PlayerStatus.ALIVE)
+				{
+					currentTurn = i;
+					awardHiddenCommand();
+				}
+			//Restore the current turn
+			currentTurn = savedTurn;
 			break;
 		}
 	}

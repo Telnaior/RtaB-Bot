@@ -6,11 +6,11 @@ public enum Events implements WeightedSpace
 	BOOST_CHARGER	( 7,"Boost Charger"),
 	DOUBLE_DEAL		( 7,"Double Deal"),
 	DRAW_TWO		( 6,"Draw Two"),
-	SKIP_TURN		( 6,"Skip Turn"),
 	PEEK_REPLENISH	( 6,"Extra Peek"),
-	REVERSE_ORDER	( 5,"Reverse"),
+	REVERSE_ORDER	( 6,"Reverse"),
 	STREAKPLARGE	( 5,"Streak Bonus"),
 	BOWSER			( 5,"Bowser Event"),
+	SPOILER_TAG		( 5,"Hidden Commands for All"),
 	BOOST_MAGNET	( 4,"Boost Magnet"),
 	JOKER			( 4,"Joker")
 	{
@@ -64,6 +64,7 @@ public enum Events implements WeightedSpace
 	STARMAN			( 1,"Starman"),
 	JACKPOT			( 1,"Jackpot"),
 	//Events Rotated Out
+	SKIP_TURN		( 0,"Skip Turn"), //This still appears in 2p from reverse autoconverting lol
 	BOOST_DRAIN		( 0,"Boost Drain"),
 	//Bowser Events
 	COINS_FOR_BOWSER( 0,"Cash for Bowser"),
