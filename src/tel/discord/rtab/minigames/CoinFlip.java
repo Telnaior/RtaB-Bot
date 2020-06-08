@@ -5,7 +5,7 @@ import java.util.LinkedList;
 public class CoinFlip implements MiniGame {
 	static final String NAME = "CoinFlip";
 	static final boolean BONUS = false; 
-	static final int[] PAYTABLE = {100,1_000,3_500,10_000,35_000,100_000,350_000,1_000_000,2_500_000};
+	static final int[] PAYTABLE = {5_000,10_000,25_000,50_000,100_000,250_000,500_000,1_000_000};
 	static final int MAX_STAGE = PAYTABLE.length-1;
 	int baseMultiplier;
 	int stage;
@@ -28,11 +28,12 @@ public class CoinFlip implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("Welcome to CoinFlip!");
-		output.add("Here there are "+MAX_STAGE+" stages to clear, and an increasing money value for each one!");
+		output.add("Here there are "+MAX_STAGE+" stages to clear, "
+				+ "and up to "+String.format("**$%,d**", payTable(MAX_STAGE))+" to be won!");
 		output.add("You start with ten coins, and at each stage you choose Heads or Tails.");
 		output.add("As long as even one coin shows your choice, you clear the stage.");
 		output.add("However, any coins that land on the wrong side are removed from your collection.");
-		output.add("You can stop at any time, but if you ever run out of coins you will leave with nothing."); //~Duh
+		output.add("You can stop at any time, but if you ever run out of coins you will lose 90% of your bank."); //~NOT DUH?!?!
 		output.add(ShowPaytable(stage));
 		output.add(makeOverview(coins, stage)); 
 		return output;  
@@ -75,13 +76,13 @@ public class CoinFlip implements MiniGame {
 		if(heads || tails)
 		{	
 			int newCoins = 0;
-			// Under 50 Heads, 50 and above Tails
 			for(int i=0; i < coins; i++)
 			{
-				if (50 < (Math.random()*100)){
+				if (0.5 < Math.random()){
 					if (tails) newCoins++;
 				}
-				else{
+				else
+				{
 					if (heads) newCoins++;
 				}
 			}
@@ -91,11 +92,13 @@ public class CoinFlip implements MiniGame {
 			else if (tails)
 				output.add(String.format("You got %d TAILS"+(newCoins==0?".":(coins/newCoins>=2?".":"!")), newCoins));
 			coins = newCoins;
-			if (coins == 0) {
+			stage++;
+			if (coins == 0)
+			{
 				alive = false;
 			}
-			else {
-				stage++;
+			else
+			{
 				output.add(String.format("You cleared Stage %d and won $%,d! \n", stage, payTable(stage)));
 				if (stage >= MAX_STAGE) accept = true;
 				else output.add(makeOverview(coins, stage));
@@ -114,16 +117,8 @@ public class CoinFlip implements MiniGame {
 		StringBuilder output = new StringBuilder();
 		output.append("```\n");
 		output.append("     Win Stages    \n\n");
-		for(int i=1; i<=MAX_STAGE; i++)
-		{
-			//Bold current stage
-			if(i == stage)
-				output.append("**");
-			output.append(String.format("Stage %1$d: $%2$,9d", i, payTable(i)));
-			if(i == stage)
-				output.append("**");
-			output.append("\n");
-		}
+		for(int i=0; i<=MAX_STAGE; i++)
+			output.append(String.format("Stage %1$d: $%2$,9d\n", i, payTable(i)));
 		output.append("```");
 		return output.toString();
 	}
@@ -140,7 +135,8 @@ public class CoinFlip implements MiniGame {
 		output.append("  CoinFlip  \n\n");
 		output.append("Current Coins: " + String.format("%d \n", coins));
 		output.append("Current Stage: " + String.format("%d - ", stage) + String.format("$%,d\n", payTable(stage)));
-		output.append("   Next Stage: " + String.format("%d - ", stage+1) + String.format("$%,d\n\n", payTable(stage+1)));
+		output.append("   Next Stage: " + String.format("%d - ", stage+1) + String.format("$%,d\n", payTable(stage+1)));
+		output.append("Current Bailout:   " + String.format("$%,d\n\n",payTable(stage+1)/10));
 		output.append("'Heads' or 'Tails'   (or 'Stop')? \n");
 		output.append("```");
 		return output.toString();
@@ -169,35 +165,34 @@ public class CoinFlip implements MiniGame {
 	 * If game isn't over yet, should return lowest possible win (usually 0) because player timed out for inactivity.
 	 */
 	@Override
-	public int getMoneyWon(){
-		return (isGameOver() & alive) ? payTable(stage) : 0;
+	public int getMoneyWon()
+	{
+		return (alive) ? payTable(stage) : payTable(stage) / 10;
 	}
 	/**
 	 * Returns true if the game is a bonus game (and therefore shouldn't have boosters or winstreak applied)
 	 * Returns false if it isn't (and therefore should have boosters and winstreak applied)
 	 */
 	@Override
-	public boolean isBonusGame(){
+	public boolean isBonusGame()
+	{
 		return BONUS;
 	}
 	
 	@Override
 	public String getBotPick()
 	{
-		//As long as we have more coins than 0-30, GO ON
-	
+		//Do a "trial run" and quit if it fails
 		if (Math.random()*Math.pow(2,coins) > 1)
 		{
-			// Throw a single coin and decide from there.
-			if (50 < (Math.random()*100)){
+			// Decide heads or tails randomly
+			if (0.5 < Math.random()){
 					return "TAILS";
 				}
 				else{
 					return "HEADS";
 				}
 		}
-	
-		//If it thinks not enough coins
 		return "STOP";
 	}
 	
