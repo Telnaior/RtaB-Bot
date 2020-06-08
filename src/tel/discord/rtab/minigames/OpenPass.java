@@ -64,7 +64,7 @@ public class OpenPass implements MiniGame {
 		output.add("The boxes have been shuffled, and we will place them out one at a time.");
 		output.add("You can choose to '**OPEN**' a box, locking it into place, or you can '**PASS**', discarding it.");
 		output.add("If there are multiple numbers or operators in a row, only the rightmost one will count.");
-		output.add("A operator at the end of the equation will not count, either.");
+		output.add("An operator at the end of the equation will not count, either.");
 		output.add("Once ten boxes have been opened, the equation is evaluated from left to right, "
 				+ String.format("and you'll win %d times the result!",finalMultiplier));
 		output.add("Good luck! Let's show you the order (N is a number and ? is an operator), and bring out the first box for you...");
