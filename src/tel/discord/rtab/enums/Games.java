@@ -4,7 +4,7 @@ import tel.discord.rtab.minigames.*;
 
 public enum Games implements WeightedSpace {
 	//Minigame Pool
-	//Booster Smash at the top intentionally
+	//Booster Smash at the top and FtRotS at the bottom intentionally
 	BOOSTER_SMASH		(2,"Booster Smash","Smash") { public MiniGame getGame() { return new BoosterSmash(); } },					//Author: Atia
 	MINEFIELD_MULTIPLIER(2,"Minefield Multiplier","Multiplier") {public MiniGame getGame() { return new MinefieldMultiplier(); } }, //Author: Amy
 	COIN_FLIP			(2,"CoinFlip","Flip") { public MiniGame getGame() { return new CoinFlip(); } },								//Author: Amy
@@ -18,6 +18,7 @@ public enum Games implements WeightedSpace {
 	SHUT_THE_BOX		(2,"Shut the Box","Shut") { public MiniGame getGame() { return new ShutTheBox(); } },						//Author: StrangerCoug
 	BOMB_ROULETTE		(2,"Bomb Roulette","Roulette") { public MiniGame getGame() { return new BombRoulette(); } },				//Author: StrangerCoug
 	HI_LO_DICE			(2,"Hi/Lo Dice","Hi/Lo") { public MiniGame getGame() { return new HiLoDice(); } },							//Author: StrangerCoug
+	FTROTS				(2,"For the Rest of the Season","FtRotS") {public MiniGame getGame() { return new FTROTS(); } },			//Author: Atia
 	//Games rotated out
 	THE_OFFER			(0,"The Offer","Offer") { public MiniGame getGame() { return new TheOffer(); }	},							//Author: Amy
 	TRIPLE_PLAY			(0,"Triple Play","Triple") { public MiniGame getGame() { return new TriplePlay(); } },						//Author: Atia

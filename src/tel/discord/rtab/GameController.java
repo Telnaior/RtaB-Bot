@@ -27,6 +27,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.managers.GuildController;
+import net.dv8tion.jda.core.utils.tuple.MutablePair;
 import net.dv8tion.jda.core.utils.tuple.Pair;
 import tel.discord.rtab.enums.BlammoChoices;
 import tel.discord.rtab.enums.BombType;
@@ -875,8 +876,11 @@ public class GameController
 		int annuityPayout = getCurrentPlayer().giveAnnuities();
 		if(getCurrentPlayer().threshold)
 			annuityPayout -= THRESHOLD_PER_TURN_PENALTY*baseMultiplier;
-		getCurrentPlayer().addMoney(annuityPayout,MoneyMultipliersToUse.NOTHING);
-		channel.sendMessage(String.format("("+(annuityPayout<0?"-":"")+"$%,d)",annuityPayout)).queueAfter(1,TimeUnit.SECONDS);
+		if(annuityPayout != 0)
+		{
+			getCurrentPlayer().addMoney(annuityPayout,MoneyMultipliersToUse.NOTHING);
+			channel.sendMessage(String.format("("+(annuityPayout<0?"-":"+")+"$%,d)",annuityPayout)).queueAfter(1,TimeUnit.SECONDS);
+		}
 		//Check boost charger
 		if(getCurrentPlayer().boostCharge != 0)
 		{
@@ -2233,6 +2237,69 @@ public class GameController
 				getCurrentPlayer().addBooster(moneyWon*multiplier);
 			}
 			channel.sendMessage(resultString).queue();
+			break;
+		case FTROTS:
+			resultString = new StringBuilder();
+			if(moneyWon == 0)
+			{
+				//ha ha you lose now you got a big bruise
+				if(getCurrentPlayer().isBot)
+				{
+					resultString.append(getCurrentPlayer().name + " won **$0** from ");
+					if(multiplier > 1)
+						resultString.append(String.format("%d copies of ",multiplier));
+					resultString.append("For the Rest of the Season.");
+				}
+				else
+				{
+					resultString.append("Game Over. You won **$0**");
+					if(multiplier > 1)
+						resultString.append(String.format(" times %d copies",multiplier));
+					resultString.append(".");
+				}
+			}
+			else
+			{
+				//Time for BODGES AND HACKS get hype
+				int timePeriod = currentGame.getMoneyWon(); //that's right we call it twice and it returns something different
+				//How do we find out the player's booster without giving the money right away? GOOD QUESTION I'M GLAD YOU ASKED
+				int boostedAmount = getCurrentPlayer().money;
+				getCurrentPlayer().addMoney(moneyWon*multiplier, MoneyMultipliersToUse.BOOSTER_OR_BONUS);
+				boostedAmount = getCurrentPlayer().money - boostedAmount;
+				getCurrentPlayer().addMoney(-1*moneyWon*multiplier, MoneyMultipliersToUse.BOOSTER_OR_BONUS);
+				//Now we've got that info in a totally reasonable manner, let's save it
+				getCurrentPlayer().annuities.add(new MutablePair<Integer, Integer>(boostedAmount, timePeriod));
+				//And then tell them what they've won
+				if(getCurrentPlayer().isBot)
+				{
+					resultString.append(getCurrentPlayer().name + String.format(" won **$%,d** from ",
+							moneyWon*multiplier));
+					if(multiplier > 1)
+						resultString.append(String.format("%d copies of ",multiplier));
+					resultString.append(currentGame.toString() + "...");
+				}
+				else
+				{
+					resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*multiplier));
+					if(multiplier > 1)
+						resultString.append(String.format(" times %d copies",multiplier));
+					resultString.append("...");
+				}
+				StringBuilder extraResult = new StringBuilder();
+				if(boostedAmount != moneyWon*multiplier)
+					extraResult.append(String.format("which gets boosted to **$%,d**...",boostedAmount));
+				StringBuilder timeResult = new StringBuilder();
+				if(timePeriod == -1)
+					timeResult.append("**FOR THE REST OF THE SEASON!**");
+				else if(timePeriod == 1)
+					timeResult.append("to be awarded on the next space selection.");
+				else
+					timeResult.append("for the next **"+timePeriod+" spaces**!");
+				channel.sendMessage(resultString).queue();
+				if(boostedAmount != moneyWon*multiplier)
+					channel.sendMessage(extraResult).queue();
+				channel.sendMessage(timeResult).queue();
+			}
 			break;
 		default:
 			//Other minigames just award your cash

@@ -41,8 +41,9 @@ public class MinigameTest
 			return;
 		}
 		//Now we know they matched, so...
-		System.out.print("Base multiplier?");
+		System.out.print("Base multiplier? ");
 		int baseMultiplier = sc.nextInt();
+		sc.nextLine();
 		System.out.print("Have a bot play for you? (Y/N) ");
 		String botChoice = sc.nextLine();
 		if(botChoice.toLowerCase().equals("y"))
