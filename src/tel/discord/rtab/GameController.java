@@ -2234,7 +2234,8 @@ public class GameController
 					else
 						resultString.append(".");
 				}
-				getCurrentPlayer().addBooster(moneyWon*multiplier);
+				if(moneyWon != 0)
+					getCurrentPlayer().addBooster(moneyWon*multiplier);
 			}
 			channel.sendMessage(resultString).queue();
 			break;
