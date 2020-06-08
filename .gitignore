@@ -1,6 +1,7 @@
 # Private Bot Data
 *.csv
 config.txt
+RaceDeal.java
 SuperBonusRound.java
 SBRItem.java
 

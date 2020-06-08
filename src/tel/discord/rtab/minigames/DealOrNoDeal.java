@@ -17,7 +17,7 @@ public class DealOrNoDeal implements MiniGame {
 
 	@Override
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier) {
-		casesLeft = 22;
+		casesLeft = VALUE_LIST.size();
 		offer = 0;
 		accept = false;
 		//Multiply each value, EXCEPT the $1, by the base multiplier
@@ -144,9 +144,9 @@ public class DealOrNoDeal implements MiniGame {
 				output.append("          ");
 			}
 			//Order is 0, 11, 1, 12, ..., 9, 20, 10, 21
-			nextValue += 11;
-			if(nextValue > 21)
-				nextValue -= 21;
+			nextValue += VALUE_LIST.size()/2;
+			if(nextValue >= VALUE_LIST.size())
+				nextValue -= VALUE_LIST.size() - 1;
 			//Space appropriately
 			output.append(i%2==0 ? "   " : "\n");
 		}

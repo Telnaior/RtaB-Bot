@@ -1934,6 +1934,7 @@ public class GameController
 				}
 			//Restore the current turn
 			currentTurn = savedTurn;
+			//If and when I rewrite this bot from scratch, fixing the "current turn" nonsense in the code is definitely planned.
 			break;
 		}
 	}
