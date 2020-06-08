@@ -10,7 +10,7 @@ public enum PrizeType {
 	S4TROPHY (   52000,"a replica of Lavina's Season 4 trophy"),
 	
 	//(Ir)Regular prizes
-	DB1		  (   22805,"a DesertBuck"),
+	DB1	  (   22805,"a DesertBuck"),
 	GOVERNOR  (   26000,"the Governor's favourite"),
 	PI  	  (   31416,"a fresh pi"),
 	ECONSTANT (   27183,"some e"),
@@ -20,9 +20,22 @@ public enum PrizeType {
 	WEIRDAL   (   27000,"Weird Al's accordion"),
 	ROCKEFELLER (  1273,"a trip down Rockefeller Street"),
 	EWW       (     144,"something gross"),
-	NEWJERSEY (   -1000,"a trip to New Jersey"),
 	HUNDREDG  (  100000,"a 100 Grand bar"),
-	DISCORD   (   70013,"Discord's ginseng (that really sings)");
+	HUNTER    (   22475,"Superportal codes"), //Aaron and Atia
+	FEUD      (   20000,"Fast Money"), //MattR
+	DEFBOMB   (  250000,"a defused bomb"), //Jumble
+	JOKERSIKE (      20,"a fake Joker"), //Lavina ($1 is too low)
+	STCHARLES (     140,"a trip to St. Charles Place"), //MattR
+	SNOOKER   (     147,"a snooker table"), //KP
+	DARTBOARD (     180,"a dartboard"), //KP
+	GRANDPIANO (  52000,"a grand piano"), //Jumble
+	GOTOGO    (     200,"Advance to GO"),
+	NORMALCD  (   54321,"a Normal Countdown"),
+	ZONK      (     123,"a Zonk"),
+	FREELIVES (    9900,"99 free lives! ...in Mario"),
+	BUTTSPIE  (   18000,"a slice of Butterscotch Pie"),
+	ITSART    (   35000,"art! Would you like to buy it... for ALL YOUR MONEY? No... no, it's free. Art"),
+	DISCORD   (   70013,"a Discord lamp");
     
     private final int prizeValue;
     private final String prizeName;
