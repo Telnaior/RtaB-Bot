@@ -83,6 +83,7 @@ public class GameController
 	int bowserJackpot;
 	int wagerPot = 0;
 	boolean[] bombs;
+	boolean[] usedDesires = new boolean[4];
 	Board gameboard;
 	public static EventWaiter waiter;
 	public ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1);
@@ -139,6 +140,7 @@ public class GameController
 		if(gameStatus != GameStatus.SEASON_OVER)
 			gameStatus = GameStatus.SIGNUPS_OPEN;
 		gameboard = null;
+		usedDesires = new boolean[4];
 		boardSize = 0;
 		finalCountdown = false;
 		repeatTurn = 0;
@@ -240,6 +242,9 @@ public class GameController
 			case WAGER:
 				commandHelp.append("You are carrying over a **WAGERER** from a previous game.\n"
 						+ "You may use it at any time by typing **!wager**.");
+			case BONUS:
+				commandHelp.append("You are carrying over the **BONUS BAG** from a previous game.\n"
+						+ "You may use it at any time by typing **!bonus** followed by 'cash', 'boost', 'game', or 'event'.");
 				break;
 			default:
 				break;
@@ -518,7 +523,7 @@ public class GameController
 			//Determine player order
 			Collections.shuffle(players);
 			currentTurn = 0;
-			gameboard = new Board(boardSize,players.size());
+			gameboard = new Board(boardSize+1,players.size());
 			//Let's get things rolling!
 			channel.sendMessage("Let's go!").queue();
 			gameStatus = GameStatus.IN_PROGRESS;
@@ -595,6 +600,49 @@ public class GameController
 					return;
 				}
 				break;
+			//Bonus bag under same condition as the fold, but more frequently because of its positive effect
+			case BONUS:
+				if(starman && getCurrentPlayer().peek < 1 && getCurrentPlayer().jokers == 0 && Math.random() * spacesLeft < 3)
+				{
+					channel.sendMessage(getCurrentPlayer().name + " dips into the bonus bag and finds..").queue();
+					getCurrentPlayer().hiddenCommand = HiddenCommand.NONE;
+					//Pick a desire!
+					int boostDesire, cashDesire, gameDesire, eventDesire;
+					//Cash is nicer the more boost we already have
+					if(usedDesires[0])
+						cashDesire = 0;
+					else
+						cashDesire = getCurrentPlayer().booster / 4;
+					//Boost is ALWAYS welcome. We especially want it if we don't have much already.
+					if(usedDesires[1])
+						boostDesire = 0;
+					else
+					{
+						if(getCurrentPlayer().booster < 200)
+							boostDesire = 500 - getCurrentPlayer().booster;
+						else
+							boostDesire = (1000 - getCurrentPlayer().booster) / 10;
+					}
+					//Games are nice if we have a big streak
+					if(usedDesires[2])
+						gameDesire = 0;
+					else
+						gameDesire = getCurrentPlayer().winstreak;
+					//Events can be fun, but they aren't really as important as the other options.
+					if(usedDesires[3])
+						eventDesire = 0;
+					else
+						eventDesire = 50;
+					//Priority goes boost > game > cash > event
+					SpaceType desire = SpaceType.BOOSTER;
+					if(gameDesire > boostDesire)
+						desire = SpaceType.GAME;
+					if(cashDesire > gameDesire && cashDesire > boostDesire)
+						desire = SpaceType.CASH;
+					if(eventDesire > cashDesire && eventDesire > gameDesire && eventDesire > boostDesire)
+						desire = SpaceType.EVENT;
+					dipIntoBonusBag(desire);
+				}
 			//Blammo under the same condition as the fold, but make sure they aren't repeating turns either
 			//We really don't want them triggering a blammo if they have a joker, because it could eliminate them despite it
 			//But do increase the chance for it compared to folding
@@ -940,16 +988,20 @@ public class GameController
 	}
 	void runBombLogic(int location)
 	{
-		channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-		//Mock them appropriately if they self-bombed
-		if(getCurrentPlayer().knownBombs.get(0) == location)
-			channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
-		//Also mock them if they saw the bomb in a peek
-		else if(getCurrentPlayer().knownBombs.contains(location))
-			channel.sendMessage("As you know, it's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
-		//Otherwise, just give them the dreaded words...
-		else
-			channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+		//If we got here from the bonus bag, skip all the fun stuff and get straight to the explosion
+		if(location != boardSize)
+		{
+			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
+			//Mock them appropriately if they self-bombed
+			if(getCurrentPlayer().knownBombs.get(0) == location)
+				channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+			//Also mock them if they saw the bomb in a peek
+			else if(getCurrentPlayer().knownBombs.contains(location))
+				channel.sendMessage("As you know, it's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+			//Otherwise, just give them the dreaded words...
+			else
+				channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+		}
 		//If player has a joker, force it to not explode
 		//This is a really ugly way of doing it though
 		if(getCurrentPlayer().jokers != 0)
@@ -1159,10 +1211,10 @@ public class GameController
 		/*
 		 * Suspense rules:
 		 * Always trigger on a blammo
-		 * Otherwise, don't trigger if they have a joker
+		 * Otherwise, don't trigger if they have a joker or if they're using a bonus bag
 		 * Otherwise trigger randomly, chance determined by spaces left and players in the game
 		 */
-		if(((Math.random()*spacesLeft)<players.size() && getCurrentPlayer().jokers == 0)
+		if(((Math.random()*spacesLeft)<players.size() && getCurrentPlayer().jokers == 0 && location != boardSize)
 				|| gameboard.typeBoard.get(location) == SpaceType.BLAMMO)
 			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
 		//Figure out what space we got
@@ -1267,9 +1319,9 @@ public class GameController
 		HiddenCommand chosenCommand = possibleCommands[commandNumber];
 		StringBuilder commandHelp = new StringBuilder();
 		if(getCurrentPlayer().hiddenCommand != HiddenCommand.NONE)
-			commandHelp.append("Your Hidden Command has been replaced with...");
+			commandHelp.append("Your Hidden Command has been replaced with...\n");
 		else
-			commandHelp.append("You found a Hidden Command...");
+			commandHelp.append("You found a Hidden Command...\n");
 		getCurrentPlayer().hiddenCommand = chosenCommand;
 		//Send them the PM telling them they have it
 		if(!getCurrentPlayer().isBot)
@@ -1304,6 +1356,13 @@ public class GameController
 						+ "The amount is equal to 1% of the last-place player's total bank, "
 						+ "and you can activate this at any time by typing **!wager**.\n"); 
 				break;
+			case BONUS:
+				commandHelp.append("The **BONUS BAG**!\n"
+						+ "The bonus bag contains many things, "
+						+ "and you can use this command to pass your turn and draw from the bag instead.\n"
+						+ "To do so, type !bonus followed by either 'cash', 'boost', 'game', or 'event', depending on what you want.\n"
+						+ "WARNING: The bag is not limitless, and misuse of the bonus bag is likely to end explosively.\n"
+						+ "It is suggested that you do not wish for the something that has already been wished for recently.\n");
 			default:
 				commandHelp.append("An **ERROR**. Report this to @Atia#2084 to get it fixed.");
 				break;
@@ -2824,8 +2883,8 @@ public class GameController
 				}
 			}
 		}
-		while((newPlayer.lives != Player.MAX_LIVES || !goodPick) && triesLeft > 0);
-		if(newPlayer.lives != Player.MAX_LIVES || !goodPick)
+		while((newPlayer.lives < Player.MAX_LIVES || !goodPick) && triesLeft > 0);
+		if(newPlayer.lives < Player.MAX_LIVES || !goodPick)
 		{
 			//If we've checked EVERY bot...
 			channel.sendMessage("No bots currently available. Game aborted.").queue();
@@ -2875,11 +2934,69 @@ public class GameController
 		pingList.clear();
 		channel.sendMessage(output.toString()).queue();
 	}
-	/**
-	 * usePeek(User peeker, String location)
-	 * Used to parse player-submitted peeks to see if they are valid, and then pass them on to the resolver.
-	 * Bot peeks should not end up here.
-	 */
+	public boolean useBonusBag(User bagger, SpaceType desire)
+	{
+		//Find them in the game
+		int player = findPlayerInGame(bagger.getId());
+		//Check that the fold is valid (the game is running, they're alive, they have the command,
+		//it's their turn, and they haven't picked a space) (this is getting a little silly)
+		if(gameStatus != GameStatus.IN_PROGRESS || player != currentTurn || resolvingSpace
+				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.BONUS)
+			return false;
+		//Cool, we're good, let them have it
+		channel.sendMessage(players.get(player).name + " dips into the bonus bag and finds...").queue();
+		dipIntoBonusBag(desire);
+		players.get(player).hiddenCommand = HiddenCommand.NONE;
+		return true;
+	}
+	void dipIntoBonusBag(SpaceType desire)
+	{
+		//Blows up if: they ask for something greedy, someone has already taken that desire, or a 1/1000 random chance
+		if(Math.random() < 0.001 || desire == SpaceType.GRAB_BAG || usedDesires[desire.ordinal()])
+		{
+			channel.sendMessage("...the **bonus bag**.").completeAfter(5,TimeUnit.SECONDS);
+			int chosenText = (int) (Math.random() * 7);
+			String mockingMessage;
+			switch(chosenText)
+			{
+			case 0:
+				mockingMessage = "Uh oh.";
+				break;
+			case 1:
+				mockingMessage = "Well, you're in for it now.";
+				break;
+			case 2:
+				mockingMessage = "That's not good.";
+				break;
+			case 3:
+				mockingMessage = "Didn't you read the warning?";
+				break;
+			case 4:
+				mockingMessage = "What did you DO?";
+				break;
+			case 5:
+				mockingMessage = "Hold on to your hat...";
+				break;
+			case 6:
+				mockingMessage = "Perhaps this was to be expected from a mystical reality-warping artefact.";
+				break;
+			default:
+				mockingMessage = "A glitch spared you from the mocking message that belonged here."
+						+ "It will not spare you from your imminent demise.";
+			}
+			channel.sendMessage(mockingMessage).completeAfter(5, TimeUnit.SECONDS);
+			if(gameboard.bombBoard.get(boardSize) == BombType.DETONATION)
+				gameboard.bombBoard.set(boardSize, BombType.NORMAL);
+			runBombLogic(boardSize);
+		}
+		else
+		{
+			//Otherwise give them their desire
+			gameboard.typeBoard.set(boardSize, desire);
+			usedDesires[desire.ordinal()] = true;
+			runSafeLogic(boardSize);
+		}
+	}
 	public boolean useFold(User folder)
 	{
 		//Find them in the game

@@ -21,12 +21,12 @@ class Board
 	
 	Board(int size, int players)
 	{
-		typeBoard = new ArrayList<>(size+5);
-		cashBoard = new ArrayList<>(size+5);
-		boostBoard = new ArrayList<>(size+5);
-		bombBoard = new ArrayList<>(size+5);
-		gameBoard = new ArrayList<>(size+5);
-		eventBoard = new ArrayList<>(size+5);
+		typeBoard = new ArrayList<>(size+1);
+		cashBoard = new ArrayList<>(size+1);
+		boostBoard = new ArrayList<>(size+1);
+		bombBoard = new ArrayList<>(size+1);
+		gameBoard = new ArrayList<>(size+1);
+		eventBoard = new ArrayList<>(size+1);
 		addSpaces(size, players);
 	}
 	
