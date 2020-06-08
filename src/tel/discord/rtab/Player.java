@@ -6,11 +6,13 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.utils.tuple.MutablePair;
 import tel.discord.rtab.enums.GameBot;
 import tel.discord.rtab.enums.Games;
 import tel.discord.rtab.enums.HiddenCommand;
@@ -52,6 +54,7 @@ public class Player implements Comparable<Player>
 	LinkedList<Games> games;
 	LinkedList<Integer> knownBombs;
 	LinkedList<Integer> safePeeks;
+	LinkedList<MutablePair<Integer,Integer>> annuities;
 	//Constructor for humans
 	Player(Member playerName, MessageChannel channelID, String botName)
 	{
@@ -101,6 +104,7 @@ public class Player implements Comparable<Player>
 		games = new LinkedList<>();
 		knownBombs = new LinkedList<>();
 		safePeeks = new LinkedList<>();
+		annuities = new LinkedList<>();
 		try
 		{
 			List<String> list = Files.readAllLines(Paths.get("scores"+channel.getId()+".csv"));
@@ -119,6 +123,7 @@ public class Player implements Comparable<Player>
 				 * record[7] = time at which lives refill
 				 * record[8] = saved hidden command
 				 * record[9] = saved boost charge
+				 * record[10] = annuities
 				 */
 				record = list.get(i).split("#");
 				if(record[0].equals(uID))
@@ -131,6 +136,12 @@ public class Player implements Comparable<Player>
 					lifeRefillTime = Instant.parse(record[7]);
 					hiddenCommand = HiddenCommand.valueOf(record[8]);
 					boostCharge = Integer.parseInt(record[9]);
+					//The annuities structure is more complicated, we can't just parse it in directly like the others
+					String savedAnnuities = record[10];
+					savedAnnuities = savedAnnuities.replaceAll("[^\\d,-]", "");
+					String[] annuityList = savedAnnuities.split(",");
+					for(int j=1; j<annuityList.length; j+=2)
+						annuities.add(MutablePair.of(Integer.parseInt(annuityList[j-1]), Integer.parseInt(annuityList[j])));
 					//If we're short on lives and we've passed the refill time, restock them
 					//Or if we still have lives but it's been 20 hours since we lost any, give an extra
 					while(lifeRefillTime.isBefore(Instant.now()))
@@ -152,6 +163,28 @@ public class Player implements Comparable<Player>
 		oldMoney = money;
 		currentCashClub = money/100_000_000;
 		oldWinstreak = winstreak;
+	}
+	int giveAnnuities()
+	{
+		int totalPayout = 0;
+		//Run through the iterator and tally up the payments
+		ListIterator<MutablePair<Integer, Integer>> iterator = annuities.listIterator();
+		while(iterator.hasNext())
+		{
+			MutablePair<Integer,Integer> nextAnnuity = iterator.next();
+			totalPayout += nextAnnuity.getLeft();
+			//If it's a temporary annuity, reduce the duration by one and remove it if it's gone, or update it if it's not
+			if(nextAnnuity.getRight() > 0)
+			{
+				nextAnnuity.setRight(nextAnnuity.getRight()-1);
+				if(nextAnnuity.getRight() == 0)
+					iterator.remove();
+				else
+					iterator.set(nextAnnuity);
+			}
+		}
+		//Then return the total amount to be paid
+		return totalPayout;
 	}
 	StringBuilder addMoney(int amount, MoneyMultipliersToUse multipliers)
 	{

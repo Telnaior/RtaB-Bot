@@ -870,19 +870,21 @@ public class GameController
 			pickedSpaces[location] = true;
 			spacesLeft--;
 		}
-		//Event things
+		//Now run through stuff that happens on every turn this player takes
+		//Check annuities (threshold situation counts as one too)
+		int annuityPayout = getCurrentPlayer().giveAnnuities();
 		if(getCurrentPlayer().threshold)
-		{
-			getCurrentPlayer().addMoney(-1*THRESHOLD_PER_TURN_PENALTY*baseMultiplier,MoneyMultipliersToUse.NOTHING);
-			channel.sendMessage(String.format("(-$%,d)",THRESHOLD_PER_TURN_PENALTY*baseMultiplier)).queueAfter(1,TimeUnit.SECONDS);
-		}
+			annuityPayout -= THRESHOLD_PER_TURN_PENALTY*baseMultiplier;
+		getCurrentPlayer().addMoney(annuityPayout,MoneyMultipliersToUse.NOTHING);
+		channel.sendMessage(String.format("("+(annuityPayout<0?"-":"")+"$%,d)",annuityPayout)).queueAfter(1,TimeUnit.SECONDS);
+		//Check boost charger
 		if(getCurrentPlayer().boostCharge != 0)
 		{
 			getCurrentPlayer().addBooster(getCurrentPlayer().boostCharge);
 			channel.sendMessage(String.format("(%+d%%)",getCurrentPlayer().boostCharge))
 				.queueAfter(1,TimeUnit.SECONDS);
 		}
-		//Alright, moving on
+		//Now look at the space they actually picked
 		//Diamond armour check
 		if(getCurrentPlayer().jokers == -1)
 		{
@@ -2551,6 +2553,7 @@ public class GameController
 				toPrint.append("#"+players.get(i).lifeRefillTime);
 				toPrint.append("#"+players.get(i).hiddenCommand);
 				toPrint.append("#"+players.get(i).boostCharge);
+				toPrint.append("#"+players.get(i).annuities);
 				if(location == -1)
 					list.add(toPrint.toString());
 				else
