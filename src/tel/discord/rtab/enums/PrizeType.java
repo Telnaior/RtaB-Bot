@@ -4,9 +4,10 @@ package tel.discord.rtab.enums;
 
 public enum PrizeType {
 	//TROPHIES, woo winners
-	S1TROPHY (   68000,"a replica of Vash's Season 1 trophy"),
+	S1TROPHY (   70000,"a replica of Vash's Season 1 trophy"),
 	S2TROPHY (   60000,"a replica of Charles510's Season 2 trophy"),
 	S3TROPHY (   54000,"a replica of Archstered's Season 3 trophy"),
+	S4TROPHY (   52000,"a replica of Lavina's Season 4 trophy"),
 	
 	//(Ir)Regular prizes
 	DB1		  (   22805,"a DesertBuck"),
