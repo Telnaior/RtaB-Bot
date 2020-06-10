@@ -49,9 +49,10 @@ public class DoubleTrouble implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		//Give instructions
 		output.add("In Double Trouble, you will see twenty spaces.");
-		output.add("You'll start with $5,000 and will pick spaces one at a time.");
+		output.add(String.format("You'll start with $%,d and will pick spaces one at a time.",5_000*baseMultiplier));
 		output.add("Nine of them are Double spaces, and will double your winnings for the round.");
-		output.add("Nine of them have dollar amounts, which could range from $100 to $20,000.");
+		output.add("Nine of them have dollar amounts, "
+				+ String.format("which could range from $%,d to $%,d.",100*baseMultiplier,20_000*baseMultiplier));
 		output.add("One space is Trouble, which will reduce your winnings by 90% should you find it.");
 		output.add("Finally, there is a bomb. If you hit it, the game is over and you lose everything.");
 		output.add("You may STOP at any time or pick a number to go on. Good luck!");

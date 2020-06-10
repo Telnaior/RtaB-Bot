@@ -12,6 +12,7 @@ public class DoubleZeroes implements MiniGame {
 	int total;
 	int digitsPicked;
 	int zeroesLeft;
+	int perZeroPrice;
 	List<Integer> numbers = Arrays.asList(-1,-1,-1,-1,-1,0,0,1,1,2,2,3,3,4,4,5,6,7,8,9);
 	// -1 = Double Zero
 	boolean alive;
@@ -28,6 +29,7 @@ public class DoubleZeroes implements MiniGame {
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
 		this.baseMultiplier = baseMultiplier;
+		perZeroPrice = 3*baseMultiplier;
 		alive = true;
 		total = 0;
 		digitsPicked = 0;
@@ -37,12 +39,13 @@ public class DoubleZeroes implements MiniGame {
 		// Give 'em the run down
 		LinkedList<String> output = new LinkedList<>();
 		output.add("In Double Zeroes, you will see twenty spaces.");
-		output.add("Five of these are Double Zeroes, and the other ten are digits from 0 to 9.");
+		output.add("Five of these are Double Zeroes, and the other fifteen are digits from 0 to 9.");
 		output.add("You'll pick spaces, one at a time, until you uncover four single digits.");
 		output.add("These digits will be put on the board as your bank.");
 		output.add("At this point, everything but the Double Zeroes turn into BOMBs!");
-		output.add("You can then choose to 'STOP' and multiply your bank treble by the number of Double Zeroes remaining...");
-		output.add("...or try to hit a Double Zero to stick that Double Zero at the end of your bank, multiplying it by 100! Good luck!");
+		output.add(String.format("You can then choose to 'STOP' and multiply your bank by %d for each Double Zero remaining...",perZeroPrice));
+		output.add("...or try to hit a Double Zero to stick that Double Zero at the end of your bank,"
+				+ String.format("multiplying it by %d! Good luck!",100*baseMultiplier));
 		output.add(generateBoard());
 		return output;
 	}
@@ -62,8 +65,8 @@ public class DoubleZeroes implements MiniGame {
 			{
 				// Player stops at the decision point? Tell 'em what they've won and end the game!
 			alive = false;
-			total = total * zeroesLeft * 3;
-				output.add("Very well! Your bank is multiplied by " + String.format("%,d",zeroesLeft*3)
+			total = total * zeroesLeft * perZeroPrice;
+				output.add("Very well! Your bank is multiplied by " + String.format("%,d",zeroesLeft*perZeroPrice)
 				+ ", which means...");
 			return output;
 			}
@@ -98,7 +101,7 @@ public class DoubleZeroes implements MiniGame {
 				if(digitsPicked == 4) // ...and you decided to go on, you win!
 				{
 					alive = false;
-					total = total*100;
+					total = total*100*baseMultiplier;
 					output.add("It's a **Double Zero**!");
 					output.add("Congratulations, you've won the game!");
 					// No need to subtract a zero because the game's over
@@ -138,23 +141,24 @@ public class DoubleZeroes implements MiniGame {
 			if(alive)
 			{
 
-				if(digitsPicked == 4) // If we just hit the 4th number, tell 'em about the DECISION~!
+				if(digitsPicked == 4 && zeroesLeft > 0) // If we just hit the 4th number, tell 'em about the DECISION~!
 				{
 				output.add("You can now choose to continue by picking a number, "
 						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
-						+ ", times treble the number of Double Zeroes left, which would give you " + String.format("**$%,d!**",total*zeroesLeft*3));
+						+ String.format(", times %d for each Double Zero left, "
+								+ "which would give you **$%,d!**",zeroesLeft*perZeroPrice,total*zeroesLeft*perZeroPrice));
 				output.add(generateBoard());
 				}
-				else if(zeroesLeft>0) // Otherwise let 'em pick another space.
+				else if(digitsPicked == 4 && zeroesLeft == 0) // uhhhhhhhhhhhhhhhh
+				{
+					output.add("That's all four digits, but, uh...");
+					output.add("You picked all the Double Zeroes!");
+					output.add("So I hope you like the total you've got.");
+					alive = false;
+				}
+				else // Otherwise let 'em pick another space.
 				{
 					output.add(generateBoard());
-				}
-				else // Oops, All Digits! (tm) Better end it quick!
-				{
-					output.add("You picked all the Double Zeroes! Uh...");
-					output.add("Let's just end the game here and tack a hundred grand on to your bank!");
-					alive = false;
-					total = total + 100000;
 				}
 			}
 			return output;
@@ -216,7 +220,7 @@ public class DoubleZeroes implements MiniGame {
 	@Override
 	public int getMoneyWon() {
 		if(isGameOver())
-			return total * baseMultiplier;
+			return total;
 		else
 			return 0;
 	}
