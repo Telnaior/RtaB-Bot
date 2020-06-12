@@ -931,7 +931,8 @@ public class GameController
 		if(annuityPayout != 0)
 		{
 			getCurrentPlayer().addMoney(annuityPayout,MoneyMultipliersToUse.NOTHING);
-			channel.sendMessage(String.format("("+(annuityPayout<0?"-":"+")+"$%,d)",annuityPayout)).queueAfter(1,TimeUnit.SECONDS);
+			channel.sendMessage(String.format("("+(annuityPayout<0?"-":"+")+"$%,d)",Math.abs(annuityPayout)))
+					.queueAfter(1,TimeUnit.SECONDS);
 		}
 		//Check boost charger
 		if(getCurrentPlayer().boostCharge != 0)
