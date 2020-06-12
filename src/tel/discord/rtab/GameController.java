@@ -242,6 +242,7 @@ public class GameController
 			case WAGER:
 				commandHelp.append("You are carrying over a **WAGERER** from a previous game.\n"
 						+ "You may use it at any time by typing **!wager**.");
+				break;
 			case BONUS:
 				commandHelp.append("You are carrying over the **BONUS BAG** from a previous game.\n"
 						+ "You may use it at any time by typing **!bonus** followed by 'cash', 'boost', 'game', or 'event'.");
@@ -1363,6 +1364,7 @@ public class GameController
 						+ "To do so, type !bonus followed by either 'cash', 'boost', 'game', or 'event', depending on what you want.\n"
 						+ "WARNING: The bag is not limitless, and misuse of the bonus bag is likely to end explosively.\n"
 						+ "It is suggested that you do not wish for the something that has already been wished for recently.\n");
+				break;
 			default:
 				commandHelp.append("An **ERROR**. Report this to @Atia#2084 to get it fixed.");
 				break;
