@@ -10,7 +10,35 @@ public enum Events implements WeightedSpace
 	REVERSE_ORDER	( 6,"Reverse"),
 	STREAKPLARGE	( 5,"Streak Bonus"),
 	BOWSER			( 5,"Bowser Event"),
-	SPOILER_TAG		( 5,"Hidden Commands for All"),
+	SPOILER_TAG		( 5,"Hidden Commands for All")
+	{
+		@Override
+		public int getWeight(int playerCount)
+		{
+			//This needs to be less common the bigger the game is
+			switch(playerCount)
+			{
+			case 16:
+			case 15:
+			case 14:
+				return 1;
+			case 13:
+			case 12:
+			case 11:
+				return 2;
+			case 10:
+			case 9:
+			case 8:
+				return 3;
+			case 7:
+			case 6:
+			case 5:
+				return 4;
+			default:
+				return weight;
+			}
+		}
+	},
 	BOOST_MAGNET	( 4,"Boost Magnet"),
 	JOKER			( 4,"Joker")
 	{
