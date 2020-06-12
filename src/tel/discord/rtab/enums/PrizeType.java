@@ -34,8 +34,11 @@ public enum PrizeType {
 	ZONK      (     123,"a Zonk"),
 	FREELIVES (    9900,"99 free lives! ...in Mario"),
 	BUTTSPIE  (   18000,"a slice of Butterscotch Pie"),
-	ITSART    (   35000,"art! Would you like to buy it... for ALL YOUR MONEY? No... no, it's free. Art"),
-	DISCORD   (   70013,"a Discord lamp");
+	ITSART    (   35000,"art! Would you like to buy it... for ALL OF YOUR MONEY? No, it's... it's free. Art"),
+	DISCORD   (   70013,"a Discord lamp"),
+	PYRAMID   (  100000,"Pyramid"),
+	BIFORCE   (   22222,"The Biforce"),
+	SMALLTHINGS (   182,"All the Small Things");
     
     private final int prizeValue;
     private final String prizeName;
