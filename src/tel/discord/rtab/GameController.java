@@ -1363,7 +1363,7 @@ public class GameController
 						+ "and you can use this command to pass your turn and draw from the bag instead.\n"
 						+ "To do so, type !bonus followed by either 'cash', 'boost', 'game', or 'event', depending on what you want.\n"
 						+ "WARNING: The bag is not limitless, and misuse of the bonus bag is likely to end explosively.\n"
-						+ "It is suggested that you do not wish for the something that has already been wished for recently.\n");
+						+ "It is suggested that you do not wish for  something that has already been wished for this game.\n");
 				break;
 			default:
 				commandHelp.append("An **ERROR**. Report this to @Atia#2084 to get it fixed.");
