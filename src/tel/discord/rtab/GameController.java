@@ -771,7 +771,9 @@ public class GameController
 					//Right player and channel
 					e ->
 					{
-						if(e.getAuthor().equals(players.get(thisPlayer).user) && e.getChannel().equals(channel)
+						if(players.get(thisPlayer).status != PlayerStatus.ALIVE || playersAlive <= 1 || thisPlayer != currentTurn)
+							return true;
+						else if(e.getAuthor().equals(players.get(thisPlayer).user) && e.getChannel().equals(channel)
 								&& checkValidNumber(e.getMessage().getContentRaw()))
 						{
 								int location = Integer.parseInt(e.getMessage().getContentRaw());
@@ -788,10 +790,10 @@ public class GameController
 					//Parse it and call the method that does stuff
 					e -> 
 					{
+						warnPlayer.cancel(false);
 						//If they're somehow taking their turn when they're out of the round, just don't do anything
 						if(players.get(thisPlayer).status == PlayerStatus.ALIVE && playersAlive > 1 && thisPlayer == currentTurn)
 						{
-							warnPlayer.cancel(false);
 							int location = Integer.parseInt(e.getMessage().getContentRaw())-1;
 							//Anyway go play out their turn
 							timer.schedule(() -> resolveTurn(location), 1, TimeUnit.SECONDS);
@@ -903,6 +905,13 @@ public class GameController
 			return;
 		else
 			resolvingSpace = true;
+		//Try to detect double-turns and negate them before damage is done
+		if(pickedSpaces[location])
+		{
+			resolvingSpace = false;
+			return;
+		}
+		//Announce the picked space
 		if(getCurrentPlayer().isBot)
 		{
 			channel.sendMessage(getCurrentPlayer().name + " selects space " + (location+1) + "...")
@@ -912,14 +921,8 @@ public class GameController
 		{
 			channel.sendMessage("Space " + (location+1) + " selected...").completeAfter(1,TimeUnit.SECONDS);
 		}
-		//Try to detect double-turns and negate them before damage is done
-		if(pickedSpaces[location])
-			return;
-		else
-		{
-			pickedSpaces[location] = true;
-			spacesLeft--;
-		}
+		pickedSpaces[location] = true;
+		spacesLeft--;
 		//Now run through stuff that happens on every turn this player takes
 		//Check annuities (threshold situation counts as one too)
 		int annuityPayout = getCurrentPlayer().giveAnnuities();
