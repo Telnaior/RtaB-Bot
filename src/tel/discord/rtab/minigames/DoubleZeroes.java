@@ -29,7 +29,7 @@ public class DoubleZeroes implements MiniGame {
 	public LinkedList<String> initialiseGame(String channelID, int baseMultiplier)
 	{
 		this.baseMultiplier = baseMultiplier;
-		perZeroPrice = 3*baseMultiplier;
+		perZeroPrice = 4*baseMultiplier;
 		alive = true;
 		total = 0;
 		digitsPicked = 0;
@@ -145,7 +145,7 @@ public class DoubleZeroes implements MiniGame {
 				{
 				output.add("You can now choose to continue by picking a number, "
 						+ "or you can type STOP to stop with your bank of " + String.format("**$%,d**",total)
-						+ String.format(", times %d for each Double Zero left, "
+						+ String.format(", times %d for the remaining Double Zeroes, "
 								+ "which would give you **$%,d!**",zeroesLeft*perZeroPrice,total*zeroesLeft*perZeroPrice));
 				output.add(generateBoard());
 				}
