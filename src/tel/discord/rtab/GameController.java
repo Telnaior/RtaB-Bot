@@ -1195,7 +1195,8 @@ public class GameController
 			//Then print the appropriate message
 			if(spacesWrecked > 0)
 				channel.sendMessage("It goes **KABLAM**! "
-						+ String.format("$%,d lost as penalty, and %d spaces destroyed.",Math.abs(penalty),spacesWrecked))
+						+ String.format("$%,d lost as penalty, and %d space"+(spacesWrecked!=1?"s":"")+" destroyed."
+								,Math.abs(penalty),spacesWrecked))
 					.completeAfter(5,TimeUnit.SECONDS);
 			else
 				channel.sendMessage(String.format("It goes **BOOM**. $%,d lost as penalty.",Math.abs(penalty)))

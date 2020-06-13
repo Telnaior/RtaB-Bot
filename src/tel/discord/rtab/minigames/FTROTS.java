@@ -38,7 +38,7 @@ public class FTROTS implements MiniGame {
 		Collections.shuffle(lights);
 		//Give instructions
 		output.add("For the Rest of the Season is a two-part game that is unlike any other.");
-		output.add("In part one, we give you a sum of money via a shortened versoin of Math Time.");
+		output.add("In part one, we give you a sum of money via a shortened version of Math Time.");
 		output.add("However, while this amount is affected by your booster, you won't be awarded that sum immediately. ");
 		output.add("Instead, we'll give it to you as an annuity to be paid out the next time you play Race to a Billion.");
 		output.add("You'll be receiving that amount every time you pick a space for a set number of installments. "
