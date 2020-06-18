@@ -160,8 +160,6 @@ public class FTROTS implements MiniGame {
 				}
 				else
 				{
-					if(timeLadderPosition != 0)
-						timeLadderPosition --;
 					canStop = false;
 					output.add("It's a **RED** light.");
 					reduceLightCount();
@@ -173,12 +171,20 @@ public class FTROTS implements MiniGame {
 					}
 					else
 					{
-						output.add("That pushes you down one rung on your time ladder, and you MUST pick again.");
+						if(timeLadderPosition != 0)
+						{
+							timeLadderPosition --;
+							output.add("That pushes you down one rung on your time ladder, and you MUST pick again.");
+						}
+						else
+						{
+							output.add("You don't have anything to lose yet, so pick again.");
+						}
 						output.add(generateTimeLadder());
 					}
 				}
 			}
-			output.add(generateBoard(false));
+			output.add(generateBoard(isGameOver()));
 			return output;
 		}
 	}
