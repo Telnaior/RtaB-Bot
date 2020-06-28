@@ -2227,7 +2227,7 @@ public class GameController
 						channel.sendMessage(getCurrentPlayer().name + 
 								" has gone missing. Cancelling their minigames.").queue();
 						getCurrentPlayer().games.clear();
-						completeMiniGame(currentGame);
+						timer.schedule(() -> prepareNextMiniGame(), 1, TimeUnit.SECONDS);
 					});
 		}
 	}
