@@ -307,7 +307,8 @@ public class GameController
 		{
 			return;
 		}
-		if(gameStatus == GameStatus.SIGNUPS_OPEN && (players.size() == 1 || Math.random() < 0.2))
+		if(gameStatus == GameStatus.SIGNUPS_OPEN && 
+				(players.size() == 1 || (players.size() < 4 && Math.random() < 0.2) || (players.size() < 16 && Math.random() < 0.1)))
 		{
 			addBotQuestion();
 			return;
