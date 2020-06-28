@@ -1679,9 +1679,9 @@ public class GameController
 			break;
 		case JACKPOT:
 				channel.sendMessage(String.format("You found the $%d,000,000 **JACKPOT**, "
-						+ "win the round to claim it!",spacesLeft*baseMultiplier))
+						+ "win the round to claim it!",(spacesLeft+1)*baseMultiplier))
 					.completeAfter(5,TimeUnit.SECONDS);
-				getCurrentPlayer().jackpot += spacesLeft*baseMultiplier;
+				getCurrentPlayer().jackpot += (spacesLeft+1)*baseMultiplier;
 			break;
 		case STREAKPSMALL:
 			int smallStreakAwarded = (int) ((Math.random() * 11) + 5);
