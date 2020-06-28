@@ -17,13 +17,13 @@ public enum Games implements WeightedSpace {
 	OPENPASS			(2,"Open, Pass","Open") { public MiniGame getGame() { return new OpenPass(); } },							//Author: JerryEris
 	SHUT_THE_BOX		(2,"Shut the Box","Shut") { public MiniGame getGame() { return new ShutTheBox(); } },						//Author: StrangerCoug
 	BOMB_ROULETTE		(2,"Bomb Roulette","Roulette") { public MiniGame getGame() { return new BombRoulette(); } },				//Author: StrangerCoug
-	HI_LO_DICE			(2,"Hi/Lo Dice","Hi/Lo") { public MiniGame getGame() { return new HiLoDice(); } },							//Author: StrangerCoug
 	FTROTS				(2,"For the Rest of the Season","FtRotS") {public MiniGame getGame() { return new FTROTS(); } },			//Author: Atia
 	//Games rotated out
 	THE_OFFER			(0,"The Offer","Offer") { public MiniGame getGame() { return new TheOffer(); }	},							//Author: Amy
 	TRIPLE_PLAY			(0,"Triple Play","Triple") { public MiniGame getGame() { return new TriplePlay(); } },						//Author: Atia
 	GAMBLE				(0,"The Gamble","Gamble") { public MiniGame getGame() { return new Gamble(); } },							//Author: Atia
 	DEUCES_WILD			(0,"Deuces Wild","Deuces") { public MiniGame getGame() { return new DeucesWild(); } },						//Author: StrangerCoug
+	HI_LO_DICE			(0,"Hi/Lo Dice","Hi/Lo") { public MiniGame getGame() { return new HiLoDice(); } },							//Author: StrangerCoug
 	//BUMPER_CASH   	(2,"Bumper Grab","Bumper") { public MiniGame getGame() { return new BumperGrab(); } },						//Author: Tara
 	//Bonus games never appear in the pool
 	SUPERCASH			(0,"SUPERCASH","Super") { public MiniGame getGame() { return new Supercash(); } },
