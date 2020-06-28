@@ -2335,6 +2335,9 @@ public class GameController
 				getCurrentPlayer().addMoney(moneyWon*multiplier, MoneyMultipliersToUse.BOOSTER_OR_BONUS);
 				boostedAmount = getCurrentPlayer().money - boostedAmount;
 				getCurrentPlayer().addMoney(-1*moneyWon*multiplier, MoneyMultipliersToUse.BOOSTER_OR_BONUS);
+				//If they're out of lives, make the permanent annuity less so
+				if(getCurrentPlayer().lives <= 0 && timePeriod == -1)
+					timePeriod = 200;
 				//Now we've got that info in a totally reasonable manner, let's save it
 				getCurrentPlayer().annuities.add(new MutablePair<Integer, Integer>(boostedAmount, timePeriod));
 				//And then tell them what they've won

@@ -46,6 +46,8 @@ public class BonusCommand extends Command
 				case "SPLIT AND SHARE":
 					desire = SpaceType.EVENT;
 					break;
+				case "BOMB":
+					event.reply("Well, if you say so.");
 				case "GRAB BAG":
 				case "BILLION":
 				case "ONE BILLION DOLLARS":

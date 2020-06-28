@@ -166,6 +166,9 @@ public class Player implements Comparable<Player>
 	}
 	int giveAnnuities()
 	{
+		//If they're out of lives, annuities are paused
+		if(lives <= 0)
+			return 0;
 		int totalPayout = 0;
 		//Run through the iterator and tally up the payments
 		ListIterator<MutablePair<Integer, Integer>> iterator = annuities.listIterator();
