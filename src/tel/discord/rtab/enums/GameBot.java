@@ -28,7 +28,7 @@ public enum GameBot
 	BOT20("-21","Frank BOTzo",null),
 	BOT21("-22","Glitter","104985399826370560"),
 	BOT22("-23","Gray Sabot",null),
-	BOT23("-24","Hagstomper",null),
+	BOT23("-24","Julie!BOT",null),
 	BOT24("-25","Hellefleur",null),
 	BOT25("-26","Heretik",null),
 	BOT26("-27","HexaBOTic",null),
