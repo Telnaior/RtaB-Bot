@@ -15,6 +15,7 @@ public enum Games implements WeightedSpace {
 	DOUBLE_ZERO     	(2,"Double Zero","00") { public MiniGame getGame() { return new DoubleZeroes(); } },						//Author: JerryEris
 	CALL_YOUR_SHOT		(2,"Call Your Shot","Call") { public MiniGame getGame() { return new CallYourShot(); } },					//Author: JerryEris
 	OPENPASS			(2,"Open, Pass","Open") { public MiniGame getGame() { return new OpenPass(); } },							//Author: JerryEris
+	UP_AND_DOWN		(2,"Up And Down","Up") { public MiniGame getGame() { return new UpAndDown(); } },							//Author: JerryEris
 	SHUT_THE_BOX		(2,"Shut the Box","Shut") { public MiniGame getGame() { return new ShutTheBox(); } },						//Author: StrangerCoug
 	BOMB_ROULETTE		(2,"Bomb Roulette","Roulette") { public MiniGame getGame() { return new BombRoulette(); } },				//Author: StrangerCoug
 	HI_LO_DICE			(2,"Hi/Lo Dice","Hi/Lo") { public MiniGame getGame() { return new HiLoDice(); } },							//Author: StrangerCoug
