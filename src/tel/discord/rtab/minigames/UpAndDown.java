@@ -1,6 +1,5 @@
 package tel.discord.rtab.minigames;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -15,10 +14,11 @@ public class UpAndDown implements MiniGame {
 	int[] curMulti = {-100, 100, 100, 150, 200};
 	int[] multiChange = {100, 200, 300, 500, 2000};
 	String[] alphabet = {"A", "B", "C", "D", "E"};
-	final List<Integer> shuffleResult = Arrays.asList(0, 1, 2, 3, 4); //Reds
+	List<Integer> shuffleResult = Arrays.asList(0, 1, 2, 3, 4); //Reds
 
 	int roundNum;
 	int yourChoice;
+	int baseMultiplier;
 	int total;
 	boolean alive;
 	
@@ -34,32 +34,18 @@ public class UpAndDown implements MiniGame {
 		LinkedList<String> output = new LinkedList<>();
 		alive = true;
 		roundNum = 0;
-		for (int j=0; j<5; j++)
-		{
-			dollarValues[j] = dollarValues[j] + dollarChange[j];
-			dollarChange[j] = dollarChange[j] + (5 * curMulti[j]);
-			for (int k=0; k<j; k++)
-			{
-				if (dollarChange[k] > dollarChange[j])
-				{
-					dollarChange[j] = (int)(dollarChange[k] * .95);
-				}
-			}
-			curMulti[j] = curMulti[j] + multiChange[j];
-			multiChange[j] = multiChange[j] - (int)((5.5 - j) * ((int)(Math.random()*126) + 125));
-		}
-		if (curMulti[4] < 400)
-		{
-			curMulti[4] = 400;
-		}
-		total = 1000;
+		//This first one doesn't actually set up the values, just the initial multipliers
+		updateValues();
+		total = 1000 * baseMultiplier;
 		//Display instructions
 		output.add("In Up And Down, you can win **unlimited** money! But with that potential comes big risk, too.");
-		output.add(String.format("You'll start with **$%,d**. We'll put five dollar amounts in envelopes, and shuffle them up.",1_000));
+		output.add(String.format("You'll start with **$%,d**. We'll put five dollar amounts in envelopes, and shuffle them up.",total));
 		output.add("After each pick, the lowest money amount will get lower, the highest money amount will get higher, and the others will change as well.");
-		output.add("They will start by rising, but the further you get into the game, the lower they get, and soon all but the high value will become negativ.!");
+		output.add("They will start by rising, but the further you get into the game, the lower they get, and soon all but the high value will become negative!");
 		output.add("The game ends when you choose to stop, or when your bank becomes negative. In either case, you'll leave with your bank.");
 		output.add("With that said, please pick envelope **A**, **B**, **C**, **D**, or **E** to begin, and **STOP** when you're satisfied!");
+		roundNum++;
+		updateValues();
 		output.add(generateBoard());
 		return output;
 	}
@@ -108,7 +94,7 @@ public class UpAndDown implements MiniGame {
 			if (total + dollarValues[j] < 0)
 			{
 				output.add("...");
-				j = 4;
+				break;
 			}
 		}
 		total = total + dollarValues[shuffleResult.get(yourChoice)];
@@ -128,20 +114,20 @@ public class UpAndDown implements MiniGame {
 		else
 		{
 			output.add("Let's change the values and see if you want to play another round!");
+			roundNum++;
+			updateValues();
 			output.add(generateBoard());
 			output.add("Will you pick envelope **A**, **B**, **C**, **D**, or **E**, or will you **STOP** with your bank?");
 		}
 		return output;
 	}
 	
-	String generateBoard()
+	void updateValues()
 	{
-		roundNum++;
-		Collections.shuffle(shuffleResult);
 		for (int j=0; j<5; j++)
 		{
-			dollarValues[j] = dollarValues[j] + dollarChange[j];
-			dollarChange[j] = dollarChange[j] + (5 * curMulti[j]);
+			dollarValues[j] += dollarChange[j] * baseMultiplier;
+			dollarChange[j] += 5 * curMulti[j];
 			for (int k=0; k<j; k++)
 			{
 				if (dollarChange[k] > dollarChange[j])
@@ -156,11 +142,16 @@ public class UpAndDown implements MiniGame {
 		{
 			curMulti[4] = 400;
 		}
+	}
+	
+	String generateBoard()
+	{
+		Collections.shuffle(shuffleResult);
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
 		display.append(" Up And Down \n\n");
 		display.append("Round " + roundNum + "\n");
-		display.append(String.format("TOTAL: $%,d.\nVALUES: ",total));
+		display.append(String.format("TOTAL: $%,d\nVALUES: ",total));
 		//Next display how many of each we have, and our total
 		for(int i=0; i<4; i++)
 		{
@@ -206,12 +197,7 @@ public class UpAndDown implements MiniGame {
 	@Override
 	public String getBotPick()
 	{
-		//ArrayList<Integer> openSpaces = new ArrayList<>(BOARD_SIZE);
-		//for(int i=0; i<BOARD_SIZE; i++)
-		//	if(!pickedSpaces[i])
-		//		openSpaces.add(i+1);
-		//return String.valueOf(openSpaces.get((int)(Math.random()*openSpaces.size())));
-		var willStop = false;
+		boolean willStop = false;
 		for (int j=0; j<4; j++)
 		{
 			if (total + dollarValues[j] < 0)
