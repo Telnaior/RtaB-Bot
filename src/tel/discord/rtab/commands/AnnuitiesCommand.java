@@ -65,7 +65,7 @@ public class AnnuitiesCommand extends ParsingCommand {
 						StringBuilder output = new StringBuilder().append("```\nYOUR ANNUITIES:\n");
 						if(annuities.size() == 0)
 						{
-							output.append("You have no annuities.\n.");
+							output.append("You have no annuities.\n");
 						}
 						else
 						{
