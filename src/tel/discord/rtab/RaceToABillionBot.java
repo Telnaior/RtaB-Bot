@@ -17,6 +17,7 @@ import tel.discord.rtab.commands.*;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.jagrosh.jdautilities.examples.command.PingCommand;
 
 public class RaceToABillionBot
 {
@@ -47,7 +48,7 @@ public class RaceToABillionBot
 							//SBC Commands
 							new ReadyCommand(), new BetCommand(), new ViewBetsCommand(), new BetRankCommand(), new BetTopCommand(),
 							//Mod Commands
-							new PingBotCommand(), new StartCommand(), new ResetCommand(),
+							new PingCommand(), new StartCommand(), new ResetCommand(),
 							new ReconnectCommand(), new ReloadCommand(), new ViewBombsCommand(), new ViewConnectionsCommand(),
 							new ShutdownBotCommand(), new AddBotCommand(), new DemoCommand(),
 							//Joke Commands
