@@ -183,7 +183,6 @@ public class MoneyCards implements MiniGame {
 					} else {
 						canChangeCard = false;
 					}
-					output.add(String.format("You now have $%,d.", score));
 				}
 			}
 		}
@@ -195,6 +194,7 @@ public class MoneyCards implements MiniGame {
 		StringBuilder display = new StringBuilder();
 		display.append("```\n");
 		display.append("MONEY CARDS\n");
+		display.append("$" + String.format("%,10d", score) + "\n\n");
 		display.append(printBoardRow(6, 7));
 		display.append(printBoardRow(3, 6));
 		display.append(printBoardRow(0, 3));
