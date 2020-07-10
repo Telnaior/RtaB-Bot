@@ -145,13 +145,13 @@ public class MoneyCards implements MiniGame {
 				output.add("...and it is a" + (firstRank==CardRank.ACE
 						|| firstRank==CardRank.EIGHT ? "n" : "") + " **" + layout[stage+1].toString()
 						+ "**" + (isCorrect ? "!" : "."));
-
-				output.add(generateBoard());
-				stage++;
 				
 				if (isCorrect)
 					score += bet;
 				else score -= bet;
+
+				output.add(generateBoard());
+				stage++;
 				
 				if (score == 0) {
 					if (stage > 3) {
@@ -258,31 +258,31 @@ public class MoneyCards implements MiniGame {
 	}
 
 	@Override
-	public String getBotPick() {
-		/* This is just for testing; it'll probably be a more interesting bot if
-		 * it's not *THAT* risk-averse :P */
-		switch (layout[stage].getRank()) {
+	public String getBotPick()
+	{
+		switch (layout[stage].getRank())
+		{
 			case DEUCE:
 				return score + " HIGHER";
-			case THREE: // deliberate fallthrough
-			case FOUR: // deliberate fallthrough
+			case THREE:
+			case FOUR:
 			case FIVE:
-				return minimumBet + " HIGHER";
-			case SIX: // deliberate fallthrough
+				return ((score+minimumBet)/2/betMultiple*betMultiple) + " HIGHER";
+			case SIX:
 			case SEVEN:
 				if (canChangeCard) return "CHANGE";
 				else return minimumBet + " HIGHER";
 			case EIGHT:
 				if (canChangeCard) return "CHANGE";
 				else return minimumBet + (Math.random() < 0.5 ? " HIGHER" : " LOWER");
-			case NINE: // deliberate fallthrough
+			case NINE:
 			case TEN:
 				if (canChangeCard) return "CHANGE";
 				else return minimumBet + " LOWER";
-			case JACK: // deliberate fallthrough
-			case QUEEN: // deliberate fallthrough
+			case JACK:
+			case QUEEN:
 			case KING:
-				return minimumBet + " LOWER";
+				return ((score+minimumBet)/2/betMultiple*betMultiple) + " LOWER";
 			case ACE:
 				return score + " LOWER";
 			default:
