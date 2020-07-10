@@ -11,14 +11,14 @@ public enum Games implements WeightedSpace {
 	MATH_TIME			(2,"Math Time","Math") { public MiniGame getGame() { return new MathTime(); } },							//Author: Atia
 	STRIKE_IT_RICH		(2,"Strike it Rich","Strike") { public MiniGame getGame() { return new StrikeItRich(); } },					//Author: Atia
 	DEAL_OR_NO_DEAL		(2,"Deal or No Deal","DoND") { public MiniGame getGame() { return new DealOrNoDeal(); } },					//Author: Atia
-	DOUBLE_TROUBLE		(2,"Double Trouble","Double") { public MiniGame getGame() { return new DoubleTrouble(); } },				//Author: JerryEris
+	DOUBLE_TROUBLE		(2,"Double Trouble","Trouble") { public MiniGame getGame() { return new DoubleTrouble(); } },				//Author: JerryEris
 	DOUBLE_ZERO     	(2,"Double Zero","00") { public MiniGame getGame() { return new DoubleZeroes(); } },						//Author: JerryEris
 	CALL_YOUR_SHOT		(2,"Call Your Shot","Call") { public MiniGame getGame() { return new CallYourShot(); } },					//Author: JerryEris
 	OPENPASS			(2,"Open, Pass","Open") { public MiniGame getGame() { return new OpenPass(); } },							//Author: JerryEris
 	UP_AND_DOWN			(2,"Up And Down","Up") { public MiniGame getGame() { return new UpAndDown(); } },							//Author: JerryEris
-	SHUT_THE_BOX		(2,"Shut the Box","Shut") { public MiniGame getGame() { return new ShutTheBox(); } },						//Author: StrangerCoug
+	SHUT_THE_BOX		(2,"Shut the Box","Box") { public MiniGame getGame() { return new ShutTheBox(); } },						//Author: StrangerCoug
 	BOMB_ROULETTE		(2,"Bomb Roulette","Roulette") { public MiniGame getGame() { return new BombRoulette(); } },				//Author: StrangerCoug
-	MONEY_CARDS			(2,"Money Cards","Money") {public MiniGame getGame() { return new MoneyCards(); } },						//Author: StrangerCoug
+	MONEY_CARDS			(2,"Money Cards","Cards") {public MiniGame getGame() { return new MoneyCards(); } },						//Author: StrangerCoug
 	FTROTS				(2,"For the Rest of the Season","FtRotS") {public MiniGame getGame() { return new FTROTS(); } },			//Author: Atia
 	//Games rotated out
 	THE_OFFER			(0,"The Offer","Offer") { public MiniGame getGame() { return new TheOffer(); }	},							//Author: Amy
