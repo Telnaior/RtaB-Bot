@@ -43,7 +43,7 @@ public class RaceToABillionBot
 							new FoldCommand(), new RepelCommand(), new BlammoCommand(), new DefuseCommand(),
 							new WagerCommand(), new BonusCommand(),
 							//Info Commands
-							new PlayersCommand(), new BoardCommand(), new TotalsCommand(), new NextCommand(),
+							new PlayersCommand(), new BoardCommand(), new TotalsCommand(), new NextCommand(), new AnnuitiesCommand(),
 							new LivesCommand(), new RankCommand(), new TopCommand(), new StatsCommand(), new HistoryCommand(),
 							//SBC Commands
 							new ReadyCommand(), new BetCommand(), new ViewBetsCommand(), new BetRankCommand(), new BetTopCommand(),
