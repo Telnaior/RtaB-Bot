@@ -8,7 +8,7 @@ import java.util.List;
 public class MathTime implements MiniGame {
 	static final String NAME = "Math Time";
 	static final boolean BONUS = false;
-	List<Integer> money = Arrays.asList(0,10000,20000,30000,50000,75000,100000);
+	List<Integer> money = Arrays.asList(0,10_000,25_000,50_000,75_000,100_000,150_000);
 	List<String> ops1 = Arrays.asList("+","+","+","+","+","-","-");
 	List<String> ops2 = Arrays.asList("x","x","x","x","/","/","/");
 	List<Integer> multis = Arrays.asList(1,2,3,4,5,7,10);
@@ -33,7 +33,7 @@ public class MathTime implements MiniGame {
 		Collections.shuffle(multis);
 		//Give instructions
 		output.add("In Math Time, you will pick five spaces that will, together, form an equation.");
-		output.add("If you pick well, you could win up to "+String.format("$%,d!",2_000_000*baseMultiplier));
+		output.add("If you pick well, you could win up to "+String.format("$%,d!",3_000_000*baseMultiplier));
 		output.add("But if things go poorly you could *lose* money in this minigame, so be careful.");
 		output.add("When you are ready, make your first pick from the money stage.");
 		stage = 1;
