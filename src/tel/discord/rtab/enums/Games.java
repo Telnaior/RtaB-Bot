@@ -18,8 +18,8 @@ public enum Games implements WeightedSpace {
 	UP_AND_DOWN			(2,"Up And Down","Up") { public MiniGame getGame() { return new UpAndDown(); } },							//Author: JerryEris
 	SHUT_THE_BOX		(2,"Shut the Box","Shut") { public MiniGame getGame() { return new ShutTheBox(); } },						//Author: StrangerCoug
 	BOMB_ROULETTE		(2,"Bomb Roulette","Roulette") { public MiniGame getGame() { return new BombRoulette(); } },				//Author: StrangerCoug
-	FTROTS				(2,"For the Rest of the Season","FtRotS") {public MiniGame getGame() { return new FTROTS(); } },			//Author: Atia
 	MONEY_CARDS			(2,"Money Cards","Money") {public MiniGame getGame() { return new MoneyCards(); } },						//Author: StrangerCoug
+	FTROTS				(2,"For the Rest of the Season","FtRotS") {public MiniGame getGame() { return new FTROTS(); } },			//Author: Atia
 	//Games rotated out
 	THE_OFFER			(0,"The Offer","Offer") { public MiniGame getGame() { return new TheOffer(); }	},							//Author: Amy
 	TRIPLE_PLAY			(0,"Triple Play","Triple") { public MiniGame getGame() { return new TriplePlay(); } },						//Author: Atia
