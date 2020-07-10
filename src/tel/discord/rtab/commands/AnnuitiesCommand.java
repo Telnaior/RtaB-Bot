@@ -62,7 +62,7 @@ public class AnnuitiesCommand extends ParsingCommand {
 						for(int j=1; j<annuityList.length; j+=2)
 							annuities.add(MutablePair.of(Integer.parseInt(annuityList[j-1]), Integer.parseInt(annuityList[j])));
 						//Start building our response
-						StringBuilder output = new StringBuilder().append("```\nYOUR ANNUITIES:\n");
+						StringBuilder output = new StringBuilder().append("```\n"+record[1]+"'s Annuities:\n");
 						if(annuities.size() == 0)
 						{
 							output.append("You have no annuities.\n");
