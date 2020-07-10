@@ -11,7 +11,7 @@ public class OpenPass implements MiniGame {
 	int total;
 	int placed;
 	int passed;
-	List<Integer> numbers = Arrays.asList(50,30,15,10,9,8,7,5,3,2,-1,-1,-1,-1,-1,-2,-2,-3,-3,-4);
+	List<Integer> numbers = Arrays.asList(50,30,15,10,9,8,7,5,3,2,-1,-1,-1,-1,-1,-1,-1,-2,-3,-4);
 	// -1 = Times, -2 = Divided by, 3 = Plus, 4 = Minus
 	int[] openedCards;
 	int[] equation;
