@@ -24,7 +24,7 @@ public enum PrizeType {
 	HUNTER    (   22475,"Superportal codes"), //Aaron and Atia
 	FEUD      (   20000,"Fast Money"), //MattR
 	DEFBOMB   (  250000,"a defused bomb"), //Jumble
-	JOKERSIKE (      20,"a fake Joker"), //Lavina ($1 is too low)
+	JOKERSIKE (       1,"a fake Joker"), //Lavina
 	STCHARLES (     140,"a trip to St. Charles Place"), //MattR
 	SNOOKER   (     147,"a snooker table"), //KP
 	DARTBOARD (     180,"a dartboard"), //KP

@@ -13,7 +13,7 @@ public class DoubleZeroes implements MiniGame {
 	int digitsPicked;
 	int zeroesLeft;
 	int perZeroPrice;
-	List<Integer> numbers = Arrays.asList(-1,-1,-1,-1,-1,0,1,2,3,4,5,6,7,8,9);
+	List<Integer> numbers = Arrays.asList(-1,-1,-1,-1,-1,0,1,2,3,4,5,6,7,8,9,1,3,5,7,9);
 	// -1 = Double Zero
 	boolean alive;
 	boolean[] pickedSpaces;
@@ -31,8 +31,8 @@ public class DoubleZeroes implements MiniGame {
 		this.baseMultiplier = baseMultiplier;
 		perZeroPrice = 4*baseMultiplier;
 		//Pick five random digits to be added to the board
-		for(int i=0; i<5; i++)
-			numbers.add((int)(Math.random()*10));
+		for(int i=15; i<19; i++)
+			numbers.set(i,(int)(Math.random()*10));
 		alive = true;
 		total = 0;
 		digitsPicked = 0;

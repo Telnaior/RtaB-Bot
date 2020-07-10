@@ -22,7 +22,7 @@ public enum GameBot
 	BOT14("-15","DustWitch",null),
 	BOT15("-16","East BOT",null),
 	BOT16("-17","ElectroJag",null),
-	BOT17("-18","Evenkill",null),
+	BOT17("-18","Evenkill","405868705126285322"),
 	BOT18("-19","Fated to Glory",null),
 	BOT19("-20","Fishbait",null),
 	BOT20("-21","Frank BOTzo",null),
