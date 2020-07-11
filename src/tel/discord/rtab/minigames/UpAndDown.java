@@ -12,7 +12,7 @@ public class UpAndDown implements MiniGame {
 	int[] dollarValues = new int[BOARD_SIZE];
 	int[] dollarChange = new int[BOARD_SIZE];
 	int[] curMulti = {-100, 100, 100, 150, 200};
-	int[] multiChange = {100, 200, 300, 500, 2000};
+	int[] multiChange = {150, 300, 450, 550, 1750};
 	String[] alphabet = {"A", "B", "C", "D", "E"};
 	List<Integer> shuffleResult = Arrays.asList(0, 1, 2, 3, 4); //Reds
 
@@ -212,6 +212,10 @@ public class UpAndDown implements MiniGame {
 		{
 			willStop = true;
 		}
+		if (roundNum < 4)
+		{
+			willStop = false;
+		}		
 		if (willStop)
 		{
 			return "STOP";
