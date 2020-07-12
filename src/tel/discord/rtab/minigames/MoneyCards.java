@@ -142,8 +142,8 @@ public class MoneyCards implements MiniGame {
 				isCorrect = (firstRank.getValue(true) < secondRank.getValue(true) && betOnHigher)
 						|| (firstRank.getValue(true) > secondRank.getValue(true) && !betOnHigher);
 				
-				output.add("...and it is a" + (firstRank==CardRank.ACE
-						|| firstRank==CardRank.EIGHT ? "n" : "") + " **" + layout[stage+1].toString()
+				output.add("...and it is a" + (secondRank==CardRank.ACE
+						|| secondRank==CardRank.EIGHT ? "n" : "") + " **" + layout[stage+1].toString()
 						+ "**" + (isCorrect ? "!" : "."));
 				
 				if (isCorrect)
