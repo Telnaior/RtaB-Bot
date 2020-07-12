@@ -50,7 +50,7 @@ public class MoneyCards implements MiniGame {
 				+ String.format("$%,d to your bankroll for the next three cards.", addOn));
 		output.add(String.format("The minimum bet is $%,d until you reach ",minimumBet)
 				+ "the top card, the Big Bet. There, you must risk at least half of "
-				+ String.format("your money. Bets must be in multiples of $%,d",betMultiple)
+				+ String.format("your money. Bets must be in multiples of $%,d ",betMultiple)
 				+ "except that you can always bet exactly half on the Big Bet.");
 		output.add("If you run out of money on the bottom row, we'll move the last card "
 				+ "revealed card from there to the base card in the middle row and " 
