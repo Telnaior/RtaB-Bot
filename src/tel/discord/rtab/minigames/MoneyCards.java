@@ -74,12 +74,16 @@ public class MoneyCards implements MiniGame {
 			if (canChangeCard) {
 				canChangeCard = false;
 				Card oldCard = layout[stage];
+				CardRank oldRank = oldCard.getRank();
 				changeCard();
 				Card newCard = layout[stage];
+				CardRank newRank = newCard.getRank();
 				
-				output.add("Alright then. The " + oldCard.toString() + " now becomes...");
+				output.add("Alright then. The " + oldRank.getName() + " now becomes...");
 				output.add(generateBoard());
-				output.add("...a **" + newCard.toString() + "**.");
+				output.add("...a" + (newRank==CardRank.ACE
+						|| newRank==CardRank.EIGHT ? "n" : "")
+						+ " **" + newCard.toString() + "**.");
 			}
 			else {
 				output.add("You can't change your card right now.");
@@ -123,9 +127,10 @@ public class MoneyCards implements MiniGame {
 			}
 			
 			else {
-				String message = String.format("Wagering $%,d that the next card is ", bet);
 				CardRank firstRank = layout[stage].getRank(), secondRank;
 				boolean isCorrect;
+				
+				String message = String.format("Wagering $%,d that the next card is ", bet);
 				
 				if (betOnHigher)
 					message += "higher";
@@ -133,7 +138,7 @@ public class MoneyCards implements MiniGame {
 				
 				message += " than a" + (firstRank==CardRank.ACE
 						|| firstRank==CardRank.EIGHT ? "n" : "")
-						+ " " + layout[stage].getRank().getName() + "...";
+						+ " " + firstRank.getName() + "...";
 				output.add(message);
 				
 				// Flip the card
