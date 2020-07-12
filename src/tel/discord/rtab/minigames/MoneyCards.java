@@ -170,13 +170,14 @@ public class MoneyCards implements MiniGame {
 					if (stage % 3 == 0) {
 						message = "We now move your card up to the next row ";
 						if (stage == 3) {
-							message += String.format("and give you another $%,d", addOn);
+							message += String.format("and give you another $%,d.", addOn);
 							score += addOn;
 						} else { // meaning we're at the Big Bet
 							minimumBet = score / 2;
 							message += "for the Big Bet. You must wager at least " +
 									String.format("$%,d on this last card.", minimumBet);
 						}
+						message += " You may CHANGE your card if you wish.";
 						output.add(message);
 						output.add(generateBoard());
 						canChangeCard = true;
