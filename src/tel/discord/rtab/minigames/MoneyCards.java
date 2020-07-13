@@ -122,7 +122,6 @@ public class MoneyCards implements MiniGame {
 					message += String.format("unless you want to make the $%,d"
 							+ " minimum wager for the Big Bet", minimumBet);
 				message += ".";
-				output.add(generateBoard());
 				output.add(message);
 			}
 			
