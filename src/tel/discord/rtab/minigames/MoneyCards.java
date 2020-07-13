@@ -80,10 +80,10 @@ public class MoneyCards implements MiniGame {
 				CardRank newRank = newCard.getRank();
 				
 				output.add("Alright then. The " + oldRank.getName() + " now becomes...");
-				output.add(generateBoard());
 				output.add("...a" + (newRank==CardRank.ACE
 						|| newRank==CardRank.EIGHT ? "n" : "")
 						+ " **" + newCard.toString() + "**.");
+				output.add(generateBoard());
 			}
 			else {
 				output.add("You can't change your card right now.");
