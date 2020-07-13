@@ -52,7 +52,7 @@ public class MoneyCards implements MiniGame {
 				+ "the top card, the Big Bet. There, you must risk at least half of "
 				+ String.format("your money. Bets must be in multiples of $%,d ",betMultiple)
 				+ "except that you can always bet exactly half on the Big Bet.");
-		output.add("If you run out of money on the bottom row, we'll move the last card "
+		output.add("If you run out of money on the bottom row, we'll move the last "
 				+ "revealed card from there to the base card in the middle row and " 
 				+ String.format("give you the $%,d. If you run out of money ", addOn)
 				+ "after the base card in the middle row, however, the game is over.");
