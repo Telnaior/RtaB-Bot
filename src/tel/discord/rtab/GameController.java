@@ -2351,7 +2351,7 @@ public class GameController
 				}
 				else
 				{
-					resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*multiplier));
+					resultString.append(String.format("Game Over. You won **$%,d**",moneyWon));
 					if(multiplier > 1)
 						resultString.append(String.format(" times %d copies",multiplier));
 					resultString.append("...");
@@ -2385,9 +2385,9 @@ public class GameController
 			}
 			else
 			{
-				resultString.append(String.format("Game Over. You won **$%,d**",moneyWon*multiplier));
+				resultString.append(String.format("Game Over. You won **$%,d**",moneyWon));
 				if(multiplier > 1)
-					resultString.append(String.format(" times %d copies!",multiplier));
+					resultString.append(String.format(" times %d copies, for a total of **$%,d**!",multiplier,multiplier*moneyWon));
 				else
 					resultString.append(".");
 			}
