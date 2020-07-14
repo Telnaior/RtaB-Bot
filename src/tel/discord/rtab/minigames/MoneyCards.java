@@ -50,9 +50,9 @@ public class MoneyCards implements MiniGame {
 				+ String.format("$%,d to your bankroll for the next three cards.", addOn));
 		output.add(String.format("The minimum bet is $%,d until you reach ",minimumBet)
 				+ "the top card, the Big Bet. There, you must risk at least half of "
-				+ String.format("your money. Bets must be in multiples of $%,d",betMultiple)
+				+ String.format("your money. Bets must be in multiples of $%,d ",betMultiple)
 				+ "except that you can always bet exactly half on the Big Bet.");
-		output.add("If you run out of money on the bottom row, we'll move the last card "
+		output.add("If you run out of money on the bottom row, we'll move the last "
 				+ "revealed card from there to the base card in the middle row and " 
 				+ String.format("give you the $%,d. If you run out of money ", addOn)
 				+ "after the base card in the middle row, however, the game is over.");
@@ -74,12 +74,16 @@ public class MoneyCards implements MiniGame {
 			if (canChangeCard) {
 				canChangeCard = false;
 				Card oldCard = layout[stage];
+				CardRank oldRank = oldCard.getRank();
 				changeCard();
 				Card newCard = layout[stage];
+				CardRank newRank = newCard.getRank();
 				
-				output.add("Alright then. The " + oldCard.toString() + " now becomes...");
+				output.add("Alright then. The " + oldRank.getName() + " now becomes...");
+				output.add("...a" + (newRank==CardRank.ACE
+						|| newRank==CardRank.EIGHT ? "n" : "")
+						+ " **" + newCard.toString() + "**.");
 				output.add(generateBoard());
-				output.add("...a **" + newCard.toString() + "**.");
 			}
 			else {
 				output.add("You can't change your card right now.");
@@ -118,14 +122,14 @@ public class MoneyCards implements MiniGame {
 					message += String.format("unless you want to make the $%,d"
 							+ " minimum wager for the Big Bet", minimumBet);
 				message += ".";
-				output.add(generateBoard());
 				output.add(message);
 			}
 			
 			else {
-				String message = String.format("Wagering $%,d that the next card is ", bet);
 				CardRank firstRank = layout[stage].getRank(), secondRank;
 				boolean isCorrect;
+				
+				String message = String.format("Wagering $%,d that the next card is ", bet);
 				
 				if (betOnHigher)
 					message += "higher";
@@ -133,7 +137,7 @@ public class MoneyCards implements MiniGame {
 				
 				message += " than a" + (firstRank==CardRank.ACE
 						|| firstRank==CardRank.EIGHT ? "n" : "")
-						+ " " + layout[stage].getRank().getName() + "...";
+						+ " " + firstRank.getName() + "...";
 				output.add(message);
 				
 				// Flip the card
@@ -142,8 +146,8 @@ public class MoneyCards implements MiniGame {
 				isCorrect = (firstRank.getValue(true) < secondRank.getValue(true) && betOnHigher)
 						|| (firstRank.getValue(true) > secondRank.getValue(true) && !betOnHigher);
 				
-				output.add("...and it is a" + (firstRank==CardRank.ACE
-						|| firstRank==CardRank.EIGHT ? "n" : "") + " **" + layout[stage+1].toString()
+				output.add("...and it is a" + (secondRank==CardRank.ACE
+						|| secondRank==CardRank.EIGHT ? "n" : "") + " **" + layout[stage+1].toString()
 						+ "**" + (isCorrect ? "!" : "."));
 				
 				if (isCorrect)
@@ -170,13 +174,14 @@ public class MoneyCards implements MiniGame {
 					if (stage % 3 == 0) {
 						message = "We now move your card up to the next row ";
 						if (stage == 3) {
-							message += String.format("and give you another $%,d", addOn);
+							message += String.format("and give you another $%,d.", addOn);
 							score += addOn;
 						} else { // meaning we're at the Big Bet
 							minimumBet = score / 2;
 							message += "for the Big Bet. You must wager at least " +
 									String.format("$%,d on this last card.", minimumBet);
 						}
+						message += " You may CHANGE your card if you wish.";
 						output.add(message);
 						output.add(generateBoard());
 						canChangeCard = true;
