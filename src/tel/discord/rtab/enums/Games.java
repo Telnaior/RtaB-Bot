@@ -44,8 +44,7 @@ public enum Games implements WeightedSpace {
 		shortName = miniName;
 		weight = valueWeight; 
 	}
-	@Override
-	public String toString()
+	public String getName()
 	{
 		return fullName;
 	}

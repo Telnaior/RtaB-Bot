@@ -296,4 +296,10 @@ public class MoneyCards implements MiniGame {
 		}
 	}
 	
+	@Override
+	public String toString()
+	{
+		return NAME;
+	}
+	
 }

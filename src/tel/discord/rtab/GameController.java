@@ -1401,7 +1401,7 @@ public class GameController
 		Games gameFound = gameboard.gameBoard.get(location);
 		getCurrentPlayer().games.add(gameFound);
 		getCurrentPlayer().games.sort(null);
-		return ("It's a minigame, **" + gameFound + "**!");
+		return ("It's a minigame, **" + gameFound.getName() + "**!");
 	}
 	
 	private void startBlammo(boolean mega)
@@ -1515,7 +1515,7 @@ public class GameController
 						getCurrentPlayer().money *= 0.9;
 						getCurrentPlayer().splitAndShare = false;
 					}
-					if(getCurrentPlayer().jackpot >= 0)
+					if(getCurrentPlayer().jackpot > 0)
 					{
 						channel.sendMessage(String.format("Oh, %1$s had a jackpot? More like an ANTI-JACKPOT! "+
 								"**MINUS $%2$,d,000,000** for you!", getCurrentPlayer().name, getCurrentPlayer().jackpot))
