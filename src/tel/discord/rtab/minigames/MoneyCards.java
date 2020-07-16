@@ -115,6 +115,10 @@ public class MoneyCards implements MiniGame {
 			output.add(String.format("Wagering $%,d on what?", Integer.parseInt(pick)));
 		}
 		
+		else if (pick.toUpperCase().equals("ALL IN") || pick.toUpperCase().equals("ALL-IN")) {
+			output.add("Going all in on what?");
+		}
+		
 		else {
 			String[] tokens = pick.split("\\s");
 			
