@@ -45,7 +45,8 @@ public class MoneyCards implements MiniGame {
 		output.add(String.format("You start with a stake of $%,d, with ",startingMoney)
 				+ "which you must bet on the three cards after your base card in the "
 				+ "bottom row. To bet, type the amount you'd like to wager (without the "
-				+ "dollar sign or commas) followed by HIGHER or LOWER.");
+				+ "dollar sign or commas) along with HIGHER or LOWER. If you would like "
+				+ "to bet everything, you can type ALL-IN along with your call.");
 		output.add("After you clear the bottom row, we will add another "
 				+ String.format("$%,d to your bankroll for the next three cards.", addOn));
 		output.add(String.format("The minimum bet is $%,d until you reach ",minimumBet)
@@ -70,6 +71,21 @@ public class MoneyCards implements MiniGame {
 	public LinkedList<String> playNextTurn(String pick) {
 		LinkedList<String> output = new LinkedList<>();
 		
+		// Handle the "all-in" alias
+		if (pick.toUpperCase().equals("ALL IN HIGHER")
+				|| pick.toUpperCase().equals("ALL-IN HIGHER")
+				|| pick.toUpperCase().equals("HIGHER ALL IN")
+				|| pick.toUpperCase().equals("HIGHER ALL-IN")) {
+			return playNextTurn(score + " HIGHER");
+		}
+		
+		if (pick.toUpperCase().equals("ALL IN LOWER")
+				|| pick.toUpperCase().equals("ALL-IN LOWER")
+				|| pick.toUpperCase().equals("LOWER ALL IN")
+				|| pick.toUpperCase().equals("LOWER ALL-IN")) {
+			return playNextTurn(score + " LOWER");
+		}
+		
 		if (pick.toUpperCase().equals("CHANGE")) {
 			if (canChangeCard) {
 				canChangeCard = false;
@@ -90,15 +106,30 @@ public class MoneyCards implements MiniGame {
 			}
 		}
 		
+		// Bot snark time :P
 		else if (pick.toUpperCase().equals("HIGHER") || pick.toUpperCase().equals("LOWER")) {
-			// Bot snark time :P
 			output.add("You must wager something.");
+		}
+		
+		else if (isNumber(pick)) {
+			output.add(String.format("Wagering $%,d on what?", Integer.parseInt(pick)));
+		}
+		
+		else if (pick.toUpperCase().equals("ALL IN") || pick.toUpperCase().equals("ALL-IN")) {
+			output.add("Going all in on what?");
 		}
 		
 		else {
 			String[] tokens = pick.split("\\s");
 			
 			// Check to make sure it's a string we can deal with
+			if (tokens.length == 2 && ((tokens[0].toUpperCase().equals("HIGHER")
+					|| tokens[0].toUpperCase().equals("LOWER"))) && isNumber(tokens[1])) {
+				String temp = tokens[1];
+				tokens[1] = tokens[0];
+				tokens[0] = temp;
+			}
+			
 			if (tokens.length != 2 || !isNumber(tokens[0])
 					|| !(tokens[1].toUpperCase().equals("HIGHER")
 					|| tokens[1].toUpperCase().equals("LOWER")))
