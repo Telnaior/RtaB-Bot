@@ -106,9 +106,13 @@ public class MoneyCards implements MiniGame {
 			}
 		}
 		
+		// Bot snark time :P
 		else if (pick.toUpperCase().equals("HIGHER") || pick.toUpperCase().equals("LOWER")) {
-			// Bot snark time :P
 			output.add("You must wager something.");
+		}
+		
+		else if (isNumber(pick)) {
+			output.add(String.format("Wagering $%,d on what?", Integer.parseInt(pick)));
 		}
 		
 		else {
