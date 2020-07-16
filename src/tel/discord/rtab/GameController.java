@@ -2129,7 +2129,7 @@ public class GameController
 					gameMessage.append(", you've unlocked a bonus game: ");
 				else
 					gameMessage.append(", time for your next minigame: ");
-				gameMessage.append(nextGame + "!");
+				gameMessage.append(nextGame.getName() + "!");
 				channel.sendMessage(gameMessage).queue();
 			}
 			startMiniGame(currentGame);
