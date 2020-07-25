@@ -156,6 +156,14 @@ public class MoneyCards implements MiniGame {
 				output.add(message);
 			}
 			
+			// Foolproofing so player is not certain to lose
+			else if (layout[stage].getRank()==CardRank.ACE && betOnHigher) {
+				output.add("There are no cards in the deck higher than an Ace.");
+			}
+			else if (layout[stage].getRank()==CardRank.DEUCE && !betOnHigher) {
+				output.add("There are no cards in the deck lower than a Deuce.");
+			}
+			
 			else {
 				CardRank firstRank = layout[stage].getRank(), secondRank;
 				boolean isCorrect;
