@@ -113,8 +113,11 @@ public class OpenPass implements MiniGame {
 			{
 				output.add("***x***! We'll keep that operator as part of the equation.");
 				equation[equPart] = -1;
-				equPart++;
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPart++;				
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 			}
@@ -122,8 +125,11 @@ public class OpenPass implements MiniGame {
 			{
 				output.add("***+***. We'll keep that operator as part of the equation.");
 				equation[equPart] = -3;
-				equPart++;
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPart++;				
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 			}
@@ -132,8 +138,11 @@ public class OpenPass implements MiniGame {
 				output.add("***x***! We'll replace the previous operator with that one.");
 				equation[equPart] = -1;
 				equPart++;				
-				equPartReal--;	
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPartReal--;					
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 			}
@@ -141,8 +150,11 @@ public class OpenPass implements MiniGame {
 			{
 				equation[equPart] = -3;
 				equPart++;
-				equPartReal--;	
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPartReal--;					
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 				output.add("***+***. We'll replace the previous operator with that one.");
@@ -152,8 +164,11 @@ public class OpenPass implements MiniGame {
 				output.add("***/***. Unfortunately, we'll replace the previous operator with that one.");
 				equation[equPart] = -2;
 				equPart++;				
-				equPartReal--;	
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPartReal--;					
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 			}
@@ -162,8 +177,11 @@ public class OpenPass implements MiniGame {
 				output.add("***-***. Unfortunately, we'll replace the previous operator with that one.");
 				equation[equPart] = -4;
 				equPart++;				
-				equPartReal--;	
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPartReal--;					
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 			}
@@ -171,8 +189,11 @@ public class OpenPass implements MiniGame {
 			{
 				output.add("***/***. Unfortunately, that operator goes in the equation.");
 				equation[equPart] = -2;
-				equPart++;				
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPart++;								
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 			}
@@ -180,8 +201,11 @@ public class OpenPass implements MiniGame {
 			{
 				output.add("***-***. Unfortunately, that operator goes in the equation.");
 				equation[equPart] = -4;
-				equPart++;				
-				equationReal[equPartReal] = equation[equPart - 1];
+				equPart++;								
+				if (equationReal[0] != 0)
+				{
+					equationReal[equPartReal] = equation[equPart - 1];
+				}
 				equPartReal++;
 				operators--;
 			}
