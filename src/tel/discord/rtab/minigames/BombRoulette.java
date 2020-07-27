@@ -96,7 +96,7 @@ public class BombRoulette implements MiniGame {
                 
         if (pick.toUpperCase().equals("STOP")) {
             // Prevent accidentally stopping with nothing if the player hasn't spun yet
-            if (bombSpaces == 1)
+            if (bombSpaces == 0)
                 return output;
             
             isAlive = false;
