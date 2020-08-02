@@ -150,7 +150,7 @@ public class MoneyCards implements MiniGame {
 				/* address the special case of the minimum bet during the Big Bet
 				 * not being a multiple of the original minimum bet */
 				if (minimumBet % betMultiple != 0)
-					message += String.format("unless you want to make the $%,d"
+					message += String.format(" unless you want to make the $%,d"
 							+ " minimum wager for the Big Bet", minimumBet);
 				message += ".";
 				output.add(message);
