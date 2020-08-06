@@ -989,7 +989,7 @@ public class GameController
 		if(spacesLeft < 0)
 			channel.sendMessage("An error has occurred, ending the game, @Atia#2084 fix pls").queue();
 		channel.sendMessage("Game Over.").completeAfter(3,TimeUnit.SECONDS);
-		currentBlammmo = false;
+		currentBlammo = false;
 		detonateBombs();
 		timer.schedule(() -> runNextEndGamePlayer(), 1, TimeUnit.SECONDS);
 	}
