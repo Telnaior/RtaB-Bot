@@ -999,12 +999,14 @@ public class GameController
 		if(location != boardSize)
 		{
 			channel.sendMessage("...").completeAfter(5,TimeUnit.SECONDS);
-			//Mock them appropriately if they self-bombed
-			if(getCurrentPlayer().knownBombs.get(0) == location)
-				channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
-			//Also mock them if they saw the bomb in a peek
-			else if(getCurrentPlayer().knownBombs.contains(location))
-				channel.sendMessage("As you know, it's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+			if(getCurrentPlayer().knownBombs.contains(location)) {
+				//Mock them appropriately if they self-bombed
+				if(getCurrentPlayer().knownBombs.get(0) == location)
+					channel.sendMessage("It's your own **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+				//Also mock them if they saw the bomb in a peek
+				else
+					channel.sendMessage("As you know, it's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
+			}
 			//Otherwise, just give them the dreaded words...
 			else
 				channel.sendMessage("It's a **BOMB**.").completeAfter(5,TimeUnit.SECONDS);
