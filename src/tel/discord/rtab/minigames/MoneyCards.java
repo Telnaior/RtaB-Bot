@@ -55,7 +55,7 @@ public class MoneyCards implements MiniGame {
 				+ "except that you can always bet exactly half on the Big Bet.");
 		output.add("If you run out of money on the bottom row, we'll move the last "
 				+ "revealed card from there to the base card in the middle row and " 
-				+ String.format("give you the $%,d. If you run out of money ", addOn)
+				+ String.format("give you the $%,d add-on. If you run out of money ", addOn)
 				+ "after the base card in the middle row, however, the game is over.");
 		output.add(String.format("But if you play your cards right, you could win up to $%,d!",
 				(int)Math.scalb(Math.scalb(startingMoney, 3) + addOn, 4)));
