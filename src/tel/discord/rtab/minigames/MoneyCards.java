@@ -201,11 +201,13 @@ public class MoneyCards implements MiniGame {
 						output.add("Sorry, but you have busted.");
 						isAlive = false;
 					} else {
-						firstRowBust = stage;
-						layout[3] = layout[stage];
-						isVisible[3] = true;
-						stage = 3;
 						output.add("You've run out of money, but that's OK this once.");
+						if (stage < 3) {
+							firstRowBust = stage;
+							layout[3] = layout[stage];
+							isVisible[3] = true;
+							stage = 3;
+						}
 					}
 				}
 				
