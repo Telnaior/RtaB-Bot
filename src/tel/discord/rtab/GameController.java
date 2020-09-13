@@ -2954,7 +2954,7 @@ public class GameController
 		int player = findPlayerInGame(bagger.getId());
 		//Check that the fold is valid (the game is running, they're alive, they have the command,
 		//it's their turn, and they haven't picked a space) (this is getting a little silly)
-		if(gameStatus != GameStatus.IN_PROGRESS || player != currentTurn || resolvingSpace
+		if(gameStatus != GameStatus.IN_PROGRESS || player != currentTurn || resolvingSpace || currentBlammo
 				|| players.get(player).status != PlayerStatus.ALIVE || players.get(player).hiddenCommand != HiddenCommand.BONUS)
 			return false;
 		//Cool, we're good, let them have it
